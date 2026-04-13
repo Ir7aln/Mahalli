@@ -7,16 +7,16 @@ import { useFieldArray, useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 
-type ClientOption = {
+interface ClientOption {
   label: string;
   value: string;
-};
+}
 
-type ProductOption = {
+interface ProductOption {
   label: string;
   value: string;
   price?: number;
-};
+}
 
 const { t, d, n } = useI18n();
 const { updateQueryParams } = useUpdateRouteQueryParams();
@@ -256,7 +256,9 @@ const onSubmit = handleSubmit(async (formValues) => {
                       :name="`items[${index}].product_id`"
                     >
                       <FormItem>
-                        <FormLabel class="md:hidden">{{ t("fields.name") }}</FormLabel>
+                        <FormLabel class="md:hidden">
+                          {{ t("fields.name") }}
+                        </FormLabel>
                         <FormControl>
                           <SearchList
                             :items="products"
@@ -274,7 +276,9 @@ const onSubmit = handleSubmit(async (formValues) => {
 
                     <FormField v-slot="{ componentField }" :name="`items[${index}].quantity`">
                       <FormItem>
-                        <FormLabel class="md:hidden">{{ t("fields.quantity") }}</FormLabel>
+                        <FormLabel class="md:hidden">
+                          {{ t("fields.quantity") }}
+                        </FormLabel>
                         <FormControl>
                           <Input v-bind="componentField" type="number" />
                         </FormControl>
@@ -283,7 +287,9 @@ const onSubmit = handleSubmit(async (formValues) => {
 
                     <FormField v-slot="{ componentField }" :name="`items[${index}].price`">
                       <FormItem>
-                        <FormLabel class="md:hidden">{{ t("fields.price") }}</FormLabel>
+                        <FormLabel class="md:hidden">
+                          {{ t("fields.price") }}
+                        </FormLabel>
                         <FormControl>
                           <Input v-bind="componentField" type="number">
                             <template #unite>

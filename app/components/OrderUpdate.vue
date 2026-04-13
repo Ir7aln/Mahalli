@@ -8,16 +8,16 @@ import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import { ORDER_STATUSES } from "@/consts";
 
-type ClientOption = {
+interface ClientOption {
   label: string;
   value: string;
-};
+}
 
-type ProductOption = {
+interface ProductOption {
   label: string;
   value: string;
   price?: number;
-};
+}
 
 const props = defineProps<{
   id: string;
@@ -321,7 +321,9 @@ function deleteOrderItem(index: number) {
                       :name="`items[${index}].product_id`"
                     >
                       <FormItem>
-                        <FormLabel class="md:hidden">{{ t("fields.name") }}</FormLabel>
+                        <FormLabel class="md:hidden">
+                          {{ t("fields.name") }}
+                        </FormLabel>
                         <FormControl>
                           <SearchList
                             :default-value="entry.value.name"
@@ -340,7 +342,9 @@ function deleteOrderItem(index: number) {
 
                     <FormField v-slot="{ componentField }" :name="`items[${index}].quantity`">
                       <FormItem>
-                        <FormLabel class="md:hidden">{{ t("fields.quantity") }}</FormLabel>
+                        <FormLabel class="md:hidden">
+                          {{ t("fields.quantity") }}
+                        </FormLabel>
                         <FormControl>
                           <Input v-bind="componentField" type="number" />
                         </FormControl>
@@ -349,7 +353,9 @@ function deleteOrderItem(index: number) {
 
                     <FormField v-slot="{ componentField }" :name="`items[${index}].price`">
                       <FormItem>
-                        <FormLabel class="md:hidden">{{ t("fields.price") }}</FormLabel>
+                        <FormLabel class="md:hidden">
+                          {{ t("fields.price") }}
+                        </FormLabel>
                         <FormControl>
                           <Input v-bind="componentField" type="number">
                             <template #unite>

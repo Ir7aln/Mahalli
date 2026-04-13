@@ -864,10 +864,7 @@ impl QueriesService {
                             inventory_transactions::Column::ProductId,
                         )),
                     )
-                    .cond_where(
-                        Expr::col((OrderItems, order_items::Column::OrderId))
-                            .eq(order_id),
-                    )
+                    .cond_where(Expr::col((OrderItems, order_items::Column::OrderId)).eq(order_id))
                     .to_owned()
                     .build(SqliteQueryBuilder);
 
