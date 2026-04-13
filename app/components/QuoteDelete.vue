@@ -39,9 +39,7 @@ async function deleteTheQuotes() {
 <template>
   <Card>
     <CardHeader>
-      <CardTitle>
-        {{ t("titles.quotes.delete") }}n° {{ identifier }} ?
-      </CardTitle>
+      <CardTitle> {{ t("titles.quotes.delete") }}n° {{ identifier }} ? </CardTitle>
     </CardHeader>
     <CardContent>
       <div />

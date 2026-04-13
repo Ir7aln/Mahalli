@@ -29,9 +29,7 @@ async function deleteTheInvoice() {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(
-      `ERROR DELETE INVOICE: ${err.error ? err.error : err.message}`
-    );
+    Logger.error(`ERROR DELETE INVOICE: ${err.error ? err.error : err.message}`);
   } finally {
     close();
   }
@@ -41,9 +39,7 @@ async function deleteTheInvoice() {
 <template>
   <Card>
     <CardHeader>
-      <CardTitle>
-        {{ t("titles.invoices.delete") }} n° {{ identifier }} ?
-      </CardTitle>
+      <CardTitle> {{ t("titles.invoices.delete") }} n° {{ identifier }} ? </CardTitle>
     </CardHeader>
     <CardContent>
       <div />

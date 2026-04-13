@@ -31,9 +31,7 @@ async function fetchQuotes() {
       args: {
         page: Number(queryParams.value.page) ?? 1,
         search: queryParams.value.search ?? "",
-        limit: queryParams.value.limit
-          ? Number(queryParams.value.limit)
-          : LIMIT,
+        limit: queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT,
         created_at: queryParams.value.created_at,
       },
     });
@@ -55,10 +53,7 @@ const quotes = computed<QuoteT[]>(() => quotesData.value?.quotes ?? []);
 const totalRows = computed<number>(() => quotesData.value?.count ?? 0);
 
 provide("count", totalRows);
-provide(
-  "itemsPerPage",
-  queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT
-);
+provide("itemsPerPage", queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT);
 
 const debouncedSearch = useDebounceFn(() => {
   updateQueryParams({ search: searchQuery.value });
@@ -68,9 +63,7 @@ watch(searchQuery, debouncedSearch);
 
 watch(created_at, () => {
   updateQueryParams({
-    created_at: created_at.value
-      ? new Date(created_at.value).toISOString()
-      : undefined,
+    created_at: created_at.value ? new Date(created_at.value).toISOString() : undefined,
   });
 });
 

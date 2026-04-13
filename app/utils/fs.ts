@@ -1,10 +1,4 @@
-import {
-  BaseDirectory,
-  exists,
-  mkdir,
-  readFile,
-  writeFile,
-} from "@tauri-apps/plugin-fs";
+import { BaseDirectory, exists, mkdir, readFile, writeFile } from "@tauri-apps/plugin-fs";
 import { appDataDir, join } from "@tauri-apps/api/path";
 import * as Logger from "@tauri-apps/plugin-log";
 
@@ -35,11 +29,7 @@ async function checkIfExistsInFs(fileOrFolder: string) {
   }
 }
 
-export async function uploadFileToDataDir(
-  folder: string,
-  bytes: Uint8Array,
-  name: string
-) {
+export async function uploadFileToDataDir(folder: string, bytes: Uint8Array, name: string) {
   try {
     await createFolder(folder);
     const path = await join(await appDataDir(), folder, name);
@@ -54,8 +44,7 @@ export async function uploadFileToDataDir(
 }
 
 export async function getFileBytes(path?: string) {
-  if (!path) 
-    return null;
+  if (!path) return null;
   try {
     const content = await readFile(path, {
       baseDir: BaseDirectory.Home,

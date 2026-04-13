@@ -52,24 +52,15 @@ const pages = ref([
         class="md:h-[700px] m-auto w-full max-w-3xl h-full p-3 gap-3 grid-cols-3 grid-rows-3 grid"
       >
         <ClientOnly>
-          <div
-            v-for="(page, index) in pages"
-            :key="index"
-            v-fade="index + 1"
-            class="w-full h-full"
-          >
-            <NuxtLink
-              :to="
-                localePath({ path: page.path, query: { page: 1, limit: 50 } })
-              "
-            >
+          <div v-for="(page, index) in pages" :key="index" v-fade="index + 1" class="w-full h-full">
+            <NuxtLink :to="localePath({ path: page.path, query: { page: 1, limit: 50 } })">
               <div
                 class="w-full h-full overflow-hidden cursor-pointer relative hover:-translate-y-1 group transition-all duration-250 flex justify-center rounded-md items-center bg-gray-400"
               >
                 <img
                   class="absolute top-0 left-0 w-full object-fill opacity-20 group-hover:opacity-60 h-full transition-all duration-250"
                   :src="page.image"
-                >
+                />
                 <span
                   class="text-center text-xl text-gray-900 font-bold bg-white rounded-md px-4 z-20 py-2 flex justify-center items-center transition-all duration-250"
                 >

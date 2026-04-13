@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import { invoke } from "@tauri-apps/api/core";
 import * as Logger from "@tauri-apps/plugin-log";
-import {
-  FilePenLine,
-  GripHorizontal,
-  NotepadText,
-  Printer,
-  Trash2,
-} from "lucide-vue-next";
+import { FilePenLine, GripHorizontal, NotepadText, Printer, Trash2 } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import { NuxtLink, OrderDelete, OrderUpdate } from "#components";
 import { ORDER_STATUSES, STATUS_COLORS } from "@/consts";
@@ -64,20 +58,15 @@ async function updateOrderStatus(id: string, status: string) {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(
-      `ERROR UPDATE ORDER STATUS: ${err.error ? err.error : err.message}`
-    );
+    Logger.error(`ERROR UPDATE ORDER STATUS: ${err.error ? err.error : err.message}`);
   }
 }
 
 async function createInvoiceFromOrder(id: string) {
   try {
-    const res = await invoke<Res<OrderForUpdateT>>(
-      "create_invoice_from_order",
-      {
-        id,
-      }
-    );
+    const res = await invoke<Res<OrderForUpdateT>>("create_invoice_from_order", {
+      id,
+    });
     //
     Logger.info(`CREATE INVOICE FROM ORDER: ${id}`);
     //
@@ -90,9 +79,7 @@ async function createInvoiceFromOrder(id: string) {
       }),
     });
   } catch (err: any) {
-    Logger.error(
-      `GET ORDER FOR INVOICE: ${err.error ? err.error : err.message}`
-    );
+    Logger.error(`GET ORDER FOR INVOICE: ${err.error ? err.error : err.message}`);
   }
 }
 </script>
@@ -151,9 +138,7 @@ async function createInvoiceFromOrder(id: string) {
                 </Button>
               </PopoverTrigger>
               <PopoverContent class="min-w-[13rem] p-2">
-                <ScrollArea
-                  :class="orderProducts.length > 16 ? 'h-[380px]' : 'h-fit'"
-                >
+                <ScrollArea :class="orderProducts.length > 16 ? 'h-[380px]' : 'h-fit'">
                   <table class="w-full not-default">
                     <thead>
                       <tr>
@@ -161,11 +146,7 @@ async function createInvoiceFromOrder(id: string) {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr
-                        v-for="(product, i) in orderProducts"
-                        :key="i"
-                        class="text-sm"
-                      >
+                      <tr v-for="(product, i) in orderProducts" :key="i" class="text-sm">
                         <td>
                           {{ product.name }}
                         </td>
@@ -195,12 +176,7 @@ async function createInvoiceFromOrder(id: string) {
               <PopoverTrigger as-child>
                 <Badge
                   variant="outline"
-                  :class="
-                    cn(
-                      'cursor-pointer whitespace-nowrap',
-                      STATUS_COLORS[order.status],
-                    )
-                  "
+                  :class="cn('cursor-pointer whitespace-nowrap', STATUS_COLORS[order.status])"
                 >
                   {{ t(`status.${order.status.toLowerCase()}`) }}
                 </Badge>
@@ -234,10 +210,7 @@ async function createInvoiceFromOrder(id: string) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent class="rtl:ml-6 ltr:mr-6">
                   <DropdownMenuItem @click="toggleThisOrder(order, 'update')">
-                    <FilePenLine
-                      :size="20"
-                      class="text-slate-800 inline mr-2"
-                    />
+                    <FilePenLine :size="20" class="text-slate-800 inline mr-2" />
                     {{ t("buttons.edit") }}
                   </DropdownMenuItem>
                   <DropdownMenuItem>
@@ -248,18 +221,16 @@ async function createInvoiceFromOrder(id: string) {
                         })
                       "
                     >
-                      <Printer
-                        :size="20"
-                        class="text-slate-800 inline mr-2"
-                      />{{ t("buttons.print") }}
+                      <Printer :size="20" class="text-slate-800 inline mr-2" />{{
+                        t("buttons.print")
+                      }}
                     </NuxtLink>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem @click="createInvoiceFromOrder(order.id!)">
-                    <NotepadText
-                      :size="20"
-                      class="text-slate-800 inline mr-2"
-                    />{{ t("buttons.to-invoice") }}
+                    <NotepadText :size="20" class="text-slate-800 inline mr-2" />{{
+                      t("buttons.to-invoice")
+                    }}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem @click="toggleThisOrder(order, 'delete')">

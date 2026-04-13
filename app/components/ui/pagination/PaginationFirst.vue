@@ -1,9 +1,5 @@
 <script setup lang="ts">
-import {
-  PaginationFirst,
-  type PaginationFirstProps,
-  useForwardProps,
-} from "radix-vue";
+import { PaginationFirst, type PaginationFirstProps, useForwardProps } from "radix-vue";
 import { ChevronsLeft } from "lucide-vue-next";
 
 const props = withDefaults(defineProps<PaginationFirstProps>(), {

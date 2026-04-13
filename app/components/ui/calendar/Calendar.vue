@@ -38,7 +38,7 @@ const props = withDefaults(
   {
     type: "single",
     columns: 1,
-  }
+  },
 );
 const emits = defineEmits<{
   (e: "update:modelValue", payload: typeof props.modelValue): void;
@@ -49,16 +49,12 @@ const modelValue = useVModel(props, "modelValue", emits, {
 
 const datePicker = ref<InstanceType<typeof DatePicker>>();
 // @ts-expect-error in this current version of v-calendar has the calendaRef instance, which is required to handle arrow nav.
-const calendarRef = computed<InstanceType<typeof Calendar>>(
-  () => datePicker.value?.calendarRef
-);
+const calendarRef = computed<InstanceType<typeof Calendar>>(() => datePicker.value?.calendarRef);
 
 function handleNav(direction: "prev" | "next") {
-  if (!calendarRef.value) 
-    return;
+  if (!calendarRef.value) return;
 
-  if (direction === "prev") 
-    calendarRef.value.movePrev();
+  if (direction === "prev") calendarRef.value.movePrev();
   else calendarRef.value.moveNext();
 }
 
@@ -71,7 +67,7 @@ onMounted(async () => {
 const $slots = useSlots();
 const vCalendarSlots = computed(() => {
   return Object.keys($slots)
-    .filter(name => isVCalendarSlot(name))
+    .filter((name) => isVCalendarSlot(name))
     .reduce((obj: Record<string, any>, key: string) => {
       obj[key] = $slots[key];
       return obj;
@@ -239,11 +235,14 @@ const vCalendarSlots = computed(() => {
 .calendar .vc-slide-down-leave-active,
 .calendar .vc-slide-fade-enter-active,
 .calendar .vc-slide-fade-leave-active {
-  transition: opacity var(--vc-slide-duration) var(--vc-slide-timing),
+  transition:
+    opacity var(--vc-slide-duration) var(--vc-slide-timing),
     -webkit-transform var(--vc-slide-duration) var(--vc-slide-timing);
-  transition: transform var(--vc-slide-duration) var(--vc-slide-timing),
+  transition:
+    transform var(--vc-slide-duration) var(--vc-slide-timing),
     opacity var(--vc-slide-duration) var(--vc-slide-timing);
-  transition: transform var(--vc-slide-duration) var(--vc-slide-timing),
+  transition:
+    transform var(--vc-slide-duration) var(--vc-slide-timing),
     opacity var(--vc-slide-duration) var(--vc-slide-timing),
     -webkit-transform var(--vc-slide-duration) var(--vc-slide-timing);
   -webkit-backface-visibility: hidden;

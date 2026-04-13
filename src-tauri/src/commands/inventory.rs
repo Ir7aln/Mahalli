@@ -1,17 +1,17 @@
-use serde_json::Value;
 use tauri::State;
 
-use service::{ListArgs, MutationsService, NewInventory, QueriesService};
+use service::{ListArgs, MutationsService, NewInventory, QueriesService, InventoryResponse};
 
 use crate::{commands::Fail, AppState};
 
-use super::{SResult, Seccess};
+use super::{SResult, Success};
 
 #[tauri::command]
-pub async fn list_inventory(state: State<'_, AppState>, args: ListArgs) -> SResult<Value> {
+#[specta::specta]
+pub async fn list_inventory(state: State<'_, AppState>, args: ListArgs) -> SResult<InventoryResponse> {
     let _ = state.db_conn;
     match QueriesService::list_inventory(&state.db_conn, args).await {
-        Ok(res) => Ok(Seccess {
+        Ok(res) => Ok(Success {
             error: None,
             message: None,
             data: Some(res),
@@ -24,13 +24,14 @@ pub async fn list_inventory(state: State<'_, AppState>, args: ListArgs) -> SResu
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn create_inventory(
     state: State<'_, AppState>,
     transaction: NewInventory,
 ) -> SResult<String> {
     let _ = state.db_conn;
     match MutationsService::create_inventory(&state.db_conn, transaction).await {
-        Ok(id) => Ok(Seccess::<String> {
+        Ok(id) => Ok(Success::<String> {
             error: None,
             message: Option::Some(String::from("inventory created successfully")),
             data: Some(id),
@@ -43,10 +44,11 @@ pub async fn create_inventory(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn delete_inventory(state: State<'_, AppState>, id: String) -> SResult<String> {
     let _ = state.db_conn;
     match MutationsService::delete_inventory(&state.db_conn, id).await {
-        Ok(_) => Ok(Seccess::<String> {
+        Ok(_) => Ok(Success::<String> {
             error: None,
             message: Option::Some(String::from("inventory deleted successfully")),
             data: None,

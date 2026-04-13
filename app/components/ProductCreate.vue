@@ -54,7 +54,7 @@ async function createNewProduct(product: ProductT) {
         ...product,
         image: image.value,
         quantity: quantity.value,
-      })}`
+      })}`,
     );
     //
     toast.success(t("notifications.product.created", { name: product.name }), {
@@ -69,9 +69,7 @@ async function createNewProduct(product: ProductT) {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(
-      `ERROR CREATE PRODUCT: ${err.error ? err.error : err.message}`
-    );
+    Logger.error(`ERROR CREATE PRODUCT: ${err.error ? err.error : err.message}`);
   } finally {
     close();
   }
@@ -122,9 +120,7 @@ function cleanImage() {
                 :placeholder="t('fields.purchase-price')"
                 v-bind="componentField"
               >
-                <template #unite>
-                  DH
-                </template>
+                <template #unite> DH </template>
               </Input>
             </FormControl>
           </FormItem>
@@ -133,14 +129,8 @@ function cleanImage() {
           <FormItem>
             <FormLabel>{{ t("fields.selling-price") }}</FormLabel>
             <FormControl>
-              <Input
-                type="number"
-                :placeholder="t('fields.selling-price')"
-                v-bind="componentField"
-              >
-                <template #unite>
-                  DH
-                </template>
+              <Input type="number" :placeholder="t('fields.selling-price')" v-bind="componentField">
+                <template #unite> DH </template>
               </Input>
             </FormControl>
           </FormItem>
@@ -149,11 +139,7 @@ function cleanImage() {
           <FormItem>
             <FormLabel>{{ t("fields.init-quantity") }}</FormLabel>
             <FormControl>
-              <Input
-                v-model="quantity"
-                type="number"
-                :placeholder="t('fields.init-quantity')"
-              >
+              <Input v-model="quantity" type="number" :placeholder="t('fields.init-quantity')">
                 <template #unite>
                   {{ t("fields.item") }}
                 </template>
@@ -165,11 +151,7 @@ function cleanImage() {
           <FormItem>
             <FormLabel>{{ t("fields.min-quantity") }}</FormLabel>
             <FormControl>
-              <Input
-                type="number"
-                :placeholder="t('fields.min-quantity')"
-                v-bind="componentField"
-              >
+              <Input type="number" :placeholder="t('fields.min-quantity')" v-bind="componentField">
                 <template #unite>
                   {{ t("fields.item") }}
                 </template>
@@ -183,10 +165,7 @@ function cleanImage() {
               {{ t("fields.description") }}
             </FormLabel>
             <FormControl>
-              <Textarea
-                :placeholder="t('fields.description')"
-                v-bind="componentField"
-              />
+              <Textarea :placeholder="t('fields.description')" v-bind="componentField" />
             </FormControl>
           </FormItem>
         </FormField>

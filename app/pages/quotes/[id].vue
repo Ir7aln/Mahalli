@@ -46,7 +46,7 @@ async function saveConfig() {
       filePath = await uploadFileToDataDir(
         "pdf-templates",
         config.template.bytes,
-        config.template.name
+        config.template.name,
       );
     }
     await invoke("create_template", {
@@ -69,9 +69,7 @@ async function saveConfig() {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(
-      `ERROR CREATE TEMPLATE: ${err.error ? err.error : err.message}`
-    );
+    Logger.error(`ERROR CREATE TEMPLATE: ${err.error ? err.error : err.message}`);
   }
 }
 

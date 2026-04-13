@@ -1,10 +1,10 @@
 {
   "name": "mahalli",
-  "type": "module",
   "version": "1.0.0",
   "private": true,
   "description": "inventory & invoicing management app",
   "author": "abdelilah ouaadouch",
+  "type": "module",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev --port 4727",
@@ -12,16 +12,19 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check ."
   },
   "dependencies": {
     "@nuxtjs/i18n": "^10.2.4",
     "@pdf-lib/fontkit": "^1.1.1",
-    "@tauri-apps/api": "2.0.0",
-    "@tauri-apps/plugin-dialog": "^2.0.1",
-    "@tauri-apps/plugin-fs": "^2.0.2",
-    "@tauri-apps/plugin-log": "^2.0.0",
+    "@tauri-apps/api": "^2.10.1",
+    "@tauri-apps/plugin-dialog": "^2.7.0",
+    "@tauri-apps/plugin-fs": "^2.5.0",
+    "@tauri-apps/plugin-log": "^2.6.0",
+    "@tauri-apps/plugin-notification": "^2.3.3",
     "@unovis/ts": "^1.3.5",
     "@unovis/vue": "^1.3.5",
     "@vee-validate/zod": "^4.13.1",
@@ -44,8 +47,9 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.27.1",
     "@nuxtjs/tailwindcss": "^6.12.0",
-    "@tauri-apps/cli": "^2.0.4"
+    "@tauri-apps/cli": "^2.10.1",
+    "oxfmt": "^0.45.0",
+    "oxlint": "^1.60.0"
   }
 }

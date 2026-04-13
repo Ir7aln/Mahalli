@@ -40,35 +40,19 @@ const sheetOverlayAlign = "justify-end";
     >
       <Transition
         :appear="true"
-        :enter-active-class="
-          isSheet
-            ? 'ease-out duration-300'
-            : 'delay-100 ease-out duration-300'
-        "
+        :enter-active-class="isSheet ? 'ease-out duration-300' : 'delay-100 ease-out duration-300'"
         :enter-from-class="
-          isSheet
-            ? sheetSlideIn
-            : 'delay-100 opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'
+          isSheet ? sheetSlideIn : 'delay-100 opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'
         "
         :enter-to-class="
-          isSheet
-            ? 'opacity-100 translate-x-0'
-            : 'delay-100 opacity-100 translate-y-0 sm:scale-100'
+          isSheet ? 'opacity-100 translate-x-0' : 'delay-100 opacity-100 translate-y-0 sm:scale-100'
         "
-        :leave-active-class="
-          isSheet
-            ? 'ease-in duration-200'
-            : 'delay-100 ease-in duration-200'
-        "
+        :leave-active-class="isSheet ? 'ease-in duration-200' : 'delay-100 ease-in duration-200'"
         :leave-from-class="
-          isSheet
-            ? 'opacity-100 translate-x-0'
-            : 'delay-100 opacity-100 translate-y-0 sm:scale-100'
+          isSheet ? 'opacity-100 translate-x-0' : 'delay-100 opacity-100 translate-y-0 sm:scale-100'
         "
         :leave-to-class="
-          isSheet
-            ? sheetSlideOut
-            : 'delay-100 opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'
+          isSheet ? sheetSlideOut : 'delay-100 opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'
         "
       >
         <Modals />

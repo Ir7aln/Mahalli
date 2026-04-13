@@ -7,9 +7,7 @@ import {
   useForwardPropsEmits,
 } from "radix-vue";
 
-const props = defineProps<
-  DropdownMenuSubContentProps & { class?: HTMLAttributes["class"] }
->();
+const props = defineProps<DropdownMenuSubContentProps & { class?: HTMLAttributes["class"] }>();
 const emits = defineEmits<DropdownMenuSubContentEmits>();
 const delegatedProps = computed(() => {
   const { class: _, ...delegated } = props;

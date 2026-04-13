@@ -26,7 +26,7 @@ const supplierSchema = toTypedSchema(
     email: z.string().default((props.email as string) ?? ""),
     phone_number: z.string().default((props.phoneNumber as string) ?? ""),
     address: z.string().default((props.address as string) ?? ""),
-  })
+  }),
 );
 
 const form = useForm({
@@ -53,15 +53,12 @@ async function updateTheSupplier(supplier: SupplierT) {
         email: supplier.email,
         phone_number: supplier.phone_number,
         address: supplier.address,
-      })}`
+      })}`,
     );
     //
-    toast.success(
-      t("notifications.supplier.updated", { name: supplier.full_name }),
-      {
-        closeButton: true,
-      }
-    );
+    toast.success(t("notifications.supplier.updated", { name: supplier.full_name }), {
+      closeButton: true,
+    });
     // toggle refresh
     updateQueryParams({
       refresh: `refresh-update-${Math.random() * 9999}`,
@@ -71,9 +68,7 @@ async function updateTheSupplier(supplier: SupplierT) {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(
-      `ERROR UPDATE SUPPLIER: ${err.error ? err.error : err.message}`
-    );
+    Logger.error(`ERROR UPDATE SUPPLIER: ${err.error ? err.error : err.message}`);
   } finally {
     close();
   }
@@ -97,10 +92,7 @@ const onSubmit = form.handleSubmit((values) => {
           <FormItem>
             <FormLabel>{{ t("fields.full-name") }}</FormLabel>
             <FormControl>
-              <Input
-                :placeholder="t('fields.full-name')"
-                v-bind="componentField"
-              />
+              <Input :placeholder="t('fields.full-name')" v-bind="componentField" />
             </FormControl>
           </FormItem>
         </FormField>
@@ -124,10 +116,7 @@ const onSubmit = form.handleSubmit((values) => {
           <FormItem>
             <FormLabel>{{ t("fields.address") }}</FormLabel>
             <FormControl>
-              <Input
-                :placeholder="t('fields.address')"
-                v-bind="componentField"
-              />
+              <Input :placeholder="t('fields.address')" v-bind="componentField" />
             </FormControl>
           </FormItem>
         </FormField>

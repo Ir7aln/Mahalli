@@ -2,9 +2,7 @@ import type { CalendarSlotName } from "v-calendar/dist/types/src/components/Cale
 
 export { default as Calendar } from "./Calendar.vue";
 
-export function isVCalendarSlot(
-  slotName: string,
-): slotName is CalendarSlotName {
+export function isVCalendarSlot(slotName: string): slotName is CalendarSlotName {
   const validSlots: CalendarSlotName[] = [
     "day-content",
     "day-popover",

@@ -26,7 +26,7 @@ const clientSchema = toTypedSchema(
     email: z.string().default((props.email as string) ?? ""),
     phone_number: z.string().default((props.phoneNumber as string) ?? ""),
     address: z.string().default((props.address as string) ?? ""),
-  })
+  }),
 );
 
 const form = useForm({
@@ -53,15 +53,12 @@ async function updateTheClient(client: ClientT) {
         email: client.email,
         phone_number: client.phone_number,
         address: client.address,
-      })}`
+      })}`,
     );
     //
-    toast.success(
-      t("notifications.client.updated", { name: client.full_name }),
-      {
-        closeButton: true,
-      }
-    );
+    toast.success(t("notifications.client.updated", { name: client.full_name }), {
+      closeButton: true,
+    });
     // toggle refresh
     updateQueryParams({
       refresh: `refresh-update-${Math.random() * 9999}`,
@@ -95,10 +92,7 @@ const onSubmit = form.handleSubmit((values) => {
           <FormItem>
             <FormLabel>{{ t("fields.full-name") }}</FormLabel>
             <FormControl>
-              <Input
-                :placeholder="t('fields.full-name')"
-                v-bind="componentField"
-              />
+              <Input :placeholder="t('fields.full-name')" v-bind="componentField" />
             </FormControl>
           </FormItem>
         </FormField>
@@ -122,10 +116,7 @@ const onSubmit = form.handleSubmit((values) => {
           <FormItem>
             <FormLabel>{{ t("fields.address") }}</FormLabel>
             <FormControl>
-              <Input
-                :placeholder="t('fields.address')"
-                v-bind="componentField"
-              />
+              <Input :placeholder="t('fields.address')" v-bind="componentField" />
             </FormControl>
           </FormItem>
         </FormField>

@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { useAttrs } from "vue";
-import {
-  PaginationEllipsis,
-  type PaginationEllipsisProps,
-  useForwardProps,
-} from "radix-vue";
+import { PaginationEllipsis, type PaginationEllipsisProps, useForwardProps } from "radix-vue";
 import { MoreHorizontal } from "lucide-vue-next";
 
 defineOptions({
@@ -18,12 +14,7 @@ const { class: className, ...rest } = useAttrs();
 
 <template>
   <PaginationEllipsis
-    :class="
-      cn(
-        'w-9 h-9 flex items-center justify-center',
-        (className as string) ?? '',
-      )
-    "
+    :class="cn('w-9 h-9 flex items-center justify-center', (className as string) ?? '')"
     v-bind="{ ...forwarded, ...rest }"
   >
     <slot>

@@ -27,9 +27,7 @@ async function fetchClients() {
       args: {
         search: queryParams.value.search ?? "",
         page: Number(queryParams.value.page) ?? 1,
-        limit: queryParams.value.limit
-          ? Number(queryParams.value.limit)
-          : LIMIT,
+        limit: queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT,
       },
     });
     return res.data;
@@ -50,10 +48,7 @@ const clients = computed<ClientT[]>(() => data.value?.clients ?? []);
 const totalRows = computed<number>(() => data.value?.count ?? 0);
 
 provide("count", totalRows);
-provide(
-  "itemsPerPage",
-  queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT
-);
+provide("itemsPerPage", queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT);
 
 const debouncedSearch = useDebounceFn(() => {
   updateQueryParams({ search: searchQuery.value });

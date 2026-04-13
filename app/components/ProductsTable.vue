@@ -61,17 +61,10 @@ function updateProductInventory(id: string, name: string) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow
-          v-for="(product, index) in products"
-          :key="product.id"
-          v-fade="index"
-        >
+        <TableRow v-for="(product, index) in products" :key="product.id" v-fade="index">
           <TableCell class="p-2 flex justify-center">
             <Avatar>
-              <AvatarImage
-                v-if="product.image"
-                :src="convertFileSrc(product.image)"
-              />
+              <AvatarImage v-if="product.image" :src="convertFileSrc(product.image)" />
               <AvatarFallback class="text-xs">
                 {{ product.name.substring(0, 5) }}
               </AvatarFallback>
@@ -150,29 +143,17 @@ function updateProductInventory(id: string, name: string) {
                   <GripHorizontal class="text-slate-800 inline" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent class="rtl:ml-6 ltr:mr-6">
-                  <DropdownMenuItem
-                    @click="toggleThisProduct(product, 'update')"
-                  >
-                    <FilePenLine
-                      class="text-slate-800 inline mr-2"
-                      :size="20"
-                    />
+                  <DropdownMenuItem @click="toggleThisProduct(product, 'update')">
+                    <FilePenLine class="text-slate-800 inline mr-2" :size="20" />
                     {{ t("buttons.edit") }}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    @click="updateProductInventory(product.id!, product.name!)"
-                  >
-                    <PackagePlus
-                      :size="20"
-                      class="text-slate-800 inline mr-2"
-                    />
+                  <DropdownMenuItem @click="updateProductInventory(product.id!, product.name!)">
+                    <PackagePlus :size="20" class="text-slate-800 inline mr-2" />
                     {{ t("buttons.inventory-update") }}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    @click="toggleThisProduct(product, 'delete')"
-                  >
+                  <DropdownMenuItem @click="toggleThisProduct(product, 'delete')">
                     <Trash2 class="text-red-500 inline mr-2" :size="20" />
                     <span>
                       <span class="text-red-500">

@@ -5,11 +5,11 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 use serde::{Deserialize, Serialize};
-use serde_json::json;
+use specta::Type;
 
 use crate::{entities::*, models::*};
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Type)]
 pub struct ListArgs {
     pub page: u64,
     pub limit: u64,
@@ -21,7 +21,7 @@ pub struct ListArgs {
 pub struct QueriesService;
 
 impl QueriesService {
-    pub async fn list_products(db: &DbConn, args: ListArgs) -> Result<JsonValue, DbErr> {
+    pub async fn list_products(db: &DbConn, args: ListArgs) -> Result<ProductsResponse, DbErr> {
         let count = Products::find()
             .filter(
                 Cond::all()
@@ -131,7 +131,7 @@ impl QueriesService {
             .to_owned()
             .build(SqliteQueryBuilder);
 
-        let result = SelectProducts::find_by_statement(Statement::from_sql_and_values(
+        let products = SelectProducts::find_by_statement(Statement::from_sql_and_values(
             DbBackend::Sqlite,
             sql,
             values,
@@ -139,12 +139,12 @@ impl QueriesService {
         .all(db)
         .await?;
 
-        Ok(json!({
-            "count": count,
-            "products": result
-        }))
+        Ok(ProductsResponse {
+            count,
+            products,
+        })
     }
-    pub async fn search_products(db: &DbConn, search: String) -> Result<Vec<JsonValue>, DbErr> {
+    pub async fn search_products(db: &DbConn, search: String) -> Result<Vec<ProductSearch>, DbErr> {
         let products = Products::find()
             .select_only()
             .expr_as_(Expr::col(products::Column::Name), "label")
@@ -152,13 +152,13 @@ impl QueriesService {
             .expr_as_(Expr::col(products::Column::SellingPrice), "price")
             .filter(products::Column::IsDeleted.eq(false))
             .filter(products::Column::Name.like(format!("{}%", search)))
-            .into_json()
+            .into_model::<ProductSearch>()
             .all(db)
             .await?;
         Ok(products)
     }
     //
-    pub async fn list_clients(db: &DbConn, args: ListArgs) -> Result<JsonValue, DbErr> {
+    pub async fn list_clients(db: &DbConn, args: ListArgs) -> Result<ClientsResponse, DbErr> {
         let count = Clients::find()
             .filter(
                 Cond::all()
@@ -288,40 +288,40 @@ impl QueriesService {
         .all(db)
         .await?;
 
-        Ok(json!({
-            "count": count,
-            "clients": result
-        }))
+        Ok(ClientsResponse {
+            count,
+            clients: result,
+        })
     }
-    pub async fn search_clients(db: &DbConn, search: String) -> Result<Vec<JsonValue>, DbErr> {
+    pub async fn search_clients(db: &DbConn, search: String) -> Result<Vec<ClientSearch>, DbErr> {
         let clients = Clients::find()
             .select_only()
             .expr_as_(Expr::col(clients::Column::FullName), "label")
             .expr_as_(Expr::col(clients::Column::Id), "value")
             .filter(clients::Column::IsDeleted.eq(false))
             .filter(clients::Column::FullName.like(format!("{}%", search)))
-            .into_json()
+            .into_model::<ClientSearch>()
             .all(db)
             .await?;
         Ok(clients)
     }
-    pub async fn get_client(db: &DbConn, id: String) -> Result<JsonValue, DbErr> {
+    pub async fn get_client(db: &DbConn, id: String) -> Result<ClientDetails, DbErr> {
         let client = Clients::find_by_id(id).one(db).await?;
 
         match client {
-            Some(client) => Ok(json!({
-                "id": client.id,
-                "full_name": client.full_name,
-                "email": client.email,
-                "phone_number": client.phone_number,
-                "address": client.address,
-                "image": client.image,
-            })),
+            Some(client) => Ok(ClientDetails {
+                id: client.id,
+                full_name: client.full_name,
+                email: client.email,
+                phone_number: client.phone_number,
+                address: client.address,
+                image: client.image,
+            }),
             None => Err(DbErr::RecordNotFound(String::from("no client"))),
         }
     }
     //
-    pub async fn list_suppliers(db: &DbConn, args: ListArgs) -> Result<JsonValue, DbErr> {
+    pub async fn list_suppliers(db: &DbConn, args: ListArgs) -> Result<SuppliersResponse, DbErr> {
         let count = Suppliers::find()
             .filter(
                 Cond::all()
@@ -368,25 +368,25 @@ impl QueriesService {
         .all(db)
         .await?;
 
-        Ok(json!({
-            "count": count,
-            "suppliers": result
-        }))
+        Ok(SuppliersResponse {
+            count,
+            suppliers: result,
+        })
     }
-    pub async fn search_suppliers(db: &DbConn, search: String) -> Result<Vec<JsonValue>, DbErr> {
+    pub async fn search_suppliers(db: &DbConn, search: String) -> Result<Vec<SupplierSearch>, DbErr> {
         let suppliers = Suppliers::find()
             .select_only()
             .expr_as_(Expr::col(suppliers::Column::FullName), "label")
             .expr_as_(Expr::col(suppliers::Column::Id), "value")
-            .filter(clients::Column::IsDeleted.eq(false))
+            .filter(suppliers::Column::IsDeleted.eq(false))
             .filter(suppliers::Column::FullName.like(format!("{}%", search)))
-            .into_json()
+            .into_model::<SupplierSearch>()
             .all(db)
             .await?;
         Ok(suppliers)
     }
     //
-    pub async fn list_orders(db: &DbConn, args: ListArgs) -> Result<JsonValue, DbErr> {
+    pub async fn list_orders(db: &DbConn, args: ListArgs) -> Result<OrdersResponse, DbErr> {
         let count = Orders::find()
             .join(JoinType::Join, orders::Relation::Clients.def())
             .filter(
@@ -498,12 +498,12 @@ impl QueriesService {
         .all(db)
         .await?;
 
-        Ok(json!({
-            "count": count,
-            "orders": result
-        }))
+        Ok(OrdersResponse {
+            count,
+            orders: result,
+        })
     }
-    pub async fn get_order(db: &DbConn, id: String) -> Result<JsonValue, DbErr> {
+    pub async fn get_order(db: &DbConn, id: String) -> Result<OrderWithClient, DbErr> {
         let order = Orders::find_by_id(id.clone())
             .find_also_related(Clients)
             .one(db)
@@ -551,20 +551,21 @@ impl QueriesService {
                 .all(db)
                 .await?;
 
-                Ok(json!({
-                    "id": order.0.id,
-                    "client_id": order.0.client_id,
-                    "created_at": order.0.created_at,
-                    "status": order.0.status,
-                    "identifier": order.0.identifier,
-                    "full_name": order.1.unwrap().full_name,
-                    "items": items,
-                }))
+                let client = order.1.unwrap();
+                Ok(OrderWithClient {
+                    id: order.0.id,
+                    client_id: order.0.client_id,
+                    created_at: order.0.created_at,
+                    status: order.0.status,
+                    identifier: order.0.identifier,
+                    full_name: client.full_name,
+                    items,
+                })
             }
             None => Err(DbErr::RecordNotFound(String::from("no order"))),
         }
     }
-    pub async fn list_order_products(db: &DbConn, id: String) -> Result<Vec<JsonValue>, DbErr> {
+    pub async fn list_order_products(db: &DbConn, id: String) -> Result<Vec<OrderProductItem>, DbErr> {
         let order_products = OrderItems::find()
             .select_only()
             .columns([order_items::Column::Price])
@@ -584,13 +585,13 @@ impl QueriesService {
                 inventory_transactions::Relation::Products.def(),
             )
             .filter(Expr::col((OrderItems, order_items::Column::OrderId)).eq(id))
-            .into_json()
+            .into_model::<OrderProductItem>()
             .all(db)
             .await?;
 
         Ok(order_products)
     }
-    pub async fn get_order_details(db: &DbConn, id: String) -> Result<JsonValue, DbErr> {
+    pub async fn get_order_details(db: &DbConn, id: String) -> Result<OrderDetailsResponse, DbErr> {
         let (sql, values) = Query::select()
             .from(Orders)
             .exprs([
@@ -683,26 +684,26 @@ impl QueriesService {
                 .all(db)
                 .await?;
 
-                Ok(json!({
-                    "id": order.id,
-                    "created_at": order.created_at,
-                    "status": order.status,
-                    "total": order.total,
-                    "identifier": order.identifier,
-                    "client": json!({
-                        "full_name": order.full_name,
-                        "email": order.email,
-                        "address":order.address,
-                        "phone_number":order.phone_number,
-                    }),
-                    "items": items,
-                }))
+                Ok(OrderDetailsResponse {
+                    id: order.id,
+                    created_at: order.created_at,
+                    status: order.status,
+                    total: order.total,
+                    identifier: order.identifier,
+                    client: OrderClientInfo {
+                        full_name: order.full_name,
+                        email: order.email,
+                        address: order.address,
+                        phone_number: order.phone_number,
+                    },
+                    items,
+                })
             }
             None => Err(DbErr::RecordNotFound(String::from("no order"))),
         }
     }
     //
-    pub async fn list_invoices(db: &DbConn, args: ListArgs) -> Result<JsonValue, DbErr> {
+    pub async fn list_invoices(db: &DbConn, args: ListArgs) -> Result<InvoicesResponse, DbErr> {
         let count = Invoices::find()
             .join(JoinType::Join, invoices::Relation::Clients.def())
             .filter(
@@ -820,12 +821,12 @@ impl QueriesService {
         .all(db)
         .await?;
 
-        Ok(json!({
-            "count": count,
-            "invoices": result
-        }))
+        Ok(InvoicesResponse {
+            count,
+            invoices: result,
+        })
     }
-    pub async fn get_invoice(db: &DbConn, id: String) -> Result<JsonValue, DbErr> {
+    pub async fn get_invoice(db: &DbConn, id: String) -> Result<InvoiceWithClient, DbErr> {
         let invoice = Invoices::find_by_id(id.clone())
             .find_also_related(Clients)
             .one(db)
@@ -877,24 +878,24 @@ impl QueriesService {
                 let (invoice_data, client_data) = invoice;
                 let client = client_data.unwrap();
 
-                Ok(json!({
-                    "id": invoice_data.id,
-                    "client_id": invoice_data.client_id,
-                    "paid_amount": invoice_data.paid_amount,
-                    "created_at": invoice_data.created_at,
-                    "status": invoice_data.status,
-                    "identifier": invoice_data.identifier,
-                    "full_name": client.full_name,
-                    "email": client.email,
-                    "address": client.address,
-                    "phone_number": client.phone_number,
-                    "items": items,
-                }))
+                Ok(InvoiceWithClient {
+                    id: invoice_data.id,
+                    client_id: invoice_data.client_id,
+                    paid_amount: invoice_data.paid_amount,
+                    created_at: invoice_data.created_at,
+                    status: invoice_data.status,
+                    identifier: invoice_data.identifier,
+                    full_name: client.full_name,
+                    email: client.email,
+                    address: client.address,
+                    phone_number: client.phone_number,
+                    items,
+                })
             }
             None => Err(DbErr::RecordNotFound(String::from("no invoice"))),
         }
     }
-    pub async fn list_invoice_products(db: &DbConn, id: String) -> Result<Vec<JsonValue>, DbErr> {
+    pub async fn list_invoice_products(db: &DbConn, id: String) -> Result<Vec<InvoiceProductItem>, DbErr> {
         let invoice_products = OrderItems::find()
             .select_only()
             .columns([order_items::Column::Price])
@@ -916,13 +917,13 @@ impl QueriesService {
                 inventory_transactions::Relation::Products.def(),
             )
             .filter(Expr::col((Invoices, invoices::Column::Id)).eq(id))
-            .into_json()
+            .into_model::<InvoiceProductItem>()
             .all(db)
             .await?;
 
         Ok(invoice_products)
     }
-    pub async fn get_invoice_details(db: &DbConn, id: String) -> Result<JsonValue, DbErr> {
+    pub async fn get_invoice_details(db: &DbConn, id: String) -> Result<InvoiceDetailsResponse, DbErr> {
         let (sql, values) = Query::select()
             .from(Invoices)
             .exprs([
@@ -1024,27 +1025,27 @@ impl QueriesService {
                 .all(db)
                 .await?;
 
-                Ok(json!({
-                    "id": invoice.id,
-                    "paid_amount": invoice.paid_amount,
-                    "created_at": invoice.created_at,
-                    "status": invoice.status,
-                    "identifier": invoice.identifier,
-                    "total": invoice.total,
-                    "client": json!({
-                        "full_name": invoice.full_name,
-                        "email": invoice.email,
-                        "address":invoice.address,
-                        "phone_number":invoice.phone_number,
-                    }),
-                    "items": items,
-                }))
+                Ok(InvoiceDetailsResponse {
+                    id: invoice.id,
+                    paid_amount: invoice.paid_amount,
+                    created_at: invoice.created_at,
+                    status: invoice.status,
+                    identifier: invoice.identifier,
+                    total: invoice.total,
+                    client: InvoiceClientInfo {
+                        full_name: invoice.full_name,
+                        email: invoice.email,
+                        address: invoice.address,
+                        phone_number: invoice.phone_number,
+                    },
+                    items,
+                })
             }
             None => Err(DbErr::RecordNotFound(String::from("no invoice"))),
         }
     }
     //
-    pub async fn list_quotes(db: &DbConn, args: ListArgs) -> Result<JsonValue, DbErr> {
+    pub async fn list_quotes(db: &DbConn, args: ListArgs) -> Result<QuotesResponse, DbErr> {
         let count = Quotes::find()
             .join(JoinType::Join, quotes::Relation::Clients.def())
             .filter(
@@ -1137,12 +1138,12 @@ impl QueriesService {
         .all(db)
         .await?;
 
-        Ok(json!({
-            "count": count,
-            "quotes": result
-        }))
+        Ok(QuotesResponse {
+            count,
+            quotes: result,
+        })
     }
-    pub async fn get_quote(db: &DbConn, id: String) -> Result<JsonValue, DbErr> {
+    pub async fn get_quote(db: &DbConn, id: String) -> Result<QuoteWithClient, DbErr> {
         let quote = Quotes::find_by_id(id.clone())
             .find_also_related(Clients)
             .one(db)
@@ -1178,19 +1179,20 @@ impl QueriesService {
                 .all(db)
                 .await?;
 
-                Ok(json!({
-                    "id": quote.0.id,
-                    "client_id": quote.0.client_id,
-                    "created_at": quote.0.created_at,
-                    "identifier": quote.0.identifier,
-                    "full_name": quote.1.unwrap().full_name,
-                    "items": items,
-                }))
+                let client = quote.1.unwrap();
+                Ok(QuoteWithClient {
+                    id: quote.0.id,
+                    client_id: quote.0.client_id,
+                    created_at: quote.0.created_at,
+                    identifier: quote.0.identifier,
+                    full_name: client.full_name,
+                    items,
+                })
             }
             None => Err(DbErr::RecordNotFound(String::from("no quote"))),
         }
     }
-    pub async fn list_quote_products(db: &DbConn, id: String) -> Result<Vec<JsonValue>, DbErr> {
+    pub async fn list_quote_products(db: &DbConn, id: String) -> Result<Vec<QuoteProductItem>, DbErr> {
         let quote_products = QuoteItems::find()
             .select_only()
             .columns([quote_items::Column::Price])
@@ -1200,13 +1202,13 @@ impl QueriesService {
             ])
             .join(JoinType::Join, quote_items::Relation::Products.def())
             .filter(Expr::col((QuoteItems, quote_items::Column::QuoteId)).eq(id))
-            .into_json()
+            .into_model::<QuoteProductItem>()
             .all(db)
             .await?;
 
         Ok(quote_products)
     }
-    pub async fn get_quote_details(db: &DbConn, id: String) -> Result<JsonValue, DbErr> {
+    pub async fn get_quote_details(db: &DbConn, id: String) -> Result<QuoteDetailsResponse, DbErr> {
         let (sql, values) = Query::select()
             .from(Quotes)
             .exprs([
@@ -1279,25 +1281,25 @@ impl QueriesService {
                 .all(db)
                 .await?;
 
-                Ok(json!({
-                    "id": quote.id,
-                    "created_at": quote.created_at,
-                    "total": quote.total,
-                    "identifier": quote.identifier,
-                    "client": json!({
-                        "full_name": quote.full_name,
-                        "email": quote.email,
-                        "address":quote.address,
-                        "phone_number":quote.phone_number,
-                    }),
-                    "items": items,
-                }))
+                Ok(QuoteDetailsResponse {
+                    id: quote.id,
+                    created_at: quote.created_at,
+                    identifier: quote.identifier,
+                    total: quote.total,
+                    client: QuoteClientInfo {
+                        full_name: quote.full_name,
+                        email: quote.email,
+                        address: quote.address,
+                        phone_number: quote.phone_number,
+                    },
+                    items,
+                })
             }
             None => Err(DbErr::RecordNotFound(String::from("no quote"))),
         }
     }
     //
-    pub async fn list_inventory(db: &DbConn, args: ListArgs) -> Result<JsonValue, DbErr> {
+    pub async fn list_inventory(db: &DbConn, args: ListArgs) -> Result<InventoryResponse, DbErr> {
         let count = InventoryTransactions::find()
             .join(JoinType::Join, inventory_transactions::Relation::Products.def())
             .join(JoinType::LeftJoin, inventory_transactions::Relation::OrderItems.def())
@@ -1382,12 +1384,12 @@ impl QueriesService {
         .all(db)
         .await?;
 
-        Ok(json!({
-            "count": count,
-            "inventory": result
-        }))
+        Ok(InventoryResponse {
+            count,
+            inventory: result,
+        })
     }
-    pub async fn list_inventory_stats(db: &DbConn) -> Result<Vec<JsonValue>, DbErr> {
+    pub async fn list_inventory_stats(db: &DbConn) -> Result<Vec<SelectTransaction>, DbErr> {
         let (sql, values) = Query::select()
             .from(InventoryTransactions)
             .columns([(
@@ -1472,19 +1474,10 @@ impl QueriesService {
         .all(db)
         .await?;
 
-        let mut result = Vec::<JsonValue>::new();
-        res.into_iter().for_each(|row| {
-            result.push(json!({
-                "price": row.price,
-                "created_at": row.created_at,
-                "quantity": row.quantity,
-                "transaction_type": row.transaction_type,
-            }));
-        });
-        Ok(result)
+        Ok(res)
     }
     //
-    pub async fn list_top_products(db: &DbConn) -> Result<Vec<JsonValue>, DbErr> {
+    pub async fn list_top_products(db: &DbConn) -> Result<Vec<SelectTopProducts>, DbErr> {
         let (sql, values) = Query::select()
             .from(Products)
             .column((Products, products::Column::Name))
@@ -1552,16 +1545,9 @@ impl QueriesService {
         .all(db)
         .await?;
 
-        let mut result = Vec::<JsonValue>::new();
-        res.into_iter().for_each(|row| {
-            result.push(json!({
-                "name": row.name,
-                "quantity": row.quantity,
-            }));
-        });
-        Ok(result)
+        Ok(res)
     }
-    pub async fn list_top_clients(db: &DbConn) -> Result<Vec<JsonValue>, DbErr> {
+    pub async fn list_top_clients(db: &DbConn) -> Result<Vec<SelectTops>, DbErr> {
         let (sql, values) = Query::select()
             .from(Clients)
             .column((Clients, clients::Column::FullName))
@@ -1628,17 +1614,9 @@ impl QueriesService {
         .all(db)
         .await?;
 
-        let mut result = Vec::<JsonValue>::new();
-        res.into_iter().for_each(|row| {
-            result.push(json!({
-                "price": row.price,
-                "Fullname": row.full_name,
-                "quantity": row.quantity,
-            }));
-        });
-        Ok(result)
+        Ok(res)
     }
-    pub async fn list_top_suppliers(db: &DbConn) -> Result<Vec<JsonValue>, DbErr> {
+    pub async fn list_top_suppliers(db: &DbConn) -> Result<Vec<SelectTops>, DbErr> {
         let (sql, values) = Query::select()
             .from(Suppliers)
             .column((Suppliers, suppliers::Column::FullName))
@@ -1705,17 +1683,9 @@ impl QueriesService {
         .all(db)
         .await?;
 
-        let mut result = Vec::<JsonValue>::new();
-        res.into_iter().for_each(|row| {
-            result.push(json!({
-                "price": row.price,
-                "Fullname": row.full_name,
-                "quantity": row.quantity,
-            }));
-        });
-        Ok(result)
+        Ok(res)
     }
-    pub async fn list_status_count(db: &DbConn) -> Result<JsonValue, DbErr> {
+    pub async fn list_status_count(db: &DbConn) -> Result<StatusCountResponse, DbErr> {
         let (order_sql, order_values) = Query::select()
             .from(Orders)
             .column(orders::Column::Status)
@@ -1764,12 +1734,12 @@ impl QueriesService {
         .all(db)
         .await?;
 
-        Ok(json!({
-            "orders": order_res,
-            "invoices": invoice_res,
-        }))
+        Ok(StatusCountResponse {
+            orders: order_res,
+            invoices: invoice_res,
+        })
     }
-    pub async fn list_financial_metrics(db: &DbConn) -> Result<JsonValue, DbErr> {
+    pub async fn list_financial_metrics(db: &DbConn) -> Result<FinancialMetricsResponse, DbErr> {
         let (sql, values) = Query::select().expr_as(Expr::expr(
             Expr::expr(SimpleExpr::SubQuery(
                 None,
@@ -1873,16 +1843,16 @@ impl QueriesService {
             0.0
         };
 
-        Ok(json!({
-            "current_revenue": res.current_revenue,
-            "last_month_revenue": res.last_month_revenue,
-            "current_expenses": res.current_expenses,
-            "last_month_expenses": res.last_month_expenses,
-            "current_net_profit": current_net_profit,
-            "last_month_net_profit": last_month_net_profit,
-            "revenue_growth_percentage": revenue_growth_percentage,
-            "expenses_growth_percentage": expenses_growth_percentage,
-            "net_profit_growth_percentage": net_profit_growth_percentage,
-        }))
+        Ok(FinancialMetricsResponse {
+            current_revenue: res.current_revenue,
+            last_month_revenue: res.last_month_revenue,
+            current_expenses: res.current_expenses,
+            last_month_expenses: res.last_month_expenses,
+            current_net_profit,
+            last_month_net_profit,
+            revenue_growth_percentage,
+            expenses_growth_percentage,
+            net_profit_growth_percentage,
+        })
     }
 }

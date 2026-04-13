@@ -37,7 +37,7 @@ const productSchema = toTypedSchema(
       .min(2)
       .default((props.description as string) ?? ""),
     min_quantity: z.number().default(Number(props.minQuantity) ?? 0),
-  })
+  }),
 );
 
 const form = useForm({
@@ -67,7 +67,7 @@ async function updateTheProduct(product: ProductT) {
         description: product.description,
         min_quantity: Number(product.min_quantity),
         id,
-      })}`
+      })}`,
     );
     //
     toast.success(t("notifications.product.updated", { name: product.name }), {
@@ -82,9 +82,7 @@ async function updateTheProduct(product: ProductT) {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(
-      `ERROR UPDATE PRODUCT: ${err.error ? err.error : err.message}`
-    );
+    Logger.error(`ERROR UPDATE PRODUCT: ${err.error ? err.error : err.message}`);
   } finally {
     close();
   }
@@ -121,9 +119,7 @@ const onSubmit = form.handleSubmit((values) => {
                 :placeholder="t('fields.purchase-price')"
                 v-bind="componentField"
               >
-                <template #unite>
-                  DH
-                </template>
+                <template #unite> DH </template>
               </Input>
             </FormControl>
           </FormItem>
@@ -132,14 +128,8 @@ const onSubmit = form.handleSubmit((values) => {
           <FormItem>
             <FormLabel>{{ t("fields.selling-price") }}</FormLabel>
             <FormControl>
-              <Input
-                type="number"
-                :placeholder="t('fields.selling-price')"
-                v-bind="componentField"
-              >
-                <template #unite>
-                  DH
-                </template>
+              <Input type="number" :placeholder="t('fields.selling-price')" v-bind="componentField">
+                <template #unite> DH </template>
               </Input>
             </FormControl>
           </FormItem>
@@ -148,11 +138,7 @@ const onSubmit = form.handleSubmit((values) => {
           <FormItem>
             <FormLabel>{{ t("fields.min-quantity") }}</FormLabel>
             <FormControl>
-              <Input
-                type="number"
-                :placeholder="t('fields.min-quantity')"
-                v-bind="componentField"
-              >
+              <Input type="number" :placeholder="t('fields.min-quantity')" v-bind="componentField">
                 <template #unite>
                   {{ t("fields.item") }}
                 </template>
@@ -166,10 +152,7 @@ const onSubmit = form.handleSubmit((values) => {
               {{ t("fields.description") }}
             </FormLabel>
             <FormControl>
-              <Textarea
-                :placeholder="t('fields.description')"
-                v-bind="componentField"
-              />
+              <Textarea :placeholder="t('fields.description')" v-bind="componentField" />
             </FormControl>
           </FormItem>
         </FormField>

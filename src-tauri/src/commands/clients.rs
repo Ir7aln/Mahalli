@@ -1,18 +1,18 @@
-use serde_json::Value;
 use tauri::State;
 
-use service::{Client, ListArgs, MutationsService, NewClient, QueriesService};
+use service::{Client, ClientsResponse, ClientDetails, ClientSearch, ListArgs, MutationsService, NewClient, QueriesService};
 
 use crate::jobs::{EntityEnum, ImageProcessorJob};
 use crate::AppState;
 
-use super::{Fail, SResult, Seccess};
+use super::{Fail, SResult, Success};
 
 #[tauri::command]
-pub async fn list_clients(state: State<'_, AppState>, args: ListArgs) -> SResult<Value> {
+#[specta::specta]
+pub async fn list_clients(state: State<'_, AppState>, args: ListArgs) -> SResult<ClientsResponse> {
     let _ = state.db_conn;
     match QueriesService::list_clients(&state.db_conn, args).await {
-        Ok(res) => Ok(Seccess {
+        Ok(res) => Ok(Success {
             error: None,
             message: None,
             data: Some(res),
@@ -25,10 +25,11 @@ pub async fn list_clients(state: State<'_, AppState>, args: ListArgs) -> SResult
 }
 
 #[tauri::command]
-pub async fn search_clients(state: State<'_, AppState>, search: String) -> SResult<Vec<Value>> {
+#[specta::specta]
+pub async fn search_clients(state: State<'_, AppState>, search: String) -> SResult<Vec<ClientSearch>> {
     let _ = state.db_conn;
     match QueriesService::search_clients(&state.db_conn, search).await {
-        Ok(res) => Ok(Seccess {
+        Ok(res) => Ok(Success {
             error: None,
             message: None,
             data: Some(res),
@@ -41,10 +42,11 @@ pub async fn search_clients(state: State<'_, AppState>, search: String) -> SResu
 }
 
 #[tauri::command]
-pub async fn get_client(state: State<'_, AppState>, id: String) -> SResult<Value> {
+#[specta::specta]
+pub async fn get_client(state: State<'_, AppState>, id: String) -> SResult<ClientDetails> {
     let _ = state.db_conn;
     match QueriesService::get_client(&state.db_conn, id).await {
-        Ok(res) => Ok(Seccess {
+        Ok(res) => Ok(Success {
             error: None,
             message: None,
             data: Some(res),
@@ -57,6 +59,7 @@ pub async fn get_client(state: State<'_, AppState>, id: String) -> SResult<Value
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn create_client(state: State<'_, AppState>, client: NewClient) -> SResult<String> {
     let _ = state.db_conn;
     let image = client.image.clone();
@@ -77,7 +80,7 @@ pub async fn create_client(state: State<'_, AppState>, client: NewClient) -> SRe
                 }
                 None => {}
             }
-            Ok(Seccess::<String> {
+            Ok(Success::<String> {
                 error: None,
                 message: Option::Some(String::from("client created successfully")),
                 data: Some(id),
@@ -91,10 +94,11 @@ pub async fn create_client(state: State<'_, AppState>, client: NewClient) -> SRe
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn delete_client(state: State<'_, AppState>, id: String) -> SResult<u64> {
     let _ = state.db_conn;
     match MutationsService::delete_client(&state.db_conn, id).await {
-        Ok(res) => Ok(Seccess {
+        Ok(res) => Ok(Success {
             error: None,
             message: None,
             data: Some(res),
@@ -107,10 +111,11 @@ pub async fn delete_client(state: State<'_, AppState>, id: String) -> SResult<u6
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn update_client(state: State<'_, AppState>, client: Client) -> SResult<String> {
     let _ = state.db_conn;
     match MutationsService::update_client(&state.db_conn, client).await {
-        Ok(_) => Ok(Seccess::<String> {
+        Ok(_) => Ok(Success::<String> {
             error: None,
             message: Option::Some(String::from("update clients success")),
             data: None,

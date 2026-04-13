@@ -39,9 +39,7 @@ async function deleteTheOrders() {
 <template>
   <Card>
     <CardHeader>
-      <CardTitle>
-        {{ t("titles.orders.delete") }}n° {{ identifier }} ?
-      </CardTitle>
+      <CardTitle> {{ t("titles.orders.delete") }}n° {{ identifier }} ? </CardTitle>
     </CardHeader>
     <CardContent>
       <div />

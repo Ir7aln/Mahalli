@@ -9,9 +9,10 @@ edition = "2021"
 entity = { path = "../entity" }
 serde = { version = "1.0.192", features = ["derive"] }
 serde_json = "1.0"
+specta = { version = "=2.0.0-rc.24", features = ["derive", "function", "serde_json"] }
 
 [dependencies.sea-orm]
-version = "0.12.4"                                                    # sea-orm version
+version = "0.12.4" # sea-orm version
 features = ["debug-print", "runtime-tokio-native-tls", "sqlx-sqlite"]
 
 [dev-dependencies]

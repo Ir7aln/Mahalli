@@ -23,13 +23,22 @@ tauri-build = { version = "2", features = [] }
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "2", features = ["protocol-asset"] }
-apalis = { version = "0.5", features = [
-  "sqlite",
-  "limit",
-  "tracing",
-  "tokio-comp",
-] }
+
+specta = { version = "=2.0.0-rc.24", features = ["derive", "function", "serde_json"] }
+specta-typescript = "=0.0.11"
+tauri-specta = { version = "=2.0.0-rc.24", features = ["typescript"] }
+
+tauri = { version = "2.10", features = ["protocol-asset"] }
+
+tauri-plugin-log = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-notification = "2"
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-updater = "2"
+
+apalis = { version = "0.5", features = ["sqlite", "limit", "tracing", "tokio-comp"] }
 tokio = { version = "1", features = ["full"] }
 libsqlite3-sys = { version = "^0", features = ["bundled"] }
 dotenvy = "0.15.7"
@@ -37,26 +46,14 @@ log = "^0.4"
 migration = { path = "./migration" }
 service = { path = "./service" }
 entity = { path = "./entity" }
-image = "0.25.5"
-tauri-plugin-log = "2"
-tauri-plugin-dialog = "2"
-tauri-plugin-fs = "2"
-tauri-plugin-notification = "2"
-dirs = "5.0.1"
-
+image = "0.25"
+dirs = "5.0"
 
 [dependencies.sqlx]
-version = "0.7.0"
+version = "0.7"
 default-features = false
 features = ["sqlite"]
 
 [features]
-# by default Tauri runs in production mode
-# when `tauri dev` runs it is executed with `cargo run --no-default-features` if `devPath` is an URL
 default = ["custom-protocol"]
-# this feature is used for production builds where `devPath` points to the filesystem
-# DO NOT remove this
 custom-protocol = ["tauri/custom-protocol"]
-
-[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
-tauri-plugin-updater = "2"

@@ -9,9 +9,7 @@ import {
 } from "radix-vue";
 import { Circle } from "lucide-vue-next";
 
-const props = defineProps<
-  DropdownMenuRadioItemProps & { class?: HTMLAttributes["class"] }
->();
+const props = defineProps<DropdownMenuRadioItemProps & { class?: HTMLAttributes["class"] }>();
 const emits = defineEmits<DropdownMenuRadioItemEmits>();
 const delegatedProps = computed(() => {
   const { class: _, ...delegated } = props;

@@ -5,9 +5,7 @@ import { PaginationList, PaginationListItem, PaginationRoot } from "radix-vue";
 
 const router = useRouter();
 const { updateQueryParams } = useUpdateRouteQueryParams();
-const defaultPage = computed(() =>
-  Number(router.currentRoute.value.query.page)
-);
+const defaultPage = computed(() => Number(router.currentRoute.value.query.page));
 
 const LIMIT = 50;
 
@@ -22,11 +20,8 @@ function goBackward() {
 
 function goForward() {
   if (
-    defaultPage.value
-    < Math.ceil(
-      (rowsCount?.value ?? 1)
-      / (itemsPerPage?.value ? itemsPerPage?.value : LIMIT)
-    )
+    defaultPage.value <
+    Math.ceil((rowsCount?.value ?? 1) / (itemsPerPage?.value ? itemsPerPage?.value : LIMIT))
   ) {
     updateQueryParams({ page: defaultPage.value + 1 });
   }
@@ -43,9 +38,7 @@ function goToFirst() {
 function goToLast() {
   if (rowsCount?.value) {
     updateQueryParams({
-      page: Math.ceil(
-        rowsCount?.value / (itemsPerPage?.value ? itemsPerPage?.value : LIMIT)
-      ),
+      page: Math.ceil(rowsCount?.value / (itemsPerPage?.value ? itemsPerPage?.value : LIMIT)),
     });
   }
 }

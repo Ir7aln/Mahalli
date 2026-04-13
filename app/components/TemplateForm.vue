@@ -125,18 +125,11 @@ const onSubmit = handleSubmit(async (values) => {
             <FormItem>
               <Select :disabled="!values.fields.status" v-bind="componentField">
                 <SelectTrigger>
-                  <SelectValue
-                    class="text-muted-foreground"
-                    :placeholder="t('select-status')"
-                  />
+                  <SelectValue class="text-muted-foreground" :placeholder="t('select-status')" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem
-                      v-for="status in statues"
-                      :key="status"
-                      :value="status"
-                    >
+                    <SelectItem v-for="status in statues" :key="status" :value="status">
                       {{ t(`status.${status.toLowerCase()}`) }}
                     </SelectItem>
                   </SelectGroup>
@@ -159,14 +152,8 @@ const onSubmit = handleSubmit(async (values) => {
           <FormField v-slot="{ componentField }" name="vat">
             <FormItem>
               <FormControl>
-                <Input
-                  v-bind="componentField"
-                  :disabled="!values.fields.vat"
-                  type="number"
-                >
-                  <template #unite>
-                    0% - 100%
-                  </template>
+                <Input v-bind="componentField" :disabled="!values.fields.vat" type="number">
+                  <template #unite> 0% - 100% </template>
                 </Input>
               </FormControl>
             </FormItem>
@@ -176,10 +163,7 @@ const onSubmit = handleSubmit(async (values) => {
         <Separator />
 
         <div v-for="item in CLIENT_FIELDS" :key="item.field" class="space-y-2">
-          <FormField
-            v-slot="{ value, handleChange }"
-            :name="`fields.${item.field}`"
-          >
+          <FormField v-slot="{ value, handleChange }" :name="`fields.${item.field}`">
             <FormItem class="flex justify-between items-end space-y-0">
               <FormLabel>{{ t(`fields.${item.label}`) }}</FormLabel>
               <FormControl>
@@ -188,16 +172,10 @@ const onSubmit = handleSubmit(async (values) => {
             </FormItem>
           </FormField>
 
-          <FormField
-            v-slot="{ componentField }"
-            :name="`documentValues.client.${item.field}`"
-          >
+          <FormField v-slot="{ componentField }" :name="`documentValues.client.${item.field}`">
             <FormItem>
               <FormControl>
-                <Input
-                  :disabled="!values.fields[item.field]"
-                  v-bind="componentField"
-                />
+                <Input :disabled="!values.fields[item.field]" v-bind="componentField" />
               </FormControl>
             </FormItem>
           </FormField>

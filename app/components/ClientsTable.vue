@@ -44,17 +44,10 @@ function toggleThisClient(client: ClientT, name: "delete" | "update") {
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow
-          v-for="(client, index) in clients"
-          :key="client.id"
-          v-fade="index"
-        >
+        <TableRow v-for="(client, index) in clients" :key="client.id" v-fade="index">
           <TableCell class="p-2 flex justify-center">
             <Avatar>
-              <AvatarImage
-                v-if="client.image"
-                :src="convertFileSrc(client.image)"
-              />
+              <AvatarImage v-if="client.image" :src="convertFileSrc(client.image)" />
               <AvatarFallback class="text-xs">
                 {{ client.full_name.substring(0, 5) }}
               </AvatarFallback>
@@ -83,10 +76,7 @@ function toggleThisClient(client: ClientT, name: "delete" | "update") {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent class="rtl:ml-6 ltr:mr-6">
                   <DropdownMenuItem @click="toggleThisClient(client, 'update')">
-                    <FilePenLine
-                      :size="20"
-                      class="text-slate-800 inline mr-2"
-                    />
+                    <FilePenLine :size="20" class="text-slate-800 inline mr-2" />
                     {{ t("buttons.edit") }}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />

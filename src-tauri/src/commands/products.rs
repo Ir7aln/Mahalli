@@ -1,19 +1,19 @@
-use serde_json::Value;
 use tauri::State;
 
-use service::{ListArgs, MutationsService, NewProduct, Product, QueriesService};
+use service::{ListArgs, MutationsService, NewProduct, Product, ProductSearch, ProductsResponse, QueriesService};
 
 use crate::jobs::{EntityEnum, ImageProcessorJob};
 
 use crate::AppState;
 
-use super::{Fail, SResult, Seccess};
+use super::{Fail, SResult, Success};
 
 #[tauri::command]
-pub async fn list_products(state: State<'_, AppState>, args: ListArgs) -> SResult<Value> {
+#[specta::specta]
+pub async fn list_products(state: State<'_, AppState>, args: ListArgs) -> SResult<ProductsResponse> {
     let _ = state.db_conn;
     match QueriesService::list_products(&state.db_conn, args).await {
-        Ok(res) => Ok(Seccess {
+        Ok(res) => Ok(Success {
             error: None,
             message: None,
             data: Some(res),
@@ -26,10 +26,11 @@ pub async fn list_products(state: State<'_, AppState>, args: ListArgs) -> SResul
 }
 
 #[tauri::command]
-pub async fn search_products(state: State<'_, AppState>, search: String) -> SResult<Vec<Value>> {
+#[specta::specta]
+pub async fn search_products(state: State<'_, AppState>, search: String) -> SResult<Vec<ProductSearch>> {
     let _ = state.db_conn;
     match QueriesService::search_products(&state.db_conn, search).await {
-        Ok(res) => Ok(Seccess {
+        Ok(res) => Ok(Success {
             error: None,
             message: None,
             data: Some(res),
@@ -42,6 +43,7 @@ pub async fn search_products(state: State<'_, AppState>, search: String) -> SRes
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn create_product(state: State<'_, AppState>, product: NewProduct) -> SResult<String> {
     let _ = state.db_conn;
     let image = product.image.clone();
@@ -62,7 +64,7 @@ pub async fn create_product(state: State<'_, AppState>, product: NewProduct) -> 
                 }
                 None => {}
             }
-            Ok(Seccess::<String> {
+            Ok(Success::<String> {
                 error: None,
                 message: Option::Some(String::from("product created successfully")),
                 data: Some(id),
@@ -76,10 +78,11 @@ pub async fn create_product(state: State<'_, AppState>, product: NewProduct) -> 
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn delete_product(state: State<'_, AppState>, id: String) -> SResult<u64> {
     let _ = state.db_conn;
     match MutationsService::delete_product(&state.db_conn, id).await {
-        Ok(res) => Ok(Seccess {
+        Ok(res) => Ok(Success {
             error: None,
             message: None,
             data: Some(res),
@@ -92,10 +95,11 @@ pub async fn delete_product(state: State<'_, AppState>, id: String) -> SResult<u
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn update_product(state: State<'_, AppState>, product: Product) -> SResult<String> {
     let _ = state.db_conn;
     match MutationsService::update_product(&state.db_conn, product).await {
-        Ok(_) => Ok(Seccess::<String> {
+        Ok(_) => Ok(Success::<String> {
             error: None,
             message: Option::Some(String::from("update products success")),
             data: None,

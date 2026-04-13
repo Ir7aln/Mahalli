@@ -108,8 +108,7 @@ async function handleOpenDialog() {
     const filePath = (await open({
       multiple: false,
       filters: [{ name: props.name, extensions: props.extensions }],
-      defaultPath:
-        props.name === "Image" ? await pictureDir() : await downloadDir(),
+      defaultPath: props.name === "Image" ? await pictureDir() : await downloadDir(),
     })) as string | null;
 
     if (filePath) {
@@ -139,10 +138,7 @@ function clearFile() {
       class="absolute -top-2 -right-2 z-[90] size-6 bg-slate-100 rounded-full hover:bg-red-50 hover:text-red-500 transition-all duration-150 flex items-center justify-center group"
       @click="clearFile"
     >
-      <X
-        :size="16"
-        class="group-hover:scale-110 transition-transform duration-150"
-      />
+      <X :size="16" class="group-hover:scale-110 transition-transform duration-150" />
     </button>
 
     <img
@@ -150,7 +146,7 @@ function clearFile() {
       :src="`${selectedFile}`"
       class="absolute top-0 w-full h-full object-cover rounded-md border border-gray-300 shadow-sm transition-all duration-200"
       alt="Selected image preview"
-    >
+    />
 
     <div
       v-else
@@ -184,14 +180,8 @@ function clearFile() {
           :size="26"
           class="transition-transform duration-200 hover:scale-110"
         />
-        <span
-          v-if="isFileSelected && name === 'Pdf'"
-          class="text-sm font-medium space-y-1"
-        >
-          <FileCheck
-            :size="30"
-            class="transition-transform duration-200 hover:scale-110 m-auto"
-          />
+        <span v-if="isFileSelected && name === 'Pdf'" class="text-sm font-medium space-y-1">
+          <FileCheck :size="30" class="transition-transform duration-200 hover:scale-110 m-auto" />
           <span>{{ fileName }}</span>
         </span>
       </button>

@@ -29,9 +29,7 @@ async function deleteTheProduct() {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(
-      `ERROR DELETE PRODUCT: ${err.error ? err.error : err.message}`
-    );
+    Logger.error(`ERROR DELETE PRODUCT: ${err.error ? err.error : err.message}`);
   } finally {
     close();
   }

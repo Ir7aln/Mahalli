@@ -163,9 +163,7 @@ async function deleteOneOrderItem(id: string) {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(
-      `ERROR DELETE ORDER ITEM: ${err.error ? err.error : err.message}`,
-    );
+    Logger.error(`ERROR DELETE ORDER ITEM: ${err.error ? err.error : err.message}`);
   }
 }
 
@@ -180,7 +178,9 @@ function deleteOrderItem(index: number) {
 
 <template>
   <form class="h-full w-full max-w-[860px]" @submit="onSubmit">
-    <div class="flex h-full w-full flex-col overflow-hidden border-s border-slate-200 bg-white text-slate-900 shadow-2xl">
+    <div
+      class="flex h-full w-full flex-col overflow-hidden border-s border-slate-200 bg-white text-slate-900 shadow-2xl"
+    >
       <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
         <div class="space-y-1">
           <p class="text-xs font-medium uppercase tracking-[0.35em] text-slate-500">
@@ -198,7 +198,9 @@ function deleteOrderItem(index: number) {
       <div class="min-h-0 flex-1 overflow-y-auto">
         <div class="w-full h-full px-5 py-6 sm:px-6">
           <section class="border border-slate-200 bg-white px-6 py-6 sm:px-7">
-            <div class="flex flex-col gap-6 border-b border-slate-200 pb-6 sm:flex-row sm:items-start sm:justify-between">
+            <div
+              class="flex flex-col gap-6 border-b border-slate-200 pb-6 sm:flex-row sm:items-start sm:justify-between"
+            >
               <div>
                 <p class="text-3xl font-semibold tracking-tight">
                   {{ t("fields.order") }}
@@ -281,7 +283,11 @@ function deleteOrderItem(index: number) {
 
                 <div class="space-y-1 text-sm leading-6 text-slate-500">
                   <p class="text-base font-semibold text-slate-900">
-                    {{ selectedClient?.full_name || values.full_name || t("placeholders.select-client") }}
+                    {{
+                      selectedClient?.full_name ||
+                      values.full_name ||
+                      t("placeholders.select-client")
+                    }}
                   </p>
                   <p v-for="detail in clientDetails" :key="detail">
                     {{ detail }}
@@ -295,14 +301,21 @@ function deleteOrderItem(index: number) {
                 <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
                   {{ t("fields.items") }}
                 </p>
-                <Button type="button" variant="ghost" class="gap-2 px-0 text-slate-700" @click="addOrderItem">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  class="gap-2 px-0 text-slate-700"
+                  @click="addOrderItem"
+                >
                   <Plus class="size-4" />
                   {{ t("buttons.add-product") }}
                 </Button>
               </div>
 
               <div class="border-y border-slate-200">
-                <div class="hidden bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 md:grid md:grid-cols-[minmax(0,2fr)_100px_140px_120px_40px] md:gap-3">
+                <div
+                  class="hidden bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 md:grid md:grid-cols-[minmax(0,2fr)_100px_140px_120px_40px] md:gap-3"
+                >
                   <span>{{ t("fields.name") }}</span>
                   <span>{{ t("fields.quantity") }}</span>
                   <span>{{ t("fields.price") }}</span>
@@ -367,11 +380,18 @@ function deleteOrderItem(index: number) {
                     </FormField>
 
                     <div class="space-y-1">
-                      <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 md:hidden">
+                      <p
+                        class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 md:hidden"
+                      >
                         {{ t("fields.total") }}
                       </p>
                       <div class="flex h-10 items-center text-sm font-medium text-slate-900">
-                        {{ formatMoney(Number(values.items?.[index]?.quantity ?? 0) * Number(values.items?.[index]?.price ?? 0)) }}
+                        {{
+                          formatMoney(
+                            Number(values.items?.[index]?.quantity ?? 0) *
+                              Number(values.items?.[index]?.price ?? 0),
+                          )
+                        }}
                       </div>
                     </div>
 
@@ -404,7 +424,9 @@ function deleteOrderItem(index: number) {
       <div class="border-t border-slate-200 px-5 py-4">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div class="text-sm text-slate-500">
-            {{ selectedClient?.full_name || values.full_name || t("placeholders.no-client-selected") }}
+            {{
+              selectedClient?.full_name || values.full_name || t("placeholders.no-client-selected")
+            }}
           </div>
           <div class="flex items-center gap-3">
             <Button type="button" variant="outline" @click="close">

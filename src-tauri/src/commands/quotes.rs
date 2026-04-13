@@ -1,19 +1,20 @@
-use serde_json::Value;
 use tauri::State;
 
 use service::{
     ListArgs, MutationsService, NewQuote, QueriesService, TransactionService, UpdateQuote,
+    QuotesResponse, QuoteProductItem, QuoteWithClient, QuoteDetailsResponse,
 };
 
 use crate::AppState;
 
-use super::{Fail, SResult, Seccess};
+use super::{Fail, SResult, Success};
 
 #[tauri::command]
-pub async fn list_quotes(state: State<'_, AppState>, args: ListArgs) -> SResult<Value> {
+#[specta::specta]
+pub async fn list_quotes(state: State<'_, AppState>, args: ListArgs) -> SResult<QuotesResponse> {
     let _ = state.db_conn;
     match QueriesService::list_quotes(&state.db_conn, args).await {
-        Ok(res) => Ok(Seccess {
+        Ok(res) => Ok(Success {
             error: None,
             message: None,
             data: Some(res),
@@ -26,10 +27,11 @@ pub async fn list_quotes(state: State<'_, AppState>, args: ListArgs) -> SResult<
 }
 
 #[tauri::command]
-pub async fn list_quote_products(state: State<'_, AppState>, id: String) -> SResult<Vec<Value>> {
+#[specta::specta]
+pub async fn list_quote_products(state: State<'_, AppState>, id: String) -> SResult<Vec<QuoteProductItem>> {
     let _ = state.db_conn;
     match QueriesService::list_quote_products(&state.db_conn, id).await {
-        Ok(res) => Ok(Seccess {
+        Ok(res) => Ok(Success {
             error: None,
             message: None,
             data: Some(res),
@@ -42,10 +44,11 @@ pub async fn list_quote_products(state: State<'_, AppState>, id: String) -> SRes
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn create_quote(state: State<'_, AppState>, quote: NewQuote) -> SResult<String> {
     let _ = state.db_conn;
     match TransactionService::create_quote(&state.db_conn, quote).await {
-        Ok(id) => Ok(Seccess {
+        Ok(id) => Ok(Success {
             error: None,
             message: None,
             data: Some(id),
@@ -58,10 +61,11 @@ pub async fn create_quote(state: State<'_, AppState>, quote: NewQuote) -> SResul
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn update_quote(state: State<'_, AppState>, quote: UpdateQuote) -> SResult<()> {
     let _ = state.db_conn;
     match TransactionService::update_quote(&state.db_conn, quote).await {
-        Ok(_) => Ok(Seccess {
+        Ok(_) => Ok(Success {
             error: None,
             message: Option::Some(String::from("update quotes success")),
             data: None,
@@ -74,10 +78,11 @@ pub async fn update_quote(state: State<'_, AppState>, quote: UpdateQuote) -> SRe
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn delete_quote(state: State<'_, AppState>, id: String) -> SResult<u64> {
     let _ = state.db_conn;
     match MutationsService::delete_quote(&state.db_conn, id).await {
-        Ok(res) => Ok(Seccess {
+        Ok(res) => Ok(Success {
             error: None,
             message: None,
             data: Some(res),
@@ -90,10 +95,11 @@ pub async fn delete_quote(state: State<'_, AppState>, id: String) -> SResult<u64
 }
 
 #[tauri::command]
-pub async fn get_quote(state: State<'_, AppState>, id: String) -> SResult<Value> {
+#[specta::specta]
+pub async fn get_quote(state: State<'_, AppState>, id: String) -> SResult<QuoteWithClient> {
     let _ = state.db_conn;
     match QueriesService::get_quote(&state.db_conn, id).await {
-        Ok(res) => Ok(Seccess {
+        Ok(res) => Ok(Success {
             error: None,
             message: None,
             data: Some(res),
@@ -106,10 +112,11 @@ pub async fn get_quote(state: State<'_, AppState>, id: String) -> SResult<Value>
 }
 
 #[tauri::command]
-pub async fn get_quote_details(state: State<'_, AppState>, id: String) -> SResult<Value> {
+#[specta::specta]
+pub async fn get_quote_details(state: State<'_, AppState>, id: String) -> SResult<QuoteDetailsResponse> {
     let _ = state.db_conn;
     match QueriesService::get_quote_details(&state.db_conn, id).await {
-        Ok(res) => Ok(Seccess {
+        Ok(res) => Ok(Success {
             error: None,
             message: None,
             data: Some(res),

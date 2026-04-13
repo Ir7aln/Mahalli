@@ -29,9 +29,7 @@ async function fetchInventory() {
       args: {
         search: queryParams.value.search ?? "",
         page: Number(queryParams.value.page) ?? 1,
-        limit: queryParams.value.limit
-          ? Number(queryParams.value.limit)
-          : LIMIT,
+        limit: queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT,
         status: queryParams.value.transaction_type,
         created_at: queryParams.value.created_at,
       },
@@ -53,10 +51,7 @@ const inventory = computed<InventoryT[]>(() => data.value?.inventory ?? []);
 const totalRows = computed<number>(() => data.value?.count ?? 0);
 
 provide("count", totalRows);
-provide(
-  "itemsPerPage",
-  queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT
-);
+provide("itemsPerPage", queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT);
 
 const debouncedSearch = useDebounceFn(() => {
   updateQueryParams({ search: searchQuery.value });
@@ -68,9 +63,7 @@ watch([transaction_type, created_at], () => {
   updateQueryParams({
     transaction_type: transaction_type.value,
     page: 1,
-    created_at: created_at.value
-      ? new Date(created_at.value).toISOString()
-      : undefined,
+    created_at: created_at.value ? new Date(created_at.value).toISOString() : undefined,
   });
 });
 </script>
@@ -104,10 +97,7 @@ watch([transaction_type, created_at], () => {
           </Popover>
           <Select v-model="transaction_type">
             <SelectTrigger>
-              <SelectValue
-                class="text-muted-foreground"
-                :placeholder="t('select-status')"
-              />
+              <SelectValue class="text-muted-foreground" :placeholder="t('select-status')" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="OUT">

@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import { invoke } from "@tauri-apps/api/core";
 import { GroupedBar } from "@unovis/ts";
-import {
-  VisAxis,
-  VisBulletLegend,
-  VisGroupedBar,
-  VisTooltip,
-  VisXYContainer,
-} from "@unovis/vue";
+import { VisAxis, VisBulletLegend, VisGroupedBar, VisTooltip, VisXYContainer } from "@unovis/vue";
 import { DollarSign, NotepadText, Truck } from "lucide-vue-next";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
@@ -67,8 +61,7 @@ const { data: bestProducts } = useAsyncData(async () => {
 const { data: statusCounts } = useAsyncData(async () => {
   try {
     const res = await invoke<Res<any>>("list_status_count");
-    if (!res?.data) 
-      return { orders: {}, invoices: {} };
+    if (!res?.data) return { orders: {}, invoices: {} };
 
     const result: {
       orders: Record<string, number>;
@@ -78,17 +71,13 @@ const { data: statusCounts } = useAsyncData(async () => {
       invoices: {},
     };
 
-    res.data.orders.forEach(
-      (item: { status: string; status_count: number }) => {
-        result.orders[item.status] = item.status_count;
-      }
-    );
+    res.data.orders.forEach((item: { status: string; status_count: number }) => {
+      result.orders[item.status] = item.status_count;
+    });
 
-    res.data.invoices.forEach(
-      (item: { status: string; status_count: number }) => {
-        result.invoices[item.status] = item.status_count;
-      }
-    );
+    res.data.invoices.forEach((item: { status: string; status_count: number }) => {
+      result.invoices[item.status] = item.status_count;
+    });
 
     return result;
   } catch (err: any) {
@@ -121,9 +110,7 @@ function handleError(err: any, context: string) {
     <div class="w-full h-full flex flex-col lg:grid lg:grid-cols-2 gap-2">
       <div class="grid grid-cols-1 lg:grid-cols-2 col-span-2 gap-2">
         <Card class="h-fit w-full">
-          <CardHeader
-            class="flex border-b-0 flex-row items-center justify-between space-y-0 pb-2"
-          >
+          <CardHeader class="flex border-b-0 flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle class="text-sm font-medium">
               {{ t("dashboard.revenue") }}
             </CardTitle>
@@ -145,9 +132,7 @@ function handleError(err: any, context: string) {
           </CardContent>
         </Card>
         <Card class="h-fit w-full lg:order-3">
-          <CardHeader
-            class="flex border-b-0 flex-row items-center justify-between space-y-0 pb-2"
-          >
+          <CardHeader class="flex border-b-0 flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle class="text-sm font-medium">
               {{ t("dashboard.expenses") }}
             </CardTitle>
@@ -169,9 +154,7 @@ function handleError(err: any, context: string) {
           </CardContent>
         </Card>
         <Card class="w-full">
-          <CardHeader
-            class="flex flex-row border-b-0 items-center justify-between space-y-0 pb-2"
-          >
+          <CardHeader class="flex flex-row border-b-0 items-center justify-between space-y-0 pb-2">
             <CardTitle class="text-sm font-medium">
               {{ t("routes.orders") }}
             </CardTitle>
@@ -190,9 +173,7 @@ function handleError(err: any, context: string) {
           </CardContent>
         </Card>
         <Card class="lg:order-4 w-full">
-          <CardHeader
-            class="flex flex-row items-center justify-between border-b-0 space-y-0 pb-2"
-          >
+          <CardHeader class="flex flex-row items-center justify-between border-b-0 space-y-0 pb-2">
             <CardTitle class="text-sm font-medium">
               {{ t("routes.invoices") }}
             </CardTitle>
@@ -214,11 +195,7 @@ function handleError(err: any, context: string) {
       <div class="w-full h-fit">
         <LazyChartHolder>
           <template #default>
-            <VisXYContainer
-              v-if="bestClients"
-              :data="bestClients"
-              :height="500"
-            >
+            <VisXYContainer v-if="bestClients" :data="bestClients" :height="500">
               <VisGroupedBar
                 :bar-padding="0.1"
                 :x="(d: any, index: number) => index"
@@ -226,9 +203,7 @@ function handleError(err: any, context: string) {
               />
               <VisAxis
                 type="x"
-                :tick-format="
-                  (i: number) => (bestClients ? bestClients[i]?.Fullname : i)
-                "
+                :tick-format="(i: number) => (bestClients ? bestClients[i]?.Fullname : i)"
               />
               <VisAxis type="y" :label="`${t('fields.price')} (MAD)`" />
               <VisTooltip
@@ -250,11 +225,7 @@ function handleError(err: any, context: string) {
       <div class="w-full h-fit">
         <LazyChartHolder>
           <template #default>
-            <VisXYContainer
-              v-if="bestProducts"
-              :data="bestProducts"
-              :height="500"
-            >
+            <VisXYContainer v-if="bestProducts" :data="bestProducts" :height="500">
               <VisGroupedBar
                 :bar-padding="0.1"
                 :x="(d: any, index: number) => index"
@@ -262,21 +233,15 @@ function handleError(err: any, context: string) {
               />
               <VisAxis
                 type="x"
-                :tick-format="
-                  (i: number) => (bestProducts ? bestProducts[i]?.name : i)
-                "
+                :tick-format="(i: number) => (bestProducts ? bestProducts[i]?.name : i)"
               />
               <VisAxis type="y" :label="t('fields.quantity')" />
               <VisTooltip
                 :triggers="{
                   [GroupedBar.selectors.bar]: (d: any) => {
-                    return (
-                      `${d.name
-                      }: ${
-                        n(d.quantity, 'decimal')
-                      } ${
-                        t('plrz.i', { n: Math.ceil(d.quantity) })}`
-                    );
+                    return `${d.name}: ${n(d.quantity, 'decimal')} ${t('plrz.i', {
+                      n: Math.ceil(d.quantity),
+                    })}`;
                   },
                 }"
               />
@@ -299,12 +264,12 @@ function handleError(err: any, context: string) {
             >
               <VisGroupedBar
                 :bar-padding="0.1"
-                :x="(_:any, index: number) => index"
+                :x="(_: any, index: number) => index"
                 :y="[(d: any) => d.IN.quantity, (d: any) => d.OUT.quantity]"
               />
               <VisAxis
                 type="x"
-                :tick-format="(i:number) => inventoryTransactions?.transactionLabels[i] || ''"
+                :tick-format="(i: number) => inventoryTransactions?.transactionLabels[i] || ''"
               />
               <VisAxis type="y" :label="t('fields.quantity')" />
               <VisTooltip
@@ -312,9 +277,7 @@ function handleError(err: any, context: string) {
                   [GroupedBar.selectors.bar]: (d: any, i: number) => {
                     const transaction_type = (i % 2 === 0 ? 'IN' : 'OUT') as 'IN' | 'OUT';
                     const quantity = d[transaction_type].quantity;
-                    return (
-                      `${n(quantity, 'decimal')} ${t('plrz.i', { n: Math.ceil(quantity) })}`
-                    );
+                    return `${n(quantity, 'decimal')} ${t('plrz.i', { n: Math.ceil(quantity) })}`;
                   },
                 }"
               />
@@ -345,12 +308,12 @@ function handleError(err: any, context: string) {
             >
               <VisGroupedBar
                 :bar-padding="0.1"
-                :x="(_:any, index: number) => index"
+                :x="(_: any, index: number) => index"
                 :y="[(d: any) => d.IN.price, (d: any) => d.OUT.price]"
               />
               <VisAxis
                 type="x"
-                :tick-format="(i:number) => inventoryTransactions?.transactionLabels[i] || ''"
+                :tick-format="(i: number) => inventoryTransactions?.transactionLabels[i] || ''"
               />
               <VisAxis type="y" :label="`${t('fields.price')} (MAD)`" />
               <VisTooltip

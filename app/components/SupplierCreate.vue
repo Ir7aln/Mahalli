@@ -40,15 +40,12 @@ async function createNewSupplier(supplier: SupplierT) {
       `CREATE SUPPLIER: ${JSON.stringify({
         ...supplier,
         image: image.value,
-      })}`
+      })}`,
     );
     //
-    toast.success(
-      t("notifications.supplier.created", { name: supplier.full_name }),
-      {
-        closeButton: true,
-      }
-    );
+    toast.success(t("notifications.supplier.created", { name: supplier.full_name }), {
+      closeButton: true,
+    });
     // toggle refresh
     updateQueryParams({
       refresh: `refresh-create-${Math.random() * 9999}`,
@@ -58,9 +55,7 @@ async function createNewSupplier(supplier: SupplierT) {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(
-      `ERROR CREATE SUPPLIER: ${err.error ? err.error : err.message}`
-    );
+    Logger.error(`ERROR CREATE SUPPLIER: ${err.error ? err.error : err.message}`);
   } finally {
     close();
   }
@@ -96,10 +91,7 @@ function cleanImage() {
           <FormItem>
             <FormLabel>{{ t("fields.full-name") }}</FormLabel>
             <FormControl>
-              <Input
-                :placeholder="t('fields.full-name')"
-                v-bind="componentField"
-              />
+              <Input :placeholder="t('fields.full-name')" v-bind="componentField" />
             </FormControl>
           </FormItem>
         </FormField>
@@ -123,10 +115,7 @@ function cleanImage() {
           <FormItem>
             <FormLabel>{{ t("fields.address") }}</FormLabel>
             <FormControl>
-              <Input
-                :placeholder="t('fields.address')"
-                v-bind="componentField"
-              />
+              <Input :placeholder="t('fields.address')" v-bind="componentField" />
             </FormControl>
           </FormItem>
         </FormField>

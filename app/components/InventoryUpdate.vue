@@ -38,7 +38,7 @@ async function updateTheProduct({ quantity }: z.infer<typeof inventory>) {
       `UPDATE PRODUCT INVENTORY: ${JSON.stringify({
         id,
         quantity: Number(quantity),
-      })}`
+      })}`,
     );
     //
     toast.success(t("notifications.product.updated", { name: props.name }), {
@@ -53,9 +53,7 @@ async function updateTheProduct({ quantity }: z.infer<typeof inventory>) {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(
-      `ERROR UPDATE PRODUCT INVENTORY: ${err.error ? err.error : err.message}`
-    );
+    Logger.error(`ERROR UPDATE PRODUCT INVENTORY: ${err.error ? err.error : err.message}`);
   } finally {
     close();
   }
@@ -79,11 +77,7 @@ const onSubmit = form.handleSubmit((values) => {
           <FormItem>
             <FormLabel>{{ t("fields.quantity") }}</FormLabel>
             <FormControl>
-              <Input
-                type="number"
-                :placeholder="t('fields.quantity')"
-                v-bind="componentField"
-              >
+              <Input type="number" :placeholder="t('fields.quantity')" v-bind="componentField">
                 <template #unite>
                   {{ t("fields.item") }}
                 </template>

@@ -1,19 +1,19 @@
-use serde_json::Value;
 use tauri::State;
 
-use service::{ListArgs, MutationsService, NewSupplier, QueriesService, Supplier};
+use service::{ListArgs, MutationsService, NewSupplier, QueriesService, Supplier, SuppliersResponse, SupplierSearch};
 
 use crate::jobs::{EntityEnum, ImageProcessorJob};
 
 use crate::AppState;
 
-use super::{Fail, SResult, Seccess};
+use super::{Fail, SResult, Success};
 
 #[tauri::command]
-pub async fn list_suppliers(state: State<'_, AppState>, args: ListArgs) -> SResult<Value> {
+#[specta::specta]
+pub async fn list_suppliers(state: State<'_, AppState>, args: ListArgs) -> SResult<SuppliersResponse> {
     let _ = state.db_conn;
     match QueriesService::list_suppliers(&state.db_conn, args).await {
-        Ok(res) => Ok(Seccess {
+        Ok(res) => Ok(Success {
             error: None,
             message: None,
             data: Some(res),
@@ -26,10 +26,11 @@ pub async fn list_suppliers(state: State<'_, AppState>, args: ListArgs) -> SResu
 }
 
 #[tauri::command]
-pub async fn search_suppliers(state: State<'_, AppState>, search: String) -> SResult<Vec<Value>> {
+#[specta::specta]
+pub async fn search_suppliers(state: State<'_, AppState>, search: String) -> SResult<Vec<SupplierSearch>> {
     let _ = state.db_conn;
     match QueriesService::search_suppliers(&state.db_conn, search).await {
-        Ok(res) => Ok(Seccess {
+        Ok(res) => Ok(Success {
             error: None,
             message: None,
             data: Some(res),
@@ -42,6 +43,7 @@ pub async fn search_suppliers(state: State<'_, AppState>, search: String) -> SRe
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn create_supplier(state: State<'_, AppState>, supplier: NewSupplier) -> SResult<String> {
     let _ = state.db_conn;
     let image = supplier.image.clone();
@@ -62,7 +64,7 @@ pub async fn create_supplier(state: State<'_, AppState>, supplier: NewSupplier) 
                 }
                 None => {}
             }
-            Ok(Seccess::<String> {
+            Ok(Success::<String> {
                 error: None,
                 message: Option::Some(String::from("supplier created successfully")),
                 data: Some(id),
@@ -76,10 +78,11 @@ pub async fn create_supplier(state: State<'_, AppState>, supplier: NewSupplier) 
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn delete_supplier(state: State<'_, AppState>, id: String) -> SResult<u64> {
     let _ = state.db_conn;
     match MutationsService::delete_supplier(&state.db_conn, id).await {
-        Ok(res) => Ok(Seccess {
+        Ok(res) => Ok(Success {
             error: None,
             message: None,
             data: Some(res),
@@ -92,10 +95,11 @@ pub async fn delete_supplier(state: State<'_, AppState>, id: String) -> SResult<
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn update_supplier(state: State<'_, AppState>, supplier: Supplier) -> SResult<String> {
     let _ = state.db_conn;
     match MutationsService::update_supplier(&state.db_conn, supplier).await {
-        Ok(_) => Ok(Seccess::<String> {
+        Ok(_) => Ok(Success::<String> {
             error: None,
             message: Option::Some(String::from("update suppliers success")),
             data: None,

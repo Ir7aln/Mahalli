@@ -34,9 +34,7 @@ async function fetchInvoices() {
       args: {
         page: Number(queryParams.value.page) ?? 1,
         search: queryParams.value.search ?? "",
-        limit: queryParams.value.limit
-          ? Number(queryParams.value.limit)
-          : LIMIT,
+        limit: queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT,
         status: queryParams.value.status,
         created_at: queryParams.value.created_at,
       },
@@ -59,10 +57,7 @@ const invoices = computed<InvoiceT[]>(() => invoicesData.value?.invoices ?? []);
 const totalRows = computed<number>(() => invoicesData.value?.count ?? 0);
 
 provide("count", totalRows);
-provide(
-  "itemsPerPage",
-  queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT
-);
+provide("itemsPerPage", queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT);
 
 watch(queryParams, fetchInvoices, { deep: true });
 
@@ -75,9 +70,7 @@ watch(searchQuery, debouncedSearch);
 watch([status, created_at], () => {
   updateQueryParams({
     status: status.value,
-    created_at: created_at.value
-      ? new Date(created_at.value).toISOString()
-      : undefined,
+    created_at: created_at.value ? new Date(created_at.value).toISOString() : undefined,
     page: 1,
   });
 });
@@ -93,9 +86,7 @@ async function listInvoiceProducts(id?: string) {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(
-      `ERROR LIST INVOICES PRODUCTS: ${err.error ? err.error : err.message}`
-    );
+    Logger.error(`ERROR LIST INVOICES PRODUCTS: ${err.error ? err.error : err.message}`);
   }
 }
 
@@ -107,12 +98,7 @@ const openCreateInvoiceModal = () => modal.open(InvoiceCreate, { sheet: true });
     <div class="w-full h-full flex flex-col items-start justify-start">
       <div class="flex justify-between w-full gap-9 mb-2">
         <div class="w-full grid grid-cols-3 gap-2 lg:max-w-screen-lg">
-          <Input
-            v-model="searchQuery"
-            name="search"
-            type="text"
-            :placeholder="t('search')"
-          />
+          <Input v-model="searchQuery" name="search" type="text" :placeholder="t('search')" />
           <Popover>
             <PopoverTrigger as-child>
               <Button
@@ -136,10 +122,7 @@ const openCreateInvoiceModal = () => modal.open(InvoiceCreate, { sheet: true });
           </Popover>
           <Select v-model="status" name="status">
             <SelectTrigger>
-              <SelectValue
-                class="text-muted-foreground"
-                :placeholder="t('select-status')"
-              />
+              <SelectValue class="text-muted-foreground" :placeholder="t('select-status')" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem

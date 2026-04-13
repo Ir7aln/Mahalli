@@ -17,12 +17,9 @@ async function deleteTheSupplier() {
     // INFO
     Logger.info(`DELETE SUPPLIER: ${props.id}`);
     //
-    toast.success(
-      t("notifications.supplier.deleted", { name: props.fullName }),
-      {
-        closeButton: true,
-      }
-    );
+    toast.success(t("notifications.supplier.deleted", { name: props.fullName }), {
+      closeButton: true,
+    });
     // toggle refresh
     updateQueryParams({
       refresh: `refresh-delete-${Math.random() * 9999}`,
@@ -32,9 +29,7 @@ async function deleteTheSupplier() {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(
-      `ERROR DELETE SUPPLIER: ${err.error ? err.error : err.message}`
-    );
+    Logger.error(`ERROR DELETE SUPPLIER: ${err.error ? err.error : err.message}`);
   } finally {
     close();
   }
@@ -44,9 +39,7 @@ async function deleteTheSupplier() {
 <template>
   <Card>
     <CardHeader>
-      <CardTitle>
-        {{ t("titles.suppliers.delete") }} {{ fullName }} ?
-      </CardTitle>
+      <CardTitle> {{ t("titles.suppliers.delete") }} {{ fullName }} ? </CardTitle>
     </CardHeader>
     <CardContent>
       <div />

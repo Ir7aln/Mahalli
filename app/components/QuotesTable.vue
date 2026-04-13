@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import { invoke } from "@tauri-apps/api/core";
-import {
-  FilePenLine,
-  GripHorizontal,
-  Printer,
-  Trash2,
-  Truck,
-} from "lucide-vue-next";
+import { FilePenLine, GripHorizontal, Printer, Trash2, Truck } from "lucide-vue-next";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
 import { NuxtLink, QuoteDelete, QuoteUpdate } from "#components";
@@ -86,11 +80,7 @@ async function createOrderFromQuote(id: string) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow
-          v-for="(quote, index) in quotes"
-          :key="quote.id"
-          v-fade="index"
-        >
+        <TableRow v-for="(quote, index) in quotes" :key="quote.id" v-fade="index">
           <TableCell class="p-2 text-nowrap font-medium">
             {{ quote.identifier }}
           </TableCell>
@@ -115,9 +105,7 @@ async function createOrderFromQuote(id: string) {
                 </Button>
               </PopoverTrigger>
               <PopoverContent class="min-w-[13rem] p-2">
-                <ScrollArea
-                  :class="quoteProducts.length > 16 ? 'h-[380px]' : 'h-fit'"
-                >
+                <ScrollArea :class="quoteProducts.length > 16 ? 'h-[380px]' : 'h-fit'">
                   <table class="w-full not-default">
                     <thead>
                       <tr>
@@ -125,11 +113,7 @@ async function createOrderFromQuote(id: string) {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr
-                        v-for="(product, i) in quoteProducts"
-                        :key="i"
-                        class="text-sm"
-                      >
+                      <tr v-for="(product, i) in quoteProducts" :key="i" class="text-sm">
                         <td>
                           {{ product.name }}
                         </td>
@@ -168,10 +152,7 @@ async function createOrderFromQuote(id: string) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent class="rtl:ml-6 ltr:mr-6">
                   <DropdownMenuItem @click="toggleThisQuote(quote, 'update')">
-                    <FilePenLine
-                      :size="20"
-                      class="text-slate-800 inline mr-2"
-                    />
+                    <FilePenLine :size="20" class="text-slate-800 inline mr-2" />
                     {{ t("buttons.edit") }}
                   </DropdownMenuItem>
                   <DropdownMenuItem>
@@ -182,10 +163,9 @@ async function createOrderFromQuote(id: string) {
                         })
                       "
                     >
-                      <Printer
-                        :size="20"
-                        class="text-slate-800 inline mr-2"
-                      />{{ t("buttons.print") }}
+                      <Printer :size="20" class="text-slate-800 inline mr-2" />{{
+                        t("buttons.print")
+                      }}
                     </NuxtLink>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />

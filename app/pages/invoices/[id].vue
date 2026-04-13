@@ -20,9 +20,7 @@ const { data: invoice } = await useAsyncData(async () => {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(
-      `ERROR INVOICE DETAILS: ${err.error ? err.error : err.message}`
-    );
+    Logger.error(`ERROR INVOICE DETAILS: ${err.error ? err.error : err.message}`);
   }
 });
 
@@ -37,9 +35,7 @@ async function handleGeneratePdf() {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(
-      `ERROR INVOICE DETAILS: ${err.error ? err.error : err.message}`
-    );
+    Logger.error(`ERROR INVOICE DETAILS: ${err.error ? err.error : err.message}`);
   }
 }
 
@@ -50,7 +46,7 @@ async function saveConfig() {
       filePath = await uploadFileToDataDir(
         "pdf-templates",
         config.template.bytes,
-        config.template.name
+        config.template.name,
       );
     }
     await invoke("create_template", {
@@ -73,9 +69,7 @@ async function saveConfig() {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(
-      `ERROR CREATE TEMPLATE: ${err.error ? err.error : err.message}`
-    );
+    Logger.error(`ERROR CREATE TEMPLATE: ${err.error ? err.error : err.message}`);
   }
 }
 

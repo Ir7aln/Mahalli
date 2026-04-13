@@ -9,9 +9,7 @@ import {
 } from "radix-vue";
 import { cn } from "@/utils/shadcn";
 
-const props = defineProps<
-  SwitchRootProps & { class?: HTMLAttributes["class"] }
->();
+const props = defineProps<SwitchRootProps & { class?: HTMLAttributes["class"] }>();
 const emits = defineEmits<SwitchRootEmits>();
 const delegatedProps = computed(() => {
   const { class: _, ...delegated } = props;

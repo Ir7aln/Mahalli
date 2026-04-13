@@ -55,7 +55,7 @@ async function updateInvoiceStatus(id: string, status: string) {
       `UPDATE INVOICE STATUS: ${JSON.stringify({
         id,
         status,
-      })}`
+      })}`,
     );
     // toggle refresh
     updateQueryParams({
@@ -66,9 +66,7 @@ async function updateInvoiceStatus(id: string, status: string) {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(
-      `ERROR UPDATE INVOICE STATUS: ${err.error ? err.error : err.message}`
-    );
+    Logger.error(`ERROR UPDATE INVOICE STATUS: ${err.error ? err.error : err.message}`);
   }
 }
 </script>
@@ -101,8 +99,7 @@ async function updateInvoiceStatus(id: string, status: string) {
           v-fade="index"
           :class="{
             'animate-highlight-row':
-              invoice.id === $route.query.id
-              && $route.query.highlight === 'true',
+              invoice.id === $route.query.id && $route.query.highlight === 'true',
           }"
         >
           <TableCell class="p-2 text-nowrap font-medium">
@@ -129,9 +126,7 @@ async function updateInvoiceStatus(id: string, status: string) {
                 </Button>
               </PopoverTrigger>
               <PopoverContent class="min-w-[13rem] p-2">
-                <ScrollArea
-                  :class="invoiceProducts.length > 16 ? 'h-[380px]' : 'h-fit'"
-                >
+                <ScrollArea :class="invoiceProducts.length > 16 ? 'h-[380px]' : 'h-fit'">
                   <table class="w-full not-default">
                     <thead>
                       <tr>
@@ -139,11 +134,7 @@ async function updateInvoiceStatus(id: string, status: string) {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr
-                        v-for="(product, i) in invoiceProducts"
-                        :key="i"
-                        class="text-sm"
-                      >
+                      <tr v-for="(product, i) in invoiceProducts" :key="i" class="text-sm">
                         <td>
                           {{ product.name }}
                         </td>
@@ -173,12 +164,7 @@ async function updateInvoiceStatus(id: string, status: string) {
               <PopoverTrigger as-child>
                 <Badge
                   variant="outline"
-                  :class="
-                    cn(
-                      'cursor-pointer whitespace-nowrap',
-                      STATUS_COLORS[invoice?.status!],
-                    )
-                  "
+                  :class="cn('cursor-pointer whitespace-nowrap', STATUS_COLORS[invoice?.status!])"
                 >
                   {{ t(`status.${invoice.status.toLowerCase()}`) }}
                 </Badge>
@@ -214,13 +200,8 @@ async function updateInvoiceStatus(id: string, status: string) {
                   <GripHorizontal class="text-slate-800 inline" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent class="rtl:ml-6 ltr:mr-6">
-                  <DropdownMenuItem
-                    @click="toggleThisInvoice(invoice, 'update')"
-                  >
-                    <FilePenLine
-                      :size="20"
-                      class="text-slate-800 inline mr-2"
-                    />
+                  <DropdownMenuItem @click="toggleThisInvoice(invoice, 'update')">
+                    <FilePenLine :size="20" class="text-slate-800 inline mr-2" />
                     {{ t("buttons.edit") }}
                   </DropdownMenuItem>
                   <DropdownMenuItem>
@@ -231,16 +212,13 @@ async function updateInvoiceStatus(id: string, status: string) {
                         })
                       "
                     >
-                      <Printer
-                        :size="20"
-                        class="text-slate-800 inline mr-2"
-                      />{{ t("buttons.print") }}
+                      <Printer :size="20" class="text-slate-800 inline mr-2" />{{
+                        t("buttons.print")
+                      }}
                     </NuxtLink>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    @click="toggleThisInvoice(invoice, 'delete')"
-                  >
+                  <DropdownMenuItem @click="toggleThisInvoice(invoice, 'delete')">
                     <Trash2 :size="20" class="text-red-500 inline mr-2" />
                     <span class="text-red-500">
                       {{ t("buttons.delete") }}

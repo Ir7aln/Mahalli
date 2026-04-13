@@ -1,3 +1,4 @@
+use specta::Type;
 use serde::{Deserialize, Serialize};
 
 pub mod clients;
@@ -11,17 +12,17 @@ pub mod quotes;
 pub mod suppliers;
 pub mod templates;
 
-#[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct Seccess<T> {
+#[derive(Deserialize, Serialize, Debug, Clone, Type)]
+pub struct Success<T> {
     pub error: Option<String>,
     pub message: Option<String>,
     pub data: Option<T>,
 }
 
-#[derive(Deserialize, Serialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone, Type)]
 pub struct Fail {
     pub error: Option<String>,
     pub message: Option<String>,
 }
 
-pub type SResult<T> = Result<Seccess<T>, Fail>;
+pub type SResult<T> = Result<Success<T>, Fail>;

@@ -43,17 +43,10 @@ function toggleThisSupplier(supplier: SupplierT, name: "delete" | "update") {
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow
-          v-for="(supplier, index) in suppliers"
-          :key="supplier.id"
-          v-fade="index"
-        >
+        <TableRow v-for="(supplier, index) in suppliers" :key="supplier.id" v-fade="index">
           <TableCell class="p-2 flex justify-center">
             <Avatar>
-              <AvatarImage
-                v-if="supplier.image"
-                :src="convertFileSrc(supplier.image)"
-              />
+              <AvatarImage v-if="supplier.image" :src="convertFileSrc(supplier.image)" />
               <AvatarFallback class="text-xs">
                 {{ supplier.full_name.substring(0, 5) }}
               </AvatarFallback>
@@ -78,19 +71,12 @@ function toggleThisSupplier(supplier: SupplierT, name: "delete" | "update") {
                   <GripHorizontal class="text-slate-800 inline" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent class="rtl:ml-6 ltr:mr-6">
-                  <DropdownMenuItem
-                    @click="toggleThisSupplier(supplier, 'update')"
-                  >
-                    <FilePenLine
-                      :size="20"
-                      class="text-slate-800 inline mr-2"
-                    />
+                  <DropdownMenuItem @click="toggleThisSupplier(supplier, 'update')">
+                    <FilePenLine :size="20" class="text-slate-800 inline mr-2" />
                     {{ t("buttons.edit") }}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    @click="toggleThisSupplier(supplier, 'delete')"
-                  >
+                  <DropdownMenuItem @click="toggleThisSupplier(supplier, 'delete')">
                     <Trash2 :size="20" class="text-red-500 inline mr-2" />
                     <span class="text-red-500">
                       {{ t("buttons.delete") }}

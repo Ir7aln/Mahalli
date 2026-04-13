@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import { onClickOutside } from "@vueuse/core";
 import { Check } from "lucide-vue-next";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 
 const props = defineProps<{
@@ -54,9 +50,7 @@ function selectItem(item: { label: string; value: string; price?: number }) {
         />
       </PopoverTrigger>
       <PopoverContent class="p-1" @open-auto-focus="(e) => e.preventDefault()">
-        <ScrollArea
-          :class="cn('space-y-1', items.length > 7 ? 'h-60' : 'h-fit')"
-        >
+        <ScrollArea :class="cn('space-y-1', items.length > 7 ? 'h-60' : 'h-fit')">
           <div
             v-for="item in items"
             :key="item.value"
