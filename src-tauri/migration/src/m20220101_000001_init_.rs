@@ -417,11 +417,26 @@ impl MigrationTrait for Migration {
                 Table::create()
                     .table(InvoiceItem::Table)
                     .if_not_exists()
-                    .col(ColumnDef::new(InvoiceItem::Id).string().not_null().primary_key())
+                    .col(
+                        ColumnDef::new(InvoiceItem::Id)
+                            .string()
+                            .not_null()
+                            .primary_key(),
+                    )
                     .col(ColumnDef::new(InvoiceItem::InvoiceId).string().not_null())
                     .col(ColumnDef::new(InvoiceItem::ProductId).string().not_null())
-                    .col(ColumnDef::new(InvoiceItem::Price).double().not_null().default(0))
-                    .col(ColumnDef::new(InvoiceItem::Quantity).double().not_null().default(0))
+                    .col(
+                        ColumnDef::new(InvoiceItem::Price)
+                            .double()
+                            .not_null()
+                            .default(0),
+                    )
+                    .col(
+                        ColumnDef::new(InvoiceItem::Quantity)
+                            .double()
+                            .not_null()
+                            .default(0),
+                    )
                     .col(ColumnDef::new(InvoiceItem::InventoryId).string().null())
                     .col(
                         ColumnDef::new(InvoiceItem::CreatedAt)

@@ -1,5 +1,5 @@
-use sea_orm::*;
 use sea_orm::entity::prelude::Decimal;
+use sea_orm::*;
 
 use crate::{entities::*, models::*};
 

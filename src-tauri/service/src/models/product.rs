@@ -1,7 +1,7 @@
-use sea_orm::FromQueryResult;
-use specta::Type;
-use serde::{Deserialize, Serialize};
 use sea_orm::entity::prelude::Decimal;
+use sea_orm::FromQueryResult;
+use serde::{Deserialize, Serialize};
+use specta::Type;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, FromQueryResult, Type)]
 pub struct SelectProducts {

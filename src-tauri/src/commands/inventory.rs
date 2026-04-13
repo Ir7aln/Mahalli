@@ -1,6 +1,6 @@
 use tauri::State;
 
-use service::{ListArgs, MutationsService, NewInventory, QueriesService, InventoryResponse};
+use service::{InventoryResponse, ListArgs, MutationsService, NewInventory, QueriesService};
 
 use crate::{commands::Fail, AppState};
 
@@ -8,7 +8,10 @@ use super::{SResult, Success};
 
 #[tauri::command]
 #[specta::specta]
-pub async fn list_inventory(state: State<'_, AppState>, args: ListArgs) -> SResult<InventoryResponse> {
+pub async fn list_inventory(
+    state: State<'_, AppState>,
+    args: ListArgs,
+) -> SResult<InventoryResponse> {
     let _ = state.db_conn;
     match QueriesService::list_inventory(&state.db_conn, args).await {
         Ok(res) => Ok(Success {

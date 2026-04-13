@@ -1,8 +1,8 @@
 use tauri::State;
 
 use service::{
-    ListArgs, MutationsService, NewQuote, QueriesService, TransactionService, UpdateQuote,
-    QuotesResponse, QuoteProductItem, QuoteWithClient, QuoteDetailsResponse,
+    ListArgs, MutationsService, NewQuote, QueriesService, QuoteDetailsResponse, QuoteProductItem,
+    QuoteWithClient, QuotesResponse, TransactionService, UpdateQuote,
 };
 
 use crate::AppState;
@@ -28,7 +28,10 @@ pub async fn list_quotes(state: State<'_, AppState>, args: ListArgs) -> SResult<
 
 #[tauri::command]
 #[specta::specta]
-pub async fn list_quote_products(state: State<'_, AppState>, id: String) -> SResult<Vec<QuoteProductItem>> {
+pub async fn list_quote_products(
+    state: State<'_, AppState>,
+    id: String,
+) -> SResult<Vec<QuoteProductItem>> {
     let _ = state.db_conn;
     match QueriesService::list_quote_products(&state.db_conn, id).await {
         Ok(res) => Ok(Success {
@@ -113,7 +116,10 @@ pub async fn get_quote(state: State<'_, AppState>, id: String) -> SResult<QuoteW
 
 #[tauri::command]
 #[specta::specta]
-pub async fn get_quote_details(state: State<'_, AppState>, id: String) -> SResult<QuoteDetailsResponse> {
+pub async fn get_quote_details(
+    state: State<'_, AppState>,
+    id: String,
+) -> SResult<QuoteDetailsResponse> {
     let _ = state.db_conn;
     match QueriesService::get_quote_details(&state.db_conn, id).await {
         Ok(res) => Ok(Success {

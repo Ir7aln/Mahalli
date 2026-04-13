@@ -139,10 +139,7 @@ impl QueriesService {
         .all(db)
         .await?;
 
-        Ok(ProductsResponse {
-            count,
-            products,
-        })
+        Ok(ProductsResponse { count, products })
     }
     pub async fn search_products(db: &DbConn, search: String) -> Result<Vec<ProductSearch>, DbErr> {
         let products = Products::find()
@@ -373,7 +370,10 @@ impl QueriesService {
             suppliers: result,
         })
     }
-    pub async fn search_suppliers(db: &DbConn, search: String) -> Result<Vec<SupplierSearch>, DbErr> {
+    pub async fn search_suppliers(
+        db: &DbConn,
+        search: String,
+    ) -> Result<Vec<SupplierSearch>, DbErr> {
         let suppliers = Suppliers::find()
             .select_only()
             .expr_as_(Expr::col(suppliers::Column::FullName), "label")
@@ -565,7 +565,10 @@ impl QueriesService {
             None => Err(DbErr::RecordNotFound(String::from("no order"))),
         }
     }
-    pub async fn list_order_products(db: &DbConn, id: String) -> Result<Vec<OrderProductItem>, DbErr> {
+    pub async fn list_order_products(
+        db: &DbConn,
+        id: String,
+    ) -> Result<Vec<OrderProductItem>, DbErr> {
         let order_products = OrderItems::find()
             .select_only()
             .columns([order_items::Column::Price])
@@ -872,10 +875,16 @@ impl QueriesService {
             None => Err(DbErr::RecordNotFound(String::from("no invoice"))),
         }
     }
-    pub async fn list_invoice_products(db: &DbConn, id: String) -> Result<Vec<InvoiceProductItem>, DbErr> {
+    pub async fn list_invoice_products(
+        db: &DbConn,
+        id: String,
+    ) -> Result<Vec<InvoiceProductItem>, DbErr> {
         let invoice_products = InvoiceItems::find()
             .select_only()
-            .columns([invoice_items::Column::Price, invoice_items::Column::Quantity])
+            .columns([
+                invoice_items::Column::Price,
+                invoice_items::Column::Quantity,
+            ])
             .exprs([Expr::col((Products, products::Column::Name))])
             .join(JoinType::Join, invoice_items::Relation::Products.def())
             .filter(Expr::col((InvoiceItems, invoice_items::Column::InvoiceId)).eq(id))
@@ -885,7 +894,10 @@ impl QueriesService {
 
         Ok(invoice_products)
     }
-    pub async fn get_invoice_details(db: &DbConn, id: String) -> Result<InvoiceDetailsResponse, DbErr> {
+    pub async fn get_invoice_details(
+        db: &DbConn,
+        id: String,
+    ) -> Result<InvoiceDetailsResponse, DbErr> {
         let (sql, values) = Query::select()
             .from(Invoices)
             .exprs([
@@ -950,7 +962,8 @@ impl QueriesService {
                             .equals((InvoiceItems, invoice_items::Column::ProductId)),
                     )
                     .cond_where(
-                        Expr::col((InvoiceItems, invoice_items::Column::InvoiceId)).eq(invoice.id.clone()),
+                        Expr::col((InvoiceItems, invoice_items::Column::InvoiceId))
+                            .eq(invoice.id.clone()),
                     )
                     .to_owned()
                     .build(SqliteQueryBuilder);
@@ -1130,7 +1143,10 @@ impl QueriesService {
             None => Err(DbErr::RecordNotFound(String::from("no quote"))),
         }
     }
-    pub async fn list_quote_products(db: &DbConn, id: String) -> Result<Vec<QuoteProductItem>, DbErr> {
+    pub async fn list_quote_products(
+        db: &DbConn,
+        id: String,
+    ) -> Result<Vec<QuoteProductItem>, DbErr> {
         let quote_products = QuoteItems::find()
             .select_only()
             .columns([quote_items::Column::Price])

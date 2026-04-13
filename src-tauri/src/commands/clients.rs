@@ -1,6 +1,9 @@
 use tauri::State;
 
-use service::{Client, ClientsResponse, ClientDetails, ClientSearch, ListArgs, MutationsService, NewClient, QueriesService};
+use service::{
+    Client, ClientDetails, ClientSearch, ClientsResponse, ListArgs, MutationsService, NewClient,
+    QueriesService,
+};
 
 use crate::jobs::{EntityEnum, ImageProcessorJob};
 use crate::AppState;
@@ -26,7 +29,10 @@ pub async fn list_clients(state: State<'_, AppState>, args: ListArgs) -> SResult
 
 #[tauri::command]
 #[specta::specta]
-pub async fn search_clients(state: State<'_, AppState>, search: String) -> SResult<Vec<ClientSearch>> {
+pub async fn search_clients(
+    state: State<'_, AppState>,
+    search: String,
+) -> SResult<Vec<ClientSearch>> {
     let _ = state.db_conn;
     match QueriesService::search_clients(&state.db_conn, search).await {
         Ok(res) => Ok(Success {

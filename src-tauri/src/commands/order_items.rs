@@ -21,4 +21,3 @@ pub async fn delete_order_item(state: State<'_, AppState>, id: String) -> SResul
         }),
     }
 }
-

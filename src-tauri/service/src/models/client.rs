@@ -1,6 +1,6 @@
 use sea_orm::FromQueryResult;
-use specta::Type;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, FromQueryResult, Type)]
 pub struct SelectClients {

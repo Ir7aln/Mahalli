@@ -1,8 +1,8 @@
 use tauri::State;
 
 use service::{
-    ListArgs, MutationsService, NewInvoice, QueriesService, TransactionService, UpdateInvoice,
-    UpdateStatus, InvoicesResponse, InvoiceProductItem, InvoiceWithClient, InvoiceDetailsResponse,
+    InvoiceDetailsResponse, InvoiceProductItem, InvoiceWithClient, InvoicesResponse, ListArgs,
+    MutationsService, NewInvoice, QueriesService, TransactionService, UpdateInvoice, UpdateStatus,
 };
 
 use crate::AppState;
@@ -28,7 +28,10 @@ pub async fn create_invoice_from_order(state: State<'_, AppState>, id: String) -
 
 #[tauri::command]
 #[specta::specta]
-pub async fn list_invoices(state: State<'_, AppState>, args: ListArgs) -> SResult<InvoicesResponse> {
+pub async fn list_invoices(
+    state: State<'_, AppState>,
+    args: ListArgs,
+) -> SResult<InvoicesResponse> {
     let _ = state.db_conn;
     match QueriesService::list_invoices(&state.db_conn, args).await {
         Ok(res) => Ok(Success {
@@ -45,7 +48,10 @@ pub async fn list_invoices(state: State<'_, AppState>, args: ListArgs) -> SResul
 
 #[tauri::command]
 #[specta::specta]
-pub async fn list_invoice_products(state: State<'_, AppState>, id: String) -> SResult<Vec<InvoiceProductItem>> {
+pub async fn list_invoice_products(
+    state: State<'_, AppState>,
+    id: String,
+) -> SResult<Vec<InvoiceProductItem>> {
     let _ = state.db_conn;
     match QueriesService::list_invoice_products(&state.db_conn, id).await {
         Ok(res) => Ok(Success {
@@ -150,7 +156,10 @@ pub async fn get_invoice(state: State<'_, AppState>, id: String) -> SResult<Invo
 
 #[tauri::command]
 #[specta::specta]
-pub async fn get_invoice_details(state: State<'_, AppState>, id: String) -> SResult<InvoiceDetailsResponse> {
+pub async fn get_invoice_details(
+    state: State<'_, AppState>,
+    id: String,
+) -> SResult<InvoiceDetailsResponse> {
     let _ = state.db_conn;
     match QueriesService::get_invoice_details(&state.db_conn, id).await {
         Ok(res) => Ok(Success {

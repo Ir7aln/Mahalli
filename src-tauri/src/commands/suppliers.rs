@@ -1,6 +1,9 @@
 use tauri::State;
 
-use service::{ListArgs, MutationsService, NewSupplier, QueriesService, Supplier, SuppliersResponse, SupplierSearch};
+use service::{
+    ListArgs, MutationsService, NewSupplier, QueriesService, Supplier, SupplierSearch,
+    SuppliersResponse,
+};
 
 use crate::jobs::{EntityEnum, ImageProcessorJob};
 
@@ -10,7 +13,10 @@ use super::{Fail, SResult, Success};
 
 #[tauri::command]
 #[specta::specta]
-pub async fn list_suppliers(state: State<'_, AppState>, args: ListArgs) -> SResult<SuppliersResponse> {
+pub async fn list_suppliers(
+    state: State<'_, AppState>,
+    args: ListArgs,
+) -> SResult<SuppliersResponse> {
     let _ = state.db_conn;
     match QueriesService::list_suppliers(&state.db_conn, args).await {
         Ok(res) => Ok(Success {
@@ -27,7 +33,10 @@ pub async fn list_suppliers(state: State<'_, AppState>, args: ListArgs) -> SResu
 
 #[tauri::command]
 #[specta::specta]
-pub async fn search_suppliers(state: State<'_, AppState>, search: String) -> SResult<Vec<SupplierSearch>> {
+pub async fn search_suppliers(
+    state: State<'_, AppState>,
+    search: String,
+) -> SResult<Vec<SupplierSearch>> {
     let _ = state.db_conn;
     match QueriesService::search_suppliers(&state.db_conn, search).await {
         Ok(res) => Ok(Success {

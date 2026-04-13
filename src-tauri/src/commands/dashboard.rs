@@ -1,6 +1,9 @@
 use tauri::State;
 
-use service::{QueriesService, SelectTransaction, SelectTops, SelectTopProducts, StatusCountResponse, FinancialMetricsResponse};
+use service::{
+    FinancialMetricsResponse, QueriesService, SelectTopProducts, SelectTops, SelectTransaction,
+    StatusCountResponse,
+};
 
 use crate::AppState;
 
@@ -93,7 +96,9 @@ pub async fn list_status_count(state: State<'_, AppState>) -> SResult<StatusCoun
 
 #[tauri::command]
 #[specta::specta]
-pub async fn list_financial_metrics(state: State<'_, AppState>) -> SResult<FinancialMetricsResponse> {
+pub async fn list_financial_metrics(
+    state: State<'_, AppState>,
+) -> SResult<FinancialMetricsResponse> {
     let _ = state.db_conn;
     match QueriesService::list_financial_metrics(&state.db_conn).await {
         Ok(res) => Ok(Success {

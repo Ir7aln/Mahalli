@@ -2,8 +2,8 @@ use std::ops::Range;
 
 use crate::{
     m20220101_000001_init_::{
-        Client, InventoryTransaction, Invoice, InvoiceItem, Order, OrderItem, Product, Quote, QuoteItem,
-        Supplier,
+        Client, InventoryTransaction, Invoice, InvoiceItem, Order, OrderItem, Product, Quote,
+        QuoteItem, Supplier,
     },
     utils::get_random_enum,
 };
@@ -315,9 +315,7 @@ impl MigrationTrait for Migration {
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        let delete_item = Query::delete()
-            .from_table(InvoiceItem::Table)
-            .to_owned();
+        let delete_item = Query::delete().from_table(InvoiceItem::Table).to_owned();
         manager.exec_stmt(delete_item).await?;
 
         let delete_item = Query::delete().from_table(OrderItem::Table).to_owned();

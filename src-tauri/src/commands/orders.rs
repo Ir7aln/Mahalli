@@ -1,8 +1,8 @@
 use tauri::State;
 
 use service::{
-    ListArgs, MutationsService, NewOrder, QueriesService, TransactionService, UpdateOrder,
-    UpdateStatus, OrdersResponse, OrderProductItem, OrderWithClient, OrderDetailsResponse,
+    ListArgs, MutationsService, NewOrder, OrderDetailsResponse, OrderProductItem, OrderWithClient,
+    OrdersResponse, QueriesService, TransactionService, UpdateOrder, UpdateStatus,
 };
 
 use crate::AppState;
@@ -45,7 +45,10 @@ pub async fn list_orders(state: State<'_, AppState>, args: ListArgs) -> SResult<
 
 #[tauri::command]
 #[specta::specta]
-pub async fn list_order_products(state: State<'_, AppState>, id: String) -> SResult<Vec<OrderProductItem>> {
+pub async fn list_order_products(
+    state: State<'_, AppState>,
+    id: String,
+) -> SResult<Vec<OrderProductItem>> {
     let _ = state.db_conn;
     match QueriesService::list_order_products(&state.db_conn, id).await {
         Ok(res) => Ok(Success {
@@ -147,7 +150,10 @@ pub async fn get_order(state: State<'_, AppState>, id: String) -> SResult<OrderW
 
 #[tauri::command]
 #[specta::specta]
-pub async fn get_order_details(state: State<'_, AppState>, id: String) -> SResult<OrderDetailsResponse> {
+pub async fn get_order_details(
+    state: State<'_, AppState>,
+    id: String,
+) -> SResult<OrderDetailsResponse> {
     let _ = state.db_conn;
     match QueriesService::get_order_details(&state.db_conn, id).await {
         Ok(res) => Ok(Success {

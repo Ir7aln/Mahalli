@@ -21,4 +21,3 @@ pub async fn delete_invoice_item(state: State<'_, AppState>, id: String) -> SRes
         }),
     }
 }
-

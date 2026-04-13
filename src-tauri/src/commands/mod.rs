@@ -1,5 +1,5 @@
-use specta::Type;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 pub mod clients;
 pub mod dashboard;
