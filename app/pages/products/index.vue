@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
 import { Plus } from "lucide-vue-next";
 import { useDebounceFn } from "@vueuse/core";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
+import { commands } from "@/bindings";
 import { ProductCreate } from "#components";
+import type { QueryParams } from "@/types/query";
+import type { SelectProducts } from "@/bindings";
 
 const route = useRoute();
 const { t } = useI18n();
@@ -14,7 +16,7 @@ const searchQuery = ref(route.query.search as string);
 
 const LIMIT = 50;
 
-const queryParams = computed<QueryParams>(() => ({
+const queryParams = computed(() => ({
   search: route.query.search,
   page: route.query.page,
   refresh: route.query.refresh,
@@ -22,29 +24,29 @@ const queryParams = computed<QueryParams>(() => ({
 }));
 
 async function fetchProducts() {
-  try {
-    const res: any = await invoke("list_products", {
-      args: {
-        search: queryParams.value.search ?? "",
-        page: Number(queryParams.value.page) ?? 1,
-        limit: queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT,
-      },
-    });
-    return res.data;
-  } catch (err: any) {
+  const result = await commands.listProducts({
+    search: String(queryParams.value.search ?? ""),
+    page: Number(queryParams.value.page ?? 1),
+    limit: queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT,
+    status: null,
+    created_at: null,
+  });
+  if (result.status === "error") {
     toast.error(t("notifications.error.title"), {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(`LIST PRODUCTS: ${err.error ? err.error : err.message}`);
+    Logger.error(`LIST PRODUCTS: ${JSON.stringify(result.error)}`);
+    return null;
   }
+  return result.data.data;
 }
 
 const { data: productsData } = await useAsyncData(fetchProducts, {
   watch: [queryParams],
 });
 
-const products = computed<ProductT[]>(() => productsData.value?.products ?? []);
+const products = computed<SelectProducts[]>(() => productsData.value?.products ?? []);
 const totalRows = computed<number>(() => productsData.value?.count ?? 0);
 
 provide("count", totalRows);

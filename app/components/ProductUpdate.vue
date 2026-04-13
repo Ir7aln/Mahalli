@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import { commands } from "@/bindings";
+import type { Product } from "@/bindings";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as Logger from "@tauri-apps/plugin-log";
 import { useForm } from "vee-validate";
@@ -36,7 +37,7 @@ const productSchema = toTypedSchema(
       .string()
       .min(2)
       .default((props.description as string) ?? ""),
-    min_quantity: z.number().default(Number(props.minQuantity) ?? 0),
+    min_quantity: z.number().default(Number(props.minQuantity ?? 0)),
   }),
 );
 
@@ -44,20 +45,26 @@ const form = useForm({
   validationSchema: productSchema,
 });
 
-async function updateTheProduct(product: ProductT) {
+async function updateTheProduct(product: {
+  name: string;
+  purchase_price: number;
+  selling_price: number;
+  description?: string;
+  min_quantity: number;
+}) {
   try {
     const id = props.id;
-    await invoke<Res<string>>("update_product", {
-      product: {
-        name: product.name,
-        selling_price: Number(product.selling_price),
-        purchase_price: Number(product.purchase_price),
-        description: product.description,
-        min_quantity: Number(product.min_quantity),
-        image: "",
-        id,
-      },
-    });
+    const payload: Product = {
+      name: product.name,
+      selling_price: Number(product.selling_price),
+      purchase_price: Number(product.purchase_price),
+      description: product.description ?? null,
+      min_quantity: Number(product.min_quantity),
+      image: null,
+      id,
+    };
+    const result = await commands.updateProduct(payload);
+    if (result.status === "error") throw result.error;
 
     Logger.info(
       `UPDATE PRODUCT: ${JSON.stringify({

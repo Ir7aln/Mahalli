@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import {
+  commands,
+  type ClientDetails,
+  type ClientSearch,
+  type NewQuote,
+  type ProductSearch,
+} from "@/bindings";
 import { CalendarDays, Plus, Trash2, X } from "lucide-vue-next";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
@@ -23,7 +29,7 @@ const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const clients = ref<ClientOption[]>([]);
 const products = ref<ProductOption[]>([]);
-const selectedClient = ref<Partial<ClientT> | null>(null);
+const selectedClient = ref<Partial<ClientDetails> | null>(null);
 const isPosting = ref(false);
 
 const quoteSchema = z.object({
@@ -84,24 +90,25 @@ function deleteQuoteItem(index: number) {
 }
 
 async function searchClients(search: string | number) {
-  const res = await invoke<Res<ClientOption[]>>("search_clients", { search });
-  if (!res.error) {
-    clients.value = res.data;
-  }
+  const result = await commands.searchClients(String(search));
+  if (result.status === "ok") clients.value = (result.data.data ?? []) as ClientSearch[];
 }
 
 async function searchProducts(search: string | number) {
-  const res = await invoke<Res<ProductOption[]>>("search_products", { search });
-  if (!res.error) {
-    products.value = res.data;
+  const result = await commands.searchProducts(String(search));
+  if (result.status === "ok") {
+    products.value = ((result.data.data ?? []) as ProductSearch[]).map((p) => ({
+      ...p,
+      price: p.price ?? undefined,
+    }));
   }
 }
 
 async function fillClientDetails(id: string) {
   try {
-    const res = await invoke<Res<ClientT>>("get_client", { id });
-    if (!res.error) {
-      selectedClient.value = res.data;
+    const result = await commands.getClient(id);
+    if (result.status === "ok" && result.data.data) {
+      selectedClient.value = result.data.data;
     }
   } catch (err: any) {
     Logger.error(`ERROR GET CLIENT: ${err.error ? err.error : err.message}`);
@@ -116,9 +123,12 @@ async function handleClientSelect(id: string) {
 const onSubmit = handleSubmit(async (formValues) => {
   isPosting.value = true;
   try {
-    await invoke<Res<string>>("create_quote", {
-      quote: formValues,
-    });
+    const payload: NewQuote = {
+      client_id: formValues.client_id,
+      items: formValues.items,
+    };
+    const result = await commands.createQuote(payload);
+    if (result.status === "error") throw result.error;
     Logger.info(`CREATE QUOTE: ${JSON.stringify(formValues)}`);
 
     toast.success(t("notifications.quote.created"), {

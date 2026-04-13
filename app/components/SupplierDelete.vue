@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import { commands } from "@/bindings";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
 
@@ -13,7 +13,8 @@ const { t } = useI18n();
 
 async function deleteTheSupplier() {
   try {
-    await invoke<Res<string>>("delete_supplier", { id: props.id });
+    const result = await commands.deleteSupplier(props.id);
+    if (result.status === "error") throw result.error;
     // INFO
     Logger.info(`DELETE SUPPLIER: ${props.id}`);
     //

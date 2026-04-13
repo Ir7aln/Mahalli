@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import { commands } from "@/bindings";
 import { sep } from "@tauri-apps/api/path";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
@@ -11,18 +11,16 @@ const pdfContent = ref("");
 
 const { config, generatePdf } = usePdfGenerator();
 const { data: order } = await useAsyncData(async () => {
-  try {
-    const res = await invoke<Res<any>>("get_order_details", {
-      id,
-    });
-    return res.data;
-  } catch (err: any) {
+  const result = await commands.getOrderDetails(id as string);
+  if (result.status === "error") {
     toast.error(t("notifications.error.title"), {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(`ERROR ORDER DETAILS: ${err.error ? err.error : err.message}`);
+    Logger.error(`ERROR ORDER DETAILS: ${JSON.stringify(result.error)}`);
+    return null;
   }
+  return result.data.data;
 });
 
 async function handleGeneratePdf() {
@@ -41,37 +39,31 @@ async function handleGeneratePdf() {
 }
 
 async function saveConfig() {
-  try {
-    let filePath: string | null = null;
-    if (config.template.bytes && config.template.name) {
-      filePath = await uploadFileToDataDir(
-        "pdf-templates",
-        config.template.bytes,
-        config.template.name,
-      );
-    }
-    await invoke("create_template", {
-      template: {
-        values_json: JSON.stringify({
-          ...config,
-          template: {
-            path: filePath,
-            name: config.template.name,
-          },
-        }),
-      },
-    });
-    toast(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
-  } catch (err: any) {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
-    Logger.error(`ERROR CREATE TEMPLATE: ${err.error ? err.error : err.message}`);
+  let filePath: string | null = null;
+  if (config.template.bytes && config.template.name) {
+    filePath = await uploadFileToDataDir(
+      "pdf-templates",
+      config.template.bytes,
+      config.template.name,
+    );
   }
+  const result = await commands.createTemplate({
+    values_json: JSON.stringify({
+      ...config,
+      template: {
+        path: filePath,
+        name: config.template.name,
+      },
+    }),
+  });
+  if (result.status === "error") {
+    Logger.error(`ERROR: ${JSON.stringify(result.error)}`);
+    return;
+  }
+  toast(t("notifications.error.title"), {
+    description: t("notifications.error.description"),
+    closeButton: true,
+  });
 }
 
 async function updateConfig(configAndValues: any) {

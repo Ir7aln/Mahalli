@@ -14,7 +14,6 @@ export default defineNuxtConfig({
   },
   routeRules: { "/": { prerender: true } },
   components: [{ path: "~/components", extensions: ["vue"] }],
-  imports: { dirs: ["./types", "./utils"] },
   shadcn: { prefix: "", componentDir: "./app/components/ui" },
   tailwindcss: {
     cssPath: "~/assets/css/tailwind.css",

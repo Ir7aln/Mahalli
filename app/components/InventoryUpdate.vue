@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import { commands } from "@/bindings";
+import type { NewInventory } from "@/bindings";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as Logger from "@tauri-apps/plugin-log";
 import { useForm } from "vee-validate";
@@ -26,13 +27,13 @@ const form = useForm({
 async function updateTheProduct({ quantity }: z.infer<typeof inventory>) {
   try {
     const id = props.id;
-    await invoke<Res<any>>("create_inventory", {
-      transaction: {
-        transaction_type: "IN",
-        product_id: id,
-        quantity: Number(quantity),
-      },
-    });
+    const payload: NewInventory = {
+      transaction_type: "IN",
+      product_id: id,
+      quantity: Number(quantity),
+    };
+    const result = await commands.createInventory(payload);
+    if (result.status === "error") throw result.error;
     // INFO
     Logger.info(
       `UPDATE PRODUCT INVENTORY: ${JSON.stringify({

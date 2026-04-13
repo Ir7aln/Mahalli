@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import { commands } from "@/bindings";
 import { GroupedBar } from "@unovis/ts";
 import { VisAxis, VisBulletLegend, VisGroupedBar, VisTooltip, VisXYContainer } from "@unovis/vue";
 import { DollarSign, NotepadText, Truck } from "lucide-vue-next";
@@ -9,100 +9,99 @@ import { INVOICE_STATUSES, ORDER_STATUSES, STATUS_COLORS } from "@/consts";
 
 const { t, d, n } = useI18n();
 const { data: inventoryTransactions } = useAsyncData(async () => {
-  try {
-    const res = await invoke<Res<any[]>>("list_inventory_stats");
-    const result = res.data.reduce((acc, item) => {
-      const { created_at: date, transaction_type, quantity, price } = item;
-      const created_at = d(new Date(date), "monthOnly");
-      if (!acc[created_at]) {
-        acc[created_at] = {
-          IN: { quantity: 0, price: 0 },
-          OUT: { quantity: 0, price: 0 },
-        };
-      }
-      acc[created_at][transaction_type].quantity += quantity;
-      acc[created_at][transaction_type].price += price;
-      return acc;
-    }, {});
-
-    return {
-      result,
-      transactionLabels: [...new Set<string>(Object.keys(result))],
-    };
-  } catch (err: any) {
-    handleError(err, "STATS INVENTORY MOUVEMENTS");
+  const result = await commands.listInventoryStats();
+  if (result.status === "error") {
+    Logger.error(`ERROR: ${JSON.stringify(result.error)}`);
+    toast.error(t("notifications.error.title"), {
+      description: t("notifications.error.description"),
+      closeButton: true,
+    });
     return {
       result: {},
       transactionLabels: [],
     };
   }
+  const res = result.data.data;
+  if (!res) {
+    return {
+      result: {},
+      transactionLabels: [],
+    };
+  }
+  const data = res.reduce((acc: any, item: any) => {
+    const { created_at: date, transaction_type, quantity, price } = item;
+    const created_at = d(new Date(date), "monthOnly");
+    if (!acc[created_at]) {
+      acc[created_at] = {
+        IN: { quantity: 0, price: 0 },
+        OUT: { quantity: 0, price: 0 },
+      };
+    }
+    acc[created_at][transaction_type].quantity += quantity;
+    acc[created_at][transaction_type].price += price;
+    return acc;
+  }, {});
+
+  return {
+    result: data,
+    transactionLabels: [...new Set<string>(Object.keys(data))],
+  };
 });
 
 const { data: bestClients } = useAsyncData(async () => {
-  try {
-    const res = await invoke<Res<any[]>>("list_top_clients");
-    return res.data;
-  } catch (err: any) {
-    handleError(err, "STATS BEST CLIENTS");
+  const result = await commands.listTopClients();
+  if (result.status === "error") {
+    Logger.error(`ERROR: ${JSON.stringify(result.error)}`);
     return [];
   }
+  return result.data.data;
 });
 
 const { data: bestProducts } = useAsyncData(async () => {
-  try {
-    const res = await invoke<Res<any[]>>("list_top_products");
-    return res.data;
-  } catch (err: any) {
-    handleError(err, "STATS BEST PRODUCTS");
+  const result = await commands.listTopProducts();
+  if (result.status === "error") {
+    Logger.error(`ERROR: ${JSON.stringify(result.error)}`);
     return [];
   }
+  return result.data.data;
 });
 
 const { data: statusCounts } = useAsyncData(async () => {
-  try {
-    const res = await invoke<Res<any>>("list_status_count");
-    if (!res?.data) return { orders: {}, invoices: {} };
-
-    const result: {
-      orders: Record<string, number>;
-      invoices: Record<string, number>;
-    } = {
-      orders: {},
-      invoices: {},
-    };
-
-    res.data.orders.forEach((item: { status: string; status_count: number }) => {
-      result.orders[item.status] = item.status_count;
-    });
-
-    res.data.invoices.forEach((item: { status: string; status_count: number }) => {
-      result.invoices[item.status] = item.status_count;
-    });
-
-    return result;
-  } catch (err: any) {
-    handleError(err, "STATS STATUS COUNT");
+  const result = await commands.listStatusCount();
+  if (result.status === "error") {
+    Logger.error(`ERROR: ${JSON.stringify(result.error)}`);
     return null;
   }
+  const res = result.data.data;
+  if (!res) return { orders: {}, invoices: {} };
+
+  const data: {
+    orders: Record<string, number>;
+    invoices: Record<string, number>;
+  } = {
+    orders: {},
+    invoices: {},
+  };
+
+  res.orders.forEach((item: { status: string; status_count: number }) => {
+    data.orders[item.status] = item.status_count;
+  });
+
+  res.invoices.forEach((item: { status: string; status_count: number }) => {
+    data.invoices[item.status] = item.status_count;
+  });
+
+  return data;
 });
 
 const { data: financials } = useAsyncData(async () => {
-  try {
-    const res = await invoke<Res<any>>("list_financial_metrics");
-    return res.data;
-  } catch (err: any) {
-    handleError(err, "STATS EXPENSES");
-    return {};
+  const result = await commands.listFinancialMetrics();
+  if (result.status === "error") {
+    Logger.error(`ERROR: ${JSON.stringify(result.error)}`);
+    return null;
   }
+  return result.data.data;
 });
-
-function handleError(err: any, context: string) {
-  toast.error(t("notifications.error.title"), {
-    description: t("notifications.error.description"),
-    closeButton: true,
-  });
-  Logger.error(`${context}: ${err.error ? err.error : err.message}`);
-}
 </script>
 
 <template>
@@ -203,7 +202,7 @@ function handleError(err: any, context: string) {
               />
               <VisAxis
                 type="x"
-                :tick-format="(i: number) => (bestClients ? bestClients[i]?.Fullname : i)"
+                :tick-format="(i: number) => (bestClients ? bestClients[i]?.full_name : i)"
               />
               <VisAxis type="y" :label="`${t('fields.price')} (MAD)`" />
               <VisTooltip

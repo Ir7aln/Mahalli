@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { toTypedSchema } from "@vee-validate/zod";
-import { invoke } from "@tauri-apps/api/core";
+import { commands } from "@/bindings";
+import type { Supplier } from "@/bindings";
 import { useForm } from "vee-validate";
 import { z } from "zod";
 import * as Logger from "@tauri-apps/plugin-log";
@@ -33,18 +34,23 @@ const form = useForm({
   validationSchema: supplierSchema,
 });
 
-async function updateTheSupplier(supplier: SupplierT) {
+async function updateTheSupplier(supplier: {
+  full_name: string;
+  email?: string;
+  phone_number?: string;
+  address?: string;
+}) {
   try {
-    await invoke<Res<any>>("update_supplier", {
-      supplier: {
-        id: props.id,
-        full_name: supplier.full_name,
-        email: supplier.email,
-        phone_number: supplier.phone_number,
-        address: supplier.address,
-        image: "",
-      },
-    });
+    const payload: Supplier = {
+      id: props.id,
+      full_name: supplier.full_name,
+      email: supplier.email ?? null,
+      phone_number: supplier.phone_number ?? null,
+      address: supplier.address ?? null,
+      image: null,
+    };
+    const result = await commands.updateSupplier(payload);
+    if (result.status === "error") throw result.error;
     //
     Logger.info(
       `UPDATE SUPPLIER: ${JSON.stringify({

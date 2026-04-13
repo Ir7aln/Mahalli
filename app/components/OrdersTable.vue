@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import { commands } from "@/bindings";
 import * as Logger from "@tauri-apps/plugin-log";
 import { FilePenLine, GripHorizontal, NotepadText, Printer, Trash2 } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import { NuxtLink, OrderDelete, OrderUpdate } from "#components";
 import { ORDER_STATUSES, STATUS_COLORS } from "@/consts";
+import type { OrderProductItem, SelectOrders } from "@/bindings";
 
-defineProps<{ orders: OrderT[]; orderProducts: OrderProductsPreviewT[] }>();
+defineProps<{ orders: SelectOrders[]; orderProducts: OrderProductItem[] }>();
 const emits = defineEmits<{
   listOrderProducts: [id: string];
 }>();
@@ -24,63 +25,56 @@ function previewProducts(id: string) {
 }
 const cancelPreviewProducts = () => clearTimeout(previewProductsTimer);
 
-function toggleThisOrder(order: OrderT, name: "delete" | "update") {
+function toggleThisOrder(order: SelectOrders, name: "delete" | "update") {
   if (name === "delete") {
     modal.open(OrderDelete, {
-      id: order.id!,
+      id: order.id,
       identifier: order.identifier,
     });
   } else {
     modal.open(OrderUpdate, {
       sheet: true,
-      id: order.id!,
+      id: order.id,
       identifier: order.identifier,
     });
   }
 }
 
 async function updateOrderStatus(id: string, status: string) {
-  try {
-    await invoke("update_order_status", {
-      order: {
-        id,
-        status,
-      },
-    });
-    //
-    Logger.info(`UPDATE ORDER STATUS: ${JSON.stringify({ id, status })}`);
-    // toggle refresh
-    updateQueryParams({
-      refresh: `refresh-update-${Math.random() * 9999}`,
-    });
-  } catch (err: any) {
+  const result = await commands.updateOrderStatus({ id, status });
+  if (result.status === "error") {
     toast.error(t("notifications.error.title"), {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(`ERROR UPDATE ORDER STATUS: ${err.error ? err.error : err.message}`);
+    Logger.error(`ERROR UPDATE ORDER STATUS: ${JSON.stringify(result.error)}`);
+    return;
   }
+  Logger.info(`UPDATE ORDER STATUS: ${JSON.stringify({ id, status })}`);
+  updateQueryParams({
+    refresh: `refresh-update-${Math.random() * 9999}`,
+  });
 }
 
 async function createInvoiceFromOrder(id: string) {
-  try {
-    const res = await invoke<Res<OrderForUpdateT>>("create_invoice_from_order", {
-      id,
-    });
-    //
-    Logger.info(`CREATE INVOICE FROM ORDER: ${id}`);
-    //
-    toast.success(t("notifications.invoice.created"), {
+  const result = await commands.createInvoiceFromOrder(id);
+  if (result.status === "error") {
+    Logger.error(`GET ORDER FOR INVOICE: ${JSON.stringify(result.error)}`);
+    toast.error(t("notifications.error.title"), {
+      description: t("notifications.error.description"),
       closeButton: true,
-      description: h(NuxtLink, {
-        to: localePath(`/invoices/?page=1&highlight=true&id=${res.data}`),
-        class: "underline",
-        innerHTML: "go to invoice",
-      }),
     });
-  } catch (err: any) {
-    Logger.error(`GET ORDER FOR INVOICE: ${err.error ? err.error : err.message}`);
+    return;
   }
+  Logger.info(`CREATE INVOICE FROM ORDER: ${id}`);
+  toast.success(t("notifications.invoice.created"), {
+    closeButton: true,
+    description: h(NuxtLink, {
+      to: localePath(`/invoices/?page=1&highlight=true&id=${result.data.data}`),
+      class: "underline",
+      innerHTML: "go to invoice",
+    }),
+  });
 }
 </script>
 

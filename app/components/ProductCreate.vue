@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import { commands, type NewProduct } from "@/bindings";
+import type { NewInventory } from "@/bindings";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as Logger from "@tauri-apps/plugin-log";
 import { useForm } from "vee-validate";
@@ -30,25 +31,25 @@ const form = useForm({
 
 const image = ref<string | null>(null);
 
-async function createNewProduct(product: ProductT) {
+async function createNewProduct(product: NewProduct) {
   try {
-    const createRes = await invoke<Res<string>>("create_product", {
-      product: {
-        name: product.name,
-        selling_price: Number(product.selling_price),
-        purchase_price: Number(product.purchase_price),
-        description: product.description,
-        min_quantity: product.min_quantity,
-        image: image.value,
-      },
+    const createResult = await commands.createProduct({
+      name: product.name,
+      selling_price: Number(product.selling_price),
+      purchase_price: Number(product.purchase_price),
+      description: product.description ?? null,
+      min_quantity: product.min_quantity,
+      image: image.value ?? null,
     });
-    await invoke<Res<string>>("create_inventory", {
-      transaction: {
-        transaction_type: "IN",
-        product_id: createRes.data,
-        quantity: Number(quantity.value),
-      },
-    });
+    if (createResult.status === "error") throw createResult.error;
+
+    const invPayload: NewInventory = {
+      transaction_type: "IN",
+      product_id: createResult.data.data as string,
+      quantity: Number(quantity.value),
+    };
+    const invResult = await commands.createInventory(invPayload);
+    if (invResult.status === "error") throw invResult.error;
     Logger.info(
       `CREATE PRODUCT: ${JSON.stringify({
         ...product,
@@ -76,7 +77,14 @@ async function createNewProduct(product: ProductT) {
 }
 
 const onSubmit = form.handleSubmit((values) => {
-  createNewProduct(values);
+  createNewProduct({
+    name: values.name,
+    selling_price: Number(values.selling_price),
+    purchase_price: Number(values.purchase_price),
+    description: values.description ?? null,
+    min_quantity: Number(values.min_quantity),
+    image: null,
+  });
 });
 
 function setImage(imagePath: string | null) {

@@ -1,55 +1,61 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
 import { Plus } from "lucide-vue-next";
 import { useDebounceFn } from "@vueuse/core";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
+import { commands } from "@/bindings";
 import { SupplierCreate } from "#components";
+import type { SelectSuppliers } from "@/bindings";
+import { queryNumber, queryString } from "@/utils/query";
 
 const route = useRoute();
 const { t } = useI18n();
 const modal = useModal();
 const { updateQueryParams } = useUpdateRouteQueryParams();
-const searchQuery = ref(route.query.search as string);
+const searchQuery = ref<string>(queryString(route.query.search));
 
 const LIMIT = 50;
 
-const queryParams = computed<QueryParams>(() => ({
-  search: route.query.search,
-  page: route.query.page,
-  refresh: route.query.refresh,
-  limit: route.query.limit,
-}));
+const queryParams = computed(() => {
+  return {
+    search: queryString(route.query.search),
+    page: queryNumber(route.query.page, 1),
+    limit: route.query.limit ? queryNumber(route.query.limit, LIMIT) : LIMIT,
+    refresh: queryString(route.query.refresh) || "",
+  };
+});
 
 async function fetchSuppliers() {
-  try {
-    const res: Res<any> = await invoke("list_suppliers", {
-      args: {
-        search: queryParams.value.search ?? "",
-        page: Number(queryParams.value.page) ?? 1,
-        limit: queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT,
-      },
-    });
-    return res.data;
-  } catch (err: any) {
+  const result = await commands.listSuppliers({
+    search: queryParams.value.search,
+    page: queryParams.value.page,
+    limit: queryParams.value.limit,
+    status: null,
+    created_at: null,
+  });
+  if (result.status === "error") {
     toast.error(t("notifications.error.title"), {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(`LIST SUPPLIERS: ${err.error ? err.error : err.message}`);
+    Logger.error(`LIST SUPPLIERS: ${JSON.stringify(result.error)}`);
+    return null;
   }
+  return result.data.data;
 }
 
-const { data } = useAsyncData(fetchSuppliers, { watch: [queryParams] });
+const { data: suppliersData } = await useAsyncData(fetchSuppliers, {
+  watch: [queryParams],
+});
 
-const suppliers = computed<SupplierT[]>(() => data.value?.suppliers ?? []);
-const totalRows = computed<number>(() => data.value?.count ?? 0);
+const suppliers = computed<SelectSuppliers[]>(() => suppliersData.value?.suppliers ?? []);
+const totalRows = computed<number>(() => suppliersData.value?.count ?? 0);
 
 provide("count", totalRows);
 provide("itemsPerPage", queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT);
 
 const debouncedSearch = useDebounceFn(() => {
-  updateQueryParams({ search: searchQuery.value });
+  updateQueryParams({ search: searchQuery.value || "" });
 }, 500);
 
 watch(searchQuery, debouncedSearch);

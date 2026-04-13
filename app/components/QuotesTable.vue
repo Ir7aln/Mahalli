@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import { commands } from "@/bindings";
 import { FilePenLine, GripHorizontal, Printer, Trash2, Truck } from "lucide-vue-next";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
 import { NuxtLink, QuoteDelete, QuoteUpdate } from "#components";
+import type { QuoteProductItem, SelectQuotes } from "@/bindings";
 
-defineProps<{ quotes: QuoteT[]; quoteProducts: QuoteProductsPreviewT[] }>();
+defineProps<{ quotes: SelectQuotes[]; quoteProducts: QuoteProductItem[] }>();
 const emits = defineEmits<{
   listQuoteProducts: [id: string];
 }>();
@@ -22,43 +23,40 @@ function previewProducts(id: string) {
 }
 const cancelPreviewProducts = () => clearTimeout(previewProductsTimer);
 
-function toggleThisQuote(quote: QuoteT, name: "delete" | "update") {
+function toggleThisQuote(quote: SelectQuotes, name: "delete" | "update") {
   if (name === "delete") {
     modal.open(QuoteDelete, {
-      id: quote.id!,
+      id: quote.id,
       identifier: quote.identifier,
     });
   } else {
     modal.open(QuoteUpdate, {
       sheet: true,
-      id: quote.id!,
+      id: quote.id,
       identifier: quote.identifier,
     });
   }
 }
 
 async function createOrderFromQuote(id: string) {
-  try {
-    const res = await invoke<Res<QuoteForUpdateT>>("create_order_from_quote", {
-      id,
-    });
-    Logger.info(`CREATE ORDER FROM QUOTE: ${id}`);
-    //
-    toast.success(t("notifications.order.created"), {
-      closeButton: true,
-      description: h(NuxtLink, {
-        to: localePath(`/orders/?page=1&highlight=true&id=${res.data}`),
-        class: "underline",
-        innerHTML: "go to order",
-      }),
-    });
-  } catch (err: any) {
+  const result = await commands.createOrderFromQuote(id);
+  if (result.status === "error") {
     toast.error(t("notifications.error.title"), {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(`GET QUOTE FOR ORDER: ${err.error ? err.error : err.message}`);
+    Logger.error(`GET QUOTE FOR ORDER: ${JSON.stringify(result.error)}`);
+    return;
   }
+  Logger.info(`CREATE ORDER FROM QUOTE: ${id}`);
+  toast.success(t("notifications.order.created"), {
+    closeButton: true,
+    description: h(NuxtLink, {
+      to: localePath(`/orders/?page=1&highlight=true&id=${result.data.data}`),
+      class: "underline",
+      innerHTML: "go to order",
+    }),
+  });
 }
 </script>
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import { commands } from "@/bindings";
+import type { Client } from "@/bindings";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as Logger from "@tauri-apps/plugin-log";
 import { useForm } from "vee-validate";
@@ -33,18 +34,23 @@ const form = useForm({
   validationSchema: clientSchema,
 });
 
-async function updateTheClient(client: ClientT) {
+async function updateTheClient(client: {
+  full_name: string;
+  email?: string;
+  phone_number?: string;
+  address?: string;
+}) {
   try {
-    await invoke<Res<any>>("update_client", {
-      client: {
-        id: props.id,
-        full_name: client.full_name,
-        email: client.email,
-        phone_number: client.phone_number,
-        address: client.address,
-        image: "",
-      },
-    });
+    const payload: Client = {
+      id: props.id,
+      full_name: client.full_name,
+      email: client.email ?? null,
+      phone_number: client.phone_number ?? null,
+      address: client.address ?? null,
+      image: null,
+    };
+    const result = await commands.updateClient(payload);
+    if (result.status === "error") throw result.error;
     //
     Logger.info(
       `UPDATE CLIENT: ${JSON.stringify({

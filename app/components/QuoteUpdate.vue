@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import {
+  commands,
+  type ClientDetails,
+  type ClientSearch,
+  type ProductSearch,
+  type QuoteWithClient,
+  type UpdateQuote,
+} from "@/bindings";
 import { CalendarDays, Plus, Trash2, X } from "lucide-vue-next";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
@@ -27,7 +34,7 @@ const { close } = useModal();
 const { t, d, n } = useI18n();
 const clients = ref<ClientOption[]>([]);
 const products = ref<ProductOption[]>([]);
-const selectedClient = ref<Partial<ClientT> | null>(null);
+const selectedClient = ref<Partial<ClientDetails> | null>(null);
 const isPosting = ref(false);
 
 const quoteSchema = z.object({
@@ -77,16 +84,26 @@ function formatMoney(value: number) {
   return n(Number.isFinite(value) ? value : 0, "currency");
 }
 
-const res = await invoke<Res<QuoteForUpdateT>>("get_quote", {
-  id: props.id,
-});
-
-if (res.data) {
+const getResult = await commands.getQuote(props.id);
+if (getResult.status === "ok" && getResult.data.data) {
+  const res = getResult.data.data as unknown as QuoteWithClient;
   resetForm({
-    values: res.data,
+    values: {
+      id: res.id,
+      client_id: res.client_id,
+      full_name: res.full_name,
+      created_at: res.created_at,
+      items: res.items.map((it) => ({
+        id: it.id,
+        product_id: it.product_id,
+        quantity: it.quantity,
+        price: it.price,
+        name: it.name,
+      })),
+    },
   });
 
-  fillClientDetails(res.data.client_id);
+  fillClientDetails(res.client_id);
 }
 
 function addQuoteItem() {
@@ -98,25 +115,26 @@ function addQuoteItem() {
 }
 
 async function searchClients(search: string | number) {
-  const res = await invoke<Res<ClientOption[]>>("search_clients", { search });
-  if (!res.error) {
-    clients.value = res.data;
-  }
+  const result = await commands.searchClients(String(search));
+  if (result.status === "ok") clients.value = (result.data.data ?? []) as ClientSearch[];
 }
 
 async function searchProducts(search: string | number) {
-  const res = await invoke<Res<ProductOption[]>>("search_products", { search });
-  if (!res.error) {
-    products.value = res.data;
+  const result = await commands.searchProducts(String(search));
+  if (result.status === "ok") {
+    products.value = ((result.data.data ?? []) as ProductSearch[]).map((p) => ({
+      ...p,
+      price: p.price ?? undefined,
+    }));
   }
 }
 
 async function fillClientDetails(id: string) {
   try {
-    const res = await invoke<Res<ClientT>>("get_client", { id });
-    if (!res.error) {
-      selectedClient.value = res.data;
-      setFieldValue("full_name", res.data.full_name);
+    const result = await commands.getClient(id);
+    if (result.status === "ok" && result.data.data) {
+      selectedClient.value = result.data.data;
+      setFieldValue("full_name", result.data.data.full_name);
     }
   } catch (err: any) {
     Logger.error(`ERROR GET CLIENT: ${err.error ? err.error : err.message}`);
@@ -131,9 +149,18 @@ async function handleClientSelect(id: string) {
 const onSubmit = handleSubmit(async (formValues) => {
   isPosting.value = true;
   try {
-    await invoke<Res<string>>("update_quote", {
-      quote: formValues,
-    });
+    const payload: UpdateQuote = {
+      id: formValues.id,
+      client_id: formValues.client_id,
+      items: (formValues.items ?? []).map((item) => ({
+        id: item.id ?? null,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+    };
+    const result = await commands.updateQuote(payload);
+    if (result.status === "error") throw result.error;
     Logger.info(`UPDATE QUOTE: ${JSON.stringify(formValues)}`);
 
     toast.success(t("notifications.quote.updated"), {
@@ -156,14 +183,13 @@ const onSubmit = handleSubmit(async (formValues) => {
 });
 
 async function deleteOneQuoteItem(id: string) {
-  try {
-    await invoke("delete_quote_item", { id });
-  } catch (err: any) {
+  const result = await commands.deleteQuoteItem(id);
+  if (result.status === "error") {
     toast.error(t("notifications.error.title"), {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(`ERROR DELETE QUOTE ITEM : ${err.error ? err.error : err.message}`);
+    Logger.error(`ERROR DELETE QUOTE ITEM: ${JSON.stringify(result.error)}`);
   }
 }
 

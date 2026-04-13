@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import { commands } from "@/bindings";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
 
@@ -13,7 +13,8 @@ const { close } = useModal();
 
 async function deleteTheOrders() {
   try {
-    await invoke<Res<any>>("delete_order", { id: props.id });
+    const result = await commands.deleteOrder(props.id);
+    if (result.status === "error") throw result.error;
     // INFO
     Logger.info(`DELETE ORDER: ${props.id}`);
     //

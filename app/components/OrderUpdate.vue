@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import {
+  commands,
+  type ClientDetails,
+  type ClientSearch,
+  type OrderWithClient,
+  type ProductSearch,
+  type UpdateOrder,
+} from "@/bindings";
 import * as Logger from "@tauri-apps/plugin-log";
 import { CalendarDays, Plus, Trash2, X } from "lucide-vue-next";
 import { toast } from "vue-sonner";
@@ -29,12 +36,13 @@ const { close } = useModal();
 const { t, d, n } = useI18n();
 const clients = ref<ClientOption[]>([]);
 const products = ref<ProductOption[]>([]);
-const selectedClient = ref<Partial<ClientT> | null>(null);
+const selectedClient = ref<Partial<ClientDetails> | null>(null);
 const isPosting = ref(false);
 
 const orderSchema = z.object({
   id: z.string(),
   client_id: z.string().min(1),
+  created_at: z.string().optional(),
   status: z.enum(ORDER_STATUSES),
   full_name: z.string(),
   items: z.array(
@@ -73,18 +81,29 @@ function formatMoney(value: number) {
   return n(Number.isFinite(value) ? value : 0, "currency");
 }
 
-const res = await invoke<Res<OrderForUpdateT>>("get_order", {
-  id: props.id,
-});
+const getResult = await commands.getOrder(props.id);
 
-if (res.data) {
+if (getResult.status === "ok" && getResult.data.data) {
+  const res = getResult.data.data as unknown as OrderWithClient;
   resetForm({
     values: {
-      ...res.data,
+      id: res.id,
+      client_id: res.client_id,
+      status: res.status as (typeof ORDER_STATUSES)[number],
+      full_name: res.full_name,
+      created_at: res.created_at,
+      items: res.items.map((it) => ({
+        id: it.id,
+        inventory_id: it.inventory_id,
+        product_id: it.product_id,
+        quantity: it.quantity,
+        price: it.price,
+        name: it.name,
+      })),
     },
   });
 
-  fillClientDetails(res.data.client_id);
+  fillClientDetails(res.client_id);
 }
 
 function addOrderItem() {
@@ -96,25 +115,26 @@ function addOrderItem() {
 }
 
 async function searchClients(search: string | number) {
-  const res = await invoke<Res<ClientOption[]>>("search_clients", { search });
-  if (!res.error) {
-    clients.value = res.data;
-  }
+  const result = await commands.searchClients(String(search));
+  if (result.status === "ok") clients.value = (result.data.data ?? []) as ClientSearch[];
 }
 
 async function searchProducts(search: string | number) {
-  const res = await invoke<Res<ProductOption[]>>("search_products", { search });
-  if (!res.error) {
-    products.value = res.data;
+  const result = await commands.searchProducts(String(search));
+  if (result.status === "ok") {
+    products.value = ((result.data.data ?? []) as ProductSearch[]).map((p) => ({
+      ...p,
+      price: p.price ?? undefined,
+    }));
   }
 }
 
 async function fillClientDetails(id: string) {
   try {
-    const res = await invoke<Res<ClientT>>("get_client", { id });
-    if (!res.error) {
-      selectedClient.value = res.data;
-      setFieldValue("full_name", res.data.full_name);
+    const result = await commands.getClient(id);
+    if (result.status === "ok" && result.data.data) {
+      selectedClient.value = result.data.data;
+      setFieldValue("full_name", result.data.data.full_name);
     }
   } catch (err: any) {
     Logger.error(`ERROR GET CLIENT: ${err.error ? err.error : err.message}`);
@@ -130,9 +150,21 @@ const onSubmit = handleSubmit(async (formValues) => {
   isPosting.value = true;
 
   try {
-    await invoke<Res<string>>("update_order", {
-      order: formValues,
-    });
+    const payload: UpdateOrder = {
+      id: formValues.id,
+      client_id: formValues.client_id,
+      status: formValues.status,
+      items: (formValues.items ?? []).map((item) => ({
+        id: item.id ?? null,
+        order_id: null,
+        inventory_id: item.inventory_id ?? null,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+    };
+    const result = await commands.updateOrder(payload);
+    if (result.status === "error") throw result.error;
 
     Logger.info(`UPDATE ORDER: ${JSON.stringify(formValues)}`);
 
@@ -156,14 +188,13 @@ const onSubmit = handleSubmit(async (formValues) => {
 });
 
 async function deleteOneOrderItem(id: string) {
-  try {
-    await invoke("delete_inventory", { id });
-  } catch (err: any) {
+  const result = await commands.deleteOrderItem(id);
+  if (result.status === "error") {
     toast.error(t("notifications.error.title"), {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(`ERROR DELETE ORDER ITEM: ${err.error ? err.error : err.message}`);
+    Logger.error(`ERROR DELETE ORDER ITEM: ${JSON.stringify(result.error)}`);
   }
 }
 

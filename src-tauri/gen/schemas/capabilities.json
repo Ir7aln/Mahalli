@@ -1,1 +1,33 @@
-{"desktop-capability":{"identifier":"desktop-capability","description":"","local":true,"permissions":["updater:default"],"platforms":["macOS","windows","linux"]},"migrated":{"identifier":"migrated","description":"permissions that were migrated from v1","local":true,"windows":["main"],"permissions":["core:default","fs:allow-read-file","fs:allow-write-file","fs:allow-read-dir","fs:allow-copy-file","fs:allow-mkdir","fs:allow-remove","fs:allow-remove","fs:allow-rename","fs:allow-exists",{"identifier":"fs:scope","allow":["**"]},"dialog:allow-open","notification:default","dialog:default","fs:default","log:default"]}}
+{
+  "desktop-capability": {
+    "identifier": "desktop-capability",
+    "description": "",
+    "local": true,
+    "permissions": ["updater:default"],
+    "platforms": ["macOS", "windows", "linux"]
+  },
+  "migrated": {
+    "identifier": "migrated",
+    "description": "permissions that were migrated from v1",
+    "local": true,
+    "windows": ["main"],
+    "permissions": [
+      "core:default",
+      "fs:allow-read-file",
+      "fs:allow-write-file",
+      "fs:allow-read-dir",
+      "fs:allow-copy-file",
+      "fs:allow-mkdir",
+      "fs:allow-remove",
+      "fs:allow-remove",
+      "fs:allow-rename",
+      "fs:allow-exists",
+      { "identifier": "fs:scope", "allow": ["**"] },
+      "dialog:allow-open",
+      "notification:default",
+      "dialog:default",
+      "fs:default",
+      "log:default"
+    ]
+  }
+}

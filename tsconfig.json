@@ -6,7 +6,7 @@
     "lib": ["esnext", "ESNext.AsyncIterable", "DOM"],
     "experimentalDecorators": true,
     "module": "esnext",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "allowJs": true,
     "strict": true,

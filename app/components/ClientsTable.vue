@@ -2,26 +2,27 @@
 import { FilePenLine, GripHorizontal, Trash2 } from "lucide-vue-next";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { ClientDelete, ClientUpdate } from "#components";
+import type { SelectClients } from "@/bindings";
 
 defineProps<{
-  clients: ClientT[];
+  clients: SelectClients[];
 }>();
 const { t, locale, n } = useI18n();
 const modal = useModal();
 
-function toggleThisClient(client: ClientT, name: "delete" | "update") {
+function toggleThisClient(client: SelectClients, name: "delete" | "update") {
   if (name === "delete") {
     modal.open(ClientDelete, {
-      id: client.id!,
+      id: client.id,
       fullName: client.full_name,
     });
   } else {
     modal.open(ClientUpdate, {
-      id: client.id!,
+      id: client.id,
       fullName: client.full_name,
-      email: client.email,
-      phoneNumber: client.phone_number,
-      address: client.address,
+      email: client.email ?? undefined,
+      phoneNumber: client.phone_number ?? undefined,
+      address: client.address ?? undefined,
     });
   }
 }
@@ -66,7 +67,7 @@ function toggleThisClient(client: ClientT, name: "delete" | "update") {
             {{ client.address || "--" }}
           </TableCell>
           <TableCell class="p-2 whitespace-nowrap">
-            {{ n(client.credit!, "currency") }}
+            {{ n(client.credit ?? 0, "currency") }}
           </TableCell>
           <TableCell class="p-2">
             <div class="flex justify-center">

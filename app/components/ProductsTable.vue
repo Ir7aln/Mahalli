@@ -9,25 +9,26 @@ import {
 } from "lucide-vue-next";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { InventoryUpdate, ProductDelete, ProductUpdate } from "#components";
+import type { SelectProducts } from "@/bindings";
 
-defineProps<{ products: ProductT[] }>();
+defineProps<{ products: SelectProducts[] }>();
 const { t, d, locale, n } = useI18n();
 const modal = useModal();
 
-function toggleThisProduct(product: ProductT, name: "delete" | "update") {
+function toggleThisProduct(product: SelectProducts, name: "delete" | "update") {
   if (name === "delete") {
     modal.open(ProductDelete, {
-      id: product.id!,
+      id: product.id,
       name: product.name,
     });
   } else {
     modal.open(ProductUpdate, {
-      id: product.id!,
+      id: product.id,
       name: product.name,
-      purchasePrice: product.purchase_price,
-      sellingPrice: product.selling_price,
-      description: product.description,
-      minQuantity: product.min_quantity,
+      purchasePrice: product.purchase_price ?? 0,
+      sellingPrice: product.selling_price ?? 0,
+      description: product.description ?? undefined,
+      minQuantity: product.min_quantity ?? 0,
     });
   }
 }
@@ -107,9 +108,9 @@ function updateProductInventory(id: string, name: string) {
                   product.inventory !== undefined
                     ? product?.inventory <= 0
                       ? 'bg-red-100 border-red-500 text-red-900'
-                      : product?.inventory < product.min_quantity
+                      : product?.inventory < (product.min_quantity ?? 0)
                         ? 'bg-yellow-100 border-yellow-500 text-yellow-900'
-                        : product?.inventory >= product.min_quantity
+                        : product?.inventory >= (product.min_quantity ?? 0)
                           ? 'bg-green-100 border-green-500 text-green-900'
                           : ''
                     : '',
@@ -125,16 +126,16 @@ function updateProductInventory(id: string, name: string) {
           </TableCell>
           <TableCell class="p-2">
             {{
-              `${product.min_quantity} ${t("plrz.i", {
+              `${product.min_quantity ?? 0} ${t("plrz.i", {
                 n: Math.ceil(product.min_quantity ?? 0),
               })}`
             }}
           </TableCell>
           <TableCell class="p-2">
-            {{ n(product.purchase_price, "currency") }}
+            {{ n(product.purchase_price ?? 0, "currency") }}
           </TableCell>
           <TableCell class="p-2">
-            {{ n(product.selling_price, "currency") }}
+            {{ n(product.selling_price ?? 0, "currency") }}
           </TableCell>
           <TableCell class="p-2">
             <div class="flex justify-center gap-3">
@@ -148,7 +149,7 @@ function updateProductInventory(id: string, name: string) {
                     {{ t("buttons.edit") }}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem @click="updateProductInventory(product.id!, product.name!)">
+                  <DropdownMenuItem @click="updateProductInventory(product.id, product.name)">
                     <PackagePlus :size="20" class="text-slate-800 inline mr-2" />
                     {{ t("buttons.inventory-update") }}
                   </DropdownMenuItem>

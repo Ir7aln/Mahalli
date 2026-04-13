@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import { commands, type NewClient } from "@/bindings";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as Logger from "@tauri-apps/plugin-log";
 import { useForm } from "vee-validate";
@@ -27,14 +27,16 @@ const form = useForm({
 
 const image = ref<string | null>(null);
 
-async function createNewClient(client: ClientT) {
+async function createNewClient(client: NewClient) {
   try {
-    await invoke<Res<null>>("create_client", {
-      client: {
-        ...client,
-        image: image.value,
-      },
+    const result = await commands.createClient({
+      full_name: client.full_name,
+      email: client.email ?? null,
+      phone_number: client.phone_number ?? null,
+      address: client.address ?? null,
+      image: image.value ?? null,
     });
+    if (result.status === "error") throw result.error;
     //
     Logger.info(
       `CREATE CLIENT: ${JSON.stringify({
@@ -62,7 +64,13 @@ async function createNewClient(client: ClientT) {
 }
 
 const onSubmit = form.handleSubmit((values) => {
-  createNewClient(values);
+  createNewClient({
+    full_name: values.full_name,
+    email: values.email ?? null,
+    phone_number: values.phone_number ?? null,
+    address: values.address ?? null,
+    image: null,
+  });
 });
 
 function setImage(imagePath: string | null) {

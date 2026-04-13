@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import { commands, type InvoiceProductItem, type SelectInvoices } from "@/bindings";
 import { FilePenLine, GripHorizontal, Printer, Trash2 } from "lucide-vue-next";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
@@ -7,8 +7,8 @@ import { InvoiceDelete, InvoiceUpdate } from "#components";
 import { INVOICE_STATUSES, STATUS_COLORS } from "@/consts";
 
 defineProps<{
-  invoices: InvoiceT[];
-  invoiceProducts: InvoiceProductsPreviewT[];
+  invoices: SelectInvoices[];
+  invoiceProducts: InvoiceProductItem[];
 }>();
 const emits = defineEmits<{
   listInvoiceProducts: [id: string];
@@ -27,47 +27,35 @@ function previewProducts(id: string) {
 }
 const cancelPreviewProducts = () => clearTimeout(previewProductsTimer);
 
-function toggleThisInvoice(invoice: InvoiceT, name: "delete" | "update") {
+function toggleThisInvoice(invoice: SelectInvoices, name: "delete" | "update") {
   if (name === "delete") {
     modal.open(InvoiceDelete, {
-      id: invoice.id!,
+      id: invoice.id,
       identifier: invoice.identifier,
     });
   } else {
     modal.open(InvoiceUpdate, {
       sheet: true,
-      id: invoice.id!,
+      id: invoice.id,
       identifier: invoice.identifier,
     });
   }
 }
 
 async function updateInvoiceStatus(id: string, status: string) {
-  try {
-    await invoke("update_invoice_status", {
-      invoice: {
-        id,
-        status,
-      },
-    });
-    //
-    Logger.info(
-      `UPDATE INVOICE STATUS: ${JSON.stringify({
-        id,
-        status,
-      })}`,
-    );
-    // toggle refresh
-    updateQueryParams({
-      refresh: `refresh-update-${Math.random() * 9999}`,
-    });
-  } catch (err: any) {
+  const result = await commands.updateInvoiceStatus({ id, status });
+  if (result.status === "error") {
     toast.error(t("notifications.error.title"), {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(`ERROR UPDATE INVOICE STATUS: ${err.error ? err.error : err.message}`);
+    Logger.error(`ERROR UPDATE INVOICE STATUS: ${JSON.stringify(result.error)}`);
+    return;
   }
+  Logger.info(`UPDATE INVOICE STATUS: ${JSON.stringify({ id, status })}`);
+  updateQueryParams({
+    refresh: `refresh-update-${Math.random() * 9999}`,
+  });
 }
 </script>
 

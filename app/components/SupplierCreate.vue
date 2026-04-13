@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import { commands, type NewSupplier } from "@/bindings";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as Logger from "@tauri-apps/plugin-log";
 import { useForm } from "vee-validate";
@@ -27,14 +27,16 @@ const form = useForm({
 
 const image = ref<string | null>(null);
 
-async function createNewSupplier(supplier: SupplierT) {
+async function createNewSupplier(supplier: NewSupplier) {
   try {
-    await invoke<Res<null>>("create_supplier", {
-      supplier: {
-        ...supplier,
-        image: image.value,
-      },
+    const result = await commands.createSupplier({
+      full_name: supplier.full_name,
+      email: supplier.email ?? null,
+      phone_number: supplier.phone_number ?? null,
+      address: supplier.address ?? null,
+      image: image.value ?? null,
     });
+    if (result.status === "error") throw result.error;
     //
     Logger.info(
       `CREATE SUPPLIER: ${JSON.stringify({
@@ -62,7 +64,13 @@ async function createNewSupplier(supplier: SupplierT) {
 }
 
 const onSubmit = form.handleSubmit((values) => {
-  createNewSupplier(values);
+  createNewSupplier({
+    full_name: values.full_name,
+    email: values.email ?? null,
+    phone_number: values.phone_number ?? null,
+    address: values.address ?? null,
+    image: null,
+  });
 });
 
 function setImage(imagePath: string | null) {

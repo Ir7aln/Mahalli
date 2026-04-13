@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import {
+  commands,
+  type ClientDetails,
+  type ClientSearch,
+  type NewInvoice,
+  type ProductSearch,
+} from "@/bindings";
 import { CalendarDays, Plus, Trash2, X } from "lucide-vue-next";
 import { useFieldArray, useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
@@ -23,7 +29,7 @@ const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const clients = ref<ClientOption[]>([]);
 const products = ref<ProductOption[]>([]);
-const selectedClient = ref<Partial<ClientT> | null>(null);
+const selectedClient = ref<Partial<ClientDetails> | null>(null);
 const isPosting = ref(false);
 
 const invoiceSchema = z.object({
@@ -88,24 +94,25 @@ function deleteInvoiceItem(index: number) {
 }
 
 async function searchClients(search: string | number) {
-  const res = await invoke<Res<ClientOption[]>>("search_clients", { search });
-  if (!res.error) {
-    clients.value = res.data;
-  }
+  const result = await commands.searchClients(String(search));
+  if (result.status === "ok") clients.value = (result.data.data ?? []) as ClientSearch[];
 }
 
 async function searchProducts(search: string | number) {
-  const res = await invoke<Res<ProductOption[]>>("search_products", { search });
-  if (!res.error) {
-    products.value = res.data;
+  const result = await commands.searchProducts(String(search));
+  if (result.status === "ok") {
+    products.value = ((result.data.data ?? []) as ProductSearch[]).map((p) => ({
+      ...p,
+      price: p.price ?? undefined,
+    }));
   }
 }
 
 async function fillClientDetails(id: string) {
   try {
-    const res = await invoke<Res<ClientT>>("get_client", { id });
-    if (!res.error) {
-      selectedClient.value = res.data;
+    const result = await commands.getClient(id);
+    if (result.status === "ok" && result.data.data) {
+      selectedClient.value = result.data.data;
     }
   } catch (err: any) {
     Logger.error(`ERROR GET CLIENT: ${err.error ? err.error : err.message}`);
@@ -121,14 +128,15 @@ const onSubmit = handleSubmit(async (formValues) => {
   isPosting.value = true;
 
   try {
-    await invoke<Res<string>>("create_invoice", {
-      invoice: {
-        client_id: formValues.client_id,
-        status: "DRAFT",
-        paid_amount: formValues.paid_amount,
-        items: formValues.items,
-      },
-    });
+    const payload: NewInvoice = {
+      client_id: formValues.client_id,
+      order_id: null,
+      status: "DRAFT",
+      paid_amount: formValues.paid_amount,
+      items: formValues.items,
+    };
+    const result = await commands.createInvoice(payload);
+    if (result.status === "error") throw result.error;
 
     Logger.info(`CREATE INVOICE: ${JSON.stringify(formValues)}`);
 

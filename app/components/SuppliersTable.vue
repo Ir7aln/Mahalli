@@ -2,26 +2,27 @@
 import { FilePenLine, GripHorizontal, Trash2 } from "lucide-vue-next";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { SupplierDelete, SupplierUpdate } from "#components";
+import type { SelectSuppliers } from "@/bindings";
 
 defineProps<{
-  suppliers: SupplierT[];
+  suppliers: SelectSuppliers[];
 }>();
 const { t, locale } = useI18n();
 const modal = useModal();
 
-function toggleThisSupplier(supplier: SupplierT, name: "delete" | "update") {
+function toggleThisSupplier(supplier: SelectSuppliers, name: "delete" | "update") {
   if (name === "delete") {
     modal.open(SupplierDelete, {
-      id: supplier.id!,
+      id: supplier.id,
       fullName: supplier.full_name,
     });
   } else {
     modal.open(SupplierUpdate, {
-      id: supplier.id!,
+      id: supplier.id,
       fullName: supplier.full_name,
-      email: supplier.email,
-      phoneNumber: supplier.phone_number,
-      address: supplier.address,
+      email: supplier.email ?? undefined,
+      phoneNumber: supplier.phone_number ?? undefined,
+      address: supplier.address ?? undefined,
     });
   }
 }

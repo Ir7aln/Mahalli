@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { SelectInventory } from "@/bindings";
+
 defineProps<{
-  inventory: InventoryT[];
+  inventory: SelectInventory[];
 }>();
 const { t, d, locale, n } = useI18n();
 </script>

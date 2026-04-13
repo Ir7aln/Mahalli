@@ -83,8 +83,12 @@ export function usePdfGenerator() {
       if (fileName.endsWith(".pdf")) {
         const sourcePdfDoc = await PDFDocument.load(config.template.bytes);
         const [templatePage] = await pdfDoc.copyPages(sourcePdfDoc, [0]);
+        if (!templatePage) {
+          handleError(new Error("Template PDF has no pages"));
+          return;
+        }
         template = templatePage;
-        page = pdfDoc.addPage(copyPage(template));
+        page = pdfDoc.addPage(copyPage(templatePage));
       } else {
         // Add empty page first
         page = pdfDoc.addPage();
@@ -273,7 +277,11 @@ export function usePdfGenerator() {
 
       if (!page || !font) return;
 
-      page.drawText(item.name, {
+      const name = String(item.name ?? "");
+      const quantity = Number(item.quantity ?? 0);
+      const price = Number(item.price ?? 0);
+
+      page.drawText(name, {
         x: config.marginX + 5,
         y: Height.value - 10,
         font,
@@ -281,7 +289,7 @@ export function usePdfGenerator() {
         color: config.secondaryColor,
       });
 
-      page.drawText(n(item?.quantity, "decimal"), {
+      page.drawText(n(quantity, "decimal"), {
         x: config.marginX + 5 + Width.value / 4,
         y: Height.value - 10,
         font,
@@ -289,7 +297,7 @@ export function usePdfGenerator() {
         color: config.secondaryColor,
       });
 
-      page.drawText(reverseText(n(item.price, "currency")), {
+      page.drawText(reverseText(n(price, "currency")), {
         x: config.marginX + 5 + Width.value / 2,
         y: Height.value - 10,
         font,
@@ -297,7 +305,7 @@ export function usePdfGenerator() {
         color: config.secondaryColor,
       });
 
-      page.drawText(reverseText(n(item.price * item.quantity, "currency")), {
+      page.drawText(reverseText(n(price * quantity, "currency")), {
         x: config.marginX + 5 + (Width.value * 3) / 4,
         y: Height.value - 10,
         font,
@@ -329,7 +337,7 @@ export function usePdfGenerator() {
         color: config.mainColor,
       });
 
-      page.drawText(item.value, {
+      page.drawText(String(item.value ?? ""), {
         x: config.marginX + 5 + (Width.value * 3) / 4,
         y: Height.value - 10,
         font,
@@ -346,7 +354,7 @@ export function usePdfGenerator() {
   function drawTotalAsText(total: number) {
     if (!page || !font) return;
 
-    const totalAsText = numberToText(total, locale.value as any);
+    const totalAsText = numberToText(total, locale.value as "en" | "fr" | "ar" | "de");
 
     page.drawText(totalAsText, {
       x: getMiddleX(totalAsText, Width.value, 13),

@@ -1,85 +1,90 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
+import { commands } from "@/bindings";
 import { Calendar as CalendarIcon, Plus } from "lucide-vue-next";
 import { useDebounceFn } from "@vueuse/core";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
 import { QuoteCreate } from "#components";
+import type { QuoteProductItem, SelectQuotes } from "@/bindings";
+import { queryNumber, queryString } from "@/utils/query";
 
 const route = useRoute();
 const { t, d } = useI18n();
 const modal = useModal();
 const { updateQueryParams } = useUpdateRouteQueryParams();
-const searchQuery = ref(route.query.search as string);
-const created_at = ref(route.query.created_at as any);
+const searchQuery = ref<string>((route.query.search as string) ?? "");
+const created_at = ref<string>(queryString(route.query.created_at));
 
-const quoteProducts = ref<QuoteProductsPreviewT[]>([]);
+const quoteProducts = ref<QuoteProductItem[]>([]);
 
 const LIMIT = 50;
 
-const queryParams = computed<QueryParams>(() => ({
-  search: route.query.search,
-  page: route.query.page,
-  refresh: route.query.refresh,
-  limit: route.query.limit,
-  created_at: route.query.created_at,
-}));
+const queryParams = computed(() => {
+  return {
+    search: queryString(route.query.search),
+    page: queryNumber(route.query.page, 1),
+    limit: route.query.limit ? queryNumber(route.query.limit, LIMIT) : LIMIT,
+    created_at: queryString(route.query.created_at) || null,
+    refresh: queryString(route.query.refresh) || "",
+  };
+});
 
 async function fetchQuotes() {
-  try {
-    const res: Res<any> = await invoke("list_quotes", {
-      args: {
-        page: Number(queryParams.value.page) ?? 1,
-        search: queryParams.value.search ?? "",
-        limit: queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT,
-        created_at: queryParams.value.created_at,
-      },
-    });
-    return res.data;
-  } catch (err: any) {
+  const result = await commands.listQuotes({
+    search: queryParams.value.search,
+    page: queryParams.value.page,
+    limit: queryParams.value.limit,
+    status: null,
+    created_at: queryParams.value.created_at,
+  });
+  if (result.status === "error") {
     toast.error(t("notifications.error.title"), {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(`LIST QUOTES: ${err.error ? err.error : err.message}`);
+    Logger.error(`ERROR: ${JSON.stringify(result.error)}`);
+    return null;
   }
+  return result.data.data;
 }
 
 const { data: quotesData } = await useAsyncData(fetchQuotes, {
   watch: [queryParams],
 });
 
-const quotes = computed<QuoteT[]>(() => quotesData.value?.quotes ?? []);
+const quotes = computed<SelectQuotes[]>(() => quotesData.value?.quotes ?? []);
 const totalRows = computed<number>(() => quotesData.value?.count ?? 0);
 
 provide("count", totalRows);
 provide("itemsPerPage", queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT);
 
 const debouncedSearch = useDebounceFn(() => {
-  updateQueryParams({ search: searchQuery.value });
+  updateQueryParams({ search: searchQuery.value || "" });
 }, 500);
 
 watch(searchQuery, debouncedSearch);
 
 watch(created_at, () => {
   updateQueryParams({
-    created_at: created_at.value ? new Date(created_at.value).toISOString() : undefined,
+    created_at: created_at.value ? new Date(created_at.value).toISOString() : "",
   });
 });
 
 async function listQuoteProducts(id?: string) {
-  try {
-    const res = await invoke<Res<any>>("list_quote_products", {
-      id,
-    });
-    quoteProducts.value = res.data;
-  } catch (err: any) {
+  if (!id) {
+    quoteProducts.value = [];
+    return;
+  }
+  const result = await commands.listQuoteProducts(id);
+  if (result.status === "error") {
     toast.error(t("notifications.error.title"), {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(`LIST QUOTE PRODUCTS: ${err.error ? err.error : err.message}`);
+    Logger.error(`LIST QUOTE PRODUCTS: ${JSON.stringify(result.error)}`);
+    return;
   }
+  quoteProducts.value = result.data.data ?? [];
 }
 
 const openCreateQuoteModal = () => modal.open(QuoteCreate, { sheet: true });

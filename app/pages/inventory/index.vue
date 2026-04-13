@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { invoke } from "@tauri-apps/api/core";
 import { CalendarIcon } from "lucide-vue-next";
 import { useDebounceFn } from "@vueuse/core";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
+import { commands } from "@/bindings";
+import type { SelectInventory } from "@/bindings";
+import { queryNumber, queryString } from "@/utils/query";
 
 const route = useRoute();
 const { t, d } = useI18n();
@@ -14,41 +16,42 @@ const created_at = ref(route.query.created_at as string);
 
 const LIMIT = 50;
 
-const queryParams = computed<QueryParams>(() => ({
-  search: route.query.search,
-  page: route.query.page,
-  refresh: route.query.refresh,
-  limit: route.query.limit,
-  transaction_type: route.query.transaction_type,
-  created_at: route.query.created_at,
-}));
+const queryParams = computed(() => {
+  return {
+    search: queryString(route.query.search),
+    page: queryNumber(route.query.page, 1),
+    limit: route.query.limit ? queryNumber(route.query.limit, LIMIT) : LIMIT,
+    transaction_type: queryString(route.query.transaction_type) || "",
+    created_at: queryString(route.query.created_at) || "",
+    refresh: queryString(route.query.refresh) || "",
+  };
+});
 
 async function fetchInventory() {
-  try {
-    const res: Res<any> = await invoke("list_inventory", {
-      args: {
-        search: queryParams.value.search ?? "",
-        page: Number(queryParams.value.page) ?? 1,
-        limit: queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT,
-        status: queryParams.value.transaction_type,
-        created_at: queryParams.value.created_at,
-      },
-    });
-    return res.data;
-  } catch (err: any) {
+  const result = await commands.listInventory({
+    search: queryParams.value.search,
+    page: queryParams.value.page,
+    limit: queryParams.value.limit,
+    status: null,
+    created_at: null,
+  });
+  if (result.status === "error") {
     toast.error(t("notifications.error.title"), {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(`LIST INVENTORY: ${err.error ? err.error : err.message}`);
-    return { inventory: [], count: 0 };
+    Logger.error(`LIST INVENTORY: ${JSON.stringify(result.error)}`);
+    return null;
   }
+  return result.data.data;
 }
 
-const { data } = useAsyncData(fetchInventory, { watch: [queryParams] });
+const { data: inventoryData } = await useAsyncData(fetchInventory, {
+  watch: [queryParams],
+});
 
-const inventory = computed<InventoryT[]>(() => data.value?.inventory ?? []);
-const totalRows = computed<number>(() => data.value?.count ?? 0);
+const inventory = computed<SelectInventory[]>(() => inventoryData.value?.inventory ?? []);
+const totalRows = computed<number>(() => inventoryData.value?.count ?? 0);
 
 provide("count", totalRows);
 provide("itemsPerPage", queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT);
@@ -61,9 +64,9 @@ watch(searchQuery, debouncedSearch);
 
 watch([transaction_type, created_at], () => {
   updateQueryParams({
-    transaction_type: transaction_type.value,
+    transaction_type: transaction_type.value || "",
     page: 1,
-    created_at: created_at.value ? new Date(created_at.value).toISOString() : undefined,
+    created_at: created_at.value ? new Date(created_at.value).toISOString() : "",
   });
 });
 </script>
