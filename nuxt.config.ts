@@ -22,7 +22,6 @@ export default defineNuxtConfig({
     viewer: false,
   },
   i18n: {
-    restructureDir: "app",
     locales: [
       { code: "en", file: "en-US.json" },
       { code: "fr", file: "fr-FR.json" },
