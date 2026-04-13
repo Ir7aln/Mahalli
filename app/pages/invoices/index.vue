@@ -99,7 +99,7 @@ async function listInvoiceProducts(id?: string) {
   }
 }
 
-const openCreateInvoiceModal = () => modal.open(InvoiceCreate, {});
+const openCreateInvoiceModal = () => modal.open(InvoiceCreate, { sheet: true });
 </script>
 
 <template>

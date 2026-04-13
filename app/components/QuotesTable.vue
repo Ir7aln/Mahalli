@@ -36,6 +36,7 @@ function toggleThisQuote(quote: QuoteT, name: "delete" | "update") {
     });
   } else {
     modal.open(QuoteUpdate, {
+      sheet: true,
       id: quote.id!,
       identifier: quote.identifier,
     });

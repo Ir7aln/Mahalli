@@ -89,7 +89,7 @@ async function listQuoteProducts(id?: string) {
   }
 }
 
-const openCreateQuoteModal = () => modal.open(QuoteCreate, {});
+const openCreateQuoteModal = () => modal.open(QuoteCreate, { sheet: true });
 </script>
 
 <template>

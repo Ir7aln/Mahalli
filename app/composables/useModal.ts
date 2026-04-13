@@ -8,6 +8,7 @@ export interface Modal {
   transition?: boolean;
   preventClose?: boolean;
   fullscreen?: boolean;
+  sheet?: boolean;
   class?: string | object | string[];
   ui?: any;
   onClose?: () => void;

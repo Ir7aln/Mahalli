@@ -85,6 +85,7 @@ pub async fn run() {
             //
             commands::clients::list_clients,
             commands::clients::search_clients,
+            commands::clients::get_client,
             commands::clients::create_client,
             commands::clients::update_client,
             commands::clients::delete_client,

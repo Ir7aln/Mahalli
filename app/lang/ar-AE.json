@@ -85,7 +85,17 @@
     "invoice": "فاتورة",
     "order": "طلب",
     "quote": "عرض أسعار",
-    "no-match": "لم يتم العثور على تطابق"
+    "no-match": "لم يتم العثور على تطابق",
+    "subtotal": "المجموع الفرعي",
+    "balance": "الرصيد",
+    "currency": "درهم"
+  },
+  "placeholders": {
+    "select-client": "اختر عميلاً",
+    "no-client-selected": "لم يتم اختيار عميل بعد",
+    "no-email": "لا يوجد بريد إلكتروني",
+    "no-address": "لا يوجد عنوان",
+    "no-phone": "لا يوجد هاتف"
   },
   "status": {
     "pending": "قيد الانتظار",

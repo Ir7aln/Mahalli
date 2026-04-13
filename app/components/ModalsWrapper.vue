@@ -1,5 +1,11 @@
 <script setup lang="ts">
+import { inject } from "vue";
+import { modalInjectionKey, useModal } from "@/composables/useModal";
+
+const modalState = inject(modalInjectionKey);
 const { isOpen } = useModal();
+
+const isSheet = computed(() => Boolean(modalState?.value?.props?.sheet));
 </script>
 
 <template>
@@ -13,16 +19,47 @@ const { isOpen } = useModal();
   >
     <div
       v-if="isOpen"
-      class="w-full h-full flex items-center justify-center fixed inset-0 transition-opacity bg-gray-200/75 z-50"
+      :class="
+        cn(
+          'fixed inset-0 z-50 flex h-full w-full transition-opacity',
+          isSheet
+            ? 'items-stretch justify-end bg-slate-950/45 backdrop-blur-[2px]'
+            : 'items-center justify-center bg-gray-200/75',
+        )
+      "
     >
       <Transition
         :appear="true"
-        enter-active-class="delay-100 ease-out duration-300"
-        enter-from-class="delay-100 opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-        enter-to-class="delay-100 opacity-100 translate-y-0 sm:scale-100"
-        leave-class="delay-100 ease-in duration-200"
-        leave-from-class="delay-100 opacity-100 translate-y-0 sm:scale-100"
-        leave-to-class="delay-100 opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+        :enter-active-class="
+          isSheet
+            ? 'ease-out duration-300'
+            : 'delay-100 ease-out duration-300'
+        "
+        :enter-from-class="
+          isSheet
+            ? 'opacity-0 translate-x-10'
+            : 'delay-100 opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'
+        "
+        :enter-to-class="
+          isSheet
+            ? 'opacity-100 translate-x-0'
+            : 'delay-100 opacity-100 translate-y-0 sm:scale-100'
+        "
+        :leave-class="
+          isSheet
+            ? 'ease-in duration-200'
+            : 'delay-100 ease-in duration-200'
+        "
+        :leave-from-class="
+          isSheet
+            ? 'opacity-100 translate-x-0'
+            : 'delay-100 opacity-100 translate-y-0 sm:scale-100'
+        "
+        :leave-to-class="
+          isSheet
+            ? 'opacity-0 translate-x-10'
+            : 'delay-100 opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'
+        "
       >
         <Modals />
       </Transition>

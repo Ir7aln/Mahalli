@@ -85,7 +85,17 @@
     "invoice": "Rechnung",
     "order": "Bestellung",
     "quote": "Angebot",
-    "no-match": "keine Übereinstimmung gefunden"
+    "no-match": "keine Übereinstimmung gefunden",
+    "subtotal": "Zwischensumme",
+    "balance": "Saldo",
+    "currency": "MAD"
+  },
+  "placeholders": {
+    "select-client": "Wählen Sie einen Kunden",
+    "no-client-selected": "Kein Kunde ausgewählt",
+    "no-email": "Keine E-Mail",
+    "no-address": "Keine Adresse",
+    "no-phone": "Kein Telefon"
   },
   "status": {
     "pending": "Ausstehend",

@@ -17,9 +17,13 @@ export interface InvoiceForUpdateT {
   id: string;
   client_id: string;
   full_name: string;
+  email?: string;
+  phone_number?: string;
+  address?: string;
   paid_amount: number;
   created_at: string;
   status: (typeof INVOICE_STATUSES)[number];
+  identifier?: string;
   items: {
     id: string;
     inventory_id: string;

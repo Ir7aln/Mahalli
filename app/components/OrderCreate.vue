@@ -1,18 +1,30 @@
 <script setup lang="ts">
 import { invoke } from "@tauri-apps/api/core";
 import * as Logger from "@tauri-apps/plugin-log";
-import { Trash2 } from "lucide-vue-next";
+import { CalendarDays, Plus, Trash2, X } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import { useFieldArray, useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 
-const { t } = useI18n();
+type ClientOption = {
+  label: string;
+  value: string;
+};
+
+type ProductOption = {
+  label: string;
+  value: string;
+  price?: number;
+};
+
+const { t, d, n } = useI18n();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
-const clients = ref<{ label: string; value: string }[]>([]);
-const products = ref<{ label: string; value: string }[]>([]);
-const isPosting = ref<boolean>(false);
+const clients = ref<ClientOption[]>([]);
+const products = ref<ProductOption[]>([]);
+const selectedClient = ref<Partial<ClientT> | null>(null);
+const isPosting = ref(false);
 
 const orderSchema = z.object({
   client_id: z.string().min(1),
@@ -21,11 +33,11 @@ const orderSchema = z.object({
       product_id: z.string().min(1),
       quantity: z.number().min(1),
       price: z.number().min(1),
-    })
+    }),
   ),
 });
 
-const { handleSubmit, setFieldValue } = useForm({
+const { handleSubmit, setFieldValue, values } = useForm({
   validationSchema: toTypedSchema(orderSchema),
   initialValues: {
     client_id: "",
@@ -39,9 +51,25 @@ const { handleSubmit, setFieldValue } = useForm({
   },
 });
 
-type item = z.infer<typeof orderSchema>["items"][number];
+type Item = z.infer<typeof orderSchema>["items"][number];
 
-const { fields, remove, push } = useFieldArray<item>("items");
+const { fields, remove, push } = useFieldArray<Item>("items");
+
+const subtotal = computed(() =>
+  (values.items ?? []).reduce((sum, item) => {
+    return sum + Number(item.quantity ?? 0) * Number(item.price ?? 0);
+  }, 0),
+);
+
+const clientDetails = computed(() => [
+  selectedClient.value?.email || t("placeholders.no-email"),
+  selectedClient.value?.address || t("placeholders.no-address"),
+  selectedClient.value?.phone_number || t("placeholders.no-phone"),
+]);
+
+function formatMoney(value: number) {
+  return n(Number.isFinite(value) ? value : 0, "currency");
+}
 
 function addOrderItem() {
   push({
@@ -56,46 +84,52 @@ function deleteOrderItem(index: number) {
 }
 
 async function searchClients(search: string | number) {
-  const res = await invoke<Res<{ label: string; value: string }[]>>(
-    "search_clients",
-    {
-      search,
-    }
-  );
+  const res = await invoke<Res<ClientOption[]>>("search_clients", { search });
   if (!res.error) {
     clients.value = res.data;
   }
 }
 
 async function searchProducts(search: string | number) {
-  const res = await invoke<Res<{ label: string; value: string }[]>>(
-    "search_products",
-    {
-      search,
-    }
-  );
+  const res = await invoke<Res<ProductOption[]>>("search_products", { search });
   if (!res.error) {
     products.value = res.data;
   }
 }
 
-const onSubmit = handleSubmit(async (values) => {
+async function fillClientDetails(id: string) {
+  try {
+    const res = await invoke<Res<ClientT>>("get_client", { id });
+    if (!res.error) {
+      selectedClient.value = res.data;
+    }
+  } catch (err: any) {
+    Logger.error(`ERROR GET CLIENT: ${err.error ? err.error : err.message}`);
+  }
+}
+
+async function handleClientSelect(id: string) {
+  setFieldValue("client_id", id);
+  await fillClientDetails(id);
+}
+
+const onSubmit = handleSubmit(async (formValues) => {
   isPosting.value = true;
   try {
     await invoke<Res<string>>("create_order", {
       order: {
-        client_id: values.client_id,
+        client_id: formValues.client_id,
         status: "PENDING",
-        items: values.items,
+        items: formValues.items,
       },
     });
-    //
-    Logger.info(`CREATE ORDER: ${JSON.stringify(values)}`);
-    //
+
+    Logger.info(`CREATE ORDER: ${JSON.stringify(formValues)}`);
+
     toast.success(t("notifications.order.created"), {
       closeButton: true,
     });
-    // toggle refresh
+
     updateQueryParams({
       refresh: `refresh-create-${Math.random() * 9999}`,
     });
@@ -109,119 +143,220 @@ const onSubmit = handleSubmit(async (values) => {
     isPosting.value = false;
     close();
   }
-  isPosting.value = false;
 });
 </script>
 
 <template>
-  <form class="w-full flex justify-center" @submit="onSubmit">
-    <Card class="w-4/6 lg:w-1/2">
-      <CardHeader>
-        <CardTitle>{{ t("titles.orders.create") }}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div class="h-full w-full grid grid-cols-1 gap-2">
-          <div class="flex w-full flex-col h-fit gap-1">
-            <div class="w-full h-full flex flex-col gap-1">
-              <FormField v-slot="{ field }" name="client_id">
-                <FormItem>
-                  <FormLabel>{{ t("fields.full-name") }}</FormLabel>
-                  <FormControl>
-                    <SearchList
-                      :items="clients"
-                      @update-items="searchClients"
-                      @on-select="field.onChange"
-                    />
-                  </FormControl>
-                </FormItem>
-              </FormField>
+  <form class="h-full w-full max-w-[860px]" @submit="onSubmit">
+    <div class="flex h-full w-full flex-col overflow-hidden border-l border-slate-200 bg-white text-slate-900 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+        <div class="space-y-1">
+          <p class="text-xs font-medium uppercase tracking-[0.35em] text-slate-500">
+            {{ t("routes.orders") }}
+          </p>
+          <h2 class="text-xl font-semibold">
+            {{ t("titles.orders.create") }}
+          </h2>
+        </div>
+        <Button type="button" variant="ghost" size="icon" class="rounded-full" @click="close">
+          <X class="size-5" />
+        </Button>
+      </div>
+
+      <div class="min-h-0 flex-1 overflow-y-auto">
+        <div class="w-full h-full px-5 py-6 sm:px-6">
+          <section class="border border-slate-200 bg-white px-6 py-6 sm:px-7">
+            <div class="flex flex-col gap-6 border-b border-slate-200 pb-6 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p class="text-3xl font-semibold tracking-tight">
+                  {{ t("fields.order") }}
+                </p>
+                <p class="mt-2 text-sm text-slate-500">
+                  {{ t("status.pending") }}
+                </p>
+              </div>
+              <div class="text-left sm:text-right">
+                <p class="text-xs uppercase tracking-[0.3em] text-slate-500">
+                  {{ t("fields.total") }}
+                </p>
+                <p class="mt-2 text-3xl font-semibold tracking-tight">
+                  {{ formatMoney(subtotal) }}
+                </p>
+              </div>
             </div>
-          </div>
-          <Separator />
-          <div class="w-full h-full flex flex-col gap-1">
-            <Button type="button" @click="addOrderItem">
-              {{ t("buttons.add-product") }}
-            </Button>
-            <ScrollArea :class="{ 'h-60': fields.length > 5 }">
-              <div class="flex flex-col space-y-1 my-1">
-                <div
-                  v-for="(field, index) in fields"
-                  :key="field.key"
-                  class="grid grid-flow-col gap-1"
-                >
-                  <FormField
-                    v-slot="{ field: productField }"
-                    :name="`items[${index}].product_id`"
-                  >
+
+            <div class="space-y-6 border-b border-slate-200 py-6">
+              <div class="grid gap-4 text-sm sm:grid-cols-2">
+                <div class="flex items-center gap-4 border-b border-slate-100 pb-3 sm:border-b-0 sm:pb-0">
+                  <span class="text-slate-500">{{ t("fields.status") }}</span>
+                  <Badge variant="outline" class="border-gray-300 bg-transparent text-gray-900">
+                    {{ t("status.pending") }}
+                  </Badge>
+                </div>
+                <div class="flex items-center gap-4">
+                  <span class="inline-flex items-center gap-2 text-slate-500">
+                    <CalendarDays class="size-4" />
+                    {{ t("fields.date") }}
+                  </span>
+                  <span class="font-medium text-slate-900">
+                    {{ d(new Date(), "long") }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="space-y-4">
+                <div class="space-y-2">
+                  <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+                    {{ t("fields.bill-to") }}
+                  </p>
+                  <FormField v-slot="{ field }" name="client_id">
                     <FormItem>
                       <FormControl>
                         <SearchList
-                          :items="products"
-                          @update-items="searchProducts"
+                          :items="clients"
+                          @update-items="searchClients"
                           @on-select="
-                            (id, price) => {
-                              productField.onChange(id);
-                              setFieldValue(`items.${index}.price`, price!);
+                            async (id) => {
+                              field.onChange(id);
+                              await handleClientSelect(id);
                             }
                           "
                         />
                       </FormControl>
                     </FormItem>
                   </FormField>
-                  <FormField
-                    v-slot="{ componentField }"
-                    :name="`items[${index}].quantity`"
-                  >
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          :placeholder="t('fields.quantity')"
-                          type="number"
-                          v-bind="componentField"
-                        >
-                          <template #unite>
-                            {{ t("fields.item") }}
-                          </template>
-                        </Input>
-                      </FormControl>
-                    </FormItem>
-                  </FormField>
-                  <FormField
-                    v-slot="{ componentField }"
-                    :name="`items[${index}].price`"
-                  >
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          :placeholder="t('fields.price')"
-                          type="number"
-                          v-bind="componentField"
-                        >
-                          <template #unite>
-                            DH
-                          </template>
-                        </Input>
-                      </FormControl>
-                    </FormItem>
-                  </FormField>
-                  <Trash2
-                    class="cursor-pointer size-6 m-auto"
-                    @click="deleteOrderItem(index)"
-                  />
+                </div>
+
+                <div class="space-y-1 text-sm leading-6 text-slate-500">
+                  <p class="text-base font-semibold text-slate-900">
+                    {{ selectedClient?.full_name || t("placeholders.select-client") }}
+                  </p>
+                  <p v-for="detail in clientDetails" :key="detail">
+                    {{ detail }}
+                  </p>
                 </div>
               </div>
-            </ScrollArea>
+            </div>
+
+            <div class="py-6">
+              <div class="flex items-center justify-between gap-4 pb-4">
+                <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+                  {{ t("fields.items") }}
+                </p>
+                <Button type="button" variant="ghost" class="gap-2 px-0 text-slate-700" @click="addOrderItem">
+                  <Plus class="size-4" />
+                  {{ t("buttons.add-product") }}
+                </Button>
+              </div>
+
+              <div class="border-y border-slate-200">
+                <div class="hidden bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 md:grid md:grid-cols-[minmax(0,2fr)_100px_140px_120px_40px] md:gap-3">
+                  <span>{{ t("fields.name") }}</span>
+                  <span>{{ t("fields.quantity") }}</span>
+                  <span>{{ t("fields.price") }}</span>
+                  <span>{{ t("fields.total") }}</span>
+                  <span />
+                </div>
+
+                <div class="divide-y divide-slate-200">
+                  <div
+                    v-for="(entry, index) in fields"
+                    :key="entry.key"
+                    class="grid gap-3 px-4 py-4 md:grid-cols-[minmax(0,2fr)_100px_140px_120px_40px] md:items-end"
+                  >
+                    <FormField
+                      v-slot="{ field: productField }"
+                      :name="`items[${index}].product_id`"
+                    >
+                      <FormItem>
+                        <FormLabel class="md:hidden">{{ t("fields.name") }}</FormLabel>
+                        <FormControl>
+                          <SearchList
+                            :items="products"
+                            @update-items="searchProducts"
+                            @on-select="
+                              (id, price) => {
+                                productField.onChange(id);
+                                setFieldValue(`items.${index}.price`, Number(price ?? 0));
+                              }
+                            "
+                          />
+                        </FormControl>
+                      </FormItem>
+                    </FormField>
+
+                    <FormField v-slot="{ componentField }" :name="`items[${index}].quantity`">
+                      <FormItem>
+                        <FormLabel class="md:hidden">{{ t("fields.quantity") }}</FormLabel>
+                        <FormControl>
+                          <Input v-bind="componentField" type="number" />
+                        </FormControl>
+                      </FormItem>
+                    </FormField>
+
+                    <FormField v-slot="{ componentField }" :name="`items[${index}].price`">
+                      <FormItem>
+                        <FormLabel class="md:hidden">{{ t("fields.price") }}</FormLabel>
+                        <FormControl>
+                          <Input v-bind="componentField" type="number">
+                            <template #unite>
+                              {{ t("fields.currency") }}
+                            </template>
+                          </Input>
+                        </FormControl>
+                      </FormItem>
+                    </FormField>
+
+                    <div class="space-y-1">
+                      <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 md:hidden">
+                        {{ t("fields.total") }}
+                      </p>
+                      <div class="flex h-10 items-center text-sm font-medium text-slate-900">
+                        {{ formatMoney(Number(values.items?.[index]?.quantity ?? 0) * Number(values.items?.[index]?.price ?? 0)) }}
+                      </div>
+                    </div>
+
+                    <div class="flex items-center justify-end">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        class="h-9 w-9 rounded-full text-slate-500 hover:text-red-600"
+                        @click="deleteOrderItem(index)"
+                      >
+                        <Trash2 class="size-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="ml-auto mt-6 w-full max-w-sm space-y-3 border-t border-slate-200 pt-4">
+                <div class="flex items-center justify-between text-base font-semibold">
+                  <span>{{ t("fields.total") }}</span>
+                  <span>{{ formatMoney(subtotal) }}</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-200 px-5 py-4">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div class="text-sm text-slate-500">
+            {{ selectedClient?.full_name || t("placeholders.no-client-selected") }}
+          </div>
+          <div class="flex items-center gap-3">
+            <Button type="button" variant="outline" @click="close">
+              {{ t("buttons.cancel") }}
+            </Button>
+            <Button type="submit" :disabled="isPosting">
+              {{ t("buttons.add") }}
+            </Button>
           </div>
         </div>
-      </CardContent>
-      <CardFooter>
-        <Button type="button" variant="outline" @click="close">
-          {{ t("buttons.cancel") }}
-        </Button>
-        <Button type="submit" class="col-span-2">
-          {{ t("buttons.add") }}
-        </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   </form>
 </template>

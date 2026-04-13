@@ -38,6 +38,7 @@ function toggleThisOrder(order: OrderT, name: "delete" | "update") {
     });
   } else {
     modal.open(OrderUpdate, {
+      sheet: true,
       id: order.id!,
       identifier: order.identifier,
     });

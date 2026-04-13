@@ -305,6 +305,21 @@ impl QueriesService {
             .await?;
         Ok(clients)
     }
+    pub async fn get_client(db: &DbConn, id: String) -> Result<JsonValue, DbErr> {
+        let client = Clients::find_by_id(id).one(db).await?;
+
+        match client {
+            Some(client) => Ok(json!({
+                "id": client.id,
+                "full_name": client.full_name,
+                "email": client.email,
+                "phone_number": client.phone_number,
+                "address": client.address,
+                "image": client.image,
+            })),
+            None => Err(DbErr::RecordNotFound(String::from("no client"))),
+        }
+    }
     //
     pub async fn list_suppliers(db: &DbConn, args: ListArgs) -> Result<JsonValue, DbErr> {
         let count = Suppliers::find()
@@ -818,6 +833,7 @@ impl QueriesService {
 
         match invoice {
             Some(invoice) => {
+                let order_id = invoice.0.order_id.clone();
                 let (sql, values) = Query::select()
                     .exprs([
                         Expr::col((OrderItems, order_items::Column::Id)),
@@ -850,7 +866,7 @@ impl QueriesService {
                     )
                     .cond_where(
                         Expr::col((OrderItems, order_items::Column::OrderId))
-                            .eq(invoice.0.order_id),
+                            .eq(order_id),
                     )
                     .to_owned()
                     .build(SqliteQueryBuilder);
@@ -861,14 +877,20 @@ impl QueriesService {
                 .all(db)
                 .await?;
 
+                let (invoice_data, client_data) = invoice;
+                let client = client_data.unwrap();
+
                 Ok(json!({
-                    "id": invoice.0.id,
-                    "client_id": invoice.0.client_id,
-                    "paid_amount": invoice.0.paid_amount,
-                    "created_at": invoice.0.created_at,
-                    "status": invoice.0.status,
-                    "identifier": invoice.0.identifier,
-                    "full_name": invoice.1.unwrap().full_name,
+                    "id": invoice_data.id,
+                    "client_id": invoice_data.client_id,
+                    "paid_amount": invoice_data.paid_amount,
+                    "created_at": invoice_data.created_at,
+                    "status": invoice_data.status,
+                    "identifier": invoice_data.identifier,
+                    "full_name": client.full_name,
+                    "email": client.email,
+                    "address": client.address,
+                    "phone_number": client.phone_number,
                     "items": items,
                 }))
             }

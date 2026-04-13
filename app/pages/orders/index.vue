@@ -99,7 +99,7 @@ async function listOrderProducts(id?: string) {
   }
 }
 
-const openCreateOrderModal = () => modal.open(OrderCreate, {});
+const openCreateOrderModal = () => modal.open(OrderCreate, { sheet: true });
 </script>
 
 <template>

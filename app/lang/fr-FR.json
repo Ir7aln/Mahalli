@@ -82,10 +82,20 @@
     "top-margin": "Marge supérieure",
     "bottom-margin": "Marge inférieure",
     "bill-to": "Facturer à :",
-    "invoice": "facture",
-    "order": "commande",
-    "quote": "devis",
-    "no-match": "aucune correspondance trouvée"
+    "invoice": "Facture",
+    "order": "Commande",
+    "quote": "Devis",
+    "no-match": "aucune correspondance trouvée",
+    "subtotal": "Sous-total",
+    "balance": "Solde",
+    "currency": "MAD"
+  },
+  "placeholders": {
+    "select-client": "Sélectionnez un client",
+    "no-client-selected": "Aucun client sélectionné",
+    "no-email": "Pas d'email",
+    "no-address": "Pas d'adresse",
+    "no-phone": "Pas de téléphone"
   },
   "status": {
     "pending": "En attente",
@@ -158,40 +168,40 @@
   },
   "titles": {
     "clients": {
-      "create": "ajouter un client",
-      "update": "mettre à jour le client",
-      "delete": "êtes-vous sûr de vouloir supprimer le client"
+      "create": "Ajouter un client",
+      "update": "Mettre à jour le client",
+      "delete": "Êtes-vous sûr de vouloir supprimer le client"
     },
     "suppliers": {
-      "create": "ajouter un fournisseur",
-      "update": "mettre à jour le fournisseur",
-      "delete": "êtes-vous sûr de vouloir supprimer le fournisseur"
+      "create": "Ajouter un fournisseur",
+      "update": "Mettre à jour le fournisseur",
+      "delete": "Êtes-vous sûr de vouloir supprimer le fournisseur"
     },
     "products": {
-      "create": "ajouter un produit",
-      "update": "mettre à jour le produit",
-      "update-inventory": "mettre à jour l'inventaire du produit",
-      "delete": "êtes-vous sûr de vouloir supprimer le produit"
+      "create": "Ajouter un produit",
+      "update": "Mettre à jour le produit",
+      "update-inventory": "Mettre à jour l'inventaire du produit",
+      "delete": "Êtes-vous sûr de vouloir supprimer le produit"
     },
     "orders": {
-      "create": "ajouter une nouvelle commande",
-      "update": "mettre à jour la commande",
-      "delete": "êtes-vous sûr de vouloir supprimer la commande"
+      "create": "Ajouter une nouvelle commande",
+      "update": "Mettre à jour la commande",
+      "delete": "Êtes-vous sûr de vouloir supprimer la commande"
     },
     "quotes": {
-      "create": "ajouter un nouveau devis",
-      "update": "mettre à jour le devis",
-      "delete": "êtes-vous sûr de vouloir supprimer le devis"
+      "create": "Ajouter un nouveau devis",
+      "update": "Mettre à jour le devis",
+      "delete": "Êtes-vous sûr de vouloir supprimer le devis"
     },
     "invoices": {
-      "create": "ajouter une nouvelle facture",
-      "update": "mettre à jour la facture",
-      "delete": "êtes-vous sûr de vouloir supprimer la facture"
+      "create": "Ajouter une nouvelle facture",
+      "update": "Mettre à jour la facture",
+      "delete": "Êtes-vous sûr de vouloir supprimer la facture"
     },
     "organizations": {
-      "create": "ajouter une nouvelle organisation",
-      "update": "mettre à jour l'organisation",
-      "delete": "êtes-vous sûr de vouloir supprimer l'organisation ?"
+      "create": "Ajouter une nouvelle organisation",
+      "update": "Mettre à jour l'organisation",
+      "delete": "Êtes-vous sûr de vouloir supprimer l'organisation ?"
     }
   }
 }

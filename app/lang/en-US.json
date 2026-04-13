@@ -82,10 +82,20 @@
     "top-margin": "Top margin",
     "bottom-margin": "Bottom margin",
     "bill-to": "Bill to :",
-    "invoice": "invoice",
-    "order": "order",
-    "quote": "quote",
-    "no-match": "no match found"
+    "invoice": "Invoice",
+    "order": "Order",
+    "quote": "Quote",
+    "no-match": "no match found",
+    "subtotal": "Subtotal",
+    "balance": "Balance",
+    "currency": "MAD"
+  },
+  "placeholders": {
+    "select-client": "Select a client",
+    "no-client-selected": "No client selected yet",
+    "no-email": "No email",
+    "no-address": "No address",
+    "no-phone": "No phone"
   },
   "status": {
     "pending": "Pending",
@@ -159,38 +169,38 @@
   },
   "titles": {
     "clients": {
-      "create": "add a client",
-      "update": "update client",
-      "delete": "are you sure you wanna delete the client"
+      "create": "Add a client",
+      "update": "Update client",
+      "delete": "Are you sure you wanna delete the client"
     },
     "suppliers": {
-      "create": "add a supplier",
-      "update": "update supplier",
-      "delete": "are you sure you wanna delete the supplier"
+      "create": "Add a supplier",
+      "update": "Update supplier",
+      "delete": "Are you sure you wanna delete the supplier"
     },
     "products": {
-      "create": "add a product",
-      "update": "update product",
-      "update-inventory": "update product inventory",
-      "delete": "are you sure you wanna delete the product "
+      "create": "Add a product",
+      "update": "Update product",
+      "update-inventory": "Update product inventory",
+      "delete": "Are you sure you wanna delete the product "
     },
     "orders": {
-      "create": "add new order",
-      "update": "update order",
-      "delete": "are you sure you wanna delete the order "
+      "create": "Add new order",
+      "update": "Update order",
+      "delete": "Are you sure you wanna delete the order "
     },
     "quotes": {
-      "create": "add new quote",
-      "update": "update quote",
-      "delete": "are you sure you wanna delete the quote "
+      "create": "Add new quote",
+      "update": "Update quote",
+      "delete": "Are you sure you wanna delete the quote "
     },
     "invoices": {
-      "create": "add new invoice",
-      "update": "update invoice",
-      "delete": "are you sure you wanna delete the invoice "
+      "create": "Add new invoice",
+      "update": "Update invoice",
+      "delete": "Are you sure you wanna delete the invoice "
     },
     "organizations": {
-      "create": "add new organization",
+      "create": "Add new organization",
       "update": "Update organization",
       "delete": "Are you sure you want to delete the organization?"
     }

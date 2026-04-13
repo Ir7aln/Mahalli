@@ -35,6 +35,7 @@ function toggleThisInvoice(invoice: InvoiceT, name: "delete" | "update") {
     });
   } else {
     modal.open(InvoiceUpdate, {
+      sheet: true,
       id: invoice.id!,
       identifier: invoice.identifier,
     });

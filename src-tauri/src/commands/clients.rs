@@ -41,6 +41,22 @@ pub async fn search_clients(state: State<'_, AppState>, search: String) -> SResu
 }
 
 #[tauri::command]
+pub async fn get_client(state: State<'_, AppState>, id: String) -> SResult<Value> {
+    let _ = state.db_conn;
+    match QueriesService::get_client(&state.db_conn, id).await {
+        Ok(res) => Ok(Seccess {
+            error: None,
+            message: None,
+            data: Some(res),
+        }),
+        Err(err) => Err(Fail {
+            error: Some(err.to_string()),
+            message: None,
+        }),
+    }
+}
+
+#[tauri::command]
 pub async fn create_client(state: State<'_, AppState>, client: NewClient) -> SResult<String> {
     let _ = state.db_conn;
     let image = client.image.clone();
