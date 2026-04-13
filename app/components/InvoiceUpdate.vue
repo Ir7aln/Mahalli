@@ -80,8 +80,8 @@ const clientDetails = computed(() => [
   selectedClient.value?.phone_number || t("placeholders.no-phone"),
 ]);
 
-function formatMoney(value: number) {
-  return n(Number.isFinite(value) ? value : 0, "currency");
+function formatMoney(value: number | string) {
+  return n(toNumber(value), "currency");
 }
 
 const getResult = await commands.getInvoice(props.id);

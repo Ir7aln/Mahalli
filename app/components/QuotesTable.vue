@@ -140,7 +140,7 @@ async function createOrderFromQuote(id: string) {
             {{ d(new Date(quote.created_at!), "long") }}
           </TableCell>
           <TableCell class="p-2">
-            {{ n(quote.total!, "currency") }}
+            {{ n(toNumber(quote.total), "currency") }}
           </TableCell>
           <TableCell class="p-2">
             <div class="flex justify-center items-center gap-3">

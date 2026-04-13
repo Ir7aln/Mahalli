@@ -176,10 +176,10 @@ async function updateInvoiceStatus(id: string, status: string) {
             {{ d(new Date(invoice.created_at!), "long") }}
           </TableCell>
           <TableCell class="p-2">
-            {{ n(invoice.total!, "currency") }}
+            {{ n(toNumber(invoice.total), "currency") }}
           </TableCell>
           <TableCell class="p-2">
-            {{ n(invoice.paid_amount, "currency") }}
+            {{ n(toNumber(invoice.paid_amount), "currency") }}
           </TableCell>
           <TableCell class="p-2">
             <div class="flex justify-center gap-3">

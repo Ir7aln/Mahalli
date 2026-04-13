@@ -117,7 +117,7 @@ const { data: financials } = useAsyncData(async () => {
           </CardHeader>
           <CardContent class="pt-0">
             <div class="text-2xl font-bold">
-              {{ n(financials?.current_revenue || 0, "currency") }}
+              {{ n(toNumber(financials?.current_revenue), "currency") }}
             </div>
             <p class="text-xs text-muted-foreground">
               {{
@@ -139,7 +139,7 @@ const { data: financials } = useAsyncData(async () => {
           </CardHeader>
           <CardContent class="pt-0">
             <div class="text-2xl font-bold">
-              {{ n(financials?.current_expenses || 0, "currency") }}
+              {{ n(toNumber(financials?.current_expenses), "currency") }}
             </div>
             <p class="text-xs text-muted-foreground">
               {{
@@ -208,7 +208,7 @@ const { data: financials } = useAsyncData(async () => {
               <VisTooltip
                 :triggers="{
                   [GroupedBar.selectors.bar]: (d: any) => {
-                    return `${n(d.price || 0, 'currency')} `;
+                    return `${n(toNumber(d.price), 'currency')} `;
                   },
                 }"
               />
@@ -319,7 +319,7 @@ const { data: financials } = useAsyncData(async () => {
                 :triggers="{
                   [GroupedBar.selectors.bar]: (d: any, i: number) => {
                     const transaction_type = (i % 2 === 0 ? 'IN' : 'OUT') as 'IN' | 'OUT';
-                    return `${n(d[transaction_type].price, 'currency')} `;
+                    return `${n(toNumber(d[transaction_type].price), 'currency')} `;
                   },
                 }"
               />

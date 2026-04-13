@@ -2,7 +2,7 @@ use std::ops::Range;
 
 use crate::{
     m20220101_000001_init_::{
-        Client, InventoryTransaction, Invoice, Order, OrderItem, Product, Quote, QuoteItem,
+        Client, InventoryTransaction, Invoice, InvoiceItem, Order, OrderItem, Product, Quote, QuoteItem,
         Supplier,
     },
     utils::get_random_enum,
@@ -245,6 +245,31 @@ impl MigrationTrait for Migration {
 
         db.execute(fix_client_id).await?;
 
+        // Seed invoice_items for existing invoices
+        for _ in 0..300 {
+            let id = ulid::Ulid::new();
+            let price: u8 = Faker.fake();
+            let quantity: u8 = Faker.fake();
+            let insert_item = Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                r#"
+                INSERT INTO
+                    invoice_items (id, invoice_id, product_id, price, quantity, inventory_id)
+                VALUES
+                    (
+                        $1,
+                        (SELECT id FROM invoices ORDER BY RANDOM() LIMIT 1),
+                        (SELECT id FROM products ORDER BY RANDOM() LIMIT 1),
+                        $2,
+                        $3,
+                        (SELECT id FROM inventory_transactions ORDER BY RANDOM() LIMIT 1)
+                    )
+                "#,
+                [id.to_string().into(), price.into(), quantity.into()],
+            );
+            db.execute(insert_item).await?;
+        }
+
         for _ in 0..150 {
             let id = ulid::Ulid::new();
             let insert_quote = Statement::from_sql_and_values(
@@ -290,6 +315,11 @@ impl MigrationTrait for Migration {
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        let delete_item = Query::delete()
+            .from_table(InvoiceItem::Table)
+            .to_owned();
+        manager.exec_stmt(delete_item).await?;
+
         let delete_item = Query::delete().from_table(OrderItem::Table).to_owned();
         manager.exec_stmt(delete_item).await?;
 

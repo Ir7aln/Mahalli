@@ -132,10 +132,10 @@ function updateProductInventory(id: string, name: string) {
             }}
           </TableCell>
           <TableCell class="p-2">
-            {{ n(product.purchase_price ?? 0, "currency") }}
+            {{ n(toNumber(product.purchase_price), "currency") }}
           </TableCell>
           <TableCell class="p-2">
-            {{ n(product.selling_price ?? 0, "currency") }}
+            {{ n(toNumber(product.selling_price), "currency") }}
           </TableCell>
           <TableCell class="p-2">
             <div class="flex justify-center gap-3">

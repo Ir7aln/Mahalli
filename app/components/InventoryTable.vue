@@ -27,7 +27,7 @@ const { t, d, locale, n } = useI18n();
             {{ tx?.name }}
           </TableCell>
           <TableCell class="p-2">
-            {{ n(tx?.price, "currency") }}
+            {{ n(toNumber(tx?.price), "currency") }}
           </TableCell>
           <TableCell class="p-2">
             {{ `${tx.quantity} ${t("plrz.i", { n: Math.ceil(tx.quantity) })}` }}

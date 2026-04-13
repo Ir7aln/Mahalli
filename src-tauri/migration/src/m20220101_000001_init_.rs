@@ -413,6 +413,48 @@ impl MigrationTrait for Migration {
             .await?;
 
         manager
+            .create_table(
+                Table::create()
+                    .table(InvoiceItem::Table)
+                    .if_not_exists()
+                    .col(ColumnDef::new(InvoiceItem::Id).string().not_null().primary_key())
+                    .col(ColumnDef::new(InvoiceItem::InvoiceId).string().not_null())
+                    .col(ColumnDef::new(InvoiceItem::ProductId).string().not_null())
+                    .col(ColumnDef::new(InvoiceItem::Price).double().not_null().default(0))
+                    .col(ColumnDef::new(InvoiceItem::Quantity).double().not_null().default(0))
+                    .col(ColumnDef::new(InvoiceItem::InventoryId).string().null())
+                    .col(
+                        ColumnDef::new(InvoiceItem::CreatedAt)
+                            .date_time()
+                            .not_null()
+                            .default(Expr::current_timestamp()),
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_invoice_items_invoice_id")
+                            .from(InvoiceItem::Table, InvoiceItem::InvoiceId)
+                            .to(Invoice::Table, Invoice::Id)
+                            .on_delete(ForeignKeyAction::Cascade),
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_invoice_items_product_id")
+                            .from(InvoiceItem::Table, InvoiceItem::ProductId)
+                            .to(Product::Table, Product::Id)
+                            .on_delete(ForeignKeyAction::Restrict),
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_invoice_items_inventory_id")
+                            .from(InvoiceItem::Table, InvoiceItem::InventoryId)
+                            .to(InventoryTransaction::Table, InventoryTransaction::Id)
+                            .on_delete(ForeignKeyAction::SetNull),
+                    )
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
             .create_index(
                 sea_query::Index::create()
                     .table(Quote::Table)
@@ -498,6 +540,16 @@ impl MigrationTrait for Migration {
                     .table(Invoice::Table)
                     .col(Invoice::Status)
                     .name("idx_invoices_status")
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .table(InvoiceItem::Table)
+                    .col(InvoiceItem::InvoiceId)
+                    .name("idx_invoice_items_invoice_id")
                     .to_owned(),
             )
             .await?;
@@ -725,6 +777,17 @@ impl MigrationTrait for Migration {
             .await?;
 
         manager
+            .drop_index(
+                Index::drop()
+                    .table(InvoiceItem::Table)
+                    .name("idx_invoice_items_invoice_id")
+                    .to_owned(),
+            )
+            .await?;
+        manager
+            .drop_table(Table::drop().table(InvoiceItem::Table).to_owned())
+            .await?;
+        manager
             .drop_table(Table::drop().table(Invoice::Table).to_owned())
             .await?;
         manager
@@ -931,4 +994,23 @@ pub enum Invoice {
     IsArchived,
     #[sea_orm(iden = "identifier")]
     Identifier,
+}
+
+#[derive(DeriveIden)]
+pub enum InvoiceItem {
+    #[sea_orm(iden = "invoice_items")]
+    Table,
+    Id,
+    #[sea_orm(iden = "invoice_id")]
+    InvoiceId,
+    #[sea_orm(iden = "product_id")]
+    ProductId,
+    #[sea_orm(iden = "price")]
+    Price,
+    #[sea_orm(iden = "quantity")]
+    Quantity,
+    #[sea_orm(iden = "inventory_id")]
+    InventoryId,
+    #[sea_orm(iden = "created_at")]
+    CreatedAt,
 }

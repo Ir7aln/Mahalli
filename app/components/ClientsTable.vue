@@ -67,7 +67,7 @@ function toggleThisClient(client: SelectClients, name: "delete" | "update") {
             {{ client.address || "--" }}
           </TableCell>
           <TableCell class="p-2 whitespace-nowrap">
-            {{ n(client.credit ?? 0, "currency") }}
+            {{ n(toNumber(client.credit), "currency") }}
           </TableCell>
           <TableCell class="p-2">
             <div class="flex justify-center">
