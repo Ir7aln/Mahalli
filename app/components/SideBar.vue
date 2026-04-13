@@ -29,7 +29,7 @@ const menuItems = [
     icon: SquareUser,
     label: "routes.clients",
     path: "/clients/",
-    query: { page: 1, limit: 25 },
+    query: { page: 1, limit: 50 },
   },
   {
     icon: Package,

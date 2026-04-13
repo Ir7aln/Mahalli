@@ -4,40 +4,36 @@ import { Calendar as CalendarIcon, Plus } from "lucide-vue-next";
 import { useDebounceFn } from "@vueuse/core";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
-import { OrderCreate } from "#components";
-import { ORDER_STATUSES } from "@/consts";
+import { QuoteCreate } from "#components";
 
 const route = useRoute();
 const { t, d } = useI18n();
 const modal = useModal();
 const { updateQueryParams } = useUpdateRouteQueryParams();
-const orderProducts = ref<OrderProductsPreviewT[]>([]);
-
-const searchQuery = ref(route.query.search as any);
-const status = ref(route.query.status as any);
+const searchQuery = ref(route.query.search as string);
 const created_at = ref(route.query.created_at as any);
 
-const LIMIT = 25;
+const quoteProducts = ref<QuoteProductsPreviewT[]>([]);
+
+const LIMIT = 50;
 
 const queryParams = computed<QueryParams>(() => ({
   search: route.query.search,
   page: route.query.page,
   refresh: route.query.refresh,
   limit: route.query.limit,
-  status: route.query.status,
   created_at: route.query.created_at,
 }));
 
-async function fetchOrders() {
+async function fetchQuotes() {
   try {
-    const res: Res<any> = await invoke("list_orders", {
+    const res: Res<any> = await invoke("list_quotes", {
       args: {
         page: Number(queryParams.value.page) ?? 1,
         search: queryParams.value.search ?? "",
         limit: queryParams.value.limit
           ? Number(queryParams.value.limit)
           : LIMIT,
-        status: queryParams.value.status,
         created_at: queryParams.value.created_at,
       },
     });
@@ -47,16 +43,16 @@ async function fetchOrders() {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(`LIST ORDERS: ${err.error ? err.error : err.message}`);
+    Logger.error(`LIST QUOTES: ${err.error ? err.error : err.message}`);
   }
 }
 
-const { data: ordersData } = await useAsyncData(fetchOrders, {
+const { data: quotesData } = await useAsyncData(fetchQuotes, {
   watch: [queryParams],
 });
 
-const orders = computed<OrderT[]>(() => ordersData.value?.orders ?? []);
-const totalRows = computed<number>(() => ordersData.value?.count ?? 0);
+const quotes = computed<QuoteT[]>(() => quotesData.value?.quotes ?? []);
+const totalRows = computed<number>(() => quotesData.value?.count ?? 0);
 
 provide("count", totalRows);
 provide(
@@ -64,55 +60,44 @@ provide(
   queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT
 );
 
-watch(queryParams, fetchOrders, { deep: true });
-
 const debouncedSearch = useDebounceFn(() => {
   updateQueryParams({ search: searchQuery.value });
 }, 500);
 
 watch(searchQuery, debouncedSearch);
 
-watch([status, created_at], () => {
+watch(created_at, () => {
   updateQueryParams({
-    status: status.value,
     created_at: created_at.value
       ? new Date(created_at.value).toISOString()
       : undefined,
-    page: 1,
   });
 });
 
-async function listOrderProducts(id?: string) {
+async function listQuoteProducts(id?: string) {
   try {
-    const res = await invoke<Res<any>>("list_order_products", {
+    const res = await invoke<Res<any>>("list_quote_products", {
       id,
     });
-    orderProducts.value = res.data;
+    quoteProducts.value = res.data;
   } catch (err: any) {
     toast.error(t("notifications.error.title"), {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(
-      `ERROR LIST ORDER PRODUCTS: ${err.error ? err.error : err.message}`
-    );
+    Logger.error(`LIST QUOTE PRODUCTS: ${err.error ? err.error : err.message}`);
   }
 }
 
-const openCreateOrderModal = () => modal.open(OrderCreate, {});
+const openCreateQuoteModal = () => modal.open(QuoteCreate, {});
 </script>
 
 <template>
   <main class="w-full h-full">
     <div class="w-full h-full flex flex-col items-start justify-start">
       <div class="flex justify-between w-full gap-9 mb-2">
-        <div class="w-full grid grid-cols-3 gap-2 lg:max-w-screen-lg">
-          <Input
-            v-model="searchQuery"
-            name="search"
-            type="text"
-            :placeholder="t('search')"
-          />
+        <div class="w-full grid grid-cols-2 gap-2 lg:max-w-screen-md">
+          <Input v-model="searchQuery" type="text" :placeholder="t('search')" />
           <Popover>
             <PopoverTrigger as-child>
               <Button
@@ -134,33 +119,16 @@ const openCreateOrderModal = () => modal.open(OrderCreate, {});
               <Calendar v-model="created_at" />
             </PopoverContent>
           </Popover>
-          <Select v-model="status" name="status">
-            <SelectTrigger>
-              <SelectValue
-                class="text-muted-foreground"
-                :placeholder="t('select-status')"
-              />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem
-                v-for="orderStatus in ORDER_STATUSES"
-                :key="orderStatus"
-                :value="orderStatus"
-              >
-                {{ t(`status.${orderStatus.toLowerCase()}`) }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
         </div>
-        <Button class="gap-2 text-nowrap" @click="openCreateOrderModal">
+        <Button class="gap-2 text-nowrap" @click="openCreateQuoteModal">
           <Plus :size="20" />
-          {{ t("buttons.toggle-create-order") }}
+          {{ t("buttons.toggle-create-quote") }}
         </Button>
       </div>
-      <OrdersTable
-        :orders="orders"
-        :order-products="orderProducts"
-        @list-order-products="listOrderProducts"
+      <QuotesTable
+        :quotes="quotes"
+        :quote-products="quoteProducts"
+        @list-quote-products="listQuoteProducts"
       />
     </div>
   </main>

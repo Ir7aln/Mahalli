@@ -1,38 +1,43 @@
 <script setup lang="ts">
 import { invoke } from "@tauri-apps/api/core";
-import { CalendarIcon } from "lucide-vue-next";
+import { Calendar as CalendarIcon, Plus } from "lucide-vue-next";
 import { useDebounceFn } from "@vueuse/core";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
+import { OrderCreate } from "#components";
+import { ORDER_STATUSES } from "@/consts";
 
 const route = useRoute();
 const { t, d } = useI18n();
+const modal = useModal();
 const { updateQueryParams } = useUpdateRouteQueryParams();
-const searchQuery = ref(route.query.search as string);
-const transaction_type = ref(route.query.transaction_type as string);
-const created_at = ref(route.query.created_at as string);
+const orderProducts = ref<OrderProductsPreviewT[]>([]);
 
-const LIMIT = 25;
+const searchQuery = ref(route.query.search as any);
+const status = ref(route.query.status as any);
+const created_at = ref(route.query.created_at as any);
+
+const LIMIT = 50;
 
 const queryParams = computed<QueryParams>(() => ({
   search: route.query.search,
   page: route.query.page,
   refresh: route.query.refresh,
   limit: route.query.limit,
-  transaction_type: route.query.transaction_type,
+  status: route.query.status,
   created_at: route.query.created_at,
 }));
 
-async function fetchInventory() {
+async function fetchOrders() {
   try {
-    const res: Res<any> = await invoke("list_inventory", {
+    const res: Res<any> = await invoke("list_orders", {
       args: {
-        search: queryParams.value.search ?? "",
         page: Number(queryParams.value.page) ?? 1,
+        search: queryParams.value.search ?? "",
         limit: queryParams.value.limit
           ? Number(queryParams.value.limit)
           : LIMIT,
-        status: queryParams.value.transaction_type,
+        status: queryParams.value.status,
         created_at: queryParams.value.created_at,
       },
     });
@@ -42,15 +47,16 @@ async function fetchInventory() {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(`LIST INVENTORY: ${err.error ? err.error : err.message}`);
-    return { inventory: [], count: 0 };
+    Logger.error(`LIST ORDERS: ${err.error ? err.error : err.message}`);
   }
 }
 
-const { data } = useAsyncData(fetchInventory, { watch: [queryParams] });
+const { data: ordersData } = await useAsyncData(fetchOrders, {
+  watch: [queryParams],
+});
 
-const inventory = computed<InventoryT[]>(() => data.value?.inventory ?? []);
-const totalRows = computed<number>(() => data.value?.count ?? 0);
+const orders = computed<OrderT[]>(() => ordersData.value?.orders ?? []);
+const totalRows = computed<number>(() => ordersData.value?.count ?? 0);
 
 provide("count", totalRows);
 provide(
@@ -58,21 +64,42 @@ provide(
   queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT
 );
 
+watch(queryParams, fetchOrders, { deep: true });
+
 const debouncedSearch = useDebounceFn(() => {
   updateQueryParams({ search: searchQuery.value });
 }, 500);
 
 watch(searchQuery, debouncedSearch);
 
-watch([transaction_type, created_at], () => {
+watch([status, created_at], () => {
   updateQueryParams({
-    transaction_type: transaction_type.value,
-    page: 1,
+    status: status.value,
     created_at: created_at.value
       ? new Date(created_at.value).toISOString()
       : undefined,
+    page: 1,
   });
 });
+
+async function listOrderProducts(id?: string) {
+  try {
+    const res = await invoke<Res<any>>("list_order_products", {
+      id,
+    });
+    orderProducts.value = res.data;
+  } catch (err: any) {
+    toast.error(t("notifications.error.title"), {
+      description: t("notifications.error.description"),
+      closeButton: true,
+    });
+    Logger.error(
+      `ERROR LIST ORDER PRODUCTS: ${err.error ? err.error : err.message}`
+    );
+  }
+}
+
+const openCreateOrderModal = () => modal.open(OrderCreate, {});
 </script>
 
 <template>
@@ -80,7 +107,12 @@ watch([transaction_type, created_at], () => {
     <div class="w-full h-full flex flex-col items-start justify-start">
       <div class="flex justify-between w-full gap-9 mb-2">
         <div class="w-full grid grid-cols-3 gap-2 lg:max-w-screen-lg">
-          <Input v-model="searchQuery" type="text" :placeholder="t('search')" />
+          <Input
+            v-model="searchQuery"
+            name="search"
+            type="text"
+            :placeholder="t('search')"
+          />
           <Popover>
             <PopoverTrigger as-child>
               <Button
@@ -102,7 +134,7 @@ watch([transaction_type, created_at], () => {
               <Calendar v-model="created_at" />
             </PopoverContent>
           </Popover>
-          <Select v-model="transaction_type">
+          <Select v-model="status" name="status">
             <SelectTrigger>
               <SelectValue
                 class="text-muted-foreground"
@@ -110,18 +142,26 @@ watch([transaction_type, created_at], () => {
               />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="OUT">
-                {{ t("status.out") }}
-              </SelectItem>
-              <SelectItem value="IN">
-                {{ t("status.in") }}
+              <SelectItem
+                v-for="orderStatus in ORDER_STATUSES"
+                :key="orderStatus"
+                :value="orderStatus"
+              >
+                {{ t(`status.${orderStatus.toLowerCase()}`) }}
               </SelectItem>
             </SelectContent>
           </Select>
         </div>
-        <div />
+        <Button class="gap-2 text-nowrap" @click="openCreateOrderModal">
+          <Plus :size="20" />
+          {{ t("buttons.toggle-create-order") }}
+        </Button>
       </div>
-      <InventoryTable :inventory="inventory" />
+      <OrdersTable
+        :orders="orders"
+        :order-products="orderProducts"
+        @list-order-products="listOrderProducts"
+      />
     </div>
   </main>
 </template>

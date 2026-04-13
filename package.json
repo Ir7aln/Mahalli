@@ -16,7 +16,7 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "@nuxtjs/i18n": "^8.3.1",
+    "@nuxtjs/i18n": "^10.2.4",
     "@pdf-lib/fontkit": "^1.1.1",
     "@tauri-apps/api": "2.0.0",
     "@tauri-apps/plugin-dialog": "^2.0.1",
@@ -30,10 +30,10 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-vue-next": "^0.387.0",
-    "nuxt": "^3.13.2",
+    "nuxt": "4.4.2",
     "pdf-lib": "^1.17.1",
-    "radix-vue": "^1.8.3",
-    "shadcn-nuxt": "^0.10.4",
+    "radix-vue": "1.9.17",
+    "shadcn-nuxt": "2.6.2",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "v-calendar": "^3.1.2",

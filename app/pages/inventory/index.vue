@@ -1,43 +1,38 @@
 <script setup lang="ts">
 import { invoke } from "@tauri-apps/api/core";
-import { Calendar as CalendarIcon, Plus } from "lucide-vue-next";
+import { CalendarIcon } from "lucide-vue-next";
 import { useDebounceFn } from "@vueuse/core";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
-import { InvoiceCreate } from "#components";
-import { INVOICE_STATUSES } from "@/consts";
 
 const route = useRoute();
 const { t, d } = useI18n();
-const modal = useModal();
 const { updateQueryParams } = useUpdateRouteQueryParams();
-const invoiceProducts = ref<InvoiceProductsPreviewT[]>([]);
+const searchQuery = ref(route.query.search as string);
+const transaction_type = ref(route.query.transaction_type as string);
+const created_at = ref(route.query.created_at as string);
 
-const searchQuery = ref(route.query.search as any);
-const status = ref(route.query.status as any);
-const created_at = ref(route.query.created_at as any);
-
-const LIMIT = 25;
+const LIMIT = 50;
 
 const queryParams = computed<QueryParams>(() => ({
   search: route.query.search,
   page: route.query.page,
   refresh: route.query.refresh,
   limit: route.query.limit,
-  status: route.query.status,
+  transaction_type: route.query.transaction_type,
   created_at: route.query.created_at,
 }));
 
-async function fetchInvoices() {
+async function fetchInventory() {
   try {
-    const res: Res<any> = await invoke("list_invoices", {
+    const res: Res<any> = await invoke("list_inventory", {
       args: {
-        page: Number(queryParams.value.page) ?? 1,
         search: queryParams.value.search ?? "",
+        page: Number(queryParams.value.page) ?? 1,
         limit: queryParams.value.limit
           ? Number(queryParams.value.limit)
           : LIMIT,
-        status: queryParams.value.status,
+        status: queryParams.value.transaction_type,
         created_at: queryParams.value.created_at,
       },
     });
@@ -47,16 +42,15 @@ async function fetchInvoices() {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(`LIST INVOICESS: ${err.error ? err.error : err.message}`);
+    Logger.error(`LIST INVENTORY: ${err.error ? err.error : err.message}`);
+    return { inventory: [], count: 0 };
   }
 }
 
-const { data: invoicesData } = await useAsyncData(fetchInvoices, {
-  watch: [queryParams],
-});
+const { data } = useAsyncData(fetchInventory, { watch: [queryParams] });
 
-const invoices = computed<InvoiceT[]>(() => invoicesData.value?.invoices ?? []);
-const totalRows = computed<number>(() => invoicesData.value?.count ?? 0);
+const inventory = computed<InventoryT[]>(() => data.value?.inventory ?? []);
+const totalRows = computed<number>(() => data.value?.count ?? 0);
 
 provide("count", totalRows);
 provide(
@@ -64,42 +58,21 @@ provide(
   queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT
 );
 
-watch(queryParams, fetchInvoices, { deep: true });
-
 const debouncedSearch = useDebounceFn(() => {
   updateQueryParams({ search: searchQuery.value });
 }, 500);
 
 watch(searchQuery, debouncedSearch);
 
-watch([status, created_at], () => {
+watch([transaction_type, created_at], () => {
   updateQueryParams({
-    status: status.value,
+    transaction_type: transaction_type.value,
+    page: 1,
     created_at: created_at.value
       ? new Date(created_at.value).toISOString()
       : undefined,
-    page: 1,
   });
 });
-
-async function listInvoiceProducts(id?: string) {
-  try {
-    const res = await invoke<Res<any>>("list_invoice_products", {
-      id,
-    });
-    invoiceProducts.value = res.data;
-  } catch (err: any) {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
-    Logger.error(
-      `ERROR LIST INVOICES PRODUCTS: ${err.error ? err.error : err.message}`
-    );
-  }
-}
-
-const openCreateInvoiceModal = () => modal.open(InvoiceCreate, {});
 </script>
 
 <template>
@@ -107,12 +80,7 @@ const openCreateInvoiceModal = () => modal.open(InvoiceCreate, {});
     <div class="w-full h-full flex flex-col items-start justify-start">
       <div class="flex justify-between w-full gap-9 mb-2">
         <div class="w-full grid grid-cols-3 gap-2 lg:max-w-screen-lg">
-          <Input
-            v-model="searchQuery"
-            name="search"
-            type="text"
-            :placeholder="t('search')"
-          />
+          <Input v-model="searchQuery" type="text" :placeholder="t('search')" />
           <Popover>
             <PopoverTrigger as-child>
               <Button
@@ -134,7 +102,7 @@ const openCreateInvoiceModal = () => modal.open(InvoiceCreate, {});
               <Calendar v-model="created_at" />
             </PopoverContent>
           </Popover>
-          <Select v-model="status" name="status">
+          <Select v-model="transaction_type">
             <SelectTrigger>
               <SelectValue
                 class="text-muted-foreground"
@@ -142,26 +110,18 @@ const openCreateInvoiceModal = () => modal.open(InvoiceCreate, {});
               />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem
-                v-for="invoiceStatus in INVOICE_STATUSES"
-                :key="invoiceStatus"
-                :value="invoiceStatus"
-              >
-                {{ t(`status.${invoiceStatus.toLowerCase()}`) }}
+              <SelectItem value="OUT">
+                {{ t("status.out") }}
+              </SelectItem>
+              <SelectItem value="IN">
+                {{ t("status.in") }}
               </SelectItem>
             </SelectContent>
           </Select>
         </div>
-        <Button class="gap-2 text-nowrap" @click="openCreateInvoiceModal()">
-          <Plus :size="20" />
-          {{ t("buttons.toggle-create-invoice") }}
-        </Button>
+        <div />
       </div>
-      <InvoicesTable
-        :invoices="invoices"
-        :invoice-products="invoiceProducts"
-        @list-invoice-products="listInvoiceProducts"
-      />
+      <InventoryTable :inventory="inventory" />
     </div>
   </main>
 </template>

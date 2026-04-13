@@ -13,10 +13,16 @@ export default defineNuxtConfig({
     },
   },
   routeRules: { "/": { prerender: true } },
+  components: [{ path: "~/components", extensions: ["vue"] }],
   imports: { dirs: ["./types", "./utils"] },
-  shadcn: { componentDir: "./components/ui" },
-  tailwindcss: { viewer: false },
+  shadcn: { prefix: "", componentDir: "./app/components/ui" },
+  tailwindcss: {
+    cssPath: "~/assets/css/tailwind.css",
+    configPath: "tailwind.config.ts",
+    viewer: false,
+  },
   i18n: {
+    restructureDir: "app",
     locales: [
       { code: "en", file: "en-US.json" },
       { code: "fr", file: "fr-FR.json" },

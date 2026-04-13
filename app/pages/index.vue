@@ -60,7 +60,7 @@ const pages = ref([
           >
             <NuxtLink
               :to="
-                localePath({ path: page.path, query: { page: 1, limit: 25 } })
+                localePath({ path: page.path, query: { page: 1, limit: 50 } })
               "
             >
               <div

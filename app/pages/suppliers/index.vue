@@ -4,7 +4,7 @@ import { Plus } from "lucide-vue-next";
 import { useDebounceFn } from "@vueuse/core";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
-import { ClientCreate } from "#components";
+import { SupplierCreate } from "#components";
 
 const route = useRoute();
 const { t } = useI18n();
@@ -12,7 +12,7 @@ const modal = useModal();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const searchQuery = ref(route.query.search as string);
 
-const LIMIT = 25;
+const LIMIT = 50;
 
 const queryParams = computed<QueryParams>(() => ({
   search: route.query.search,
@@ -21,9 +21,9 @@ const queryParams = computed<QueryParams>(() => ({
   limit: route.query.limit,
 }));
 
-async function fetchClients() {
+async function fetchSuppliers() {
   try {
-    const res: Res<any> = await invoke("list_clients", {
+    const res: Res<any> = await invoke("list_suppliers", {
       args: {
         search: queryParams.value.search ?? "",
         page: Number(queryParams.value.page) ?? 1,
@@ -38,15 +38,13 @@ async function fetchClients() {
       description: t("notifications.error.description"),
       closeButton: true,
     });
-    Logger.error(`LIST CLIENTS: ${err.error ? err.error : err.message}`);
+    Logger.error(`LIST SUPPLIERS: ${err.error ? err.error : err.message}`);
   }
 }
 
-const { data } = useAsyncData(fetchClients, {
-  watch: [queryParams],
-});
+const { data } = useAsyncData(fetchSuppliers, { watch: [queryParams] });
 
-const clients = computed<ClientT[]>(() => data.value?.clients ?? []);
+const suppliers = computed<SupplierT[]>(() => data.value?.suppliers ?? []);
 const totalRows = computed<number>(() => data.value?.count ?? 0);
 
 provide("count", totalRows);
@@ -61,22 +59,22 @@ const debouncedSearch = useDebounceFn(() => {
 
 watch(searchQuery, debouncedSearch);
 
-const openCreateClientModal = () => modal.open(ClientCreate, {});
+const openCreateSupplierModal = () => modal.open(SupplierCreate, {});
 </script>
 
 <template>
   <main class="w-full h-full">
     <div class="w-full h-full flex flex-col items-start justify-start">
       <div class="flex justify-between w-full gap-9 mb-2">
-        <div class="w-full max-w-md">
+        <div class="w-full lg:max-w-screen-lg">
           <Input v-model="searchQuery" type="text" :placeholder="t('search')" />
         </div>
-        <Button class="gap-2 text-nowrap" @click="openCreateClientModal()">
+        <Button class="gap-2 text-nowrap" @click="openCreateSupplierModal">
           <Plus :size="20" />
-          {{ t("buttons.toggle-create-client") }}
+          {{ t("buttons.toggle-create-supplier") }}
         </Button>
       </div>
-      <ClientsTable :clients="clients" />
+      <SuppliersTable :suppliers="suppliers" />
     </div>
   </main>
 </template>

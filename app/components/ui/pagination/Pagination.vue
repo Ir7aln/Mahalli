@@ -9,7 +9,7 @@ const defaultPage = computed(() =>
   Number(router.currentRoute.value.query.page)
 );
 
-const LIMIT = 25;
+const LIMIT = 50;
 
 const rowsCount = inject<Ref<number>>("count");
 const itemsPerPage = inject<Ref<number>>("itemsPerPage");

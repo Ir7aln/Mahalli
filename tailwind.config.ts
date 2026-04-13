@@ -1,19 +1,16 @@
 import animate from "tailwindcss-animate";
 
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: [
-    `./components/**/*.{vue,js,ts}`,
-    `./layouts/**/*.vue`,
-    `./consts/*`,
-    `./pages/**/*.vue`,
-    `./composables/**/*.{js,ts}`,
-    `./plugins/**/*.{js,ts}`,
-    `./utils/**/*.{js,ts}`,
-    `./App.{js,ts,vue}`,
-    `./app.{js,ts,vue}`,
-    `./Error.{js,ts,vue}`,
-    `./error.{js,ts,vue}`,
+    `./app/components/**/*.{vue,js,ts}`,
+    `./app/layouts/**/*.vue`,
+    `./app/consts/*`,
+    `./app/pages/**/*.vue`,
+    `./app/composables/**/*.{js,ts}`,
+    `./app/plugins/**/*.{js,ts}`,
+    `./app/utils/**/*.{js,ts}`,
+    `./app/app.{js,ts,vue}`,
     `./app.config.{js,ts}`,
   ],
   darkMode: ["class"],

@@ -12,7 +12,7 @@ const modal = useModal();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const searchQuery = ref(route.query.search as string);
 
-const LIMIT = 25;
+const LIMIT = 50;
 
 const queryParams = computed<QueryParams>(() => ({
   search: route.query.search,
