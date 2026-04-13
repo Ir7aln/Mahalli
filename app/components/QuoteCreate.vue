@@ -143,7 +143,7 @@ const onSubmit = handleSubmit(async (formValues) => {
 
 <template>
   <form class="h-full w-full max-w-[860px]" @submit="onSubmit">
-    <div class="flex h-full w-full flex-col overflow-hidden border-l border-slate-200 bg-white text-slate-900 shadow-2xl">
+    <div class="flex h-full w-full flex-col overflow-hidden border-s border-slate-200 bg-white text-slate-900 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
         <div class="space-y-1">
           <p class="text-xs font-medium uppercase tracking-[0.35em] text-slate-500">
