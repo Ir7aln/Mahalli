@@ -8,6 +8,9 @@ mod entities {
     pub use entity::inventory_transactions::{
         self, ActiveModel as InventoryActiveModel, Entity as InventoryTransactions,
     };
+    pub use entity::invoice_items::{
+        self, ActiveModel as InvoiceItemActiveModel, Entity as InvoiceItems,
+    };
     pub use entity::invoices::{self, ActiveModel as InvoiceActiveModel, Entity as Invoices};
     pub use entity::order_items::{
         self, ActiveModel as OrderItemActiveModel, Entity as OrderItems,

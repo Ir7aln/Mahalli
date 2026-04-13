@@ -3,6 +3,7 @@ use super::quote_item::{SelectQuotesItems, SelectQuotesItemsForUpdate};
 use sea_orm::FromQueryResult;
 use specta::Type;
 use serde::{Deserialize, Serialize};
+use sea_orm::entity::prelude::Decimal;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, FromQueryResult, Type)]
 pub struct SelectQuotes {
@@ -12,7 +13,8 @@ pub struct SelectQuotes {
     pub full_name: String,
     pub products: i64,
     pub identifier: String,
-    pub total: f64,
+    #[specta(type = f64)]
+    pub total: Decimal,
 }
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, FromQueryResult, Type)]
@@ -24,7 +26,8 @@ pub struct SelectQuoteDetails {
     pub phone_number: Option<String>,
     pub email: Option<String>,
     pub identifier: String,
-    pub total: f64,
+    #[specta(type = f64)]
+    pub total: Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]
@@ -49,8 +52,10 @@ pub struct QuotesResponse {
 #[derive(Debug, Serialize, Deserialize, FromQueryResult, Type)]
 pub struct QuoteProductItem {
     pub name: String,
-    pub price: f64,
-    pub quantity: f64,
+    #[specta(type = f64)]
+    pub price: Decimal,
+    #[specta(type = f64)]
+    pub quantity: Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]
@@ -68,7 +73,8 @@ pub struct QuoteDetailsResponse {
     pub id: String,
     pub created_at: String,
     pub identifier: String,
-    pub total: f64,
+    #[specta(type = f64)]
+    pub total: Decimal,
     pub client: QuoteClientInfo,
     pub items: Vec<SelectQuotesItems>,
 }

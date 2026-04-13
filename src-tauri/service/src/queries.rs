@@ -740,7 +740,7 @@ impl QueriesService {
             ])
             .expr_as(
                 Func::coalesce([
-                    Func::count(Expr::col(inventory_transactions::Column::Quantity)).into(),
+                    Func::count(Expr::col((InvoiceItems, invoice_items::Column::Id))).into(),
                     Expr::val(0i64).into(),
                 ]),
                 Alias::new("products"),
@@ -748,11 +748,8 @@ impl QueriesService {
             .expr_as(
                 Func::coalesce([
                     Func::sum(
-                        Expr::col((
-                            InventoryTransactions,
-                            inventory_transactions::Column::Quantity,
-                        ))
-                        .mul(Expr::col((OrderItems, order_items::Column::Price))),
+                        Expr::col((InvoiceItems, invoice_items::Column::Quantity))
+                            .mul(Expr::col((InvoiceItems, invoice_items::Column::Price))),
                     )
                     .into(),
                     Expr::val(0.0f64).into(),
@@ -760,19 +757,9 @@ impl QueriesService {
                 Alias::new("total"),
             )
             .left_join(
-                Orders,
-                Expr::col((Orders, orders::Column::Id))
-                    .equals((Invoices, invoices::Column::OrderId)),
-            )
-            .left_join(
-                OrderItems,
-                Expr::col((OrderItems, order_items::Column::OrderId))
-                    .equals((Orders, orders::Column::Id)),
-            )
-            .left_join(
-                InventoryTransactions,
-                Expr::col((InventoryTransactions, inventory_transactions::Column::Id))
-                    .equals((OrderItems, order_items::Column::InventoryId)),
+                InvoiceItems,
+                Expr::col((InvoiceItems, invoice_items::Column::InvoiceId))
+                    .equals((Invoices, invoices::Column::Id)),
             )
             .join(
                 JoinType::Join,
@@ -834,38 +821,28 @@ impl QueriesService {
 
         match invoice {
             Some(invoice) => {
-                let order_id = invoice.0.order_id.clone();
                 let (sql, values) = Query::select()
                     .exprs([
-                        Expr::col((OrderItems, order_items::Column::Id)),
-                        Expr::col((OrderItems, order_items::Column::InventoryId)),
-                        Expr::col((OrderItems, order_items::Column::Price)),
-                        Expr::col((
-                            InventoryTransactions,
-                            inventory_transactions::Column::Quantity,
-                        )),
+                        Expr::col((InvoiceItems, invoice_items::Column::Id)),
+                        Expr::col((InvoiceItems, invoice_items::Column::InventoryId)),
+                        Expr::col((InvoiceItems, invoice_items::Column::Price)),
+                        Expr::col((InvoiceItems, invoice_items::Column::Quantity)),
                         Expr::col((Products, products::Column::Name)),
                     ])
                     .expr_as(
                         Expr::col((Products, products::Column::Id)),
                         Alias::new("product_id"),
                     )
-                    .from(OrderItems)
-                    .join(
-                        JoinType::Join,
-                        InventoryTransactions,
-                        Expr::col((InventoryTransactions, inventory_transactions::Column::Id))
-                            .equals((OrderItems, order_items::Column::InventoryId)),
-                    )
+                    .from(InvoiceItems)
                     .join(
                         JoinType::Join,
                         Products,
-                        Expr::col((Products, products::Column::Id)).equals((
-                            InventoryTransactions,
-                            inventory_transactions::Column::ProductId,
-                        )),
+                        Expr::col((Products, products::Column::Id))
+                            .equals((InvoiceItems, invoice_items::Column::ProductId)),
                     )
-                    .cond_where(Expr::col((OrderItems, order_items::Column::OrderId)).eq(order_id))
+                    .cond_where(
+                        Expr::col((InvoiceItems, invoice_items::Column::InvoiceId)).eq(id.clone()),
+                    )
                     .to_owned()
                     .build(SqliteQueryBuilder);
 
@@ -896,27 +873,12 @@ impl QueriesService {
         }
     }
     pub async fn list_invoice_products(db: &DbConn, id: String) -> Result<Vec<InvoiceProductItem>, DbErr> {
-        let invoice_products = OrderItems::find()
+        let invoice_products = InvoiceItems::find()
             .select_only()
-            .columns([order_items::Column::Price])
-            .exprs([
-                Expr::col((Products, products::Column::Name)),
-                Expr::col((
-                    InventoryTransactions,
-                    inventory_transactions::Column::Quantity,
-                )),
-            ])
-            .join(
-                JoinType::Join,
-                order_items::Relation::InventoryTransactions.def(),
-            )
-            .join(JoinType::Join, order_items::Relation::Orders.def())
-            .join(JoinType::Join, orders::Relation::Invoices.def())
-            .join(
-                JoinType::Join,
-                inventory_transactions::Relation::Products.def(),
-            )
-            .filter(Expr::col((Invoices, invoices::Column::Id)).eq(id))
+            .columns([invoice_items::Column::Price, invoice_items::Column::Quantity])
+            .exprs([Expr::col((Products, products::Column::Name))])
+            .join(JoinType::Join, invoice_items::Relation::Products.def())
+            .filter(Expr::col((InvoiceItems, invoice_items::Column::InvoiceId)).eq(id))
             .into_model::<InvoiceProductItem>()
             .all(db)
             .await?;
@@ -941,11 +903,8 @@ impl QueriesService {
             .expr_as(
                 Func::coalesce([
                     Func::sum(
-                        Expr::col((
-                            InventoryTransactions,
-                            inventory_transactions::Column::Quantity,
-                        ))
-                        .mul(Expr::col((OrderItems, order_items::Column::Price))),
+                        Expr::col((InvoiceItems, invoice_items::Column::Quantity))
+                            .mul(Expr::col((InvoiceItems, invoice_items::Column::Price))),
                     )
                     .into(),
                     Expr::val(0.0f64).into(),
@@ -953,19 +912,9 @@ impl QueriesService {
                 Alias::new("total"),
             )
             .left_join(
-                Orders,
-                Expr::col((Orders, orders::Column::Id))
-                    .equals((Invoices, invoices::Column::OrderId)),
-            )
-            .inner_join(
-                OrderItems,
-                Expr::col((OrderItems, order_items::Column::OrderId))
-                    .equals((Orders, orders::Column::Id)),
-            )
-            .inner_join(
-                InventoryTransactions,
-                Expr::col((InventoryTransactions, inventory_transactions::Column::Id))
-                    .equals((OrderItems, order_items::Column::InventoryId)),
+                InvoiceItems,
+                Expr::col((InvoiceItems, invoice_items::Column::InvoiceId))
+                    .equals((Invoices, invoices::Column::Id)),
             )
             .join(
                 JoinType::Join,
@@ -989,30 +938,19 @@ impl QueriesService {
             Some(invoice) => {
                 let (sql, values) = Query::select()
                     .exprs([
-                        Expr::col((OrderItems, order_items::Column::Price)),
-                        Expr::col((
-                            InventoryTransactions,
-                            inventory_transactions::Column::Quantity,
-                        )),
                         Expr::col((Products, products::Column::Name)),
+                        Expr::col((InvoiceItems, invoice_items::Column::Price)),
+                        Expr::col((InvoiceItems, invoice_items::Column::Quantity)),
                     ])
-                    .from(OrderItems)
-                    .join(
-                        JoinType::Join,
-                        InventoryTransactions,
-                        Expr::col((InventoryTransactions, inventory_transactions::Column::Id))
-                            .equals((OrderItems, order_items::Column::InventoryId)),
-                    )
+                    .from(InvoiceItems)
                     .join(
                         JoinType::Join,
                         Products,
-                        Expr::col((Products, products::Column::Id)).equals((
-                            InventoryTransactions,
-                            inventory_transactions::Column::ProductId,
-                        )),
+                        Expr::col((Products, products::Column::Id))
+                            .equals((InvoiceItems, invoice_items::Column::ProductId)),
                     )
                     .cond_where(
-                        Expr::col((OrderItems, order_items::Column::OrderId)).eq(invoice.order_id),
+                        Expr::col((InvoiceItems, invoice_items::Column::InvoiceId)).eq(invoice.id.clone()),
                     )
                     .to_owned()
                     .build(SqliteQueryBuilder);

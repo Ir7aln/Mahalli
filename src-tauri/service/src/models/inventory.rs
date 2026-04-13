@@ -1,14 +1,17 @@
 use sea_orm::FromQueryResult;
 use specta::Type;
 use serde::{Deserialize, Serialize};
+use sea_orm::entity::prelude::Decimal;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, FromQueryResult, Type)]
 pub struct SelectInventory {
     pub id: String,
     pub name: String,
     pub created_at: String,
-    pub price: f64,
-    pub quantity: f64,
+    #[specta(type = f64)]
+    pub price: Decimal,
+    #[specta(type = f64)]
+    pub quantity: Decimal,
     pub transaction_type: String,
 }
 
@@ -16,7 +19,8 @@ pub struct SelectInventory {
 pub struct NewInventory {
     pub transaction_type: String,
     pub product_id: String,
-    pub quantity: f64,
+    #[specta(type = f64)]
+    pub quantity: Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]
@@ -24,7 +28,8 @@ pub struct Inventory {
     pub id: String,
     pub transaction_type: String,
     pub product_id: String,
-    pub quantity: f64,
+    #[specta(type = f64)]
+    pub quantity: Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]

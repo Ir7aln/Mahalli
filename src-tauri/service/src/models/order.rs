@@ -3,6 +3,7 @@ use super::order_item::{SelectOrdersItems, SelectOrdersItemsForUpdate};
 use sea_orm::FromQueryResult;
 use specta::Type;
 use serde::{Deserialize, Serialize};
+use sea_orm::entity::prelude::Decimal;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, FromQueryResult, Type)]
 pub struct SelectOrders {
@@ -13,7 +14,8 @@ pub struct SelectOrders {
     pub status: String,
     pub identifier: String,
     pub products: i64,
-    pub total: f64,
+    #[specta(type = f64)]
+    pub total: Decimal,
 }
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, FromQueryResult, Type)]
@@ -26,7 +28,8 @@ pub struct SelectOrderDetails {
     pub phone_number: Option<String>,
     pub email: Option<String>,
     pub status: String,
-    pub total: f64,
+    #[specta(type = f64)]
+    pub total: Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]
@@ -53,8 +56,10 @@ pub struct OrdersResponse {
 #[derive(Debug, Serialize, Deserialize, FromQueryResult, Type)]
 pub struct OrderProductItem {
     pub name: String,
-    pub price: f64,
-    pub quantity: f64,
+    #[specta(type = f64)]
+    pub price: Decimal,
+    #[specta(type = f64)]
+    pub quantity: Decimal,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]
@@ -74,7 +79,8 @@ pub struct OrderDetailsResponse {
     pub created_at: String,
     pub status: String,
     pub identifier: String,
-    pub total: f64,
+    #[specta(type = f64)]
+    pub total: Decimal,
     pub client: OrderClientInfo,
     pub items: Vec<SelectOrdersItems>,
 }

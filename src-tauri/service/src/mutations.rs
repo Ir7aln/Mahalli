@@ -288,16 +288,14 @@ impl MutationsService {
     }
 
     pub async fn delete_invoice_item(db: &DbConn, id: String) -> Result<u64, DbErr> {
-        // NOTE: `invoice_items` SeaORM entity is currently not compiled in this repo.
-        // We still need to support item deletes from the UI, so use a direct SQL DELETE.
-        let res = db
-            .execute(Statement::from_sql_and_values(
-                DbBackend::Sqlite,
-                "DELETE FROM invoice_items WHERE id = ?",
-                [id.into()],
-            ))
-            .await?;
-        Ok(res.rows_affected())
+        let item_model = InvoiceItems::find_by_id(&id).one(db).await?;
+        match item_model {
+            Some(item_model) => {
+                let res = item_model.delete(db).await?;
+                Ok(res.rows_affected)
+            }
+            None => Ok(0),
+        }
     }
     //
     pub async fn create_template(db: &DbConn, template: NewTemplate) -> Result<String, DbErr> {
