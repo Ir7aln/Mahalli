@@ -75,7 +75,7 @@ async function updateInvoiceStatus(id: string, status: string) {
           </TableHead>
           <TableHead>{{ t("fields.total") }}</TableHead>
           <TableHead>{{ t("fields.paid") }}</TableHead>
-          <TableHead class="w-20">
+          <TableHead class="w-20 sticky ltr:right-0 rtl:left-0 bg-gray-100 z-10">
             {{ t("fields.actions") }}
           </TableHead>
         </TableRow>
@@ -181,7 +181,7 @@ async function updateInvoiceStatus(id: string, status: string) {
           <TableCell class="p-2">
             {{ n(toNumber(invoice.paid_amount), "currency") }}
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell class="p-2 sticky ltr:right-0 rtl:left-0 bg-background z-10">
             <div class="flex justify-center gap-3">
               <DropdownMenu>
                 <DropdownMenuTrigger>

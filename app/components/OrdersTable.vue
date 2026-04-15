@@ -93,7 +93,7 @@ async function createInvoiceFromOrder(id: string) {
             {{ t("fields.date") }}
           </TableHead>
           <TableHead>{{ t("fields.total") }}</TableHead>
-          <TableHead class="w-20">
+          <TableHead class="w-20 sticky ltr:right-0 rtl:left-0 bg-gray-100 z-10">
             {{ t("fields.actions") }}
           </TableHead>
         </TableRow>
@@ -196,7 +196,7 @@ async function createInvoiceFromOrder(id: string) {
           <TableCell class="p-2">
             {{ n(toNumber(order.total), "currency") }}
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell class="p-2 sticky ltr:right-0 rtl:left-0 bg-background z-10">
             <div class="flex justify-center items-center gap-3">
               <DropdownMenu>
                 <DropdownMenuTrigger>

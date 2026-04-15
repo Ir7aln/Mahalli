@@ -56,7 +56,7 @@ function updateProductInventory(id: string, name: string) {
           <TableHead>{{ t("fields.threshold") }}</TableHead>
           <TableHead>{{ t("fields.purchase-price") }}</TableHead>
           <TableHead>{{ t("fields.selling-price") }}</TableHead>
-          <TableHead class="w-20">
+          <TableHead class="w-20 sticky ltr:right-0 rtl:left-0 bg-gray-100 z-10">
             {{ t("fields.actions") }}
           </TableHead>
         </TableRow>
@@ -137,7 +137,7 @@ function updateProductInventory(id: string, name: string) {
           <TableCell class="p-2">
             {{ n(toNumber(product.selling_price), "currency") }}
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell class="p-2 sticky ltr:right-0 rtl:left-0 bg-background z-10">
             <div class="flex justify-center gap-3">
               <DropdownMenu>
                 <DropdownMenuTrigger>

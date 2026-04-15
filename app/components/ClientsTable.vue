@@ -39,7 +39,7 @@ function toggleThisClient(client: SelectClients, name: "delete" | "update") {
           <TableHead>{{ t("fields.phone") }}</TableHead>
           <TableHead>{{ t("fields.address") }}</TableHead>
           <TableHead>{{ t("fields.credit") }}</TableHead>
-          <TableHead class="w-20">
+          <TableHead class="w-20 sticky ltr:right-0 rtl:left-0 bg-gray-100 z-10">
             {{ t("fields.actions") }}
           </TableHead>
         </TableRow>
@@ -69,7 +69,7 @@ function toggleThisClient(client: SelectClients, name: "delete" | "update") {
           <TableCell class="p-2 whitespace-nowrap">
             {{ n(toNumber(client.credit), "currency") }}
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell class="p-2 sticky ltr:right-0 rtl:left-0 bg-background z-10">
             <div class="flex justify-center">
               <DropdownMenu>
                 <DropdownMenuTrigger>

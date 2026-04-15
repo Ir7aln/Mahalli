@@ -115,7 +115,7 @@ html {
 }
 
 div:has(> table:not(.not-default)) {
-  @apply flex flex-col h-full w-full rounded-md overflow-hidden border border-gray-200 bg-white;
+  @apply flex flex-col h-full w-full rounded-md overflow-x-auto border border-gray-200 bg-white;
 }
 
 table:not(.not-default) {
@@ -144,6 +144,78 @@ table:not(.not-default) > tbody {
 
 table:not(.not-default) > tbody > tr {
   @apply [&>*]:border-x first:[&>td]:border-0 last:[&>td]:border-0;
+}
+
+/* Sticky actions column separator + shadow — only when table overflows horizontally */
+.is-x-scrollable > table th:last-child,
+.is-x-scrollable > table td:last-child {
+  position: sticky;
+}
+
+.is-x-scrollable > table[dir="ltr"] th:last-child::before,
+.is-x-scrollable > table[dir="ltr"] td:last-child::before,
+.is-x-scrollable > table[dir="rtl"] th:last-child::before,
+.is-x-scrollable > table[dir="rtl"] td:last-child::before,
+.is-x-scrollable > table[dir="ltr"] th:last-child::after,
+.is-x-scrollable > table[dir="ltr"] td:last-child::after,
+.is-x-scrollable > table[dir="rtl"] th:last-child::after,
+.is-x-scrollable > table[dir="rtl"] td:last-child::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.is-x-scrollable > table[dir="ltr"] th:last-child::before,
+.is-x-scrollable > table[dir="ltr"] td:last-child::before {
+  left: 0;
+  width: 1px;
+  background: hsl(var(--border));
+}
+
+.is-x-scrollable > table[dir="rtl"] th:last-child::before,
+.is-x-scrollable > table[dir="rtl"] td:last-child::before {
+  right: 0;
+  width: 1px;
+  background: hsl(var(--border));
+}
+
+.is-x-scrollable > table[dir="ltr"] th:last-child::after,
+.is-x-scrollable > table[dir="ltr"] td:last-child::after {
+  left: -8px;
+  width: 8px;
+  background: linear-gradient(to left, rgba(15, 23, 42, 0.08), transparent);
+}
+
+.is-x-scrollable > table[dir="rtl"] th:last-child::after,
+.is-x-scrollable > table[dir="rtl"] td:last-child::after {
+  right: -8px;
+  width: 8px;
+  background: linear-gradient(to right, rgba(15, 23, 42, 0.08), transparent);
+}
+
+*::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgb(241, 245, 249);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgb(203, 213, 225);
+  border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgb(184, 197, 212);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(203, 213, 225) rgb(241, 245, 249);
 }
 
 .grainy-light {
