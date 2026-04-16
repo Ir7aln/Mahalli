@@ -1,0 +1,15 @@
+[package]
+name = "system-service"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+system-entity = { path = "../system-entity" }
+serde = { version = "1.0", features = ["derive"] }
+specta = { version = "=2.0.0-rc.24", features = ["derive", "function", "serde_json"] }
+chrono = "0.4"
+ulid = "1.1.2"
+
+[dependencies.sea-orm]
+version = "0.12.4"
+features = ["debug-print", "runtime-tokio-native-tls", "sqlx-sqlite"]

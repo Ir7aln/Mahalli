@@ -4,7 +4,7 @@
    <a href="https://github.com/AbdelilahOu/Mahalli/releases"><img src="https://img.shields.io/github/release/AbdelilahOu/Mahalli.svg" alt="Latest Release"></a>
 </div>
 
-Mahalli is a desktop application for inventory and invoicing, it help you create and manage clients, products, quotes, commands and invoices.
+Mahalli is a desktop application for inventory and invoicing. It helps you manage clients, products, quotes, orders, and invoices — across multiple workspaces.
 
 ## Video Showcase
 
@@ -20,67 +20,100 @@ Check out a quick video demonstration of Mahalli's features:
 
 Mahalli is specifically designed to streamline the business-to-business (B2B) workflow prevalent in Morocco. The typical process involves:
 
-1.  **Quote Generation**: Businesses often start by generating a detailed quote for their clients.
-2.  **Order Creation**: Once the quote is approved, it transitions into an official order.
-3.  **Invoice Generation**: Upon payment or delivery, an invoice is created to finalize the transaction.
+1. **Quote Generation**: Businesses often start by generating a detailed quote for their clients.
+2. **Order Creation**: Once the quote is approved, it transitions into an official order.
+3. **Invoice Generation**: Upon payment or delivery, an invoice is created to finalize the transaction.
 
 Mahalli provides comprehensive tools to manage each step of this process efficiently.
 
+## Architecture
+
+Mahalli uses a two-layer SQLite database architecture:
+
+### System Database (`catalog.sqlite`)
+A permanent catalog database that runs at all times. It tracks all registered tenant databases — their names, slugs, file paths, and which one is currently active.
+
+### Tenant Databases
+Each tenant database is an independent SQLite file that holds all business data (clients, products, orders, quotes, invoices, inventory) for a given workspace. The active tenant connection is hot-swappable at runtime — users can create new workspaces, clone existing ones, and switch between them without restarting the app.
+
+### Crate Structure
+
+```
+src-tauri/
+├── src/                        # Main Tauri app
+│   ├── commands/               # Tauri commands exposed to the frontend
+│   │   └── databases.rs        # create, switch, list databases
+│   ├── db/                     # DB manager, path resolution, system setup
+│   └── jobs/                   # Background jobs (image optimizer)
+└── crates/
+    ├── system-entity/          # SeaORM entities for the system/catalog DB
+    ├── system-migration/       # Migrations for the system DB
+    ├── system-service/         # Queries/mutations for the system DB
+    ├── tenant-entity/          # SeaORM entities for tenant databases
+    ├── tenant-migration/       # Migrations for tenant databases
+    └── tenant-service/         # Queries/mutations for tenant databases
+```
+
 ## Getting Started
 
-Before you begin using Mahalli, ensure you have Node.js and npm (Node Package Manager) installed on your system. You can download and install them from the official Node.js website (https://nodejs.org/en/download/package-manager/current).
+Before you begin, ensure you have [Bun](https://bun.sh) and the [Tauri prerequisites](https://tauri.app/start/prerequisites/) installed.
 
-### Prerequisites for Running Tauri Apps
+### Running in Development
 
-Tauri is the framework used to build Mahalli. Here are the additional requirements for running Tauri applications:
-
-check : [tauri prerequisites](https://tauri.app/v1/guides/getting-started/prerequisites/#:~:text=Tauri%20heavily%20depends%20on%20WebView2,and%20version%20for%20your%20system.)
-
-### Running Mahalli
-
-1. Clone the Mahalli repository from GitHub.
-2. Open a terminal and navigate to the root directory of the Mahalli project.
-3. Install the project dependencies by running:
-
-```Bash
-npm install
-```
-
-4. Start the development server to run Mahalli in development mode:
-
-```Bash
-npm run tauri dev
-```
-
-This will launch Mahalli in your default desktop browser.
-
-5. Building Mahalli
-   To create a standalone desktop application for distribution, use the following command:
-
-```Bash
-npm run tauri build
-```
-
-This will generate an executable file in the target directory. The specific location and file name will depend on your operating system.
-
-### Understanding the Makefile Commands
-
-The project also includes a Makefile that defines various commands for managing the Tauri application. Here's a breakdown of some relevant commands:
-
-- migrationsup: Runs database migrations to update the schema (use with caution in production).
-- migrationslast: Reverts the most recent database migration.
-- migrationsdown: Drops all tables and data, essentially resetting the database (use with extreme caution).
-- entity: Generates the sea_orm entities from your database models.
-- dev: Starts the development server.
-- build: Builds a standalone desktop application.
-- check: Runs static code checks on the Rust code.
-- lint: Lints the JavaScript code for potential errors and style issues.
-- migration: Generates a new database migration file:
+1. Clone the repository and navigate to the project root.
+2. Install frontend dependencies:
 
 ```bash
-make migration name=migration_name
+bun install
 ```
 
-- Note: These Makefile commands are typically used during development and may not be directly relevant for casual users of Mahalli.
+3. Start the development server:
 
-We recommend referring to the Tauri documentation (https://tauri.app/) for a more comprehensive understanding of these commands and Tauri development in general.
+```bash
+bun run tauri dev
+```
+
+### Building for Production
+
+```bash
+bun run tauri build
+```
+
+## Makefile Commands
+
+### Development
+
+| Command | Description |
+|---|---|
+| `make dev` | Start the development server |
+| `make build` | Build a debug desktop executable |
+| `make check` | Run `cargo check` on the Rust code |
+| `make lint` | Format Rust code and lint frontend code |
+
+### Tenant Database (business data)
+
+| Command | Description |
+|---|---|
+| `make tenant-migrationsup` | Run all pending tenant migrations |
+| `make tenant-migrationslast` | Revert the last tenant migration |
+| `make tenant-migrationsdown` | Drop and reset the tenant database |
+| `make tenant-entity` | Regenerate SeaORM entities from the tenant DB |
+| `make migration name=<name>` | Generate a new tenant migration file |
+
+Shorthands `make migrationsup`, `make migrationslast`, `make migrationsdown`, and `make entity` all target the tenant database.
+
+### System Database (catalog)
+
+| Command | Description |
+|---|---|
+| `make system-migrationsup` | Run all pending system migrations |
+| `make system-migrationslast` | Revert the last system migration |
+| `make system-migrationsdown` | Drop and reset the system database |
+| `make system-entity` | Regenerate SeaORM entities from the system DB |
+| `make system-migration name=<name>` | Generate a new system migration file |
+
+### Version
+
+```bash
+make update-v v=1.2.3
+```

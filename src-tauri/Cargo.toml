@@ -15,7 +15,15 @@ name = "app_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [workspace]
-members = [".", "service", "entity", "migration"]
+members = [
+  ".",
+  "crates/tenant-entity",
+  "crates/tenant-migration",
+  "crates/tenant-service",
+  "crates/system-entity",
+  "crates/system-migration",
+  "crates/system-service",
+]
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
@@ -43,9 +51,10 @@ tokio = { version = "1", features = ["full"] }
 libsqlite3-sys = { version = "^0", features = ["bundled"] }
 dotenvy = "0.15.7"
 log = "^0.4"
-migration = { path = "./migration" }
-service = { path = "./service" }
-entity = { path = "./entity" }
+tenant-migration = { path = "./crates/tenant-migration" }
+tenant-service = { path = "./crates/tenant-service" }
+system-migration = { path = "./crates/system-migration" }
+system-service = { path = "./crates/system-service" }
 image = "0.25"
 dirs = "5.0"
 

@@ -7,6 +7,7 @@ import {
   Package,
   Quote,
   ReceiptText,
+  Settings,
   SquareUser,
   Store,
   Truck,
@@ -62,6 +63,7 @@ const menuItems = [
     query: { page: 1 },
   },
   { icon: BarChart3Icon, label: "routes.dashboard", path: "/dashboard" },
+  { icon: Settings, label: "routes.settings", path: "/settings" },
 ];
 </script>
 

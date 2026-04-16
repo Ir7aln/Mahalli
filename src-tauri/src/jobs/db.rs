@@ -26,9 +26,6 @@ fn get_database_url() -> String {
         let data_dir = home_dir.join(".mahalli/data");
         std::fs::create_dir_all(&data_dir)
             .unwrap_or_else(|_| panic!("Could not create data directory"));
-        format!(
-            "sqlite://{}jobs.sqlite?mode=rwc",
-            data_dir.to_string_lossy()
-        )
+        crate::db::paths::sqlite_url_from_path(&data_dir.join("jobs.sqlite"))
     }
 }

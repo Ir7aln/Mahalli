@@ -28,7 +28,8 @@ useHead({
 
 <template>
   <NuxtLoadingIndicator />
-  <NuxtLayout name="default">
+  <NuxtLayout>
     <NuxtPage />
+    <DatabaseSelectorGate />
   </NuxtLayout>
 </template>

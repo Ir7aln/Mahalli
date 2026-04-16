@@ -122,6 +122,86 @@
     "bp": "Bestseller (Menge)",
     "b3s": "Beste Lieferanten basierend auf Ausgaben"
   },
+  "database": {
+    "common": {
+      "none": "Keine",
+      "empty": "Leer",
+      "start-empty": "Leer starten"
+    },
+    "actions": {
+      "refresh": "Aktualisieren",
+      "new": "Neue Datenbank",
+      "create": "Erstellen",
+      "creating": "Wird erstellt...",
+      "switch": "Wechseln"
+    },
+    "fields": {
+      "slug": "Slug",
+      "source": "Quelle",
+      "clone-from": "Klonen von",
+      "database-name": "Datenbankname",
+      "start-from": "Starten von"
+    },
+    "status": {
+      "active": "Aktiv",
+      "idle": "Inaktiv",
+      "current": "Aktuell"
+    },
+    "placeholders": {
+      "name": "Casablanca Filiale",
+      "initial-name": "Mahalli Hauptarbeitsbereich"
+    },
+    "settings": {
+      "title": "Datenbankeinstellungen",
+      "description": "Verwalten Sie die Katalogdatenbank und wechseln Sie die aktive Geschäftsdatenbank.",
+      "active-title": "Aktive Datenbank",
+      "no-active-description": "Keine Datenbank ausgewählt.",
+      "catalog-title": "Katalog",
+      "catalog-count": "{count} Datenbanken",
+      "catalog-description": "Neue Datenbanken können leer starten oder eine vorhandene Tenant-Datei klonen.",
+      "create-card-description": "Öffnen Sie ein Modal, um eine neue Datenbank zu erstellen oder eine bestehende zu klonen.",
+      "create-card-note": "Neue Datenbanken können leer starten oder Daten aus einer bereits registrierten Datenbank kopieren.",
+      "registered-title": "Registrierte Datenbanken",
+      "registered-description": "Diese Einträge stammen aus der System-Katalogdatenbank.",
+      "empty-state": "Es sind noch keine Datenbanken registriert."
+    },
+    "create": {
+      "title": "Datenbank erstellen",
+      "description": "Erstellen Sie eine neue Datenbank oder kopieren Sie eine vorhandene, bevor Sie zu ihr wechseln.",
+      "make-active-title": "Sofort aktivieren",
+      "make-active-description": "Geschäftsbefehle verwenden dann die neue aktive Tenant-Verbindung."
+    },
+    "selector": {
+      "title": "Datenbank wählen",
+      "description": "Es gibt Datenbanken, aber keine ist aktuell aktiv. Wählen Sie eine aus, um fortzufahren.",
+      "opening": "Wird geöffnet",
+      "use-database": "Diese Datenbank verwenden",
+      "manage": "Datenbanken verwalten"
+    },
+    "onboarding": {
+      "badge": "Ersteinrichtung",
+      "title": "Richten Sie zuerst Ihre Arbeitsbereich-Datenbank ein, bevor Sie Kunden und Lagerbestand verwalten.",
+      "description": "Mahalli verwendet eine Systemdatenbank für die Datenbankverwaltung und separate Tenant-Datenbanken für Ihre Geschäftsdaten. Dieser Bildschirm erstellt die erste Tenant-Datenbank und aktiviert sie sofort.",
+      "initial-tenant": "Erster Tenant",
+      "form-title": "Erstellen Sie Ihre erste Datenbank",
+      "form-description": "Verwenden Sie eine leere Datenbank oder kopieren Sie Daten aus einem früheren Tenant, falls bereits einer registriert ist.",
+      "active-note": "Die neue Datenbank wird sofort als aktiv markiert, damit der Rest der App normal geöffnet werden kann.",
+      "creating": "Datenbank wird erstellt...",
+      "create-and-continue": "Erstellen und fortfahren"
+    },
+    "notifications": {
+      "name-required": "Der Datenbankname ist erforderlich.",
+      "create-error": "Datenbank konnte nicht erstellt werden.",
+      "create-success": "Datenbank erstellt.",
+      "switch-error": "Datenbank konnte nicht gewechselt werden.",
+      "switch-success": "Aktive Datenbank wurde geändert.",
+      "open-error": "Datenbank konnte nicht geöffnet werden.",
+      "choose-another": "Bitte wählen Sie eine andere Datenbank oder erstellen Sie eine neue.",
+      "initial-create-error": "Ihre erste Datenbank konnte nicht erstellt werden.",
+      "try-another-name": "Versuchen Sie einen anderen Namen oder wählen Sie eine andere Quelldatenbank.",
+      "ready": "Datenbank bereit."
+    }
+  },
   "notifications": {
     "product": {
       "created": "Das Produkt {name} wurde hinzugefügt",

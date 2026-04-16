@@ -1,6 +1,6 @@
 use tauri::State;
 
-use service::{
+use tenant_service::{
     ListArgs, MutationsService, NewProduct, Product, ProductSearch, ProductsResponse,
     QueriesService,
 };
@@ -9,7 +9,7 @@ use crate::jobs::{EntityEnum, ImageProcessorJob};
 
 use crate::AppState;
 
-use super::{Fail, SResult, Success};
+use super::{tenant_db_or_fail, Fail, SResult, Success};
 
 #[tauri::command]
 #[specta::specta]
@@ -17,8 +17,8 @@ pub async fn list_products(
     state: State<'_, AppState>,
     args: ListArgs,
 ) -> SResult<ProductsResponse> {
-    let _ = state.db_conn;
-    match QueriesService::list_products(&state.db_conn, args).await {
+    let db_conn = tenant_db_or_fail(&state).await?;
+    match QueriesService::list_products(&db_conn, args).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -37,8 +37,8 @@ pub async fn search_products(
     state: State<'_, AppState>,
     search: String,
 ) -> SResult<Vec<ProductSearch>> {
-    let _ = state.db_conn;
-    match QueriesService::search_products(&state.db_conn, search).await {
+    let db_conn = tenant_db_or_fail(&state).await?;
+    match QueriesService::search_products(&db_conn, search).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -54,9 +54,9 @@ pub async fn search_products(
 #[tauri::command]
 #[specta::specta]
 pub async fn create_product(state: State<'_, AppState>, product: NewProduct) -> SResult<String> {
-    let _ = state.db_conn;
+    let db_conn = tenant_db_or_fail(&state).await?;
     let image = product.image.clone();
-    match MutationsService::create_product(&state.db_conn, product).await {
+    match MutationsService::create_product(&db_conn, product).await {
         Ok(id) => {
             match image {
                 Some(data) => {
@@ -89,8 +89,8 @@ pub async fn create_product(state: State<'_, AppState>, product: NewProduct) -> 
 #[tauri::command]
 #[specta::specta]
 pub async fn delete_product(state: State<'_, AppState>, id: String) -> SResult<u64> {
-    let _ = state.db_conn;
-    match MutationsService::delete_product(&state.db_conn, id).await {
+    let db_conn = tenant_db_or_fail(&state).await?;
+    match MutationsService::delete_product(&db_conn, id).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -106,8 +106,8 @@ pub async fn delete_product(state: State<'_, AppState>, id: String) -> SResult<u
 #[tauri::command]
 #[specta::specta]
 pub async fn update_product(state: State<'_, AppState>, product: Product) -> SResult<String> {
-    let _ = state.db_conn;
-    match MutationsService::update_product(&state.db_conn, product).await {
+    let db_conn = tenant_db_or_fail(&state).await?;
+    match MutationsService::update_product(&db_conn, product).await {
         Ok(_) => Ok(Success::<String> {
             error: None,
             message: Option::Some(String::from("update products success")),

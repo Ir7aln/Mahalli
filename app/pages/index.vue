@@ -42,6 +42,11 @@ const pages = ref([
     text: "dashboard",
     path: "/dashboard",
   },
+  {
+    image: "",
+    text: "settings",
+    path: "/settings",
+  },
 ]);
 </script>
 
@@ -53,11 +58,12 @@ const pages = ref([
       >
         <ClientOnly>
           <div v-for="(page, index) in pages" :key="index" v-fade="index + 1" class="w-full h-full">
-            <NuxtLink :to="localePath({ path: page.path, query: { page: 1, limit: 50 } })">
+            <NuxtLink :to="localePath({ path: page.path, query: page.text === 'settings' ? {} : { page: 1, limit: 50 } })">
               <div
                 class="w-full h-full overflow-hidden cursor-pointer relative hover:-translate-y-1 group transition-all duration-250 flex justify-center rounded-md items-center bg-gray-400"
               >
                 <img
+                  v-if="page.image"
                   class="absolute top-0 left-0 w-full object-fill opacity-20 group-hover:opacity-60 h-full transition-all duration-250"
                   :src="page.image"
                 />

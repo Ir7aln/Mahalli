@@ -1,7 +1,9 @@
 use serde::{Deserialize, Serialize};
 use specta::Type;
+use tenant_service::sea_orm::DatabaseConnection as TenantDatabaseConnection;
 
 pub mod clients;
+pub mod databases;
 pub mod dashboard;
 pub mod inventory;
 pub mod invoice_items;
@@ -28,3 +30,12 @@ pub struct Fail {
 }
 
 pub type SResult<T> = Result<Success<T>, Fail>;
+
+pub async fn tenant_db_or_fail(
+    state: &crate::AppState,
+) -> Result<TenantDatabaseConnection, Fail> {
+    state.tenant_db().await.map_err(|err| Fail {
+        error: Some(err),
+        message: Some(String::from("Select a database before using the app.")),
+    })
+}

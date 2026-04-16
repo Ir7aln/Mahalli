@@ -121,6 +121,86 @@
     "bp": "Meilleurs produits vendus (quantité)",
     "b3s": "Meilleurs fournisseurs en fonction des dépenses"
   },
+  "database": {
+    "common": {
+      "none": "Aucune",
+      "empty": "Vide",
+      "start-empty": "Commencer vide"
+    },
+    "actions": {
+      "refresh": "Actualiser",
+      "new": "Nouvelle base",
+      "create": "Créer",
+      "creating": "Création...",
+      "switch": "Basculer"
+    },
+    "fields": {
+      "slug": "Slug",
+      "source": "Source",
+      "clone-from": "Cloner depuis",
+      "database-name": "Nom de la base",
+      "start-from": "Démarrer à partir de"
+    },
+    "status": {
+      "active": "Active",
+      "idle": "Inactive",
+      "current": "Actuelle"
+    },
+    "placeholders": {
+      "name": "Magasin Casablanca",
+      "initial-name": "Espace principal Mahalli"
+    },
+    "settings": {
+      "title": "Paramètres des bases",
+      "description": "Gérez la base catalogue et changez la base métier active.",
+      "active-title": "Base active",
+      "no-active-description": "Aucune base sélectionnée.",
+      "catalog-title": "Catalogue",
+      "catalog-count": "{count} bases",
+      "catalog-description": "Les nouvelles bases peuvent démarrer vides ou cloner un fichier tenant existant.",
+      "create-card-description": "Ouvrez une fenêtre pour créer une base propre ou cloner une base existante.",
+      "create-card-note": "Les nouvelles bases peuvent démarrer vides ou copier les données d'une base déjà enregistrée.",
+      "registered-title": "Bases enregistrées",
+      "registered-description": "Ces entrées proviennent de la base catalogue système.",
+      "empty-state": "Aucune base n'est encore enregistrée."
+    },
+    "create": {
+      "title": "Créer une base",
+      "description": "Créez une base propre ou copiez une base précédente avant de l'activer.",
+      "make-active-title": "Rendre active immédiatement",
+      "make-active-description": "Les commandes métier utiliseront la nouvelle connexion tenant active."
+    },
+    "selector": {
+      "title": "Choisir une base",
+      "description": "Des bases existent, mais aucune n'est active actuellement. Choisissez-en une pour continuer.",
+      "opening": "Ouverture",
+      "use-database": "Utiliser cette base",
+      "manage": "Gérer les bases"
+    },
+    "onboarding": {
+      "badge": "Première configuration",
+      "title": "Configurez votre première base d'espace de travail avant de gérer clients et stock.",
+      "description": "Mahalli conserve une base système pour la gestion des bases, et des bases tenant séparées pour vos données métier. Cet écran crée la première base tenant et l'active immédiatement.",
+      "initial-tenant": "Tenant initial",
+      "form-title": "Créez votre première base",
+      "form-description": "Utilisez une base vide ou copiez les données d'un tenant précédent s'il en existe déjà un.",
+      "active-note": "La nouvelle base sera marquée active immédiatement afin que le reste de l'application puisse s'ouvrir normalement.",
+      "creating": "Création de la base...",
+      "create-and-continue": "Créer et continuer"
+    },
+    "notifications": {
+      "name-required": "Le nom de la base est requis.",
+      "create-error": "Impossible de créer la base.",
+      "create-success": "Base créée.",
+      "switch-error": "Impossible de basculer la base.",
+      "switch-success": "La base active a changé.",
+      "open-error": "Impossible d'ouvrir la base.",
+      "choose-another": "Choisissez une autre base ou créez-en une nouvelle.",
+      "initial-create-error": "Impossible de créer votre première base.",
+      "try-another-name": "Essayez un autre nom ou choisissez une autre base source.",
+      "ready": "Base prête."
+    }
+  },
   "notifications": {
     "product": {
       "created": "Le produit {name} a été ajouté",
