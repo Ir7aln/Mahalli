@@ -46,22 +46,14 @@ tauri-plugin-notification = "2"
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-updater = "2"
 
-apalis = { version = "0.5", features = ["sqlite", "limit", "tracing", "tokio-comp"] }
 tokio = { version = "1", features = ["full"] }
-libsqlite3-sys = { version = "^0", features = ["bundled"] }
 dotenvy = "0.15.7"
 log = "^0.4"
 tenant-migration = { path = "./crates/tenant-migration" }
 tenant-service = { path = "./crates/tenant-service" }
 system-migration = { path = "./crates/system-migration" }
 system-service = { path = "./crates/system-service" }
-image = "0.25"
 dirs = "5.0"
-
-[dependencies.sqlx]
-version = "0.7"
-default-features = false
-features = ["sqlite"]
 
 [features]
 default = ["custom-protocol"]

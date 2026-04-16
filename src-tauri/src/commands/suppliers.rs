@@ -5,8 +5,6 @@ use tenant_service::{
     SuppliersResponse,
 };
 
-use crate::jobs::{EntityEnum, ImageProcessorJob};
-
 use crate::AppState;
 
 use super::{tenant_db_or_fail, Fail, SResult, Success};
@@ -55,30 +53,12 @@ pub async fn search_suppliers(
 #[specta::specta]
 pub async fn create_supplier(state: State<'_, AppState>, supplier: NewSupplier) -> SResult<String> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    let image = supplier.image.clone();
     match MutationsService::create_supplier(&db_conn, supplier).await {
-        Ok(id) => {
-            match image {
-                Some(data) => {
-                    let job = ImageProcessorJob {
-                        id: id.clone(),
-                        entity: EntityEnum::SUPPLIER,
-                        data,
-                    };
-                    state
-                        .job_storage
-                        .push_job(job)
-                        .await
-                        .expect("error pushing the job");
-                }
-                None => {}
-            }
-            Ok(Success::<String> {
-                error: None,
-                message: Option::Some(String::from("supplier created successfully")),
-                data: Some(id),
-            })
-        }
+        Ok(id) => Ok(Success::<String> {
+            error: None,
+            message: Option::Some(String::from("supplier created successfully")),
+            data: Some(id),
+        }),
         Err(err) => Err(Fail {
             error: Some(err.to_string()),
             message: None,

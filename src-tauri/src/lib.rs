@@ -1,8 +1,4 @@
-use apalis::{
-    layers::tracing::TraceLayer, prelude::*, sqlite::SqliteStorage, utils::TokioExecutor,
-};
 use db::{manager::DatabaseManager, paths::AppPaths, system::setup_system_database};
-use jobs::{process_image, setup_jobs_database, ImageOptimizerJobStorage, ImageProcessorJob};
 use std::sync::Arc;
 use system_service::sea_orm::DatabaseConnection as SystemDatabaseConnection;
 use tenant_service::sea_orm::DatabaseConnection as TenantDatabaseConnection;
@@ -10,14 +6,12 @@ use tokio::sync::RwLock;
 
 mod commands;
 mod db;
-mod jobs;
 mod specta;
 
 pub struct AppState {
     system_db_conn: SystemDatabaseConnection,
     tenant_db_conn: Arc<RwLock<Option<TenantDatabaseConnection>>>,
     db_manager: DatabaseManager,
-    job_storage: ImageOptimizerJobStorage,
 }
 
 impl AppState {
@@ -58,24 +52,6 @@ pub async fn run() {
         .expect("unable to resolve active tenant database");
     let tenant_db_conn = Arc::new(RwLock::new(db_conn));
 
-    // Background jobs setup
-    let pool = setup_jobs_database().await;
-    let image_storage: SqliteStorage<ImageProcessorJob> = SqliteStorage::new(pool.clone());
-    let thread_safe_storage = ImageOptimizerJobStorage::new(image_storage.clone());
-
-    let monitor = Monitor::<TokioExecutor>::new().register_with_count(2, {
-        WorkerBuilder::new("image-processor")
-            .layer(TraceLayer::new())
-            .data(tenant_db_conn.clone())
-            .with_storage(image_storage)
-            .build_fn(process_image)
-    });
-
-    // Run job monitor in background
-    tokio::spawn(async move {
-        monitor.run().await.unwrap();
-    });
-
     // Build the Specta handler
     let specta_builder = specta::builder::<tauri::Wry>();
 
@@ -84,7 +60,6 @@ pub async fn run() {
             system_db_conn,
             tenant_db_conn,
             db_manager,
-            job_storage: thread_safe_storage,
         })
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
