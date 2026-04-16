@@ -70,7 +70,7 @@ async function createInitialDatabase() {
       </div>
     </section>
 
-    <section class="rounded-[28px] border border-white/70 bg-white/90 p-7 shadow-xl shadow-sky-100/80 text-left rtl:text-right">
+    <section class="rounded-s border border-white/70 bg-white/90 p-7 shadow-xl shadow-sky-100/80 text-left rtl:text-right">
       <div class="space-y-2">
         <p class="text-sm font-medium uppercase tracking-[0.25em] text-slate-500">
           {{ t("database.onboarding.initial-tenant") }}
@@ -101,7 +101,7 @@ async function createInitialDatabase() {
           </select>
         </div>
 
-        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+        <div class="rounded-md border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
           {{ t("database.onboarding.active-note") }}
         </div>
 
