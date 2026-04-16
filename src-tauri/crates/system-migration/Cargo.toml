@@ -1,0 +1,20 @@
+[package]
+name = "system-migration"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+name = "system_migration"
+path = "src/lib.rs"
+
+[dependencies]
+async-std = { version = "1", features = ["attributes", "tokio1"] }
+regex = { version = "1.12.3", features = ["std"] }
+
+[dependencies.sea-orm-migration]
+version = "0.12.0"
+features = [
+  "runtime-tokio-rustls",
+  "sqlx-sqlite",
+]

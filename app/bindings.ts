@@ -11,6 +11,11 @@ export const commands = {
 	createProduct: (product: NewProduct) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_product", { product })),
 	updateProduct: (product: Product) => typedError<Success<string>, Fail>(__TAURI_INVOKE("update_product", { product })),
 	deleteProduct: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_product", { id })),
+	listDatabases: () => typedError<Success<DatabaseRecord[]>, Fail>(__TAURI_INVOKE("list_databases")),
+	getDatabaseBootstrapStatus: () => typedError<Success<DatabaseBootstrapStatus>, Fail>(__TAURI_INVOKE("get_database_bootstrap_status")),
+	getActiveDatabase: () => typedError<Success<DatabaseRecord>, Fail>(__TAURI_INVOKE("get_active_database")),
+	createDatabase: (input: CreateTenantDatabaseRequest) => typedError<Success<DatabaseRecord>, Fail>(__TAURI_INVOKE("create_database", { input })),
+	switchDatabase: (id: string) => typedError<Success<DatabaseRecord>, Fail>(__TAURI_INVOKE("switch_database", { id })),
 	listInventory: (args: ListArgs) => typedError<Success<InventoryResponse>, Fail>(__TAURI_INVOKE("list_inventory", { args })),
 	createInventory: (transaction: NewInventory) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_inventory", { transaction })),
 	deleteInventory: (id: string) => typedError<Success<string>, Fail>(__TAURI_INVOKE("delete_inventory", { id })),
@@ -89,6 +94,32 @@ export type ClientSearch = {
 export type ClientsResponse = {
 	count: number,
 	clients: SelectClients[],
+};
+
+export type CreateTenantDatabaseRequest = {
+	name: string,
+	clone_from_database_id: string | null,
+	make_active: boolean,
+};
+
+export type DatabaseBootstrapStatus = {
+	databases: DatabaseRecord[],
+	active_database: DatabaseRecord | null,
+	has_any_database: boolean,
+	has_active_database: boolean,
+};
+
+export type DatabaseRecord = {
+	id: string,
+	name: string,
+	slug: string,
+	file_name: string,
+	file_path: string,
+	is_active: boolean,
+	created_from_database_id: string | null,
+	created_at: string,
+	updated_at: string,
+	last_opened_at: string | null,
 };
 
 export type Fail = {

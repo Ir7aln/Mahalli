@@ -1,16 +1,16 @@
 use tauri::State;
 
-use service::{MutationsService, NewTemplate};
+use tenant_service::{MutationsService, NewTemplate};
 
 use crate::AppState;
 
-use super::{Fail, SResult, Success};
+use super::{tenant_db_or_fail, Fail, SResult, Success};
 
 #[tauri::command]
 #[specta::specta]
 pub async fn create_template(state: State<'_, AppState>, template: NewTemplate) -> SResult<String> {
-    let _ = state.db_conn;
-    match MutationsService::create_template(&state.db_conn, template).await {
+    let db_conn = tenant_db_or_fail(&state).await?;
+    match MutationsService::create_template(&db_conn, template).await {
         Ok(id) => Ok(Success::<String> {
             error: None,
             message: Option::Some(String::from("template created successfully")),

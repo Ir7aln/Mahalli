@@ -122,6 +122,86 @@
     "bp": "Best Selling Products (quantity)",
     "b3s": "Best suppliers based on expenses"
   },
+  "database": {
+    "common": {
+      "none": "None",
+      "empty": "Empty",
+      "start-empty": "Start empty"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "new": "New Database",
+      "create": "Create",
+      "creating": "Creating...",
+      "switch": "Switch"
+    },
+    "fields": {
+      "slug": "Slug",
+      "source": "Source",
+      "clone-from": "Clone From",
+      "database-name": "Database name",
+      "start-from": "Start from"
+    },
+    "status": {
+      "active": "Active",
+      "idle": "Idle",
+      "current": "Current"
+    },
+    "placeholders": {
+      "name": "Casablanca Store",
+      "initial-name": "Mahalli Main Workspace"
+    },
+    "settings": {
+      "title": "Database Settings",
+      "description": "Manage the catalog database and switch the active business database.",
+      "active-title": "Active Database",
+      "no-active-description": "No database selected.",
+      "catalog-title": "Catalog",
+      "catalog-count": "{count} databases",
+      "catalog-description": "New databases can start empty or clone any existing tenant file.",
+      "create-card-description": "Open a modal to create a clean database or clone an existing one.",
+      "create-card-note": "New databases can start empty or copy data from any previously registered database.",
+      "registered-title": "Registered Databases",
+      "registered-description": "These entries come from the system catalog database.",
+      "empty-state": "No databases are registered yet."
+    },
+    "create": {
+      "title": "Create Database",
+      "description": "Create a clean database or copy a previous one before switching to it.",
+      "make-active-title": "Make active immediately",
+      "make-active-description": "Business commands will use the new active tenant connection."
+    },
+    "selector": {
+      "title": "Choose Database",
+      "description": "Databases exist, but none is currently active. Pick one to continue.",
+      "opening": "Opening",
+      "use-database": "Use this database",
+      "manage": "Manage Databases"
+    },
+    "onboarding": {
+      "badge": "First-time setup",
+      "title": "Set up your first workspace database before you start managing clients and inventory.",
+      "description": "Mahalli keeps one system database for database management, and separate tenant databases for your business data. This setup screen creates the first tenant database and activates it immediately.",
+      "initial-tenant": "Initial Tenant",
+      "form-title": "Create Your First Database",
+      "form-description": "Use an empty database or copy data from a previous tenant if one is already registered.",
+      "active-note": "The new database will be marked active immediately so the rest of the app can open normally.",
+      "creating": "Creating database...",
+      "create-and-continue": "Create and Continue"
+    },
+    "notifications": {
+      "name-required": "Database name is required.",
+      "create-error": "Unable to create database.",
+      "create-success": "Database created.",
+      "switch-error": "Unable to switch database.",
+      "switch-success": "Active database changed.",
+      "open-error": "Unable to open database.",
+      "choose-another": "Please choose another database or create a new one.",
+      "initial-create-error": "Unable to create your first database.",
+      "try-another-name": "Try another name or choose a different source database.",
+      "ready": "Database ready."
+    }
+  },
   "notifications": {
     "product": {
       "created": "Product {name} has been added",

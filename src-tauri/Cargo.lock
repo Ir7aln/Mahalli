@@ -976,8 +976,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c673075a2e0e5f4a1dde27ce9dee1ea4558c7ffe648f576438a20ca1d2acc4b0"
 dependencies = [
  "iana-time-zone",
+ "js-sys",
  "num-traits",
  "serde",
+ "wasm-bindgen",
  "windows-link 0.2.1",
 ]
 
@@ -1634,15 +1636,6 @@ name = "endi"
 version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "66b7e2430c6dff6a955451e2cfc438f09cea1965a9d6f87f7e3b90decc014099"
-
-[[package]]
-name = "entity"
-version = "0.1.0"
-dependencies = [
- "sea-orm",
- "serde",
- "ulid",
-]
 
 [[package]]
 name = "enumflags2"
@@ -3245,17 +3238,16 @@ dependencies = [
  "apalis",
  "dirs 5.0.1",
  "dotenvy",
- "entity",
  "image",
  "libsqlite3-sys",
  "log",
- "migration",
  "serde",
  "serde_json",
- "service",
  "specta",
  "specta-typescript",
  "sqlx",
+ "system-migration",
+ "system-service",
  "tauri",
  "tauri-build",
  "tauri-plugin-dialog",
@@ -3264,6 +3256,8 @@ dependencies = [
  "tauri-plugin-notification",
  "tauri-plugin-updater",
  "tauri-specta",
+ "tenant-migration",
+ "tenant-service",
  "tokio",
 ]
 
@@ -3351,16 +3345,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "488016bfae457b036d996092f6cb448677611ce4449e970ceaf42695203f218a"
 dependencies = [
  "autocfg",
-]
-
-[[package]]
-name = "migration"
-version = "0.1.0"
-dependencies = [
- "async-std",
- "fake",
- "sea-orm-migration",
- "ulid",
 ]
 
 [[package]]
@@ -5602,18 +5586,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "service"
-version = "0.1.0"
-dependencies = [
- "entity",
- "sea-orm",
- "serde",
- "serde_json",
- "specta",
- "tokio",
-]
-
-[[package]]
 name = "servo_arc"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6255,6 +6227,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "system-entity"
+version = "0.1.0"
+dependencies = [
+ "sea-orm",
+ "serde",
+ "ulid",
+]
+
+[[package]]
+name = "system-migration"
+version = "0.1.0"
+dependencies = [
+ "async-std",
+ "regex",
+ "sea-orm-migration",
+]
+
+[[package]]
+name = "system-service"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "sea-orm",
+ "serde",
+ "specta",
+ "system-entity",
+ "ulid",
+]
+
+[[package]]
 name = "tao"
 version = "0.34.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6715,6 +6717,38 @@ dependencies = [
  "once_cell",
  "rustix",
  "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "tenant-entity"
+version = "0.1.0"
+dependencies = [
+ "sea-orm",
+ "serde",
+ "ulid",
+]
+
+[[package]]
+name = "tenant-migration"
+version = "0.1.0"
+dependencies = [
+ "async-std",
+ "fake",
+ "regex",
+ "sea-orm-migration",
+ "ulid",
+]
+
+[[package]]
+name = "tenant-service"
+version = "0.1.0"
+dependencies = [
+ "sea-orm",
+ "serde",
+ "serde_json",
+ "specta",
+ "tenant-entity",
+ "tokio",
 ]
 
 [[package]]

@@ -1,9 +1,16 @@
 use apalis::{
     layers::tracing::TraceLayer, prelude::*, sqlite::SqliteStorage, utils::TokioExecutor,
 };
-use db::setup_database;
+use std::sync::Arc;
+use db::{
+    manager::DatabaseManager,
+    paths::AppPaths,
+    system::setup_system_database,
+};
 use jobs::{process_image, setup_jobs_database, ImageOptimizerJobStorage, ImageProcessorJob};
-use service::sea_orm::DatabaseConnection;
+use system_service::sea_orm::DatabaseConnection as SystemDatabaseConnection;
+use tenant_service::sea_orm::DatabaseConnection as TenantDatabaseConnection;
+use tokio::sync::RwLock;
 
 mod commands;
 mod db;
@@ -11,8 +18,32 @@ mod jobs;
 mod specta;
 
 pub struct AppState {
-    db_conn: DatabaseConnection,
+    system_db_conn: SystemDatabaseConnection,
+    tenant_db_conn: Arc<RwLock<Option<TenantDatabaseConnection>>>,
+    db_manager: DatabaseManager,
     job_storage: ImageOptimizerJobStorage,
+}
+
+impl AppState {
+    pub fn system_db(&self) -> &SystemDatabaseConnection {
+        &self.system_db_conn
+    }
+
+    pub async fn tenant_db(&self) -> Result<TenantDatabaseConnection, String> {
+        self.tenant_db_conn
+            .read()
+            .await
+            .clone()
+            .ok_or_else(|| String::from("No active tenant database selected"))
+    }
+
+    pub async fn set_tenant_db(&self, db_conn: Option<TenantDatabaseConnection>) {
+        *self.tenant_db_conn.write().await = db_conn;
+    }
+
+    pub fn db_manager(&self) -> &DatabaseManager {
+        &self.db_manager
+    }
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -22,8 +53,14 @@ pub async fn run() {
     #[cfg(debug_assertions)]
     specta::export_bindings();
 
-    // Database setup
-    let db_conn = setup_database().await;
+    let app_paths = AppPaths::resolve();
+    let db_manager = DatabaseManager::new(app_paths.clone());
+    let system_db_conn = setup_system_database(&app_paths).await;
+    let db_conn = db_manager
+        .open_active_tenant_database(&system_db_conn)
+        .await
+        .expect("unable to resolve active tenant database");
+    let tenant_db_conn = Arc::new(RwLock::new(db_conn));
 
     // Background jobs setup
     let pool = setup_jobs_database().await;
@@ -33,7 +70,7 @@ pub async fn run() {
     let monitor = Monitor::<TokioExecutor>::new().register_with_count(2, {
         WorkerBuilder::new("image-processor")
             .layer(TraceLayer::new())
-            .data(db_conn.clone())
+            .data(tenant_db_conn.clone())
             .with_storage(image_storage)
             .build_fn(process_image)
     });
@@ -48,7 +85,9 @@ pub async fn run() {
 
     tauri::Builder::default()
         .manage(AppState {
-            db_conn,
+            system_db_conn,
+            tenant_db_conn,
+            db_manager,
             job_storage: thread_safe_storage,
         })
         .plugin(tauri_plugin_notification::init())

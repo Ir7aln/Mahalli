@@ -1,19 +1,19 @@
 use tauri::State;
 
-use service::{
+use tenant_service::{
     FinancialMetricsResponse, QueriesService, SelectTopProducts, SelectTops, SelectTransaction,
     StatusCountResponse,
 };
 
 use crate::AppState;
 
-use super::{Fail, SResult, Success};
+use super::{tenant_db_or_fail, Fail, SResult, Success};
 
 #[tauri::command]
 #[specta::specta]
 pub async fn list_inventory_stats(state: State<'_, AppState>) -> SResult<Vec<SelectTransaction>> {
-    let _ = state.db_conn;
-    match QueriesService::list_inventory_stats(&state.db_conn).await {
+    let db_conn = tenant_db_or_fail(&state).await?;
+    match QueriesService::list_inventory_stats(&db_conn).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -29,8 +29,8 @@ pub async fn list_inventory_stats(state: State<'_, AppState>) -> SResult<Vec<Sel
 #[tauri::command]
 #[specta::specta]
 pub async fn list_top_clients(state: State<'_, AppState>) -> SResult<Vec<SelectTops>> {
-    let _ = state.db_conn;
-    match QueriesService::list_top_clients(&state.db_conn).await {
+    let db_conn = tenant_db_or_fail(&state).await?;
+    match QueriesService::list_top_clients(&db_conn).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -46,8 +46,8 @@ pub async fn list_top_clients(state: State<'_, AppState>) -> SResult<Vec<SelectT
 #[tauri::command]
 #[specta::specta]
 pub async fn list_top_suppliers(state: State<'_, AppState>) -> SResult<Vec<SelectTops>> {
-    let _ = state.db_conn;
-    match QueriesService::list_top_suppliers(&state.db_conn).await {
+    let db_conn = tenant_db_or_fail(&state).await?;
+    match QueriesService::list_top_suppliers(&db_conn).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -63,8 +63,8 @@ pub async fn list_top_suppliers(state: State<'_, AppState>) -> SResult<Vec<Selec
 #[tauri::command]
 #[specta::specta]
 pub async fn list_top_products(state: State<'_, AppState>) -> SResult<Vec<SelectTopProducts>> {
-    let _ = state.db_conn;
-    match QueriesService::list_top_products(&state.db_conn).await {
+    let db_conn = tenant_db_or_fail(&state).await?;
+    match QueriesService::list_top_products(&db_conn).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -80,8 +80,8 @@ pub async fn list_top_products(state: State<'_, AppState>) -> SResult<Vec<Select
 #[tauri::command]
 #[specta::specta]
 pub async fn list_status_count(state: State<'_, AppState>) -> SResult<StatusCountResponse> {
-    let _ = state.db_conn;
-    match QueriesService::list_status_count(&state.db_conn).await {
+    let db_conn = tenant_db_or_fail(&state).await?;
+    match QueriesService::list_status_count(&db_conn).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -99,8 +99,8 @@ pub async fn list_status_count(state: State<'_, AppState>) -> SResult<StatusCoun
 pub async fn list_financial_metrics(
     state: State<'_, AppState>,
 ) -> SResult<FinancialMetricsResponse> {
-    let _ = state.db_conn;
-    match QueriesService::list_financial_metrics(&state.db_conn).await {
+    let db_conn = tenant_db_or_fail(&state).await?;
+    match QueriesService::list_financial_metrics(&db_conn).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,

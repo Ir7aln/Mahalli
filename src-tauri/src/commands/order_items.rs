@@ -1,14 +1,15 @@
-use service::MutationsService;
+use tenant_service::MutationsService;
 use tauri::State;
 
 use crate::AppState;
 
-use super::{Fail, SResult, Success};
+use super::{tenant_db_or_fail, Fail, SResult, Success};
 
 #[tauri::command]
 #[specta::specta]
 pub async fn delete_order_item(state: State<'_, AppState>, id: String) -> SResult<u64> {
-    let res = MutationsService::delete_order_item(&state.db_conn, id).await;
+    let db_conn = tenant_db_or_fail(&state).await?;
+    let res = MutationsService::delete_order_item(&db_conn, id).await;
     match res {
         Ok(res) => Ok(Success {
             error: None,

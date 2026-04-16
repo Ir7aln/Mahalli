@@ -6,9 +6,9 @@ use apalis::{prelude::*, sqlite::SqliteStorage};
 use dirs;
 use log::warn;
 use serde::{Deserialize, Serialize};
-use tokio::sync::Mutex;
+use tokio::sync::{Mutex, RwLock};
 
-use service::{
+use tenant_service::{
     sea_orm::DatabaseConnection, MutationsService, UpdateClient, UpdateProduct, UpdateSupplier,
 };
 
@@ -66,9 +66,16 @@ impl ImageOptimizerJobStorage {
 
 pub async fn process_image(
     job: ImageProcessorJob,
-    db_conn: Data<DatabaseConnection>,
+    db_conn: Data<Arc<RwLock<Option<DatabaseConnection>>>>,
 ) -> Result<(), Error> {
     let processor = ImageProcessor::new(1920);
+    let active_db = match db_conn.read().await.clone() {
+        Some(connection) => connection,
+        None => {
+            warn!("skipping image job because no active tenant database is selected");
+            return Ok(());
+        }
+    };
 
     let home_dir = match dirs::data_dir() {
         Some(val) => val,
@@ -108,7 +115,7 @@ pub async fn process_image(
     let updated_entity = match job.entity {
         EntityEnum::CLIENT => {
             MutationsService::partial_update_client(
-                &db_conn,
+                &active_db,
                 UpdateClient {
                     id: job.id,
                     full_name: Option::None,
@@ -122,7 +129,7 @@ pub async fn process_image(
         }
         EntityEnum::SUPPLIER => {
             MutationsService::partial_update_supplier(
-                &db_conn,
+                &active_db,
                 UpdateSupplier {
                     id: job.id,
                     full_name: Option::None,
@@ -136,7 +143,7 @@ pub async fn process_image(
         }
         EntityEnum::PRODUCT => {
             MutationsService::partial_update_product(
-                &db_conn,
+                &active_db,
                 UpdateProduct {
                     id: job.id,
                     name: Option::None,
