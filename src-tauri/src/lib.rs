@@ -1,13 +1,9 @@
 use apalis::{
     layers::tracing::TraceLayer, prelude::*, sqlite::SqliteStorage, utils::TokioExecutor,
 };
-use std::sync::Arc;
-use db::{
-    manager::DatabaseManager,
-    paths::AppPaths,
-    system::setup_system_database,
-};
+use db::{manager::DatabaseManager, paths::AppPaths, system::setup_system_database};
 use jobs::{process_image, setup_jobs_database, ImageOptimizerJobStorage, ImageProcessorJob};
+use std::sync::Arc;
 use system_service::sea_orm::DatabaseConnection as SystemDatabaseConnection;
 use tenant_service::sea_orm::DatabaseConnection as TenantDatabaseConnection;
 use tokio::sync::RwLock;

@@ -1,13 +1,10 @@
 use tauri::State;
 
-use system_service::DatabaseRecord;
 use serde::{Deserialize, Serialize};
 use specta::Type;
+use system_service::DatabaseRecord;
 
-use crate::{
-    db::manager::CreateTenantDatabaseRequest,
-    AppState,
-};
+use crate::{db::manager::CreateTenantDatabaseRequest, AppState};
 
 use super::{Fail, SResult, Success};
 
@@ -41,7 +38,10 @@ pub async fn get_database_bootstrap_status(
     state: State<'_, AppState>,
 ) -> SResult<DatabaseBootstrapStatus> {
     let databases = state.db_manager().list_databases(state.system_db()).await;
-    let active_database = state.db_manager().get_active_database(state.system_db()).await;
+    let active_database = state
+        .db_manager()
+        .get_active_database(state.system_db())
+        .await;
 
     match (databases, active_database) {
         (Ok(databases), Ok(active_database)) => Ok(Success {
@@ -64,7 +64,11 @@ pub async fn get_database_bootstrap_status(
 #[tauri::command]
 #[specta::specta]
 pub async fn get_active_database(state: State<'_, AppState>) -> SResult<DatabaseRecord> {
-    match state.db_manager().get_active_database(state.system_db()).await {
+    match state
+        .db_manager()
+        .get_active_database(state.system_db())
+        .await
+    {
         Ok(Some(database)) => Ok(Success {
             error: None,
             message: None,
@@ -87,7 +91,11 @@ pub async fn create_database(
     state: State<'_, AppState>,
     input: CreateTenantDatabaseRequest,
 ) -> SResult<DatabaseRecord> {
-    match state.db_manager().create_database(state.system_db(), input).await {
+    match state
+        .db_manager()
+        .create_database(state.system_db(), input)
+        .await
+    {
         Ok(database) => {
             if database.is_active {
                 let tenant_db = state
@@ -117,7 +125,11 @@ pub async fn create_database(
 #[tauri::command]
 #[specta::specta]
 pub async fn switch_database(state: State<'_, AppState>, id: String) -> SResult<DatabaseRecord> {
-    match state.db_manager().switch_database(state.system_db(), id).await {
+    match state
+        .db_manager()
+        .switch_database(state.system_db(), id)
+        .await
+    {
         Ok((database, conn)) => {
             state.set_tenant_db(Some(conn)).await;
             Ok(Success {

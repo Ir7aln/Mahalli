@@ -11,11 +11,31 @@ impl MigrationTrait for Migration {
                 Table::create()
                     .table(Databases::Table)
                     .if_not_exists()
-                    .col(ColumnDef::new(Databases::Id).string().not_null().primary_key())
+                    .col(
+                        ColumnDef::new(Databases::Id)
+                            .string()
+                            .not_null()
+                            .primary_key(),
+                    )
                     .col(ColumnDef::new(Databases::Name).string().not_null())
-                    .col(ColumnDef::new(Databases::Slug).string().not_null().unique_key())
-                    .col(ColumnDef::new(Databases::FileName).string().not_null().unique_key())
-                    .col(ColumnDef::new(Databases::FilePath).string().not_null().unique_key())
+                    .col(
+                        ColumnDef::new(Databases::Slug)
+                            .string()
+                            .not_null()
+                            .unique_key(),
+                    )
+                    .col(
+                        ColumnDef::new(Databases::FileName)
+                            .string()
+                            .not_null()
+                            .unique_key(),
+                    )
+                    .col(
+                        ColumnDef::new(Databases::FilePath)
+                            .string()
+                            .not_null()
+                            .unique_key(),
+                    )
                     .col(
                         ColumnDef::new(Databases::IsActive)
                             .boolean()

@@ -3,7 +3,9 @@ pub mod mutations;
 pub mod queries;
 
 mod entities {
-    pub use system_entity::databases::{self, ActiveModel as DatabaseActiveModel, Entity as Databases};
+    pub use system_entity::databases::{
+        self, ActiveModel as DatabaseActiveModel, Entity as Databases,
+    };
 }
 
 pub use models::*;

@@ -1,6 +1,11 @@
-use sea_orm::{ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
+use sea_orm::{
+    ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter,
+};
 
-use crate::{entities::{databases, DatabaseActiveModel, Databases}, ActivateDatabaseInput, CreateDatabaseInput};
+use crate::{
+    entities::{databases, DatabaseActiveModel, Databases},
+    ActivateDatabaseInput, CreateDatabaseInput,
+};
 
 pub struct MutationsService;
 

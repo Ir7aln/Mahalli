@@ -5,7 +5,9 @@ use crate::{entities::Databases, DatabaseRecord};
 pub struct QueriesService;
 
 impl QueriesService {
-    pub async fn list_databases(db: &DatabaseConnection) -> Result<Vec<DatabaseRecord>, sea_orm::DbErr> {
+    pub async fn list_databases(
+        db: &DatabaseConnection,
+    ) -> Result<Vec<DatabaseRecord>, sea_orm::DbErr> {
         let models = Databases::find().all(db).await?;
         Ok(models
             .into_iter()

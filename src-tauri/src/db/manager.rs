@@ -38,7 +38,9 @@ impl DatabaseManager {
     ) -> Result<Option<TenantDbConnection>, String> {
         let active = self.get_active_database(system_db).await?;
         match active {
-            Some(active) => Ok(Some(open_tenant_database(Path::new(&active.file_path)).await)),
+            Some(active) => Ok(Some(
+                open_tenant_database(Path::new(&active.file_path)).await,
+            )),
             None => Ok(None),
         }
     }
@@ -112,9 +114,14 @@ impl DatabaseManager {
         system_db: &SystemDbConnection,
         database_id: String,
     ) -> Result<(DatabaseRecord, TenantDbConnection), String> {
-        SystemMutationsService::activate_database(system_db, ActivateDatabaseInput { id: database_id.clone() })
-            .await
-            .map_err(|err| err.to_string())?;
+        SystemMutationsService::activate_database(
+            system_db,
+            ActivateDatabaseInput {
+                id: database_id.clone(),
+            },
+        )
+        .await
+        .map_err(|err| err.to_string())?;
 
         let active = self
             .get_active_database(system_db)
