@@ -6,7 +6,7 @@ on:
 env:
   TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
   TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-  RELEASE_VERSION: 1.0.0
+  RELEASE_VERSION: 1.0.1
 
 jobs:
   create-release:
