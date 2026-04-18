@@ -2,7 +2,7 @@ use tauri::State;
 
 use serde::{Deserialize, Serialize};
 use specta::Type;
-use system_service::DatabaseRecord;
+use system_service::types::DatabaseRecord;
 
 use crate::{db::manager::CreateTenantDatabaseRequest, AppState};
 
