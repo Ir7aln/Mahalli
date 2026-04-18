@@ -1,4 +1,6 @@
-use sea_orm::{ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
+use sea_orm::{
+    ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter,
+};
 
 use crate::types::{ActivateDatabaseInput, CreateDatabaseInput, DatabaseRecord};
 
