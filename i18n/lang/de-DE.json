@@ -133,7 +133,9 @@
       "new": "Neue Datenbank",
       "create": "Erstellen",
       "creating": "Wird erstellt...",
-      "switch": "Wechseln"
+      "switch": "Wechseln",
+      "seed": "Beispieldaten",
+      "seeding": "Wird gefüllt..."
     },
     "fields": {
       "slug": "Slug",
@@ -163,7 +165,10 @@
       "create-card-note": "Neue Datenbanken können leer starten oder Daten aus einer bereits registrierten Datenbank kopieren.",
       "registered-title": "Registrierte Datenbanken",
       "registered-description": "Diese Einträge stammen aus der System-Katalogdatenbank.",
-      "empty-state": "Es sind noch keine Datenbanken registriert."
+      "empty-state": "Es sind noch keine Datenbanken registriert.",
+      "seed-title": "Datenbank mit Beispieldaten füllen",
+      "seed-description": "Füllen Sie die Datenbank mit Beispieldaten zum Testen und Entwickeln.",
+      "seed-card-note": "Dies fügt 200 Kunden, 200 Lieferanten, 400 Produkte, 100 Bestellungen, 100 Rechnungen und 150 Angebote mit Beispieldaten hinzu."
     },
     "create": {
       "title": "Datenbank erstellen",
@@ -199,7 +204,9 @@
       "choose-another": "Bitte wählen Sie eine andere Datenbank oder erstellen Sie eine neue.",
       "initial-create-error": "Ihre erste Datenbank konnte nicht erstellt werden.",
       "try-another-name": "Versuchen Sie einen anderen Namen oder wählen Sie eine andere Quelldatenbank.",
-      "ready": "Datenbank bereit."
+      "ready": "Datenbank bereit.",
+      "seed-success": "Datenbank erfolgreich mit Beispieldaten gefüllt",
+      "seed-error": "Datenbank konnte nicht mit Beispieldaten gefüllt werden"
     }
   },
   "notifications": {

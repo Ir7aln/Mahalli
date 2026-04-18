@@ -132,7 +132,9 @@
       "new": "Nouvelle base",
       "create": "Créer",
       "creating": "Création...",
-      "switch": "Basculer"
+      "switch": "Basculer",
+      "seed": "Données d'exemple",
+      "seeding": "Remplissage..."
     },
     "fields": {
       "slug": "Slug",
@@ -162,7 +164,10 @@
       "create-card-note": "Les nouvelles bases peuvent démarrer vides ou copier les données d'une base déjà enregistrée.",
       "registered-title": "Bases enregistrées",
       "registered-description": "Ces entrées proviennent de la base catalogue système.",
-      "empty-state": "Aucune base n'est encore enregistrée."
+      "empty-state": "Aucune base n'est encore enregistrée.",
+      "seed-title": "Remplir la base avec des données d'exemple",
+      "seed-description": "Remplissez la base avec des données d'exemple pour tester et développer.",
+      "seed-card-note": "Cela ajoutera 200 clients, 200 fournisseurs, 400 produits, 100 commandes, 100 factures et 150 devis avec des données d'exemple."
     },
     "create": {
       "title": "Créer une base",
@@ -198,7 +203,9 @@
       "choose-another": "Choisissez une autre base ou créez-en une nouvelle.",
       "initial-create-error": "Impossible de créer votre première base.",
       "try-another-name": "Essayez un autre nom ou choisissez une autre base source.",
-      "ready": "Base prête."
+      "ready": "Base prête.",
+      "seed-success": "La base a été remplie avec succès",
+      "seed-error": "Impossible de remplir la base"
     }
   },
   "notifications": {

@@ -2,6 +2,7 @@ mod models;
 mod mutations;
 mod queries;
 mod transactions;
+mod seed;
 
 mod entities {
     pub use tenant_entity::clients::{self, ActiveModel as ClientActiveModel, Entity as Clients};
@@ -35,5 +36,6 @@ pub use models::*;
 pub use mutations::*;
 pub use queries::*;
 pub use transactions::*;
+pub use seed::*;
 
 pub use sea_orm;

@@ -13,6 +13,7 @@ pub mod orders;
 pub mod products;
 pub mod quote_items;
 pub mod quotes;
+pub mod seed;
 pub mod suppliers;
 pub mod templates;
 

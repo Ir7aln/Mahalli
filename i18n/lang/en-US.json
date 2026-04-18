@@ -133,7 +133,9 @@
       "new": "New Database",
       "create": "Create",
       "creating": "Creating...",
-      "switch": "Switch"
+      "switch": "Switch",
+      "seed": "Seed Data",
+      "seeding": "Seeding..."
     },
     "fields": {
       "slug": "Slug",
@@ -163,7 +165,10 @@
       "create-card-note": "New databases can start empty or copy data from any previously registered database.",
       "registered-title": "Registered Databases",
       "registered-description": "These entries come from the system catalog database.",
-      "empty-state": "No databases are registered yet."
+      "empty-state": "No databases are registered yet.",
+      "seed-title": "Seed Database",
+      "seed-description": "Populate the database with sample data for testing and development.",
+      "seed-card-note": "This will add 200 clients, 200 suppliers, 400 products, 100 orders, 100 invoices, and 150 quotes with sample data."
     },
     "create": {
       "title": "Create Database",
@@ -199,7 +204,9 @@
       "choose-another": "Please choose another database or create a new one.",
       "initial-create-error": "Unable to create your first database.",
       "try-another-name": "Try another name or choose a different source database.",
-      "ready": "Database ready."
+      "ready": "Database ready.",
+      "seed-success": "Database seeded successfully",
+      "seed-error": "Unable to seed database"
     }
   },
   "notifications": {

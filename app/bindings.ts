@@ -65,6 +65,7 @@ export const commands = {
 	listTopProducts: () => typedError<Success<SelectTopProducts[]>, Fail>(__TAURI_INVOKE("list_top_products")),
 	listStatusCount: () => typedError<Success<StatusCountResponse>, Fail>(__TAURI_INVOKE("list_status_count")),
 	listFinancialMetrics: () => typedError<Success<FinancialMetricsResponse>, Fail>(__TAURI_INVOKE("list_financial_metrics")),
+	seedDatabase: () => typedError<Success<null>, Fail>(__TAURI_INVOKE("seed_database")),
 };
 
 /* Types */

@@ -1,0 +1,245 @@
+use std::ops::Range;
+
+use fake::{
+    faker::{
+        address::en::SecondaryAddress,
+        internet::en::FreeEmail,
+        lorem::en::{Sentence, Word},
+        name::en::Name,
+        phone_number::en::PhoneNumber,
+    },
+    Fake, Faker,
+};
+use sea_orm::{ConnectionTrait, DatabaseConnection, DbErr, Statement};
+
+fn get_random_item<T: Clone>(items: &[T]) -> T {
+    let idx = (Faker.fake::<u8>() as usize) % items.len();
+    items[idx].clone()
+}
+
+pub struct SeedService;
+
+impl SeedService {
+    pub async fn seed_database(db: &DatabaseConnection) -> Result<(), DbErr> {
+        Self::seed_clients(db).await?;
+        Self::seed_suppliers(db).await?;
+        Self::seed_products(db).await?;
+        Self::seed_orders(db).await?;
+        Self::seed_order_items(db).await?;
+        Self::seed_invoices(db).await?;
+        Self::seed_invoice_items(db).await?;
+        Self::seed_quotes(db).await?;
+        Self::seed_quote_items(db).await?;
+        Ok(())
+    }
+
+    async fn seed_clients(db: &DatabaseConnection) -> Result<(), DbErr> {
+        for _ in 0..200 {
+            let id = ulid::Ulid::new();
+            let full_name: String = Name().fake();
+            let phone_number: String = PhoneNumber().fake();
+            let email: String = FreeEmail().fake();
+            let address: String = SecondaryAddress().fake();
+
+            let insert = Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                r#"INSERT INTO clients (id, full_name, is_deleted, is_archived, phone_number, email, address) VALUES ($1, $2, $3, $4, $5, $6, $7)"#,
+                [
+                    id.to_string().into(),
+                    full_name.into(),
+                    false.into(),
+                    false.into(),
+                    phone_number.into(),
+                    email.into(),
+                    address.into(),
+                ],
+            );
+
+            db.execute(insert).await?;
+        }
+        Ok(())
+    }
+
+    async fn seed_suppliers(db: &DatabaseConnection) -> Result<(), DbErr> {
+        for _ in 0..200 {
+            let id = ulid::Ulid::new();
+            let full_name: String = Name().fake();
+            let phone_number: String = PhoneNumber().fake();
+            let email: String = FreeEmail().fake();
+            let address: String = SecondaryAddress().fake();
+
+            let insert = Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                r#"INSERT INTO suppliers (id, full_name, is_deleted, is_archived, phone_number, email, address) VALUES ($1, $2, $3, $4, $5, $6, $7)"#,
+                [
+                    id.to_string().into(),
+                    full_name.into(),
+                    false.into(),
+                    false.into(),
+                    phone_number.into(),
+                    email.into(),
+                    address.into(),
+                ],
+            );
+
+            db.execute(insert).await?;
+        }
+        Ok(())
+    }
+
+    async fn seed_products(db: &DatabaseConnection) -> Result<(), DbErr> {
+        for _ in 0..400 {
+            let id = ulid::Ulid::new();
+            let name: String = Word().fake();
+            let rand: u8 = Faker.fake();
+            let description: String = Sentence(Range { start: 5, end: 10 }).fake();
+            let purchase_price = (50..150).fake::<u8>();
+            let selling_price = (150..250).fake::<u8>();
+            let quantity: u8 = Faker.fake();
+
+            let insert = Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                r#"INSERT INTO products (id, name, is_deleted, is_archived, description, purchase_price, selling_price, min_quantity) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"#,
+                [
+                    id.to_string().into(),
+                    format!("{}-{}", name, rand).into(),
+                    false.into(),
+                    false.into(),
+                    description.into(),
+                    (purchase_price as f32).into(),
+                    (selling_price as f32).into(),
+                    (quantity as f32).into(),
+                ],
+            );
+
+            db.execute(insert).await?;
+
+            let inventory_id = ulid::Ulid::new();
+            let inventory_quantity: u8 = Faker.fake();
+            let insert_stock = Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                r#"INSERT INTO inventory_transactions (id, product_id, quantity, transaction_type) VALUES ($1, $2, $3, $4)"#,
+                [
+                    inventory_id.to_string().into(),
+                    id.to_string().into(),
+                    (inventory_quantity as f32).into(),
+                    String::from("IN").into(),
+                ],
+            );
+
+            db.execute(insert_stock).await?;
+        }
+        Ok(())
+    }
+
+    async fn seed_orders(db: &DatabaseConnection) -> Result<(), DbErr> {
+        let statuses = vec!["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
+
+        for _ in 0..100 {
+            let id = ulid::Ulid::new();
+            let status = get_random_item(&statuses);
+            let insert_order = Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                r#"INSERT INTO orders (id, status, client_id) VALUES ($1, $2, (SELECT id FROM clients ORDER BY RANDOM() LIMIT 1))"#,
+                [id.to_string().into(), status.to_string().into()],
+            );
+            db.execute(insert_order).await?;
+        }
+        Ok(())
+    }
+
+    async fn seed_order_items(db: &DatabaseConnection) -> Result<(), DbErr> {
+        for _ in 0..1000 {
+            let _id = ulid::Ulid::new();
+            let quantity: u8 = Faker.fake();
+            let insert_inventory = Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                r#"INSERT INTO inventory_transactions (id, transaction_type, quantity, product_id) VALUES ($1, $2, $3, (SELECT id FROM products ORDER BY RANDOM() LIMIT 1))"#,
+                [
+                    _id.to_string().into(),
+                    String::from("OUT").into(),
+                    (quantity as f32).into(),
+                ],
+            );
+            db.execute(insert_inventory).await?;
+
+            let id = ulid::Ulid::new();
+            let price: u8 = Faker.fake();
+            let insert_order = Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                r#"INSERT INTO order_items (id, price, order_id, inventory_id) VALUES ($1, $2, (SELECT id FROM orders ORDER BY RANDOM() LIMIT 1), $3)"#,
+                [id.to_string().into(), (price as f32).into(), _id.to_string().into()],
+            );
+            db.execute(insert_order).await?;
+        }
+        Ok(())
+    }
+
+    async fn seed_invoices(db: &DatabaseConnection) -> Result<(), DbErr> {
+        let statuses = vec!["DRAFT", "SENT", "PAID", "PARTIALLY_PAID", "OVERDUE", "CANCELLED"];
+
+        for _ in 0..100 {
+            let id = ulid::Ulid::new();
+            let status = get_random_item(&statuses);
+            let paid: u8 = Faker.fake();
+            let insert_invoice = Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                r#"INSERT INTO invoices (id, status, client_id, paid_amount, order_id) VALUES ($1, $2, (SELECT id FROM clients ORDER BY RANDOM() LIMIT 1), $3, (SELECT id FROM orders ORDER BY RANDOM() LIMIT 1)) ON CONFLICT DO NOTHING"#,
+                [id.to_string().into(), status.to_string().into(), (paid as f32).into()],
+            );
+            db.execute(insert_invoice).await?;
+        }
+
+        let fix_client_id = Statement::from_string(
+            sea_orm::DatabaseBackend::Sqlite,
+            "UPDATE invoices SET client_id = (SELECT client_id FROM orders WHERE id = order_id);".to_string(),
+        );
+
+        db.execute(fix_client_id).await?;
+
+        Ok(())
+    }
+
+    async fn seed_invoice_items(db: &DatabaseConnection) -> Result<(), DbErr> {
+        for _ in 0..300 {
+            let id = ulid::Ulid::new();
+            let price: u8 = Faker.fake();
+            let quantity: u8 = Faker.fake();
+            let insert_item = Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                r#"INSERT INTO invoice_items (id, invoice_id, product_id, price, quantity, inventory_id) VALUES ($1, (SELECT id FROM invoices ORDER BY RANDOM() LIMIT 1), (SELECT id FROM products ORDER BY RANDOM() LIMIT 1), $2, $3, (SELECT id FROM inventory_transactions ORDER BY RANDOM() LIMIT 1))"#,
+                [id.to_string().into(), (price as f32).into(), (quantity as f32).into()],
+            );
+            db.execute(insert_item).await?;
+        }
+        Ok(())
+    }
+
+    async fn seed_quotes(db: &DatabaseConnection) -> Result<(), DbErr> {
+        for _ in 0..150 {
+            let id = ulid::Ulid::new();
+            let insert_quote = Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                r#"INSERT INTO quotes (id, client_id) VALUES ($1, (SELECT id FROM clients ORDER BY RANDOM() LIMIT 1))"#,
+                [id.to_string().into()],
+            );
+            db.execute(insert_quote).await?;
+        }
+        Ok(())
+    }
+
+    async fn seed_quote_items(db: &DatabaseConnection) -> Result<(), DbErr> {
+        for _ in 0..1000 {
+            let id = ulid::Ulid::new();
+            let price: u8 = Faker.fake();
+            let quantity: u8 = Faker.fake();
+            let insert_quote = Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                r#"INSERT INTO quote_items (id, price, product_id, quote_id, quantity) VALUES ($1, $2, (SELECT id FROM products ORDER BY RANDOM() LIMIT 1), (SELECT id FROM quotes ORDER BY RANDOM() LIMIT 1), $3)"#,
+                [id.to_string().into(), (price as f32).into(), (quantity as f32).into()],
+            );
+            db.execute(insert_quote).await?;
+        }
+        Ok(())
+    }
+}

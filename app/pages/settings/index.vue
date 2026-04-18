@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import * as Logger from "@tauri-apps/plugin-log";
-import { Plus, RefreshCw } from "lucide-vue-next";
+import { Plus, RefreshCw, Database } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import { commands, type DatabaseRecord } from "@/bindings";
 import { DatabaseCreate } from "#components";
@@ -11,6 +11,7 @@ const { status, refreshStatus } = useDatabaseBootstrap();
 const modal = useModal();
 
 const refreshKey = ref(0);
+const seeding = ref(false);
 
 const { data: databasesData, refresh: refreshDatabases, pending } = await useAsyncData(
   "settings-databases",
@@ -67,6 +68,27 @@ async function switchDatabase(id: string) {
 
   await refreshPage();
 }
+
+async function seedDatabase() {
+  seeding.value = true;
+  const result = await commands.seedDatabase();
+
+  if (result.status === "error") {
+    toast.error(t("notifications.error.title"), {
+      description: t("database.notifications.seed-error"),
+      closeButton: true,
+    });
+    Logger.error(`SEED DATABASE: ${JSON.stringify(result.error)}`);
+    seeding.value = false;
+    return;
+  }
+
+  toast.success(t("database.notifications.seed-success"), {
+    closeButton: true,
+  });
+
+  seeding.value = false;
+}
 </script>
 
 <template>
@@ -113,20 +135,39 @@ async function switchDatabase(id: string) {
       </section>
 
       <section class="grid gap-6 xl:grid-cols-[380px_minmax(0,1fr)]">
-        <div class="rounded-md border border-slate-200 bg-white p-6 shadow-sm text-left rtl:text-right">
-          <h2 class="text-lg font-semibold text-slate-900">{{ t("database.create.title") }}</h2>
-          <p class="mt-1 text-sm text-slate-500">
-            {{ t("database.settings.create-card-description") }}
-          </p>
-
-          <div class="mt-5 rounded-md border border-slate-200 bg-slate-50 p-4">
-            <p class="text-sm text-slate-600">
-              {{ t("database.settings.create-card-note") }}
+        <div class="flex flex-col gap-6">
+          <div class="rounded-md border border-slate-200 bg-white p-6 shadow-sm text-left rtl:text-right">
+            <h2 class="text-lg font-semibold text-slate-900">{{ t("database.create.title") }}</h2>
+            <p class="mt-1 text-sm text-slate-500">
+              {{ t("database.settings.create-card-description") }}
             </p>
-            <Button class="mt-4 w-full gap-2 rtl:flex-row-reverse" :disabled="pending" @click="openCreateDatabaseModal">
-              <Plus :size="16" />
-              {{ t("database.actions.new") }}
-            </Button>
+
+            <div class="mt-5 rounded-md border border-slate-200 bg-slate-50 p-4">
+              <p class="text-sm text-slate-600">
+                {{ t("database.settings.create-card-note") }}
+              </p>
+              <Button class="mt-4 w-full gap-2 rtl:flex-row-reverse" :disabled="pending" @click="openCreateDatabaseModal">
+                <Plus :size="16" />
+                {{ t("database.actions.new") }}
+              </Button>
+            </div>
+          </div>
+
+          <div class="rounded-md border border-slate-200 bg-white p-6 shadow-sm text-left rtl:text-right">
+            <h2 class="text-lg font-semibold text-slate-900">{{ t("database.settings.seed-title") }}</h2>
+            <p class="mt-1 text-sm text-slate-500">
+              {{ t("database.settings.seed-description") }}
+            </p>
+
+            <div class="mt-5 rounded-md border border-slate-200 bg-slate-50 p-4">
+              <p class="text-sm text-slate-600">
+                {{ t("database.settings.seed-card-note") }}
+              </p>
+              <Button class="mt-4 w-full gap-2 rtl:flex-row-reverse" :disabled="seeding || pending" :loading="seeding" @click="seedDatabase">
+                <Database :size="16" />
+                {{ seeding ? t("database.actions.seeding") : t("database.actions.seed") }}
+              </Button>
+            </div>
           </div>
         </div>
 

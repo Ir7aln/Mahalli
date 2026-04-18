@@ -65,6 +65,7 @@ pub fn builder<R: Runtime>() -> Builder<R> {
         commands::dashboard::list_top_products,
         commands::dashboard::list_status_count,
         commands::dashboard::list_financial_metrics,
+        commands::seed::seed_database,
     ])
 }
 

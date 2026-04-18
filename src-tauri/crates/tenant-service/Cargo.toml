@@ -10,6 +10,8 @@ tenant-entity = { path = "../tenant-entity" }
 serde = { version = "1.0.192", features = ["derive"] }
 serde_json = "1.0"
 specta = { version = "=2.0.0-rc.24", features = ["derive", "function", "serde_json"] }
+fake = { version = "2.9.2", features = ["derive"] }
+ulid = "1.1.2"
 
 [dependencies.sea-orm]
 version = "0.12.4" # sea-orm version

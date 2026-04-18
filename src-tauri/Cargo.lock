@@ -2778,7 +2778,7 @@ dependencies = [
 
 [[package]]
 name = "mahalli"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "dirs 5.0.1",
  "dotenvy",
@@ -6018,22 +6018,21 @@ name = "tenant-migration"
 version = "0.1.0"
 dependencies = [
  "async-std",
- "fake",
- "regex",
  "sea-orm-migration",
- "ulid",
 ]
 
 [[package]]
 name = "tenant-service"
 version = "0.1.0"
 dependencies = [
+ "fake",
  "sea-orm",
  "serde",
  "serde_json",
  "specta",
  "tenant-entity",
  "tokio",
+ "ulid",
 ]
 
 [[package]]
