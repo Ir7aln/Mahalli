@@ -168,7 +168,11 @@ impl SeedService {
             let insert_order = Statement::from_sql_and_values(
                 sea_orm::DatabaseBackend::Sqlite,
                 r#"INSERT INTO order_items (id, price, order_id, inventory_id) VALUES ($1, $2, (SELECT id FROM orders ORDER BY RANDOM() LIMIT 1), $3)"#,
-                [id.to_string().into(), (price as f32).into(), _id.to_string().into()],
+                [
+                    id.to_string().into(),
+                    (price as f32).into(),
+                    _id.to_string().into(),
+                ],
             );
             db.execute(insert_order).await?;
         }
@@ -176,7 +180,14 @@ impl SeedService {
     }
 
     async fn seed_invoices(db: &DatabaseConnection) -> Result<(), DbErr> {
-        let statuses = vec!["DRAFT", "SENT", "PAID", "PARTIALLY_PAID", "OVERDUE", "CANCELLED"];
+        let statuses = vec![
+            "DRAFT",
+            "SENT",
+            "PAID",
+            "PARTIALLY_PAID",
+            "OVERDUE",
+            "CANCELLED",
+        ];
 
         for _ in 0..100 {
             let id = ulid::Ulid::new();
@@ -185,14 +196,19 @@ impl SeedService {
             let insert_invoice = Statement::from_sql_and_values(
                 sea_orm::DatabaseBackend::Sqlite,
                 r#"INSERT INTO invoices (id, status, client_id, paid_amount, order_id) VALUES ($1, $2, (SELECT id FROM clients ORDER BY RANDOM() LIMIT 1), $3, (SELECT id FROM orders ORDER BY RANDOM() LIMIT 1)) ON CONFLICT DO NOTHING"#,
-                [id.to_string().into(), status.to_string().into(), (paid as f32).into()],
+                [
+                    id.to_string().into(),
+                    status.to_string().into(),
+                    (paid as f32).into(),
+                ],
             );
             db.execute(insert_invoice).await?;
         }
 
         let fix_client_id = Statement::from_string(
             sea_orm::DatabaseBackend::Sqlite,
-            "UPDATE invoices SET client_id = (SELECT client_id FROM orders WHERE id = order_id);".to_string(),
+            "UPDATE invoices SET client_id = (SELECT client_id FROM orders WHERE id = order_id);"
+                .to_string(),
         );
 
         db.execute(fix_client_id).await?;
@@ -208,7 +224,11 @@ impl SeedService {
             let insert_item = Statement::from_sql_and_values(
                 sea_orm::DatabaseBackend::Sqlite,
                 r#"INSERT INTO invoice_items (id, invoice_id, product_id, price, quantity, inventory_id) VALUES ($1, (SELECT id FROM invoices ORDER BY RANDOM() LIMIT 1), (SELECT id FROM products ORDER BY RANDOM() LIMIT 1), $2, $3, (SELECT id FROM inventory_transactions ORDER BY RANDOM() LIMIT 1))"#,
-                [id.to_string().into(), (price as f32).into(), (quantity as f32).into()],
+                [
+                    id.to_string().into(),
+                    (price as f32).into(),
+                    (quantity as f32).into(),
+                ],
             );
             db.execute(insert_item).await?;
         }
@@ -236,7 +256,11 @@ impl SeedService {
             let insert_quote = Statement::from_sql_and_values(
                 sea_orm::DatabaseBackend::Sqlite,
                 r#"INSERT INTO quote_items (id, price, product_id, quote_id, quantity) VALUES ($1, $2, (SELECT id FROM products ORDER BY RANDOM() LIMIT 1), (SELECT id FROM quotes ORDER BY RANDOM() LIMIT 1), $3)"#,
-                [id.to_string().into(), (price as f32).into(), (quantity as f32).into()],
+                [
+                    id.to_string().into(),
+                    (price as f32).into(),
+                    (quantity as f32).into(),
+                ],
             );
             db.execute(insert_quote).await?;
         }
