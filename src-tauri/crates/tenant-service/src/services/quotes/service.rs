@@ -3,17 +3,17 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 
+use super::types::{
+    ListQuotesArgs, NewQuote, QuoteClientInfo, QuoteDetailsResponse, QuoteProductItem,
+    QuoteWithClient, QuotesResponse, SelectQuoteDetails, SelectQuotes, SelectQuotesItems,
+    SelectQuotesItemsForUpdate, UpdateQuote,
+};
 use tenant_entity::{
     clients::{self, Entity as Clients},
     inventory_transactions,
     products::{self, Entity as Products},
     quote_items::{self, ActiveModel as QuoteItemActiveModel, Entity as QuoteItems},
     quotes::{self, ActiveModel as QuoteActiveModel, Entity as Quotes},
-};
-use super::types::{
-    ListQuotesArgs, NewQuote, QuoteClientInfo, QuoteDetailsResponse, QuoteProductItem,
-    QuoteWithClient, QuotesResponse, SelectQuoteDetails, SelectQuotes, SelectQuotesItems,
-    SelectQuotesItemsForUpdate, UpdateQuote,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
@@ -126,10 +126,16 @@ impl Service {
                 );
             }
             Some("products") => {
-                query.order_by_expr(Expr::cust("products"), requested_order(args.direction.as_deref()));
+                query.order_by_expr(
+                    Expr::cust("products"),
+                    requested_order(args.direction.as_deref()),
+                );
             }
             Some("total") => {
-                query.order_by_expr(Expr::cust("total"), requested_order(args.direction.as_deref()));
+                query.order_by_expr(
+                    Expr::cust("total"),
+                    requested_order(args.direction.as_deref()),
+                );
             }
             Some("created_at") => {
                 query.order_by(

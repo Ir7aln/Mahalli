@@ -1,8 +1,14 @@
 use sea_orm::{
-    sea_query::{Alias, Cond, Expr, Func, Query, SimpleExpr, SqliteQueryBuilder, SubQueryStatement},
+    sea_query::{
+        Alias, Cond, Expr, Func, Query, SimpleExpr, SqliteQueryBuilder, SubQueryStatement,
+    },
     DatabaseConnection as DbConn, *,
 };
 
+use super::types::{
+    FinancialMetricsResponse, Finiacialmetrics, SelectStatusCount, SelectTopProducts, SelectTops,
+    SelectTransaction, StatusCountResponse,
+};
 use tenant_entity::{
     clients::{self, Entity as Clients},
     inventory_transactions::{self, Entity as InventoryTransactions},
@@ -11,10 +17,6 @@ use tenant_entity::{
     orders::{self, Entity as Orders},
     products::{self, Entity as Products},
     suppliers::{self, Entity as Suppliers},
-};
-use super::types::{
-    FinancialMetricsResponse, Finiacialmetrics, SelectStatusCount, SelectTops, SelectTopProducts,
-    SelectTransaction, StatusCountResponse,
 };
 
 pub struct Service;
@@ -219,10 +221,12 @@ impl Service {
                 Expr::col((InventoryTransactions, inventory_transactions::Column::Id))
                     .equals((OrderItems, order_items::Column::InventoryId)),
             )
-            .cond_where(Cond::all().add(
-                Expr::expr(Expr::col((Invoices, invoices::Column::Status)))
-                    .is_not_in(["CANCELLED", "DRAFT"]),
-            ))
+            .cond_where(
+                Cond::all().add(
+                    Expr::expr(Expr::col((Invoices, invoices::Column::Status)))
+                        .is_not_in(["CANCELLED", "DRAFT"]),
+                ),
+            )
             .add_group_by([Expr::col((Clients, clients::Column::Id)).into()])
             .order_by_expr(
                 Func::sum(
@@ -287,10 +291,12 @@ impl Service {
                 Expr::col((InventoryTransactions, inventory_transactions::Column::Id))
                     .equals((OrderItems, order_items::Column::InventoryId)),
             )
-            .cond_where(Cond::all().add(
-                Expr::expr(Expr::col((Orders, orders::Column::Status)))
-                    .is_not_in(["CANCELLED", "PENDING"]),
-            ))
+            .cond_where(
+                Cond::all().add(
+                    Expr::expr(Expr::col((Orders, orders::Column::Status)))
+                        .is_not_in(["CANCELLED", "PENDING"]),
+                ),
+            )
             .add_group_by([Expr::col((Suppliers, suppliers::Column::Id)).into()])
             .order_by_expr(
                 Func::sum(
@@ -601,11 +607,9 @@ impl Service {
             .to_owned()
             .build(SqliteQueryBuilder);
 
-        let res: Finiacialmetrics = Finiacialmetrics::find_by_statement(Statement::from_sql_and_values(
-            DbBackend::Sqlite,
-            sql,
-            values,
-        ))
+        let res: Finiacialmetrics = Finiacialmetrics::find_by_statement(
+            Statement::from_sql_and_values(DbBackend::Sqlite, sql, values),
+        )
         .one(db)
         .await?
         .ok_or(DbErr::Custom("No data found".to_string()))?;

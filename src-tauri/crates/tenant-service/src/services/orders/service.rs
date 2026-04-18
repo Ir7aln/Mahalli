@@ -3,19 +3,21 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 
-use tenant_entity::{
-    clients::{self, Entity as Clients},
-    inventory_transactions::{self, ActiveModel as InventoryActiveModel, Entity as InventoryTransactions},
-    order_items::{self, ActiveModel as OrderItemActiveModel, Entity as OrderItems},
-    orders::{self, ActiveModel as OrderActiveModel, Entity as Orders},
-    products::{self, Entity as Products},
-    quotes::Entity as Quotes,
-    quote_items::{self, Entity as QuoteItems},
-};
 use super::types::{
     ListOrdersArgs, NewOrder, OrderClientInfo, OrderDetailsResponse, OrderProductItem,
     OrderWithClient, OrdersResponse, SelectOrderDetails, SelectOrders, SelectOrdersItems,
     SelectOrdersItemsForUpdate, UpdateOrder, UpdateOrderStatus,
+};
+use tenant_entity::{
+    clients::{self, Entity as Clients},
+    inventory_transactions::{
+        self, ActiveModel as InventoryActiveModel, Entity as InventoryTransactions,
+    },
+    order_items::{self, ActiveModel as OrderItemActiveModel, Entity as OrderItems},
+    orders::{self, ActiveModel as OrderActiveModel, Entity as Orders},
+    products::{self, Entity as Products},
+    quote_items::{self, Entity as QuoteItems},
+    quotes::Entity as Quotes,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
@@ -78,8 +80,11 @@ impl Service {
             .expr_as(
                 Func::coalesce([
                     Func::sum(
-                        Expr::col((InventoryTransactions, inventory_transactions::Column::Quantity))
-                            .mul(Expr::col((OrderItems, order_items::Column::Price))),
+                        Expr::col((
+                            InventoryTransactions,
+                            inventory_transactions::Column::Quantity,
+                        ))
+                        .mul(Expr::col((OrderItems, order_items::Column::Price))),
                     )
                     .into(),
                     Expr::val(0.0f64).into(),
@@ -144,7 +149,10 @@ impl Service {
                 );
             }
             Some("products") => {
-                query.order_by_expr(Expr::cust("products"), requested_order(args.direction.as_deref()));
+                query.order_by_expr(
+                    Expr::cust("products"),
+                    requested_order(args.direction.as_deref()),
+                );
             }
             Some("status") => {
                 query.order_by(
@@ -153,7 +161,10 @@ impl Service {
                 );
             }
             Some("total") => {
-                query.order_by_expr(Expr::cust("total"), requested_order(args.direction.as_deref()));
+                query.order_by_expr(
+                    Expr::cust("total"),
+                    requested_order(args.direction.as_deref()),
+                );
             }
             Some("created_at") => {
                 query.order_by(
@@ -195,7 +206,10 @@ impl Service {
                         Expr::col((OrderItems, order_items::Column::Id)),
                         Expr::col((OrderItems, order_items::Column::InventoryId)),
                         Expr::col((OrderItems, order_items::Column::Price)),
-                        Expr::col((InventoryTransactions, inventory_transactions::Column::Quantity)),
+                        Expr::col((
+                            InventoryTransactions,
+                            inventory_transactions::Column::Quantity,
+                        )),
                         Expr::col((Products, products::Column::Name)),
                     ])
                     .expr_as(
@@ -251,7 +265,10 @@ impl Service {
             .columns([order_items::Column::Price])
             .exprs([
                 Expr::col((Products, products::Column::Name)),
-                Expr::col((InventoryTransactions, inventory_transactions::Column::Quantity)),
+                Expr::col((
+                    InventoryTransactions,
+                    inventory_transactions::Column::Quantity,
+                )),
             ])
             .join(
                 JoinType::Join,
@@ -285,8 +302,11 @@ impl Service {
             .expr_as(
                 Func::coalesce([
                     Func::sum(
-                        Expr::col((InventoryTransactions, inventory_transactions::Column::Quantity))
-                            .mul(Expr::col((OrderItems, order_items::Column::Price))),
+                        Expr::col((
+                            InventoryTransactions,
+                            inventory_transactions::Column::Quantity,
+                        ))
+                        .mul(Expr::col((OrderItems, order_items::Column::Price))),
                     )
                     .into(),
                     Expr::val(0.0f64).into(),
@@ -326,7 +346,10 @@ impl Service {
                 let (sql, values) = Query::select()
                     .exprs([
                         Expr::col((OrderItems, order_items::Column::Price)),
-                        Expr::col((InventoryTransactions, inventory_transactions::Column::Quantity)),
+                        Expr::col((
+                            InventoryTransactions,
+                            inventory_transactions::Column::Quantity,
+                        )),
                         Expr::col((Products, products::Column::Name)),
                     ])
                     .from(OrderItems)
@@ -375,7 +398,10 @@ impl Service {
         }
     }
 
-    pub async fn create_order(db: &DbConn, order: NewOrder) -> Result<String, TransactionError<DbErr>> {
+    pub async fn create_order(
+        db: &DbConn,
+        order: NewOrder,
+    ) -> Result<String, TransactionError<DbErr>> {
         db.transaction::<_, String, DbErr>(|txn| {
             Box::pin(async move {
                 let created_order = OrderActiveModel {
@@ -415,7 +441,10 @@ impl Service {
         .await
     }
 
-    pub async fn update_order(db: &DbConn, order: UpdateOrder) -> Result<(), TransactionError<DbErr>> {
+    pub async fn update_order(
+        db: &DbConn,
+        order: UpdateOrder,
+    ) -> Result<(), TransactionError<DbErr>> {
         db.transaction::<_, (), DbErr>(|txn| {
             Box::pin(async move {
                 let order_model = Orders::find_by_id(order.id.clone()).one(txn).await?;

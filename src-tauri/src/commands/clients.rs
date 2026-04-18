@@ -3,8 +3,8 @@ use tauri::State;
 use tenant_service::services::clients::{
     service::{MutationsService, QueriesService},
     types::{
-        Client, ClientDetails, ClientInvoiceDebtItem, ClientSearch, ClientsResponse, ListClientsArgs,
-        NewClient,
+        Client, ClientDetails, ClientInvoiceDebtItem, ClientSearch, ClientsResponse,
+        ListClientsArgs, NewClient,
     },
 };
 

@@ -1,7 +1,7 @@
 use sea_orm::*;
 
-use tenant_entity::templates::ActiveModel as TemplateActiveModel;
 use super::types::NewTemplate;
+use tenant_entity::templates::ActiveModel as TemplateActiveModel;
 
 pub struct Service;
 

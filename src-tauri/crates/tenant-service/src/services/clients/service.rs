@@ -1,16 +1,18 @@
 use sea_orm::{
-    sea_query::{Alias, Cond, Expr, Func, Query, SimpleExpr, SqliteQueryBuilder, SubQueryStatement},
+    sea_query::{
+        Alias, Cond, Expr, Func, Query, SimpleExpr, SqliteQueryBuilder, SubQueryStatement,
+    },
     DatabaseConnection as DbConn, *,
 };
 
+use super::types::{
+    Client, ClientDetails, ClientInvoiceDebtItem, ClientSearch, ClientsResponse, ListClientsArgs,
+    NewClient, SelectClients, UpdateClient,
+};
 use tenant_entity::{
     clients::{self, ActiveModel as ClientActiveModel, Entity as Clients},
     invoice_items::{self, Entity as InvoiceItems},
     invoices::{self, Entity as Invoices},
-};
-use super::types::{
-    Client, ClientDetails, ClientInvoiceDebtItem, ClientSearch, ClientsResponse, ListClientsArgs,
-    NewClient, SelectClients, UpdateClient,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
@@ -42,10 +44,11 @@ fn client_credit_expr() -> SimpleExpr {
                 )
                 .cond_where(
                     Cond::all()
-                        .add(
-                            Expr::col((Invoices, invoices::Column::Status))
-                                .is_not_in(["CANCELLED", "DRAFT", "PAID"]),
-                        )
+                        .add(Expr::col((Invoices, invoices::Column::Status)).is_not_in([
+                            "CANCELLED",
+                            "DRAFT",
+                            "PAID",
+                        ]))
                         .add(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
                         .add(
                             Expr::col((Invoices, invoices::Column::ClientId))
@@ -66,10 +69,11 @@ fn client_credit_expr() -> SimpleExpr {
                 ])))
                 .cond_where(
                     Cond::all()
-                        .add(
-                            Expr::col((Invoices, invoices::Column::Status))
-                                .is_not_in(["CANCELLED", "DRAFT", "PAID"]),
-                        )
+                        .add(Expr::col((Invoices, invoices::Column::Status)).is_not_in([
+                            "CANCELLED",
+                            "DRAFT",
+                            "PAID",
+                        ]))
                         .add(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
                         .add(
                             Expr::col((Invoices, invoices::Column::ClientId))
@@ -87,7 +91,10 @@ pub type QueriesService = Service;
 pub type MutationsService = Service;
 
 impl Service {
-    pub async fn list_clients(db: &DbConn, args: ListClientsArgs) -> Result<ClientsResponse, DbErr> {
+    pub async fn list_clients(
+        db: &DbConn,
+        args: ListClientsArgs,
+    ) -> Result<ClientsResponse, DbErr> {
         let count = Clients::find()
             .filter(
                 Cond::all()
@@ -132,7 +139,10 @@ impl Service {
                 );
             }
             Some("email") => {
-                query.order_by(clients::Column::Email, requested_order(args.direction.as_deref()));
+                query.order_by(
+                    clients::Column::Email,
+                    requested_order(args.direction.as_deref()),
+                );
             }
             Some("phone_number") => {
                 query.order_by(
@@ -147,7 +157,10 @@ impl Service {
                 );
             }
             Some("credit") => {
-                query.order_by_expr(Expr::cust("credit"), requested_order(args.direction.as_deref()));
+                query.order_by_expr(
+                    Expr::cust("credit"),
+                    requested_order(args.direction.as_deref()),
+                );
             }
             _ => {
                 query.order_by(clients::Column::CreatedAt, Order::Desc);

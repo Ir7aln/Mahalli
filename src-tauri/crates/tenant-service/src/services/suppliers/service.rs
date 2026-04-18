@@ -3,13 +3,11 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 
-use tenant_entity::{
-    suppliers::{self, ActiveModel as SupplierActiveModel, Entity as Suppliers},
-};
 use super::types::{
     ListSuppliersArgs, NewSupplier, SelectSuppliers, Supplier, SupplierSearch, SuppliersResponse,
     UpdateSupplier,
 };
+use tenant_entity::suppliers::{self, ActiveModel as SupplierActiveModel, Entity as Suppliers};
 
 fn requested_order(direction: Option<&str>) -> Order {
     if matches!(direction, Some("asc")) {

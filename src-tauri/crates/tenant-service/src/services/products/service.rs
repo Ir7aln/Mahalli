@@ -1,17 +1,19 @@
 use sea_orm::{
-    sea_query::{Alias, Cond, Expr, Func, Query, SimpleExpr, SqliteQueryBuilder, SubQueryStatement},
+    sea_query::{
+        Alias, Cond, Expr, Func, Query, SimpleExpr, SqliteQueryBuilder, SubQueryStatement,
+    },
     DatabaseConnection as DbConn, *,
 };
 
+use super::types::{
+    ListProductsArgs, NewProduct, Product, ProductSearch, ProductsResponse, SelectProducts,
+    UpdateProduct,
+};
 use tenant_entity::{
     inventory_transactions::{self, Entity as InventoryTransactions},
     order_items::{self, Entity as OrderItems},
     orders::{self, Entity as Orders},
     products::{self, ActiveModel as ProductActiveModel, Entity as Products},
-};
-use super::types::{
-    ListProductsArgs, NewProduct, Product, ProductSearch, ProductsResponse, SelectProducts,
-    UpdateProduct,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
@@ -140,10 +142,16 @@ impl Service {
             .offset((args.page - 1) * args.limit);
         match args.sort.as_deref() {
             Some("name") => {
-                query.order_by(products::Column::Name, requested_order(args.direction.as_deref()));
+                query.order_by(
+                    products::Column::Name,
+                    requested_order(args.direction.as_deref()),
+                );
             }
             Some("inventory") => {
-                query.order_by_expr(Expr::cust("inventory"), requested_order(args.direction.as_deref()));
+                query.order_by_expr(
+                    Expr::cust("inventory"),
+                    requested_order(args.direction.as_deref()),
+                );
             }
             Some("min_quantity") => {
                 query.order_by(

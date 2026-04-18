@@ -3,14 +3,14 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 
+use super::types::{InventoryResponse, ListInventoryArgs, NewInventory, SelectInventory};
 use tenant_entity::{
-    inventory_transactions::{self, ActiveModel as InventoryActiveModel, Entity as InventoryTransactions},
+    inventory_transactions::{
+        self, ActiveModel as InventoryActiveModel, Entity as InventoryTransactions,
+    },
     order_items::{self, Entity as OrderItems},
     orders::{self, Entity as Orders},
     products::{self, Entity as Products},
-};
-use super::types::{
-    InventoryResponse, ListInventoryArgs, NewInventory, SelectInventory,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
@@ -169,7 +169,10 @@ impl Service {
                 requested_order(args.direction.as_deref()),
             ),
             Some("quantity") => query.order_by(
-                (InventoryTransactions, inventory_transactions::Column::Quantity),
+                (
+                    InventoryTransactions,
+                    inventory_transactions::Column::Quantity,
+                ),
                 requested_order(args.direction.as_deref()),
             ),
             Some("transaction_type") => query.order_by(
@@ -180,11 +183,17 @@ impl Service {
                 requested_order(args.direction.as_deref()),
             ),
             Some("created_at") => query.order_by(
-                (InventoryTransactions, inventory_transactions::Column::CreatedAt),
+                (
+                    InventoryTransactions,
+                    inventory_transactions::Column::CreatedAt,
+                ),
                 requested_order(args.direction.as_deref()),
             ),
             _ => query.order_by(
-                (InventoryTransactions, inventory_transactions::Column::CreatedAt),
+                (
+                    InventoryTransactions,
+                    inventory_transactions::Column::CreatedAt,
+                ),
                 Order::Desc,
             ),
         };

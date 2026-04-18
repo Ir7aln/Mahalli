@@ -1,22 +1,24 @@
+use sea_orm::entity::prelude::Decimal;
 use sea_orm::{
     sea_query::{Alias, Cond, Expr, Func, Query, SqliteQueryBuilder},
     DatabaseConnection as DbConn, *,
 };
-use sea_orm::entity::prelude::Decimal;
 
+use super::types::{
+    InvoiceClientInfo, InvoiceDetailsResponse, InvoiceProductItem, InvoiceWithClient,
+    InvoicesResponse, ListInvoicesArgs, NewInvoice, SelectInvoiceDetails, SelectInvoices,
+    SelectInvoicesItems, SelectInvoicesItemsForUpdate, UpdateInvoice, UpdateInvoiceStatus,
+};
 use tenant_entity::{
     clients::{self, Entity as Clients},
-    inventory_transactions::{ActiveModel as InventoryActiveModel, Entity as InventoryTransactions},
+    inventory_transactions::{
+        ActiveModel as InventoryActiveModel, Entity as InventoryTransactions,
+    },
     invoice_items::{self, ActiveModel as InvoiceItemActiveModel, Entity as InvoiceItems},
     invoices::{self, ActiveModel as InvoiceActiveModel, Entity as Invoices},
     order_items::{self, Entity as OrderItems},
     orders::{ActiveModel as OrderActiveModel, Entity as Orders},
     products::{self, Entity as Products},
-};
-use super::types::{
-    InvoiceClientInfo, InvoiceDetailsResponse, InvoiceProductItem, InvoiceWithClient, InvoicesResponse,
-    ListInvoicesArgs, NewInvoice, SelectInvoiceDetails, SelectInvoices, SelectInvoicesItems,
-    SelectInvoicesItemsForUpdate, UpdateInvoice, UpdateInvoiceStatus,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
@@ -158,7 +160,10 @@ impl Service {
                 );
             }
             Some("products") => {
-                query.order_by_expr(Expr::cust("products"), requested_order(args.direction.as_deref()));
+                query.order_by_expr(
+                    Expr::cust("products"),
+                    requested_order(args.direction.as_deref()),
+                );
             }
             Some("status") => {
                 query.order_by(
@@ -167,7 +172,10 @@ impl Service {
                 );
             }
             Some("total") => {
-                query.order_by_expr(Expr::cust("total"), requested_order(args.direction.as_deref()));
+                query.order_by_expr(
+                    Expr::cust("total"),
+                    requested_order(args.direction.as_deref()),
+                );
             }
             Some("paid_amount") => {
                 query.order_by(
@@ -560,7 +568,10 @@ impl Service {
         .await
     }
 
-    pub async fn update_invoice_status(db: &DbConn, data: UpdateInvoiceStatus) -> Result<(), DbErr> {
+    pub async fn update_invoice_status(
+        db: &DbConn,
+        data: UpdateInvoiceStatus,
+    ) -> Result<(), DbErr> {
         let invoice_model = Invoices::find_by_id(data.id).one(db).await?;
         let mut invoice_active: InvoiceActiveModel = invoice_model.unwrap().into();
         invoice_active.status = ActiveValue::Set(data.status);
