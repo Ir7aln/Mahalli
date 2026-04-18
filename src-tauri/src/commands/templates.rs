@@ -1,6 +1,9 @@
 use tauri::State;
 
-use tenant_service::{MutationsService, NewTemplate};
+use tenant_service::services::templates::{
+    service::MutationsService,
+    types::NewTemplate,
+};
 
 use crate::AppState;
 

@@ -24,6 +24,8 @@ const queryParams = computed(() => {
     transaction_type: queryString(route.query.transaction_type) || "",
     created_at: queryString(route.query.created_at) || "",
     refresh: queryString(route.query.refresh) || "",
+    sort: queryString(route.query.sort) || "",
+    direction: queryString(route.query.direction) || "",
   };
 });
 
@@ -32,8 +34,10 @@ async function fetchInventory() {
     search: queryParams.value.search,
     page: queryParams.value.page,
     limit: queryParams.value.limit,
-    status: null,
-    created_at: null,
+    transaction_type: queryParams.value.transaction_type || null,
+    created_at: queryParams.value.created_at || null,
+    sort: queryString(route.query.sort) || null,
+    direction: queryString(route.query.direction) || null,
   });
   if (result.status === "error") {
     toast.error(t("notifications.error.title"), {

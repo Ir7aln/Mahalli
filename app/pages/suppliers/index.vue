@@ -22,6 +22,8 @@ const queryParams = computed(() => {
     page: queryNumber(route.query.page, 1),
     limit: route.query.limit ? queryNumber(route.query.limit, LIMIT) : LIMIT,
     refresh: queryString(route.query.refresh) || "",
+    sort: queryString(route.query.sort) || "",
+    direction: queryString(route.query.direction) || "",
   };
 });
 
@@ -30,8 +32,8 @@ async function fetchSuppliers() {
     search: queryParams.value.search,
     page: queryParams.value.page,
     limit: queryParams.value.limit,
-    status: null,
-    created_at: null,
+    sort: queryString(route.query.sort) || null,
+    direction: queryString(route.query.direction) || null,
   });
   if (result.status === "error") {
     toast.error(t("notifications.error.title"), {

@@ -1,10 +1,27 @@
 <script setup lang="ts">
 import type { SelectInventory } from "@/bindings";
+import { queryString } from "@/utils/query";
 
-defineProps<{
+const props = defineProps<{
   inventory: SelectInventory[];
 }>();
+const route = useRoute();
+const { updateQueryParams } = useUpdateRouteQueryParams();
 const { t, d, locale, n } = useI18n();
+const sortKey = computed(() => queryString(route.query.sort));
+const sortDirection = computed(() => (queryString(route.query.direction) === "desc" ? "desc" : "asc"));
+
+function toggleSort(key: string) {
+  if (sortKey.value !== key) {
+    updateQueryParams({ sort: key, direction: "asc", page: 1 });
+    return;
+  }
+  if (sortDirection.value === "asc") {
+    updateQueryParams({ direction: "desc", page: 1 });
+    return;
+  }
+  updateQueryParams({ sort: "", direction: "", page: 1 });
+}
 </script>
 
 <template>
@@ -12,17 +29,50 @@ const { t, d, locale, n } = useI18n();
     <Table :dir="locale === 'ar' ? 'rtl' : 'ltr'">
       <TableHeader>
         <TableRow>
-          <TableHead>{{ t("fields.name") }}</TableHead>
-          <TableHead>{{ t("fields.price") }}</TableHead>
-          <TableHead>{{ t("fields.quantity") }}</TableHead>
-          <TableHead>{{ t("fields.status") }}</TableHead>
+          <TableHead>
+            <TableSortHeader
+              :label="t('fields.name')"
+              :active="sortKey === 'name'"
+              :direction="sortDirection"
+              @click="toggleSort('name')"
+            />
+          </TableHead>
+          <TableHead>
+            <TableSortHeader
+              :label="t('fields.price')"
+              :active="sortKey === 'price'"
+              :direction="sortDirection"
+              @click="toggleSort('price')"
+            />
+          </TableHead>
+          <TableHead>
+            <TableSortHeader
+              :label="t('fields.quantity')"
+              :active="sortKey === 'quantity'"
+              :direction="sortDirection"
+              @click="toggleSort('quantity')"
+            />
+          </TableHead>
+          <TableHead>
+            <TableSortHeader
+              :label="t('fields.status')"
+              :active="sortKey === 'transaction_type'"
+              :direction="sortDirection"
+              @click="toggleSort('transaction_type')"
+            />
+          </TableHead>
           <TableHead class="w-56">
-            {{ t("fields.date") }}
+            <TableSortHeader
+              :label="t('fields.date')"
+              :active="sortKey === 'created_at'"
+              :direction="sortDirection"
+              @click="toggleSort('created_at')"
+            />
           </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow v-for="(tx, index) in inventory" :key="tx.id" v-fade="index">
+        <TableRow v-for="(tx, index) in props.inventory" :key="tx.id" v-fade="index">
           <TableCell class="p-2 font-medium">
             {{ tx?.name }}
           </TableCell>

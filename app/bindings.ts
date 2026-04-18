@@ -6,7 +6,7 @@ import { invoke as __TAURI_INVOKE } from "@tauri-apps/api/core";
 
 /** Commands */
 export const commands = {
-	listProducts: (args: ListArgs) => typedError<Success<ProductsResponse>, Fail>(__TAURI_INVOKE("list_products", { args })),
+	listProducts: (args: ListProductsArgs) => typedError<Success<ProductsResponse>, Fail>(__TAURI_INVOKE("list_products", { args })),
 	searchProducts: (search: string) => typedError<Success<ProductSearch[]>, Fail>(__TAURI_INVOKE("search_products", { search })),
 	createProduct: (product: NewProduct) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_product", { product })),
 	updateProduct: (product: Product) => typedError<Success<string>, Fail>(__TAURI_INVOKE("update_product", { product })),
@@ -16,21 +16,22 @@ export const commands = {
 	getActiveDatabase: () => typedError<Success<DatabaseRecord>, Fail>(__TAURI_INVOKE("get_active_database")),
 	createDatabase: (input: CreateTenantDatabaseRequest) => typedError<Success<DatabaseRecord>, Fail>(__TAURI_INVOKE("create_database", { input })),
 	switchDatabase: (id: string) => typedError<Success<DatabaseRecord>, Fail>(__TAURI_INVOKE("switch_database", { id })),
-	listInventory: (args: ListArgs) => typedError<Success<InventoryResponse>, Fail>(__TAURI_INVOKE("list_inventory", { args })),
+	listInventory: (args: ListInventoryArgs) => typedError<Success<InventoryResponse>, Fail>(__TAURI_INVOKE("list_inventory", { args })),
 	createInventory: (transaction: NewInventory) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_inventory", { transaction })),
 	deleteInventory: (id: string) => typedError<Success<string>, Fail>(__TAURI_INVOKE("delete_inventory", { id })),
-	listClients: (args: ListArgs) => typedError<Success<ClientsResponse>, Fail>(__TAURI_INVOKE("list_clients", { args })),
+	listClients: (args: ListClientsArgs) => typedError<Success<ClientsResponse>, Fail>(__TAURI_INVOKE("list_clients", { args })),
+	listClientInvoiceDebts: (clientId: string) => typedError<Success<ClientInvoiceDebtItem[]>, Fail>(__TAURI_INVOKE("list_client_invoice_debts", { clientId })),
 	searchClients: (search: string) => typedError<Success<ClientSearch[]>, Fail>(__TAURI_INVOKE("search_clients", { search })),
 	getClient: (id: string) => typedError<Success<ClientDetails>, Fail>(__TAURI_INVOKE("get_client", { id })),
 	createClient: (client: NewClient) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_client", { client })),
 	updateClient: (client: Client) => typedError<Success<string>, Fail>(__TAURI_INVOKE("update_client", { client })),
 	deleteClient: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_client", { id })),
-	listSuppliers: (args: ListArgs) => typedError<Success<SuppliersResponse>, Fail>(__TAURI_INVOKE("list_suppliers", { args })),
+	listSuppliers: (args: ListSuppliersArgs) => typedError<Success<SuppliersResponse>, Fail>(__TAURI_INVOKE("list_suppliers", { args })),
 	searchSuppliers: (search: string) => typedError<Success<SupplierSearch[]>, Fail>(__TAURI_INVOKE("search_suppliers", { search })),
 	createSupplier: (supplier: NewSupplier) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_supplier", { supplier })),
 	updateSupplier: (supplier: Supplier) => typedError<Success<string>, Fail>(__TAURI_INVOKE("update_supplier", { supplier })),
 	deleteSupplier: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_supplier", { id })),
-	listOrders: (args: ListArgs) => typedError<Success<OrdersResponse>, Fail>(__TAURI_INVOKE("list_orders", { args })),
+	listOrders: (args: ListOrdersArgs) => typedError<Success<OrdersResponse>, Fail>(__TAURI_INVOKE("list_orders", { args })),
 	getOrder: (id: string) => typedError<Success<OrderWithClient>, Fail>(__TAURI_INVOKE("get_order", { id })),
 	getOrderDetails: (id: string) => typedError<Success<OrderDetailsResponse>, Fail>(__TAURI_INVOKE("get_order_details", { id })),
 	createOrder: (order: NewOrder) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_order", { order })),
@@ -38,8 +39,8 @@ export const commands = {
 	deleteOrder: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_order", { id })),
 	listOrderProducts: (id: string) => typedError<Success<OrderProductItem[]>, Fail>(__TAURI_INVOKE("list_order_products", { id })),
 	createOrderFromQuote: (id: string) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_order_from_quote", { id })),
-	updateOrderStatus: (order: UpdateStatus) => typedError<Success<null>, Fail>(__TAURI_INVOKE("update_order_status", { order })),
-	listQuotes: (args: ListArgs) => typedError<Success<QuotesResponse>, Fail>(__TAURI_INVOKE("list_quotes", { args })),
+	updateOrderStatus: (order: UpdateOrderStatus) => typedError<Success<null>, Fail>(__TAURI_INVOKE("update_order_status", { order })),
+	listQuotes: (args: ListQuotesArgs) => typedError<Success<QuotesResponse>, Fail>(__TAURI_INVOKE("list_quotes", { args })),
 	getQuote: (id: string) => typedError<Success<QuoteWithClient>, Fail>(__TAURI_INVOKE("get_quote", { id })),
 	getQuoteDetails: (id: string) => typedError<Success<QuoteDetailsResponse>, Fail>(__TAURI_INVOKE("get_quote_details", { id })),
 	createQuote: (quote: NewQuote) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_quote", { quote })),
@@ -49,7 +50,7 @@ export const commands = {
 	createTemplate: (template: NewTemplate) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_template", { template })),
 	deleteQuoteItem: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_quote_item", { id })),
 	deleteOrderItem: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_order_item", { id })),
-	listInvoices: (args: ListArgs) => typedError<Success<InvoicesResponse>, Fail>(__TAURI_INVOKE("list_invoices", { args })),
+	listInvoices: (args: ListInvoicesArgs) => typedError<Success<InvoicesResponse>, Fail>(__TAURI_INVOKE("list_invoices", { args })),
 	getInvoice: (id: string) => typedError<Success<InvoiceWithClient>, Fail>(__TAURI_INVOKE("get_invoice", { id })),
 	getInvoiceDetails: (id: string) => typedError<Success<InvoiceDetailsResponse>, Fail>(__TAURI_INVOKE("get_invoice_details", { id })),
 	createInvoice: (invoice: NewInvoice) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_invoice", { invoice })),
@@ -57,7 +58,7 @@ export const commands = {
 	deleteInvoice: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_invoice", { id })),
 	listInvoiceProducts: (id: string) => typedError<Success<InvoiceProductItem[]>, Fail>(__TAURI_INVOKE("list_invoice_products", { id })),
 	createInvoiceFromOrder: (id: string) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_invoice_from_order", { id })),
-	updateInvoiceStatus: (invoice: UpdateStatus) => typedError<Success<null>, Fail>(__TAURI_INVOKE("update_invoice_status", { invoice })),
+	updateInvoiceStatus: (invoice: UpdateInvoiceStatus) => typedError<Success<null>, Fail>(__TAURI_INVOKE("update_invoice_status", { invoice })),
 	deleteInvoiceItem: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_invoice_item", { id })),
 	listInventoryStats: () => typedError<Success<SelectTransaction[]>, Fail>(__TAURI_INVOKE("list_inventory_stats")),
 	listTopClients: () => typedError<Success<SelectTops[]>, Fail>(__TAURI_INVOKE("list_top_clients")),
@@ -85,6 +86,13 @@ export type ClientDetails = {
 	phone_number: string | null,
 	address: string | null,
 	image: string | null,
+};
+
+export type ClientInvoiceDebtItem = {
+	id: string,
+	identifier: string,
+	total: number,
+	paid_amount: number,
 };
 
 export type ClientSearch = {
@@ -188,12 +196,67 @@ export type InvoicesResponse = {
 	invoices: SelectInvoices[],
 };
 
-export type ListArgs = {
+export type ListClientsArgs = {
+	page: number,
+	limit: number,
+	search: string,
+	sort: string | null,
+	direction: string | null,
+};
+
+export type ListInventoryArgs = {
+	page: number,
+	limit: number,
+	search: string,
+	transaction_type: string | null,
+	created_at: string | null,
+	sort: string | null,
+	direction: string | null,
+};
+
+export type ListInvoicesArgs = {
 	page: number,
 	limit: number,
 	search: string,
 	status: string | null,
 	created_at: string | null,
+	sort: string | null,
+	direction: string | null,
+};
+
+export type ListOrdersArgs = {
+	page: number,
+	limit: number,
+	search: string,
+	status: string | null,
+	created_at: string | null,
+	sort: string | null,
+	direction: string | null,
+};
+
+export type ListProductsArgs = {
+	page: number,
+	limit: number,
+	search: string,
+	sort: string | null,
+	direction: string | null,
+};
+
+export type ListQuotesArgs = {
+	page: number,
+	limit: number,
+	search: string,
+	created_at: string | null,
+	sort: string | null,
+	direction: string | null,
+};
+
+export type ListSuppliersArgs = {
+	page: number,
+	limit: number,
+	search: string,
+	sort: string | null,
+	direction: string | null,
 };
 
 export type NewClient = {
@@ -550,6 +613,11 @@ export type UpdateInvoiceItem = {
 	product_id: string,
 };
 
+export type UpdateInvoiceStatus = {
+	id: string,
+	status: string,
+};
+
 export type UpdateOrder = {
 	id: string,
 	client_id: string,
@@ -566,6 +634,11 @@ export type UpdateOrderItem = {
 	product_id: string,
 };
 
+export type UpdateOrderStatus = {
+	id: string,
+	status: string,
+};
+
 export type UpdateQuote = {
 	id: string,
 	client_id: string,
@@ -577,11 +650,6 @@ export type UpdateQuoteItem = {
 	price: number,
 	quantity: number,
 	product_id: string,
-};
-
-export type UpdateStatus = {
-	id: string,
-	status: string,
 };
 
 /* Tauri Specta runtime */

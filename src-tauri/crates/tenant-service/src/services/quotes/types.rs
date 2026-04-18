@@ -1,9 +1,17 @@
-use super::quote_item::{SelectQuotesItems, SelectQuotesItemsForUpdate};
-use crate::{NewQuoteItem, UpdateQuoteItem};
 use sea_orm::entity::prelude::Decimal;
 use sea_orm::FromQueryResult;
 use serde::{Deserialize, Serialize};
 use specta::Type;
+
+#[derive(Debug, Serialize, Deserialize, Type)]
+pub struct ListQuotesArgs {
+    pub page: u64,
+    pub limit: u64,
+    pub search: String,
+    pub created_at: Option<String>,
+    pub sort: Option<String>,
+    pub direction: Option<String>,
+}
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, FromQueryResult, Type)]
 pub struct SelectQuotes {
@@ -28,6 +36,25 @@ pub struct SelectQuoteDetails {
     pub identifier: String,
     #[specta(type = f64)]
     pub total: Decimal,
+}
+
+#[derive(Debug, Serialize, Deserialize, Type)]
+pub struct NewQuoteItem {
+    #[specta(type = f64)]
+    pub price: Decimal,
+    #[specta(type = f64)]
+    pub quantity: Decimal,
+    pub product_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Type)]
+pub struct UpdateQuoteItem {
+    pub id: Option<String>,
+    #[specta(type = f64)]
+    pub price: Decimal,
+    #[specta(type = f64)]
+    pub quantity: Decimal,
+    pub product_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]
@@ -85,4 +112,24 @@ pub struct QuoteClientInfo {
     pub email: Option<String>,
     pub address: Option<String>,
     pub phone_number: Option<String>,
+}
+
+#[derive(Deserialize, Serialize, Debug, PartialEq, FromQueryResult, Type)]
+pub struct SelectQuotesItemsForUpdate {
+    pub id: String,
+    pub name: String,
+    #[specta(type = f64)]
+    pub price: Decimal,
+    #[specta(type = f64)]
+    pub quantity: Decimal,
+    pub product_id: String,
+}
+
+#[derive(Deserialize, Serialize, Debug, PartialEq, FromQueryResult, Type)]
+pub struct SelectQuotesItems {
+    pub name: String,
+    #[specta(type = f64)]
+    pub price: Decimal,
+    #[specta(type = f64)]
+    pub quantity: Decimal,
 }

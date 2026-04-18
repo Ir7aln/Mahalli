@@ -1,0 +1,9 @@
+pub mod clients;
+pub mod dashboard;
+pub mod inventory;
+pub mod invoices;
+pub mod orders;
+pub mod products;
+pub mod quotes;
+pub mod suppliers;
+pub mod templates;

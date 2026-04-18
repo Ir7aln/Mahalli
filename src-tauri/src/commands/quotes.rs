@@ -1,8 +1,11 @@
 use tauri::State;
 
-use tenant_service::{
-    ListArgs, MutationsService, NewQuote, QueriesService, QuoteDetailsResponse, QuoteProductItem,
-    QuoteWithClient, QuotesResponse, TransactionService, UpdateQuote,
+use tenant_service::services::quotes::{
+    service::{MutationsService, QueriesService, TransactionService},
+    types::{
+        ListQuotesArgs, NewQuote, QuoteDetailsResponse, QuoteProductItem, QuoteWithClient,
+        QuotesResponse, UpdateQuote,
+    },
 };
 
 use crate::AppState;
@@ -11,7 +14,10 @@ use super::{tenant_db_or_fail, Fail, SResult, Success};
 
 #[tauri::command]
 #[specta::specta]
-pub async fn list_quotes(state: State<'_, AppState>, args: ListArgs) -> SResult<QuotesResponse> {
+pub async fn list_quotes(
+    state: State<'_, AppState>,
+    args: ListQuotesArgs,
+) -> SResult<QuotesResponse> {
     let db_conn = tenant_db_or_fail(&state).await?;
     match QueriesService::list_quotes(&db_conn, args).await {
         Ok(res) => Ok(Success {

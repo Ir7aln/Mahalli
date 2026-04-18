@@ -26,6 +26,8 @@ const queryParams = computed(() => {
     limit: route.query.limit ? queryNumber(route.query.limit, LIMIT) : LIMIT,
     created_at: queryString(route.query.created_at) || null,
     refresh: queryString(route.query.refresh) || "",
+    sort: queryString(route.query.sort) || "",
+    direction: queryString(route.query.direction) || "",
   };
 });
 
@@ -34,8 +36,9 @@ async function fetchQuotes() {
     search: queryParams.value.search,
     page: queryParams.value.page,
     limit: queryParams.value.limit,
-    status: null,
     created_at: queryParams.value.created_at,
+    sort: queryParams.value.sort,
+    direction: queryParams.value.direction,
   });
   if (result.status === "error") {
     toast.error(t("notifications.error.title"), {

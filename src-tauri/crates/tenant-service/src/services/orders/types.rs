@@ -1,9 +1,18 @@
-use super::order_item::{SelectOrdersItems, SelectOrdersItemsForUpdate};
-use crate::{NewOrderItem, UpdateOrderItem};
 use sea_orm::entity::prelude::Decimal;
 use sea_orm::FromQueryResult;
 use serde::{Deserialize, Serialize};
 use specta::Type;
+
+#[derive(Debug, Serialize, Deserialize, Type)]
+pub struct ListOrdersArgs {
+    pub page: u64,
+    pub limit: u64,
+    pub search: String,
+    pub status: Option<String>,
+    pub created_at: Option<String>,
+    pub sort: Option<String>,
+    pub direction: Option<String>,
+}
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, FromQueryResult, Type)]
 pub struct SelectOrders {
@@ -33,6 +42,27 @@ pub struct SelectOrderDetails {
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]
+pub struct NewOrderItem {
+    #[specta(type = f64)]
+    pub price: Decimal,
+    #[specta(type = f64)]
+    pub quantity: Decimal,
+    pub product_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Type)]
+pub struct UpdateOrderItem {
+    pub id: Option<String>,
+    pub order_id: Option<String>,
+    pub inventory_id: Option<String>,
+    #[specta(type = f64)]
+    pub price: Decimal,
+    #[specta(type = f64)]
+    pub quantity: Decimal,
+    pub product_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Type)]
 pub struct NewOrder {
     pub client_id: String,
     pub status: String,
@@ -51,6 +81,12 @@ pub struct UpdateOrder {
 pub struct OrdersResponse {
     pub count: u64,
     pub orders: Vec<SelectOrders>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Type)]
+pub struct UpdateOrderStatus {
+    pub id: String,
+    pub status: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromQueryResult, Type)]
@@ -91,4 +127,25 @@ pub struct OrderClientInfo {
     pub email: Option<String>,
     pub address: Option<String>,
     pub phone_number: Option<String>,
+}
+
+#[derive(Deserialize, Serialize, Debug, PartialEq, FromQueryResult, Type)]
+pub struct SelectOrdersItemsForUpdate {
+    pub id: String,
+    pub inventory_id: String,
+    pub name: String,
+    #[specta(type = f64)]
+    pub price: Decimal,
+    #[specta(type = f64)]
+    pub quantity: Decimal,
+    pub product_id: String,
+}
+
+#[derive(Deserialize, Serialize, Debug, PartialEq, FromQueryResult, Type)]
+pub struct SelectOrdersItems {
+    pub name: String,
+    #[specta(type = f64)]
+    pub price: Decimal,
+    #[specta(type = f64)]
+    pub quantity: Decimal,
 }

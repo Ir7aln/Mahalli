@@ -1,8 +1,11 @@
 use tauri::State;
 
-use tenant_service::{
-    FinancialMetricsResponse, QueriesService, SelectTopProducts, SelectTops, SelectTransaction,
-    StatusCountResponse,
+use tenant_service::services::dashboard::{
+    service::QueriesService,
+    types::{
+        FinancialMetricsResponse, SelectTopProducts, SelectTops, SelectTransaction,
+        StatusCountResponse,
+    },
 };
 
 use crate::AppState;

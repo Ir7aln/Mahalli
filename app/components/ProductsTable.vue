@@ -10,10 +10,27 @@ import {
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { InventoryUpdate, ProductDelete, ProductUpdate } from "#components";
 import type { SelectProducts } from "@/bindings";
+import { queryString } from "@/utils/query";
 
-defineProps<{ products: SelectProducts[] }>();
+const props = defineProps<{ products: SelectProducts[] }>();
+const route = useRoute();
+const { updateQueryParams } = useUpdateRouteQueryParams();
 const { t, d, locale, n } = useI18n();
 const modal = useModal();
+const sortKey = computed(() => queryString(route.query.sort));
+const sortDirection = computed(() => (queryString(route.query.direction) === "desc" ? "desc" : "asc"));
+
+function toggleSort(key: string) {
+  if (sortKey.value !== key) {
+    updateQueryParams({ sort: key, direction: "asc", page: 1 });
+    return;
+  }
+  if (sortDirection.value === "asc") {
+    updateQueryParams({ direction: "desc", page: 1 });
+    return;
+  }
+  updateQueryParams({ sort: "", direction: "", page: 1 });
+}
 
 function toggleThisProduct(product: SelectProducts, name: "delete" | "update") {
   if (name === "delete") {
@@ -48,21 +65,52 @@ function updateProductInventory(id: string, name: string) {
         <TableRow>
           <TableHead class="w-14" />
           <TableHead class="w-20">
-            {{ t("fields.name") }}
+            <TableSortHeader
+              :label="t('fields.name')"
+              :active="sortKey === 'name'"
+              :direction="sortDirection"
+              @click="toggleSort('name')"
+            />
           </TableHead>
           <TableHead class="w-fit">
-            {{ t("fields.inventory") }}
+            <TableSortHeader
+              :label="t('fields.inventory')"
+              :active="sortKey === 'inventory'"
+              :direction="sortDirection"
+              @click="toggleSort('inventory')"
+            />
           </TableHead>
-          <TableHead>{{ t("fields.threshold") }}</TableHead>
-          <TableHead>{{ t("fields.purchase-price") }}</TableHead>
-          <TableHead>{{ t("fields.selling-price") }}</TableHead>
+          <TableHead>
+            <TableSortHeader
+              :label="t('fields.threshold')"
+              :active="sortKey === 'min_quantity'"
+              :direction="sortDirection"
+              @click="toggleSort('min_quantity')"
+            />
+          </TableHead>
+          <TableHead>
+            <TableSortHeader
+              :label="t('fields.purchase-price')"
+              :active="sortKey === 'purchase_price'"
+              :direction="sortDirection"
+              @click="toggleSort('purchase_price')"
+            />
+          </TableHead>
+          <TableHead>
+            <TableSortHeader
+              :label="t('fields.selling-price')"
+              :active="sortKey === 'selling_price'"
+              :direction="sortDirection"
+              @click="toggleSort('selling_price')"
+            />
+          </TableHead>
           <TableHead class="w-20 sticky ltr:right-0 rtl:left-0 bg-gray-100 z-10">
             {{ t("fields.actions") }}
           </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow v-for="(product, index) in products" :key="product.id" v-fade="index">
+        <TableRow v-for="(product, index) in props.products" :key="product.id" v-fade="index">
           <TableCell class="p-2 flex justify-center">
             <Avatar>
               <AvatarImage v-if="product.image" :src="convertFileSrc(product.image)" />

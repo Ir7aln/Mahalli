@@ -46,8 +46,8 @@ const quoteSchema = z.object({
     z.object({
       id: z.string().optional(),
       product_id: z.string().min(1),
-      quantity: z.number().min(1),
-      price: z.number().min(1),
+      quantity: z.coerce.number().min(1),
+      price: z.coerce.number().min(1),
       name: z.string().optional(),
     }),
   ),

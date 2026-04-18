@@ -1,8 +1,11 @@
 use tauri::State;
 
-use tenant_service::{
-    ListArgs, MutationsService, NewOrder, OrderDetailsResponse, OrderProductItem, OrderWithClient,
-    OrdersResponse, QueriesService, TransactionService, UpdateOrder, UpdateStatus,
+use tenant_service::services::orders::{
+    service::{MutationsService, QueriesService, TransactionService},
+    types::{
+        ListOrdersArgs, NewOrder, OrderDetailsResponse, OrderProductItem, OrderWithClient,
+        OrdersResponse, UpdateOrder, UpdateOrderStatus,
+    },
 };
 
 use crate::AppState;
@@ -28,7 +31,10 @@ pub async fn create_order_from_quote(state: State<'_, AppState>, id: String) -> 
 
 #[tauri::command]
 #[specta::specta]
-pub async fn list_orders(state: State<'_, AppState>, args: ListArgs) -> SResult<OrdersResponse> {
+pub async fn list_orders(
+    state: State<'_, AppState>,
+    args: ListOrdersArgs,
+) -> SResult<OrdersResponse> {
     let db_conn = tenant_db_or_fail(&state).await?;
     match QueriesService::list_orders(&db_conn, args).await {
         Ok(res) => Ok(Success {
@@ -99,7 +105,10 @@ pub async fn update_order(state: State<'_, AppState>, order: UpdateOrder) -> SRe
 
 #[tauri::command]
 #[specta::specta]
-pub async fn update_order_status(state: State<'_, AppState>, order: UpdateStatus) -> SResult<()> {
+pub async fn update_order_status(
+    state: State<'_, AppState>,
+    order: UpdateOrderStatus,
+) -> SResult<()> {
     let db_conn = tenant_db_or_fail(&state).await?;
     match MutationsService::update_order_status(&db_conn, order).await {
         Ok(_) => Ok(Success {

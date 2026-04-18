@@ -6,15 +6,31 @@ import { toast } from "vue-sonner";
 import { NuxtLink, OrderDelete, OrderUpdate } from "#components";
 import { ORDER_STATUSES, STATUS_COLORS } from "@/consts";
 import type { OrderProductItem, SelectOrders } from "@/bindings";
+import { queryString } from "@/utils/query";
 
-defineProps<{ orders: SelectOrders[]; orderProducts: OrderProductItem[] }>();
+const props = defineProps<{ orders: SelectOrders[]; orderProducts: OrderProductItem[] }>();
 const emits = defineEmits<{
   listOrderProducts: [id: string];
 }>();
+const route = useRoute();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const modal = useModal();
 const { t, d, locale, n } = useI18n();
 const localePath = useLocalePath();
+const sortKey = computed(() => queryString(route.query.sort));
+const sortDirection = computed(() => (queryString(route.query.direction) === "desc" ? "desc" : "asc"));
+
+function toggleSort(key: string) {
+  if (sortKey.value !== key) {
+    updateQueryParams({ sort: key, direction: "asc", page: 1 });
+    return;
+  }
+  if (sortDirection.value === "asc") {
+    updateQueryParams({ direction: "desc", page: 1 });
+    return;
+  }
+  updateQueryParams({ sort: "", direction: "", page: 1 });
+}
 
 let previewProductsTimer: any;
 function previewProducts(id: string) {
@@ -84,15 +100,46 @@ async function createInvoiceFromOrder(id: string) {
       <TableHeader>
         <TableRow>
           <TableHead class="w-24" />
-          <TableHead>{{ t("fields.full-name") }}</TableHead>
-          <TableHead>{{ t("fields.items") }}</TableHead>
+          <TableHead>
+            <TableSortHeader
+              :label="t('fields.full-name')"
+              :active="sortKey === 'full_name'"
+              :direction="sortDirection"
+              @click="toggleSort('full_name')"
+            />
+          </TableHead>
+          <TableHead>
+            <TableSortHeader
+              :label="t('fields.items')"
+              :active="sortKey === 'products'"
+              :direction="sortDirection"
+              @click="toggleSort('products')"
+            />
+          </TableHead>
           <TableHead class="w-fit">
-            {{ t("fields.status") }}
+            <TableSortHeader
+              :label="t('fields.status')"
+              :active="sortKey === 'status'"
+              :direction="sortDirection"
+              @click="toggleSort('status')"
+            />
           </TableHead>
           <TableHead class="w-56">
-            {{ t("fields.date") }}
+            <TableSortHeader
+              :label="t('fields.date')"
+              :active="sortKey === 'created_at'"
+              :direction="sortDirection"
+              @click="toggleSort('created_at')"
+            />
           </TableHead>
-          <TableHead>{{ t("fields.total") }}</TableHead>
+          <TableHead>
+            <TableSortHeader
+              :label="t('fields.total')"
+              :active="sortKey === 'total'"
+              :direction="sortDirection"
+              @click="toggleSort('total')"
+            />
+          </TableHead>
           <TableHead class="w-20 sticky ltr:right-0 rtl:left-0 bg-gray-100 z-10">
             {{ t("fields.actions") }}
           </TableHead>
@@ -100,7 +147,7 @@ async function createInvoiceFromOrder(id: string) {
       </TableHeader>
       <TableBody>
         <TableRow
-          v-for="(order, index) in orders"
+          v-for="(order, index) in props.orders"
           :key="order.id"
           v-fade="index"
           :class="{

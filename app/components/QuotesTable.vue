@@ -5,14 +5,31 @@ import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
 import { NuxtLink, QuoteDelete, QuoteUpdate } from "#components";
 import type { QuoteProductItem, SelectQuotes } from "@/bindings";
+import { queryString } from "@/utils/query";
 
-defineProps<{ quotes: SelectQuotes[]; quoteProducts: QuoteProductItem[] }>();
+const props = defineProps<{ quotes: SelectQuotes[]; quoteProducts: QuoteProductItem[] }>();
 const emits = defineEmits<{
   listQuoteProducts: [id: string];
 }>();
+const route = useRoute();
+const { updateQueryParams } = useUpdateRouteQueryParams();
 const modal = useModal();
 const { t, d, locale, n } = useI18n();
 const localePath = useLocalePath();
+const sortKey = computed(() => queryString(route.query.sort));
+const sortDirection = computed(() => (queryString(route.query.direction) === "desc" ? "desc" : "asc"));
+
+function toggleSort(key: string) {
+  if (sortKey.value !== key) {
+    updateQueryParams({ sort: key, direction: "asc", page: 1 });
+    return;
+  }
+  if (sortDirection.value === "asc") {
+    updateQueryParams({ direction: "desc", page: 1 });
+    return;
+  }
+  updateQueryParams({ sort: "", direction: "", page: 1 });
+}
 
 let previewProductsTimer: any;
 function previewProducts(id: string) {
@@ -66,19 +83,45 @@ async function createOrderFromQuote(id: string) {
       <TableHeader>
         <TableRow>
           <TableHead class="w-24" />
-          <TableHead>{{ t("fields.full-name") }}</TableHead>
-          <TableHead>{{ t("fields.items") }}</TableHead>
-          <TableHead class="w-56">
-            {{ t("fields.date") }}
+          <TableHead>
+            <TableSortHeader
+              :label="t('fields.full-name')"
+              :active="sortKey === 'full_name'"
+              :direction="sortDirection"
+              @click="toggleSort('full_name')"
+            />
           </TableHead>
-          <TableHead>{{ t("fields.total") }}</TableHead>
+          <TableHead>
+            <TableSortHeader
+              :label="t('fields.items')"
+              :active="sortKey === 'products'"
+              :direction="sortDirection"
+              @click="toggleSort('products')"
+            />
+          </TableHead>
+          <TableHead class="w-56">
+            <TableSortHeader
+              :label="t('fields.date')"
+              :active="sortKey === 'created_at'"
+              :direction="sortDirection"
+              @click="toggleSort('created_at')"
+            />
+          </TableHead>
+          <TableHead>
+            <TableSortHeader
+              :label="t('fields.total')"
+              :active="sortKey === 'total'"
+              :direction="sortDirection"
+              @click="toggleSort('total')"
+            />
+          </TableHead>
           <TableHead class="w-20 sticky ltr:right-0 rtl:left-0 bg-gray-100 z-10">
             {{ t("fields.actions") }}
           </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow v-for="(quote, index) in quotes" :key="quote.id" v-fade="index">
+        <TableRow v-for="(quote, index) in props.quotes" :key="quote.id" v-fade="index">
           <TableCell class="p-2 text-nowrap font-medium">
             {{ quote.identifier }}
           </TableCell>

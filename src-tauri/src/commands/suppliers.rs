@@ -1,8 +1,8 @@
 use tauri::State;
 
-use tenant_service::{
-    ListArgs, MutationsService, NewSupplier, QueriesService, Supplier, SupplierSearch,
-    SuppliersResponse,
+use tenant_service::services::suppliers::{
+    service::{MutationsService, QueriesService},
+    types::{ListSuppliersArgs, NewSupplier, Supplier, SupplierSearch, SuppliersResponse},
 };
 
 use crate::AppState;
@@ -13,7 +13,7 @@ use super::{tenant_db_or_fail, Fail, SResult, Success};
 #[specta::specta]
 pub async fn list_suppliers(
     state: State<'_, AppState>,
-    args: ListArgs,
+    args: ListSuppliersArgs,
 ) -> SResult<SuppliersResponse> {
     let db_conn = tenant_db_or_fail(&state).await?;
     match QueriesService::list_suppliers(&db_conn, args).await {

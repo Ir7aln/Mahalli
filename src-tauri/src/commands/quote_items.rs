@@ -1,6 +1,6 @@
 use tauri::State;
 
-use tenant_service::MutationsService;
+use tenant_service::services::quotes::service::MutationsService;
 
 use crate::AppState;
 

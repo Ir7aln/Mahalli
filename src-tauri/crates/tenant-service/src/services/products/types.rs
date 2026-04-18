@@ -3,6 +3,15 @@ use sea_orm::FromQueryResult;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
+#[derive(Debug, Serialize, Deserialize, Type)]
+pub struct ListProductsArgs {
+    pub page: u64,
+    pub limit: u64,
+    pub search: String,
+    pub sort: Option<String>,
+    pub direction: Option<String>,
+}
+
 #[derive(Deserialize, Serialize, Debug, PartialEq, FromQueryResult, Type)]
 pub struct SelectProducts {
     pub id: String,

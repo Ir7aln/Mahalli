@@ -7,6 +7,7 @@ import { commands } from "@/bindings";
 import { ProductCreate } from "#components";
 import type { QueryParams } from "@/types/query";
 import type { SelectProducts } from "@/bindings";
+import { queryString } from "@/utils/query";
 
 const route = useRoute();
 const { t } = useI18n();
@@ -21,6 +22,8 @@ const queryParams = computed(() => ({
   page: route.query.page,
   refresh: route.query.refresh,
   limit: route.query.limit,
+  sort: route.query.sort,
+  direction: route.query.direction,
 }));
 
 async function fetchProducts() {
@@ -28,8 +31,8 @@ async function fetchProducts() {
     search: String(queryParams.value.search ?? ""),
     page: Number(queryParams.value.page ?? 1),
     limit: queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT,
-    status: null,
-    created_at: null,
+    sort: queryString(route.query.sort) || null,
+    direction: queryString(route.query.direction) || null,
   });
   if (result.status === "error") {
     toast.error(t("notifications.error.title"), {

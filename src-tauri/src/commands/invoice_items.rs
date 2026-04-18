@@ -1,5 +1,5 @@
 use tauri::State;
-use tenant_service::MutationsService;
+use tenant_service::services::invoices::service::MutationsService;
 
 use crate::AppState;
 

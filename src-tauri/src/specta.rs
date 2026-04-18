@@ -20,6 +20,7 @@ pub fn builder<R: Runtime>() -> Builder<R> {
         commands::inventory::create_inventory,
         commands::inventory::delete_inventory,
         commands::clients::list_clients,
+        commands::clients::list_client_invoice_debts,
         commands::clients::search_clients,
         commands::clients::get_client,
         commands::clients::create_client,

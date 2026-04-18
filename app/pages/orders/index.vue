@@ -29,6 +29,8 @@ const queryParams = computed(() => {
     status: queryString(route.query.status) || null,
     created_at: queryString(route.query.created_at) || null,
     refresh: queryString(route.query.refresh) || "",
+    sort: queryString(route.query.sort) || "",
+    direction: queryString(route.query.direction) || "",
   };
 });
 
@@ -39,6 +41,8 @@ async function fetchOrders() {
     limit: queryParams.value.limit,
     status: queryParams.value.status,
     created_at: queryParams.value.created_at,
+    sort: queryParams.value.sort,
+    direction: queryParams.value.direction,
   });
   if (result.status === "error") {
     toast.error(t("notifications.error.title"), {
@@ -60,8 +64,6 @@ const totalRows = computed<number>(() => ordersData.value?.count ?? 0);
 
 provide("count", totalRows);
 provide("itemsPerPage", queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT);
-
-watch(queryParams, fetchOrders, { deep: true });
 
 const debouncedSearch = useDebounceFn(() => {
   updateQueryParams({ search: searchQuery.value || "" });

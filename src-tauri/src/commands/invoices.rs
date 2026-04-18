@@ -1,8 +1,11 @@
 use tauri::State;
 
-use tenant_service::{
-    InvoiceDetailsResponse, InvoiceProductItem, InvoiceWithClient, InvoicesResponse, ListArgs,
-    MutationsService, NewInvoice, QueriesService, TransactionService, UpdateInvoice, UpdateStatus,
+use tenant_service::services::invoices::{
+    service::{MutationsService, QueriesService, TransactionService},
+    types::{
+        InvoiceDetailsResponse, InvoiceProductItem, InvoiceWithClient, InvoicesResponse,
+        ListInvoicesArgs, NewInvoice, UpdateInvoice, UpdateInvoiceStatus,
+    },
 };
 
 use crate::AppState;
@@ -30,7 +33,7 @@ pub async fn create_invoice_from_order(state: State<'_, AppState>, id: String) -
 #[specta::specta]
 pub async fn list_invoices(
     state: State<'_, AppState>,
-    args: ListArgs,
+    args: ListInvoicesArgs,
 ) -> SResult<InvoicesResponse> {
     let db_conn = tenant_db_or_fail(&state).await?;
     match QueriesService::list_invoices(&db_conn, args).await {
@@ -104,7 +107,7 @@ pub async fn update_invoice(state: State<'_, AppState>, invoice: UpdateInvoice) 
 #[specta::specta]
 pub async fn update_invoice_status(
     state: State<'_, AppState>,
-    invoice: UpdateStatus,
+    invoice: UpdateInvoiceStatus,
 ) -> SResult<()> {
     let db_conn = tenant_db_or_fail(&state).await?;
     match MutationsService::update_invoice_status(&db_conn, invoice).await {

@@ -3,12 +3,29 @@ import { FilePenLine, GripHorizontal, Trash2 } from "lucide-vue-next";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { SupplierDelete, SupplierUpdate } from "#components";
 import type { SelectSuppliers } from "@/bindings";
+import { queryString } from "@/utils/query";
 
-defineProps<{
+const props = defineProps<{
   suppliers: SelectSuppliers[];
 }>();
+const route = useRoute();
+const { updateQueryParams } = useUpdateRouteQueryParams();
 const { t, locale } = useI18n();
 const modal = useModal();
+const sortKey = computed(() => queryString(route.query.sort));
+const sortDirection = computed(() => (queryString(route.query.direction) === "desc" ? "desc" : "asc"));
+
+function toggleSort(key: string) {
+  if (sortKey.value !== key) {
+    updateQueryParams({ sort: key, direction: "asc", page: 1 });
+    return;
+  }
+  if (sortDirection.value === "asc") {
+    updateQueryParams({ direction: "desc", page: 1 });
+    return;
+  }
+  updateQueryParams({ sort: "", direction: "", page: 1 });
+}
 
 function toggleThisSupplier(supplier: SelectSuppliers, name: "delete" | "update") {
   if (name === "delete") {
@@ -34,17 +51,45 @@ function toggleThisSupplier(supplier: SelectSuppliers, name: "delete" | "update"
       <TableHeader>
         <TableRow>
           <TableHead class="w-14" />
-          <TableHead>{{ t("fields.full-name") }}</TableHead>
-          <TableHead>{{ t("fields.email") }}</TableHead>
-          <TableHead>{{ t("fields.phone") }}</TableHead>
-          <TableHead>{{ t("fields.address") }}</TableHead>
+          <TableHead>
+            <TableSortHeader
+              :label="t('fields.full-name')"
+              :active="sortKey === 'full_name'"
+              :direction="sortDirection"
+              @click="toggleSort('full_name')"
+            />
+          </TableHead>
+          <TableHead>
+            <TableSortHeader
+              :label="t('fields.email')"
+              :active="sortKey === 'email'"
+              :direction="sortDirection"
+              @click="toggleSort('email')"
+            />
+          </TableHead>
+          <TableHead>
+            <TableSortHeader
+              :label="t('fields.phone')"
+              :active="sortKey === 'phone_number'"
+              :direction="sortDirection"
+              @click="toggleSort('phone_number')"
+            />
+          </TableHead>
+          <TableHead>
+            <TableSortHeader
+              :label="t('fields.address')"
+              :active="sortKey === 'address'"
+              :direction="sortDirection"
+              @click="toggleSort('address')"
+            />
+          </TableHead>
           <TableHead class="w-20 sticky ltr:right-0 rtl:left-0 bg-gray-100 z-10">
             {{ t("fields.actions") }}
           </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow v-for="(supplier, index) in suppliers" :key="supplier.id" v-fade="index">
+        <TableRow v-for="(supplier, index) in props.suppliers" :key="supplier.id" v-fade="index">
           <TableCell class="p-2 flex justify-center">
             <Avatar>
               <AvatarImage v-if="supplier.image" :src="convertFileSrc(supplier.image)" />
