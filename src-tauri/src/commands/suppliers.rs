@@ -1,8 +1,7 @@
 use tauri::State;
 
 use tenant_service::suppliers::{
-    ListSuppliersArgs, NewSupplier, Supplier, SupplierSearch, SuppliersResponse,
-    SuppliersService,
+    ListSuppliersArgs, NewSupplier, Supplier, SupplierSearch, SuppliersResponse, SuppliersService,
 };
 
 use crate::AppState;

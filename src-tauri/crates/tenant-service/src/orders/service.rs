@@ -583,6 +583,3 @@ impl OrdersService {
         }
     }
 }
-
-
-

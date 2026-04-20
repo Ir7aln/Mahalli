@@ -3,9 +3,8 @@ use std::path::Path;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use system_service::{
-    sea_orm::DatabaseConnection as SystemDbConnection,
-    DatabasesService as SystemDatabasesService,
-    ActivateDatabaseInput, CreateDatabaseInput, DatabaseRecord,
+    sea_orm::DatabaseConnection as SystemDbConnection, ActivateDatabaseInput, CreateDatabaseInput,
+    DatabaseRecord, DatabasesService as SystemDatabasesService,
 };
 use tenant_service::sea_orm::DatabaseConnection as TenantDbConnection;
 

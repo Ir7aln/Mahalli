@@ -241,6 +241,3 @@ impl ProductsService {
         }
     }
 }
-
-
-

@@ -295,6 +295,3 @@ impl ClientsService {
         }
     }
 }
-
-
-

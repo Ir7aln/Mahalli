@@ -4,7 +4,9 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
-    inventory_transactions::{self, ActiveModel as InventoryActiveModel, Entity as InventoryTransactions},
+    inventory_transactions::{
+        self, ActiveModel as InventoryActiveModel, Entity as InventoryTransactions,
+    },
     order_items::{self, Entity as OrderItems},
     orders::{self, Entity as Orders},
     products::{self, Entity as Products},
@@ -231,6 +233,3 @@ impl InventoryService {
         }
     }
 }
-
-
-

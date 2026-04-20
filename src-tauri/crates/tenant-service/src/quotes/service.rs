@@ -413,6 +413,3 @@ impl QuotesService {
         }
     }
 }
-
-
-

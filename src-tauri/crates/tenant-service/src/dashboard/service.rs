@@ -215,10 +215,12 @@ impl DashboardService {
                 Expr::col((InventoryTransactions, inventory_transactions::Column::Id))
                     .equals((OrderItems, order_items::Column::InventoryId)),
             )
-            .cond_where(Cond::all().add(
-                Expr::expr(Expr::col((Invoices, invoices::Column::Status)))
-                    .is_not_in(["CANCELLED", "DRAFT"]),
-            ))
+            .cond_where(
+                Cond::all().add(
+                    Expr::expr(Expr::col((Invoices, invoices::Column::Status)))
+                        .is_not_in(["CANCELLED", "DRAFT"]),
+                ),
+            )
             .add_group_by([Expr::col((Clients, clients::Column::Id)).into()])
             .order_by_expr(
                 Func::sum(
@@ -283,10 +285,12 @@ impl DashboardService {
                 Expr::col((InventoryTransactions, inventory_transactions::Column::Id))
                     .equals((OrderItems, order_items::Column::InventoryId)),
             )
-            .cond_where(Cond::all().add(
-                Expr::expr(Expr::col((Orders, orders::Column::Status)))
-                    .is_not_in(["CANCELLED", "PENDING"]),
-            ))
+            .cond_where(
+                Cond::all().add(
+                    Expr::expr(Expr::col((Orders, orders::Column::Status)))
+                        .is_not_in(["CANCELLED", "PENDING"]),
+                ),
+            )
             .add_group_by([Expr::col((Suppliers, suppliers::Column::Id)).into()])
             .order_by_expr(
                 Func::sum(
@@ -634,6 +638,3 @@ impl DashboardService {
         })
     }
 }
-
-
-

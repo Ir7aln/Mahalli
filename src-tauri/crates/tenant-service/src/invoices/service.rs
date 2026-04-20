@@ -6,7 +6,9 @@ use sea_orm::{
 };
 use tenant_entity::{
     clients::{self, Entity as Clients},
-    inventory_transactions::{ActiveModel as InventoryActiveModel, Entity as InventoryTransactions},
+    inventory_transactions::{
+        ActiveModel as InventoryActiveModel, Entity as InventoryTransactions,
+    },
     invoice_items::{self, ActiveModel as InvoiceItemActiveModel, Entity as InvoiceItems},
     invoices::{self, ActiveModel as InvoiceActiveModel, Entity as Invoices},
     order_items::{self, Entity as OrderItems},
@@ -591,6 +593,3 @@ impl InvoicesService {
         }
     }
 }
-
-
-

@@ -16,6 +16,3 @@ impl TemplatesService {
         }
     }
 }
-
-
-
