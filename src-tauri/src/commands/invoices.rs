@@ -1,11 +1,8 @@
 use tauri::State;
 
-use tenant_service::services::invoices::{
-    service::{MutationsService, QueriesService, TransactionService},
-    types::{
-        InvoiceDetailsResponse, InvoiceProductItem, InvoiceWithClient, InvoicesResponse,
-        ListInvoicesArgs, NewInvoice, UpdateInvoice, UpdateInvoiceStatus,
-    },
+use tenant_service::invoices::{
+    InvoiceDetailsResponse, InvoiceProductItem, InvoiceWithClient, InvoicesResponse,
+    InvoicesService, ListInvoicesArgs, NewInvoice, UpdateInvoice, UpdateInvoiceStatus,
 };
 
 use crate::AppState;
@@ -16,7 +13,7 @@ use super::{tenant_db_or_fail, Fail, SResult, Success};
 #[specta::specta]
 pub async fn create_invoice_from_order(state: State<'_, AppState>, id: String) -> SResult<String> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match TransactionService::create_invoice_from_order(&db_conn, id).await {
+    match InvoicesService::create_invoice_from_order(&db_conn, id).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -36,7 +33,7 @@ pub async fn list_invoices(
     args: ListInvoicesArgs,
 ) -> SResult<InvoicesResponse> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match QueriesService::list_invoices(&db_conn, args).await {
+    match InvoicesService::list_invoices(&db_conn, args).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -56,7 +53,7 @@ pub async fn list_invoice_products(
     id: String,
 ) -> SResult<Vec<InvoiceProductItem>> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match QueriesService::list_invoice_products(&db_conn, id).await {
+    match InvoicesService::list_invoice_products(&db_conn, id).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -73,7 +70,7 @@ pub async fn list_invoice_products(
 #[specta::specta]
 pub async fn create_invoice(state: State<'_, AppState>, invoice: NewInvoice) -> SResult<String> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match TransactionService::create_invoice(&db_conn, invoice).await {
+    match InvoicesService::create_invoice(&db_conn, invoice).await {
         Ok(id) => Ok(Success {
             error: None,
             message: None,
@@ -90,7 +87,7 @@ pub async fn create_invoice(state: State<'_, AppState>, invoice: NewInvoice) -> 
 #[specta::specta]
 pub async fn update_invoice(state: State<'_, AppState>, invoice: UpdateInvoice) -> SResult<()> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match TransactionService::update_invoice(&db_conn, invoice).await {
+    match InvoicesService::update_invoice(&db_conn, invoice).await {
         Ok(_) => Ok(Success {
             error: None,
             message: Option::Some(String::from("update invoices success")),
@@ -110,7 +107,7 @@ pub async fn update_invoice_status(
     invoice: UpdateInvoiceStatus,
 ) -> SResult<()> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match MutationsService::update_invoice_status(&db_conn, invoice).await {
+    match InvoicesService::update_invoice_status(&db_conn, invoice).await {
         Ok(_) => Ok(Success {
             error: None,
             message: Option::Some(String::from("update invoices success")),
@@ -127,7 +124,7 @@ pub async fn update_invoice_status(
 #[specta::specta]
 pub async fn delete_invoice(state: State<'_, AppState>, id: String) -> SResult<u64> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match MutationsService::delete_invoice(&db_conn, id).await {
+    match InvoicesService::delete_invoice(&db_conn, id).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -144,7 +141,7 @@ pub async fn delete_invoice(state: State<'_, AppState>, id: String) -> SResult<u
 #[specta::specta]
 pub async fn get_invoice(state: State<'_, AppState>, id: String) -> SResult<InvoiceWithClient> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match QueriesService::get_invoice(&db_conn, id).await {
+    match InvoicesService::get_invoice(&db_conn, id).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -164,7 +161,7 @@ pub async fn get_invoice_details(
     id: String,
 ) -> SResult<InvoiceDetailsResponse> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match QueriesService::get_invoice_details(&db_conn, id).await {
+    match InvoicesService::get_invoice_details(&db_conn, id).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,

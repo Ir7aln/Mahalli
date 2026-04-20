@@ -1,11 +1,8 @@
 use tauri::State;
 
-use tenant_service::services::clients::{
-    service::{MutationsService, QueriesService},
-    types::{
-        Client, ClientDetails, ClientInvoiceDebtItem, ClientSearch, ClientsResponse,
-        ListClientsArgs, NewClient,
-    },
+use tenant_service::clients::{
+    Client, ClientDetails, ClientInvoiceDebtItem, ClientSearch, ClientsResponse, ClientsService,
+    ListClientsArgs, NewClient,
 };
 
 use crate::AppState;
@@ -19,7 +16,7 @@ pub async fn list_clients(
     args: ListClientsArgs,
 ) -> SResult<ClientsResponse> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match QueriesService::list_clients(&db_conn, args).await {
+    match ClientsService::list_clients(&db_conn, args).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -39,7 +36,7 @@ pub async fn list_client_invoice_debts(
     client_id: String,
 ) -> SResult<Vec<ClientInvoiceDebtItem>> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match QueriesService::list_client_invoice_debts(&db_conn, client_id).await {
+    match ClientsService::list_client_invoice_debts(&db_conn, client_id).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -59,7 +56,7 @@ pub async fn search_clients(
     search: String,
 ) -> SResult<Vec<ClientSearch>> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match QueriesService::search_clients(&db_conn, search).await {
+    match ClientsService::search_clients(&db_conn, search).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -76,7 +73,7 @@ pub async fn search_clients(
 #[specta::specta]
 pub async fn get_client(state: State<'_, AppState>, id: String) -> SResult<ClientDetails> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match QueriesService::get_client(&db_conn, id).await {
+    match ClientsService::get_client(&db_conn, id).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -93,7 +90,7 @@ pub async fn get_client(state: State<'_, AppState>, id: String) -> SResult<Clien
 #[specta::specta]
 pub async fn create_client(state: State<'_, AppState>, client: NewClient) -> SResult<String> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match MutationsService::create_client(&db_conn, client).await {
+    match ClientsService::create_client(&db_conn, client).await {
         Ok(id) => Ok(Success::<String> {
             error: None,
             message: Option::Some(String::from("client created successfully")),
@@ -110,7 +107,7 @@ pub async fn create_client(state: State<'_, AppState>, client: NewClient) -> SRe
 #[specta::specta]
 pub async fn delete_client(state: State<'_, AppState>, id: String) -> SResult<u64> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match MutationsService::delete_client(&db_conn, id).await {
+    match ClientsService::delete_client(&db_conn, id).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -127,7 +124,7 @@ pub async fn delete_client(state: State<'_, AppState>, id: String) -> SResult<u6
 #[specta::specta]
 pub async fn update_client(state: State<'_, AppState>, client: Client) -> SResult<String> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match MutationsService::update_client(&db_conn, client).await {
+    match ClientsService::update_client(&db_conn, client).await {
         Ok(_) => Ok(Success::<String> {
             error: None,
             message: Option::Some(String::from("update clients success")),

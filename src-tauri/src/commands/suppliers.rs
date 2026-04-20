@@ -1,8 +1,8 @@
 use tauri::State;
 
-use tenant_service::services::suppliers::{
-    service::{MutationsService, QueriesService},
-    types::{ListSuppliersArgs, NewSupplier, Supplier, SupplierSearch, SuppliersResponse},
+use tenant_service::suppliers::{
+    ListSuppliersArgs, NewSupplier, Supplier, SupplierSearch, SuppliersResponse,
+    SuppliersService,
 };
 
 use crate::AppState;
@@ -16,7 +16,7 @@ pub async fn list_suppliers(
     args: ListSuppliersArgs,
 ) -> SResult<SuppliersResponse> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match QueriesService::list_suppliers(&db_conn, args).await {
+    match SuppliersService::list_suppliers(&db_conn, args).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -36,7 +36,7 @@ pub async fn search_suppliers(
     search: String,
 ) -> SResult<Vec<SupplierSearch>> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match QueriesService::search_suppliers(&db_conn, search).await {
+    match SuppliersService::search_suppliers(&db_conn, search).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -53,7 +53,7 @@ pub async fn search_suppliers(
 #[specta::specta]
 pub async fn create_supplier(state: State<'_, AppState>, supplier: NewSupplier) -> SResult<String> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match MutationsService::create_supplier(&db_conn, supplier).await {
+    match SuppliersService::create_supplier(&db_conn, supplier).await {
         Ok(id) => Ok(Success::<String> {
             error: None,
             message: Option::Some(String::from("supplier created successfully")),
@@ -70,7 +70,7 @@ pub async fn create_supplier(state: State<'_, AppState>, supplier: NewSupplier) 
 #[specta::specta]
 pub async fn delete_supplier(state: State<'_, AppState>, id: String) -> SResult<u64> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match MutationsService::delete_supplier(&db_conn, id).await {
+    match SuppliersService::delete_supplier(&db_conn, id).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -87,7 +87,7 @@ pub async fn delete_supplier(state: State<'_, AppState>, id: String) -> SResult<
 #[specta::specta]
 pub async fn update_supplier(state: State<'_, AppState>, supplier: Supplier) -> SResult<String> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match MutationsService::update_supplier(&db_conn, supplier).await {
+    match SuppliersService::update_supplier(&db_conn, supplier).await {
         Ok(_) => Ok(Success::<String> {
             error: None,
             message: Option::Some(String::from("update suppliers success")),

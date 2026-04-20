@@ -1,8 +1,7 @@
 use tauri::State;
 
-use tenant_service::services::inventory::{
-    service::{MutationsService, QueriesService},
-    types::{InventoryResponse, ListInventoryArgs, NewInventory},
+use tenant_service::inventory::{
+    InventoryResponse, InventoryService, ListInventoryArgs, NewInventory,
 };
 
 use crate::{commands::Fail, AppState};
@@ -16,7 +15,7 @@ pub async fn list_inventory(
     args: ListInventoryArgs,
 ) -> SResult<InventoryResponse> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match QueriesService::list_inventory(&db_conn, args).await {
+    match InventoryService::list_inventory(&db_conn, args).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -36,7 +35,7 @@ pub async fn create_inventory(
     transaction: NewInventory,
 ) -> SResult<String> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match MutationsService::create_inventory(&db_conn, transaction).await {
+    match InventoryService::create_inventory(&db_conn, transaction).await {
         Ok(id) => Ok(Success::<String> {
             error: None,
             message: Option::Some(String::from("inventory created successfully")),
@@ -53,7 +52,7 @@ pub async fn create_inventory(
 #[specta::specta]
 pub async fn delete_inventory(state: State<'_, AppState>, id: String) -> SResult<String> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match MutationsService::delete_inventory(&db_conn, id).await {
+    match InventoryService::delete_inventory(&db_conn, id).await {
         Ok(_) => Ok(Success::<String> {
             error: None,
             message: Option::Some(String::from("inventory deleted successfully")),

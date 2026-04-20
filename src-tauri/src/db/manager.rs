@@ -4,8 +4,8 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 use system_service::{
     sea_orm::DatabaseConnection as SystemDbConnection,
-    service::{MutationsService as SystemMutationsService, QueriesService as SystemQueriesService},
-    types::{ActivateDatabaseInput, CreateDatabaseInput, DatabaseRecord},
+    DatabasesService as SystemDatabasesService,
+    ActivateDatabaseInput, CreateDatabaseInput, DatabaseRecord,
 };
 use tenant_service::sea_orm::DatabaseConnection as TenantDbConnection;
 
@@ -49,7 +49,7 @@ impl DatabaseManager {
         &self,
         system_db: &SystemDbConnection,
     ) -> Result<Vec<DatabaseRecord>, String> {
-        SystemQueriesService::list_databases(system_db)
+        SystemDatabasesService::list_databases(system_db)
             .await
             .map_err(|err| err.to_string())
     }
@@ -58,7 +58,7 @@ impl DatabaseManager {
         &self,
         system_db: &SystemDbConnection,
     ) -> Result<Option<DatabaseRecord>, String> {
-        SystemQueriesService::get_active_database(system_db)
+        SystemDatabasesService::get_active_database(system_db)
             .await
             .map_err(|err| err.to_string())
     }
@@ -85,7 +85,7 @@ impl DatabaseManager {
 
         open_tenant_database(&file_path).await;
 
-        let inserted_id = SystemMutationsService::create_database(
+        let inserted_id = SystemDatabasesService::create_database(
             system_db,
             CreateDatabaseInput {
                 name: input.name,
@@ -114,7 +114,7 @@ impl DatabaseManager {
         system_db: &SystemDbConnection,
         database_id: String,
     ) -> Result<(DatabaseRecord, TenantDbConnection), String> {
-        SystemMutationsService::activate_database(
+        SystemDatabasesService::activate_database(
             system_db,
             ActivateDatabaseInput {
                 id: database_id.clone(),
