@@ -6018,6 +6018,7 @@ name = "tenant-migration"
 version = "0.1.0"
 dependencies = [
  "async-std",
+ "regex",
  "sea-orm-migration",
 ]
 
