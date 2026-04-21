@@ -73,10 +73,10 @@ impl DashboardService {
             .cond_where(
                 Cond::all()
                     .add(
-                    Expr::expr(Func::coalesce([
-                        Expr::col((Orders, orders::Column::Status)),
-                        Expr::expr("PENDING"),
-                    ]))
+                        Expr::expr(Func::coalesce([
+                            Expr::col((Orders, orders::Column::Status)),
+                            Expr::expr("PENDING"),
+                        ]))
                         .eq("CANCELLED")
                         .not(),
                     )

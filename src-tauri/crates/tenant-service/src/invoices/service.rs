@@ -75,9 +75,10 @@ impl InvoicesService {
             ])
             .expr_as(
                 Func::coalesce([
-                    Expr::expr(Func::count(Expr::col(
-                        (InvoiceItems, invoice_items::Column::Id),
-                    ))),
+                    Expr::expr(Func::count(Expr::col((
+                        InvoiceItems,
+                        invoice_items::Column::Id,
+                    )))),
                     Expr::val(0i64),
                 ]),
                 Alias::new("products"),

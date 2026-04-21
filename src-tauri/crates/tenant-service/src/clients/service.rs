@@ -59,7 +59,10 @@ fn client_credit_expr() -> SimpleExpr {
             Query::select()
                 .from(Invoices)
                 .expr(Expr::expr(Func::coalesce([
-                    Expr::expr(Func::sum(Expr::col((Invoices, invoices::Column::PaidAmount)))),
+                    Expr::expr(Func::sum(Expr::col((
+                        Invoices,
+                        invoices::Column::PaidAmount,
+                    )))),
                     Expr::val(0.0f64),
                 ])))
                 .cond_where(
