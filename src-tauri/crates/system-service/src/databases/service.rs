@@ -69,9 +69,9 @@ impl DatabasesService {
             file_path: ActiveValue::Set(input.file_path),
             is_active: ActiveValue::Set(input.is_active),
             created_from_database_id: ActiveValue::Set(input.created_from_database_id),
-            created_at: ActiveValue::Set(now.clone()),
             updated_at: ActiveValue::Set(now),
             last_opened_at: ActiveValue::Set(None),
+            ..Default::default()
         };
 
         Ok(model.insert(db).await?.id)
