@@ -55,7 +55,7 @@ impl SeedService {
                 ],
             );
 
-            db.execute(insert).await?;
+            db.execute_raw(insert).await?;
         }
         Ok(())
     }
@@ -82,7 +82,7 @@ impl SeedService {
                 ],
             );
 
-            db.execute(insert).await?;
+            db.execute_raw(insert).await?;
         }
         Ok(())
     }
@@ -112,7 +112,7 @@ impl SeedService {
                 ],
             );
 
-            db.execute(insert).await?;
+            db.execute_raw(insert).await?;
 
             let inventory_id = ulid::Ulid::new();
             let inventory_quantity: u8 = Faker.fake();
@@ -127,7 +127,7 @@ impl SeedService {
                 ],
             );
 
-            db.execute(insert_stock).await?;
+            db.execute_raw(insert_stock).await?;
         }
         Ok(())
     }
@@ -143,7 +143,7 @@ impl SeedService {
                 r#"INSERT INTO orders (id, status, client_id) VALUES ($1, $2, (SELECT id FROM clients ORDER BY RANDOM() LIMIT 1))"#,
                 [id.to_string().into(), status.to_string().into()],
             );
-            db.execute(insert_order).await?;
+            db.execute_raw(insert_order).await?;
         }
         Ok(())
     }
@@ -161,7 +161,7 @@ impl SeedService {
                     (quantity as f32).into(),
                 ],
             );
-            db.execute(insert_inventory).await?;
+            db.execute_raw(insert_inventory).await?;
 
             let id = ulid::Ulid::new();
             let price: u8 = Faker.fake();
@@ -174,7 +174,7 @@ impl SeedService {
                     _id.to_string().into(),
                 ],
             );
-            db.execute(insert_order).await?;
+            db.execute_raw(insert_order).await?;
         }
         Ok(())
     }
@@ -202,7 +202,7 @@ impl SeedService {
                     (paid as f32).into(),
                 ],
             );
-            db.execute(insert_invoice).await?;
+            db.execute_raw(insert_invoice).await?;
         }
 
         let fix_client_id = Statement::from_string(
@@ -211,7 +211,7 @@ impl SeedService {
                 .to_string(),
         );
 
-        db.execute(fix_client_id).await?;
+        db.execute_raw(fix_client_id).await?;
 
         Ok(())
     }
@@ -230,7 +230,7 @@ impl SeedService {
                     (quantity as f32).into(),
                 ],
             );
-            db.execute(insert_item).await?;
+            db.execute_raw(insert_item).await?;
         }
         Ok(())
     }
@@ -243,7 +243,7 @@ impl SeedService {
                 r#"INSERT INTO quotes (id, client_id) VALUES ($1, (SELECT id FROM clients ORDER BY RANDOM() LIMIT 1))"#,
                 [id.to_string().into()],
             );
-            db.execute(insert_quote).await?;
+            db.execute_raw(insert_quote).await?;
         }
         Ok(())
     }
@@ -262,7 +262,7 @@ impl SeedService {
                     (quantity as f32).into(),
                 ],
             );
-            db.execute(insert_quote).await?;
+            db.execute_raw(insert_quote).await?;
         }
         Ok(())
     }

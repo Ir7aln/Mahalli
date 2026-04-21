@@ -57,6 +57,11 @@ src-tauri/
 ## Getting Started
 
 Before you begin, ensure you have [Bun](https://bun.sh) and the [Tauri prerequisites](https://tauri.app/start/prerequisites/) installed.
+For SeaORM entity and migration generation, install the matching v2 CLI:
+
+```bash
+cargo install sea-orm-cli@^2.0.0-rc.34
+```
 
 ### Running in Development
 

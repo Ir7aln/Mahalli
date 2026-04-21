@@ -54,7 +54,7 @@ impl ActiveModelBehavior for ActiveModel {
     fn new() -> Self {
         Self {
             id: Set(ulid::Ulid::new().to_string()),
-            ..Default::default()
+            ..ActiveModelTrait::default()
         }
     }
 }

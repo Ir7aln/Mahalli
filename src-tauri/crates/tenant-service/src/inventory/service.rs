@@ -35,16 +35,16 @@ impl InventoryService {
                 Cond::all()
                     .add(
                         Expr::expr(Func::coalesce([
-                            Expr::col((Orders, orders::Column::Status)).into(),
-                            Expr::expr("PENDING").into(),
+                            Expr::col((Orders, orders::Column::Status)),
+                            Expr::expr("PENDING"),
                         ]))
                         .eq("CANCELLED")
                         .not(),
                     )
                     .add(
                         Expr::expr(Func::coalesce([
-                            Expr::col((Orders, orders::Column::IsDeleted)).into(),
-                            Expr::expr(false).into(),
+                            Expr::col((Orders, orders::Column::IsDeleted)),
+                            Expr::expr(false),
                         ]))
                         .eq(false),
                     ),
@@ -82,8 +82,8 @@ impl InventoryService {
             ])
             .expr_as(
                 Func::coalesce([
-                    Expr::col((OrderItems, order_items::Column::Price)).into(),
-                    Expr::col((Products, products::Column::PurchasePrice)).into(),
+                    Expr::col((OrderItems, order_items::Column::Price)),
+                    Expr::col((Products, products::Column::PurchasePrice)),
                 ]),
                 Alias::new("price"),
             )
@@ -112,16 +112,16 @@ impl InventoryService {
             .cond_where(
                 Cond::all().add(
                     Expr::expr(Func::coalesce([
-                        Expr::col((Orders, orders::Column::Status)).into(),
-                        Expr::expr("PENDING").into(),
+                        Expr::col((Orders, orders::Column::Status)),
+                        Expr::expr("PENDING"),
                     ]))
                     .eq("CANCELLED")
                     .not(),
                 )
                 .add(
                     Expr::expr(Func::coalesce([
-                        Expr::col((Orders, orders::Column::IsDeleted)).into(),
-                        Expr::expr(false).into(),
+                        Expr::col((Orders, orders::Column::IsDeleted)),
+                        Expr::expr(false),
                     ]))
                     .eq(false),
                 ),

@@ -26,12 +26,11 @@ fn client_credit_expr() -> SimpleExpr {
             Query::select()
                 .from(Invoices)
                 .expr(Expr::expr(Func::coalesce([
-                    Func::sum(
+                    Expr::expr(Func::sum(
                         Expr::col((InvoiceItems, invoice_items::Column::Quantity))
                             .mul(Expr::col((InvoiceItems, invoice_items::Column::Price))),
-                    )
-                    .into(),
-                    Expr::val(0.0f64).into(),
+                    )),
+                    Expr::val(0.0f64),
                 ])))
                 .left_join(
                     InvoiceItems,
@@ -60,8 +59,8 @@ fn client_credit_expr() -> SimpleExpr {
             Query::select()
                 .from(Invoices)
                 .expr(Expr::expr(Func::coalesce([
-                    Func::sum(Expr::col((Invoices, invoices::Column::PaidAmount))).into(),
-                    Expr::val(0.0f64).into(),
+                    Expr::expr(Func::sum(Expr::col((Invoices, invoices::Column::PaidAmount)))),
+                    Expr::val(0.0f64),
                 ])))
                 .cond_where(
                     Cond::all()
@@ -188,12 +187,11 @@ impl ClientsService {
             ])
             .expr_as(
                 Func::coalesce([
-                    Func::sum(
+                    Expr::expr(Func::sum(
                         Expr::col((InvoiceItems, invoice_items::Column::Quantity))
                             .mul(Expr::col((InvoiceItems, invoice_items::Column::Price))),
-                    )
-                    .into(),
-                    Expr::val(0.0f64).into(),
+                    )),
+                    Expr::val(0.0f64),
                 ]),
                 Alias::new("total"),
             )
@@ -231,8 +229,8 @@ impl ClientsService {
     pub async fn search_clients(db: &DbConn, search: String) -> Result<Vec<ClientSearch>, DbErr> {
         let clients = Clients::find()
             .select_only()
-            .expr_as_(Expr::col(clients::Column::FullName), "label")
-            .expr_as_(Expr::col(clients::Column::Id), "value")
+            .expr_as(Expr::col(clients::Column::FullName), "label")
+            .expr_as(Expr::col(clients::Column::Id), "value")
             .filter(clients::Column::IsDeleted.eq(false))
             .filter(clients::Column::FullName.like(format!("{}%", search)))
             .into_model::<ClientSearch>()

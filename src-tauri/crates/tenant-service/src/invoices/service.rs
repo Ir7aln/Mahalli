@@ -75,19 +75,20 @@ impl InvoicesService {
             ])
             .expr_as(
                 Func::coalesce([
-                    Func::count(Expr::col((InvoiceItems, invoice_items::Column::Id))).into(),
-                    Expr::val(0i64).into(),
+                    Expr::expr(Func::count(Expr::col(
+                        (InvoiceItems, invoice_items::Column::Id),
+                    ))),
+                    Expr::val(0i64),
                 ]),
                 Alias::new("products"),
             )
             .expr_as(
                 Func::coalesce([
-                    Func::sum(
+                    Expr::expr(Func::sum(
                         Expr::col((InvoiceItems, invoice_items::Column::Quantity))
                             .mul(Expr::col((InvoiceItems, invoice_items::Column::Price))),
-                    )
-                    .into(),
-                    Expr::val(0.0f64).into(),
+                    )),
+                    Expr::val(0.0f64),
                 ]),
                 Alias::new("total"),
             )
@@ -301,12 +302,11 @@ impl InvoicesService {
             ])
             .expr_as(
                 Func::coalesce([
-                    Func::sum(
+                    Expr::expr(Func::sum(
                         Expr::col((InvoiceItems, invoice_items::Column::Quantity))
                             .mul(Expr::col((InvoiceItems, invoice_items::Column::Price))),
-                    )
-                    .into(),
-                    Expr::val(0.0f64).into(),
+                    )),
+                    Expr::val(0.0f64),
                 ]),
                 Alias::new("total"),
             )

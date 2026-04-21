@@ -106,8 +106,8 @@ impl SuppliersService {
     ) -> Result<Vec<SupplierSearch>, DbErr> {
         let suppliers = Suppliers::find()
             .select_only()
-            .expr_as_(Expr::col(suppliers::Column::FullName), "label")
-            .expr_as_(Expr::col(suppliers::Column::Id), "value")
+            .expr_as(Expr::col(suppliers::Column::FullName), "label")
+            .expr_as(Expr::col(suppliers::Column::Id), "value")
             .filter(suppliers::Column::IsDeleted.eq(false))
             .filter(suppliers::Column::FullName.like(format!("{}%", search)))
             .into_model::<SupplierSearch>()

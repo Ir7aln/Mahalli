@@ -60,9 +60,10 @@ impl ProductsService {
                         Query::select()
                             .from(InventoryTransactions)
                             .expr(Func::coalesce([
-                                Func::sum(Expr::col(inventory_transactions::Column::Quantity))
-                                    .into(),
-                                Expr::val(0.0f64).into(),
+                                Expr::expr(Func::sum(Expr::col(
+                                    inventory_transactions::Column::Quantity,
+                                ))),
+                                Expr::val(0.0f64),
                             ]))
                             .cond_where(
                                 Cond::all()
@@ -87,9 +88,10 @@ impl ProductsService {
                         Query::select()
                             .from(InventoryTransactions)
                             .expr(Func::coalesce([
-                                Func::sum(Expr::col(inventory_transactions::Column::Quantity))
-                                    .into(),
-                                Expr::val(0.0f64).into(),
+                                Expr::expr(Func::sum(Expr::col(
+                                    inventory_transactions::Column::Quantity,
+                                ))),
+                                Expr::val(0.0f64),
                             ]))
                             .join(
                                 JoinType::Join,
@@ -190,9 +192,9 @@ impl ProductsService {
     pub async fn search_products(db: &DbConn, search: String) -> Result<Vec<ProductSearch>, DbErr> {
         let products = Products::find()
             .select_only()
-            .expr_as_(Expr::col(products::Column::Name), "label")
-            .expr_as_(Expr::col(products::Column::Id), "value")
-            .expr_as_(Expr::col(products::Column::SellingPrice), "price")
+            .expr_as(Expr::col(products::Column::Name), "label")
+            .expr_as(Expr::col(products::Column::Id), "value")
+            .expr_as(Expr::col(products::Column::SellingPrice), "price")
             .filter(products::Column::IsDeleted.eq(false))
             .filter(products::Column::Name.like(format!("{}%", search)))
             .into_model::<ProductSearch>()

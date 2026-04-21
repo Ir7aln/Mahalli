@@ -40,8 +40,8 @@ impl DashboardService {
             .expr_as(
                 Func::sum(
                     Expr::expr(Func::coalesce([
-                        Expr::col((OrderItems, order_items::Column::Price)).into(),
-                        Expr::col((Products, products::Column::PurchasePrice)).into(),
+                        Expr::col((OrderItems, order_items::Column::Price)),
+                        Expr::col((Products, products::Column::PurchasePrice)),
                     ]))
                     .mul(Expr::col((
                         InventoryTransactions,
@@ -73,10 +73,10 @@ impl DashboardService {
             .cond_where(
                 Cond::all()
                     .add(
-                        Expr::expr(Func::coalesce([
-                            Expr::col((Orders, orders::Column::Status)).into(),
-                            Expr::expr("PENDING").into(),
-                        ]))
+                    Expr::expr(Func::coalesce([
+                        Expr::col((Orders, orders::Column::Status)),
+                        Expr::expr("PENDING"),
+                    ]))
                         .eq("CANCELLED")
                         .not(),
                     )
@@ -379,7 +379,7 @@ impl DashboardService {
                     None,
                     Box::new(SubQueryStatement::SelectStatement(
                         Query::select().expr(Func::coalesce([
-                            Func::sum(
+                            Expr::expr(Func::sum(
                                 Expr::case(
                                     Expr::col((Invoices, invoices::Column::Status)).eq("PAID"),
                                     Expr::col((
@@ -394,9 +394,8 @@ impl DashboardService {
                                     Expr::col((Invoices, invoices::Column::PaidAmount)),
                                 )
                                 .finally(Expr::val(0)),
-                            )
-                            .into(),
-                            Expr::val(0.0).into(),
+                            )),
+                            Expr::val(0.0),
                         ]))
                         .from(InventoryTransactions)
                         .join(
@@ -435,7 +434,7 @@ impl DashboardService {
                     None,
                     Box::new(SubQueryStatement::SelectStatement(
                         Query::select().expr(Func::coalesce([
-                            Func::sum(
+                            Expr::expr(Func::sum(
                                 Expr::case(
                                     Expr::col((Invoices, invoices::Column::Status)).eq("PAID"),
                                     Expr::col((
@@ -450,9 +449,8 @@ impl DashboardService {
                                     Expr::col((Invoices, invoices::Column::PaidAmount)),
                                 )
                                 .finally(Expr::val(0)),
-                            )
-                            .into(),
-                            Expr::val(0.0).into(),
+                            )),
+                            Expr::val(0.0),
                         ]))
                         .from(InventoryTransactions)
                         .join(
@@ -491,7 +489,7 @@ impl DashboardService {
                     None,
                     Box::new(SubQueryStatement::SelectStatement(
                         Query::select().expr(Func::coalesce([
-                            Func::sum(
+                            Expr::expr(Func::sum(
                                 Expr::case(
                                     Expr::col((Invoices, invoices::Column::Status)).eq("PAID"),
                                     Expr::col((
@@ -506,9 +504,8 @@ impl DashboardService {
                                     Expr::col((Invoices, invoices::Column::PaidAmount)),
                                 )
                                 .finally(Expr::val(0)),
-                            )
-                            .into(),
-                            Expr::val(0.0).into(),
+                            )),
+                            Expr::val(0.0),
                         ]))
                         .from(InventoryTransactions)
                         .join(
@@ -547,7 +544,7 @@ impl DashboardService {
                     None,
                     Box::new(SubQueryStatement::SelectStatement(
                         Query::select().expr(Func::coalesce([
-                            Func::sum(
+                            Expr::expr(Func::sum(
                                 Expr::case(
                                     Expr::col((Invoices, invoices::Column::Status)).eq("PAID"),
                                     Expr::col((
@@ -562,9 +559,8 @@ impl DashboardService {
                                     Expr::col((Invoices, invoices::Column::PaidAmount)),
                                 )
                                 .finally(Expr::val(0)),
-                            )
-                            .into(),
-                            Expr::val(0.0).into(),
+                            )),
+                            Expr::val(0.0),
                         ]))
                         .from(InventoryTransactions)
                         .join(

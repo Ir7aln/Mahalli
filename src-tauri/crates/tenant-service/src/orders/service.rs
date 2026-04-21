@@ -63,22 +63,23 @@ impl OrdersService {
             ])
             .expr_as(
                 Func::coalesce([
-                    Func::count(Expr::col(inventory_transactions::Column::Quantity)).into(),
-                    Expr::val(0i64).into(),
+                    Expr::expr(Func::count(Expr::col(
+                        inventory_transactions::Column::Quantity,
+                    ))),
+                    Expr::val(0i64),
                 ]),
                 Alias::new("products"),
             )
             .expr_as(
                 Func::coalesce([
-                    Func::sum(
+                    Expr::expr(Func::sum(
                         Expr::col((
                             InventoryTransactions,
                             inventory_transactions::Column::Quantity,
                         ))
                         .mul(Expr::col((OrderItems, order_items::Column::Price))),
-                    )
-                    .into(),
-                    Expr::val(0.0f64).into(),
+                    )),
+                    Expr::val(0.0f64),
                 ]),
                 Alias::new("total"),
             )
@@ -292,15 +293,14 @@ impl OrdersService {
             ])
             .expr_as(
                 Func::coalesce([
-                    Func::sum(
+                    Expr::expr(Func::sum(
                         Expr::col((
                             InventoryTransactions,
                             inventory_transactions::Column::Quantity,
                         ))
                         .mul(Expr::col((OrderItems, order_items::Column::Price))),
-                    )
-                    .into(),
-                    Expr::val(0.0f64).into(),
+                    )),
+                    Expr::val(0.0f64),
                 ]),
                 Alias::new("total"),
             )

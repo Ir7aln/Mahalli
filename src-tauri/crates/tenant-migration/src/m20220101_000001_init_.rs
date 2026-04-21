@@ -7,7 +7,7 @@ pub struct Migration;
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let db = manager.get_connection();
-        db.execute(Statement::from_string(
+        db.execute_raw(Statement::from_string(
             sea_orm::DatabaseBackend::Sqlite,
             r#"PRAGMA journal_mode=WAL;"#,
         ))
@@ -626,7 +626,7 @@ impl MigrationTrait for Migration {
                 END;
             "#,
         );
-        db.execute(i_identifier_generator).await?;
+        db.execute_raw(i_identifier_generator).await?;
 
         let o_identifier_generator = Statement::from_string(
             sea_orm::DatabaseBackend::Sqlite,
@@ -653,7 +653,7 @@ impl MigrationTrait for Migration {
                 END;
             "#,
         );
-        db.execute(o_identifier_generator).await?;
+        db.execute_raw(o_identifier_generator).await?;
 
         let q_identifier_generator = Statement::from_string(
             sea_orm::DatabaseBackend::Sqlite,
@@ -680,7 +680,7 @@ impl MigrationTrait for Migration {
                 END;
             "#,
         );
-        db.execute(q_identifier_generator).await?;
+        db.execute_raw(q_identifier_generator).await?;
 
         Ok(())
     }
