@@ -5688,6 +5688,7 @@ dependencies = [
 name = "system-entity"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "sea-orm",
  "serde",
  "ulid",
@@ -6181,6 +6182,7 @@ dependencies = [
 name = "tenant-entity"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "sea-orm",
  "serde",
  "ulid",
