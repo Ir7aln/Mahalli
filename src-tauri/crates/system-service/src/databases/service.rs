@@ -55,7 +55,7 @@ impl DatabasesService {
         db: &DatabaseConnection,
         input: CreateDatabaseInput,
     ) -> Result<String, sea_orm::DbErr> {
-        let now = chrono::Utc::now().naive_utc().to_string();
+        let now = chrono::Utc::now().naive_utc();
 
         if input.is_active {
             Self::clear_active_database(db).await?;
@@ -81,7 +81,7 @@ impl DatabasesService {
         db: &DatabaseConnection,
         input: ActivateDatabaseInput,
     ) -> Result<(), sea_orm::DbErr> {
-        let now = chrono::Utc::now().naive_utc().to_string();
+        let now = chrono::Utc::now().naive_utc();
         Self::clear_active_database(db).await?;
 
         if let Some(model) = Databases::find_by_id(input.id).one(db).await? {

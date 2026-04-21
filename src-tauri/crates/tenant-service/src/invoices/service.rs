@@ -1,5 +1,4 @@
 use super::dto::*;
-use sea_orm::entity::prelude::Decimal;
 use sea_orm::{
     sea_query::{Alias, Cond, Expr, Func, Query, SqliteQueryBuilder},
     DatabaseConnection as DbConn, *,
@@ -249,7 +248,7 @@ impl InvoicesService {
                     id: invoice_data.id,
                     client_id: invoice_data.client_id,
                     paid_amount: invoice_data.paid_amount,
-                    created_at: invoice_data.created_at,
+                    created_at: invoice_data.created_at.to_string(),
                     status: invoice_data.status,
                     identifier: invoice_data.identifier,
                     full_name: client.full_name,
@@ -412,7 +411,7 @@ impl InvoicesService {
                 for item in invoice.items {
                     let created_inventory = InventoryActiveModel {
                         product_id: ActiveValue::Set(item.product_id.clone()),
-                        quantity: ActiveValue::Set(item.quantity),
+                        quantity: ActiveValue::Set(item.quantity as f32),
                         transaction_type: ActiveValue::Set("OUT".to_string()),
                         ..Default::default()
                     }
@@ -470,7 +469,7 @@ impl InvoicesService {
                         None => {
                             let created_inventory = InventoryActiveModel {
                                 product_id: ActiveValue::Set(item.product_id.clone()),
-                                quantity: ActiveValue::Set(item.quantity),
+                                quantity: ActiveValue::Set(item.quantity as f32),
                                 transaction_type: ActiveValue::Set("OUT".to_string()),
                                 ..Default::default()
                             }
@@ -513,7 +512,7 @@ impl InvoicesService {
                         Some(order) => {
                             let invoice = InvoiceActiveModel {
                                 client_id: ActiveValue::Set(order.client_id),
-                                paid_amount: ActiveValue::Set(Decimal::ZERO),
+                                paid_amount: ActiveValue::Set(0.0f32),
                                 status: ActiveValue::Set("DRAFT".to_string()),
                                 order_id: ActiveValue::Set(order.id),
                                 ..Default::default()
@@ -541,8 +540,8 @@ impl InvoicesService {
                                 invoice_items.push(InvoiceItemActiveModel {
                                     invoice_id: ActiveValue::Set(invoice.id.clone()),
                                     product_id: ActiveValue::Set(inv_txn.product_id),
-                                    price: ActiveValue::Set(item.price),
-                                    quantity: ActiveValue::Set(inv_txn.quantity),
+                                    price: ActiveValue::Set(item.price as f64),
+                                    quantity: ActiveValue::Set(inv_txn.quantity as f64),
                                     inventory_id: ActiveValue::Set(Some(item.inventory_id)),
                                     ..Default::default()
                                 });

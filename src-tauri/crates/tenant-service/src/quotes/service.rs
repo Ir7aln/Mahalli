@@ -196,7 +196,7 @@ impl QuotesService {
                 Ok(QuoteWithClient {
                     id: quote.0.id,
                     client_id: quote.0.client_id,
-                    created_at: quote.0.created_at,
+                    created_at: quote.0.created_at.to_string(),
                     identifier: quote.0.identifier,
                     full_name: client.full_name,
                     items,

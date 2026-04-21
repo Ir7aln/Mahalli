@@ -1,4 +1,3 @@
-use sea_orm::entity::prelude::Decimal;
 use sea_orm::FromQueryResult;
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -69,7 +68,7 @@ pub struct ClientInvoiceDebtItem {
     pub id: String,
     pub identifier: String,
     #[specta(type = f64)]
-    pub total: Decimal,
-    #[specta(type = f64)]
-    pub paid_amount: Decimal,
+    pub total: f64,
+    #[specta(type = f32)]
+    pub paid_amount: f32,
 }

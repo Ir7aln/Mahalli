@@ -1,4 +1,3 @@
-use sea_orm::entity::prelude::Decimal;
 use sea_orm::FromQueryResult;
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -18,15 +17,15 @@ pub struct ListInvoicesArgs {
 pub struct SelectInvoices {
     pub id: String,
     pub created_at: String,
-    #[specta(type = f64)]
-    pub paid_amount: Decimal,
+    #[specta(type = f32)]
+    pub paid_amount: f32,
     pub client_id: String,
     pub full_name: String,
     pub status: String,
     pub identifier: String,
     pub products: i64,
     #[specta(type = f64)]
-    pub total: Decimal,
+    pub total: f64,
 }
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, FromQueryResult, Type)]
@@ -34,8 +33,8 @@ pub struct SelectInvoiceDetails {
     pub id: String,
     pub order_id: String,
     pub created_at: String,
-    #[specta(type = f64)]
-    pub paid_amount: Decimal,
+    #[specta(type = f32)]
+    pub paid_amount: f32,
     pub full_name: String,
     pub address: Option<String>,
     pub phone_number: Option<String>,
@@ -43,15 +42,15 @@ pub struct SelectInvoiceDetails {
     pub status: String,
     pub identifier: String,
     #[specta(type = f64)]
-    pub total: Decimal,
+    pub total: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]
 pub struct NewInvoiceItem {
     #[specta(type = f64)]
-    pub price: Decimal,
+    pub price: f64,
     #[specta(type = f64)]
-    pub quantity: Decimal,
+    pub quantity: f64,
     pub product_id: String,
 }
 
@@ -61,9 +60,9 @@ pub struct UpdateInvoiceItem {
     pub invoice_id: Option<String>,
     pub inventory_id: Option<String>,
     #[specta(type = f64)]
-    pub price: Decimal,
+    pub price: f64,
     #[specta(type = f64)]
-    pub quantity: Decimal,
+    pub quantity: f64,
     pub product_id: String,
 }
 
@@ -72,8 +71,8 @@ pub struct NewInvoice {
     pub client_id: String,
     pub order_id: Option<String>,
     pub status: String,
-    #[specta(type = f64)]
-    pub paid_amount: Decimal,
+    #[specta(type = f32)]
+    pub paid_amount: f32,
     pub items: Vec<NewInvoiceItem>,
 }
 
@@ -82,8 +81,8 @@ pub struct UpdateInvoice {
     pub id: String,
     pub client_id: String,
     pub status: String,
-    #[specta(type = f64)]
-    pub paid_amount: Decimal,
+    #[specta(type = f32)]
+    pub paid_amount: f32,
     pub items: Vec<UpdateInvoiceItem>,
 }
 
@@ -103,9 +102,9 @@ pub struct UpdateInvoiceStatus {
 pub struct InvoiceProductItem {
     pub name: String,
     #[specta(type = f64)]
-    pub price: Decimal,
+    pub price: f64,
     #[specta(type = f64)]
-    pub quantity: Decimal,
+    pub quantity: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]
@@ -115,8 +114,8 @@ pub struct InvoiceWithClient {
     pub created_at: String,
     pub status: String,
     pub identifier: Option<String>,
-    #[specta(type = f64)]
-    pub paid_amount: Decimal,
+    #[specta(type = f32)]
+    pub paid_amount: f32,
     pub full_name: String,
     pub email: Option<String>,
     pub address: Option<String>,
@@ -130,10 +129,10 @@ pub struct InvoiceDetailsResponse {
     pub created_at: String,
     pub status: String,
     pub identifier: String,
+    #[specta(type = f32)]
+    pub paid_amount: f32,
     #[specta(type = f64)]
-    pub paid_amount: Decimal,
-    #[specta(type = f64)]
-    pub total: Decimal,
+    pub total: f64,
     pub client: InvoiceClientInfo,
     pub items: Vec<SelectInvoicesItems>,
 }
@@ -152,9 +151,9 @@ pub struct SelectInvoicesItemsForUpdate {
     pub inventory_id: Option<String>,
     pub name: String,
     #[specta(type = f64)]
-    pub price: Decimal,
+    pub price: f64,
     #[specta(type = f64)]
-    pub quantity: Decimal,
+    pub quantity: f64,
     pub product_id: String,
 }
 
@@ -162,7 +161,7 @@ pub struct SelectInvoicesItemsForUpdate {
 pub struct SelectInvoicesItems {
     pub name: String,
     #[specta(type = f64)]
-    pub price: Decimal,
+    pub price: f64,
     #[specta(type = f64)]
-    pub quantity: Decimal,
+    pub quantity: f64,
 }

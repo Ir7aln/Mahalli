@@ -1,4 +1,3 @@
-use sea_orm::entity::prelude::Decimal;
 use sea_orm::FromQueryResult;
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -21,8 +20,8 @@ pub struct SelectQuotes {
     pub full_name: String,
     pub products: i64,
     pub identifier: String,
-    #[specta(type = f64)]
-    pub total: Decimal,
+    #[specta(type = f32)]
+    pub total: f32,
 }
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, FromQueryResult, Type)]
@@ -34,26 +33,26 @@ pub struct SelectQuoteDetails {
     pub phone_number: Option<String>,
     pub email: Option<String>,
     pub identifier: String,
-    #[specta(type = f64)]
-    pub total: Decimal,
+    #[specta(type = f32)]
+    pub total: f32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]
 pub struct NewQuoteItem {
-    #[specta(type = f64)]
-    pub price: Decimal,
-    #[specta(type = f64)]
-    pub quantity: Decimal,
+    #[specta(type = f32)]
+    pub price: f32,
+    #[specta(type = f32)]
+    pub quantity: f32,
     pub product_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]
 pub struct UpdateQuoteItem {
     pub id: Option<String>,
-    #[specta(type = f64)]
-    pub price: Decimal,
-    #[specta(type = f64)]
-    pub quantity: Decimal,
+    #[specta(type = f32)]
+    pub price: f32,
+    #[specta(type = f32)]
+    pub quantity: f32,
     pub product_id: String,
 }
 
@@ -79,10 +78,10 @@ pub struct QuotesResponse {
 #[derive(Debug, Serialize, Deserialize, FromQueryResult, Type)]
 pub struct QuoteProductItem {
     pub name: String,
-    #[specta(type = f64)]
-    pub price: Decimal,
-    #[specta(type = f64)]
-    pub quantity: Decimal,
+    #[specta(type = f32)]
+    pub price: f32,
+    #[specta(type = f32)]
+    pub quantity: f32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]
@@ -100,8 +99,8 @@ pub struct QuoteDetailsResponse {
     pub id: String,
     pub created_at: String,
     pub identifier: String,
-    #[specta(type = f64)]
-    pub total: Decimal,
+    #[specta(type = f32)]
+    pub total: f32,
     pub client: QuoteClientInfo,
     pub items: Vec<SelectQuotesItems>,
 }
@@ -118,18 +117,18 @@ pub struct QuoteClientInfo {
 pub struct SelectQuotesItemsForUpdate {
     pub id: String,
     pub name: String,
-    #[specta(type = f64)]
-    pub price: Decimal,
-    #[specta(type = f64)]
-    pub quantity: Decimal,
+    #[specta(type = f32)]
+    pub price: f32,
+    #[specta(type = f32)]
+    pub quantity: f32,
     pub product_id: String,
 }
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, FromQueryResult, Type)]
 pub struct SelectQuotesItems {
     pub name: String,
-    #[specta(type = f64)]
-    pub price: Decimal,
-    #[specta(type = f64)]
-    pub quantity: Decimal,
+    #[specta(type = f32)]
+    pub price: f32,
+    #[specta(type = f32)]
+    pub quantity: f32,
 }

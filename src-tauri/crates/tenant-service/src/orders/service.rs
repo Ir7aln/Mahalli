@@ -237,7 +237,7 @@ impl OrdersService {
                 Ok(OrderWithClient {
                     id: order.0.id,
                     client_id: order.0.client_id,
-                    created_at: order.0.created_at,
+                    created_at: order.0.created_at.to_string(),
                     status: order.0.status,
                     identifier: order.0.identifier,
                     full_name: client.full_name,
