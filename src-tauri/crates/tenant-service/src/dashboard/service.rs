@@ -8,6 +8,7 @@ use sea_orm::{
 use tenant_entity::{
     clients::{self, Entity as Clients},
     inventory_transactions::{self, Entity as InventoryTransactions},
+    invoice_payments::{self, Entity as InvoicePayments},
     invoices::{self, Entity as Invoices},
     order_items::{self, Entity as OrderItems},
     orders::{self, Entity as Orders},
@@ -16,6 +17,28 @@ use tenant_entity::{
 };
 
 pub struct DashboardService;
+
+fn invoice_paid_amount_expr() -> SimpleExpr {
+    SimpleExpr::SubQuery(
+        None,
+        Box::new(SubQueryStatement::SelectStatement(
+            Query::select()
+                .expr(Expr::expr(Func::coalesce([
+                    Expr::expr(Func::sum(Expr::col((
+                        InvoicePayments,
+                        invoice_payments::Column::Amount,
+                    )))),
+                    Expr::val(0.0f64),
+                ])))
+                .from(InvoicePayments)
+                .cond_where(
+                    Expr::col((InvoicePayments, invoice_payments::Column::InvoiceId))
+                        .equals((Invoices, invoices::Column::Id)),
+                )
+                .to_owned(),
+        )),
+    )
+}
 
 impl DashboardService {
     pub async fn list_inventory_stats(db: &DbConn) -> Result<Vec<SelectTransaction>, DbErr> {
@@ -391,7 +414,7 @@ impl DashboardService {
                                 .case(
                                     Expr::col((Invoices, invoices::Column::Status))
                                         .eq("PARTIALLY_PAID"),
-                                    Expr::col((Invoices, invoices::Column::PaidAmount)),
+                                    invoice_paid_amount_expr(),
                                 )
                                 .finally(Expr::val(0)),
                             )),
@@ -446,7 +469,7 @@ impl DashboardService {
                                 .case(
                                     Expr::col((Invoices, invoices::Column::Status))
                                         .eq("PARTIALLY_PAID"),
-                                    Expr::col((Invoices, invoices::Column::PaidAmount)),
+                                    invoice_paid_amount_expr(),
                                 )
                                 .finally(Expr::val(0)),
                             )),
@@ -501,7 +524,7 @@ impl DashboardService {
                                 .case(
                                     Expr::col((Invoices, invoices::Column::Status))
                                         .eq("PARTIALLY_PAID"),
-                                    Expr::col((Invoices, invoices::Column::PaidAmount)),
+                                    invoice_paid_amount_expr(),
                                 )
                                 .finally(Expr::val(0)),
                             )),
@@ -556,7 +579,7 @@ impl DashboardService {
                                 .case(
                                     Expr::col((Invoices, invoices::Column::Status))
                                         .eq("PARTIALLY_PAID"),
-                                    Expr::col((Invoices, invoices::Column::PaidAmount)),
+                                    invoice_paid_amount_expr(),
                                 )
                                 .finally(Expr::val(0)),
                             )),

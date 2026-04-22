@@ -34,6 +34,7 @@
     "toggle-create-invoice": "Add new invoice",
     "toggle-create-org": "Create an organisation",
     "edit": "Edit",
+    "add-payment": "Add payment",
     "delete": "Delete",
     "print": "Print",
     "to-order": "Create order",
@@ -57,6 +58,7 @@
     "address": "Address",
     "actions": "Actions",
     "description": "Description",
+    "amount": "Amount",
     "status": "Status",
     "price": "Price",
     "purchase-price": "Purchase Price",
@@ -88,6 +90,7 @@
     "no-match": "no match found",
     "subtotal": "Subtotal",
     "balance": "Balance",
+    "payments": "Payments",
     "currency": "MAD"
   },
   "placeholders": {
@@ -95,7 +98,9 @@
     "no-client-selected": "No client selected yet",
     "no-email": "No email",
     "no-address": "No address",
-    "no-phone": "No phone"
+    "no-phone": "No phone",
+    "payment-description": "Optional payment note",
+    "no-payments": "No payments recorded yet"
   },
   "status": {
     "pending": "Pending",
@@ -233,7 +238,10 @@
     "invoice": {
       "created": "An Invoice has been created",
       "updated": "The Invoice has been updated",
-      "deleted": "The Invoice has been deleted"
+      "deleted": "The Invoice has been deleted",
+      "payment-added": "Payment added to the invoice",
+      "payment-too-high": "Payment amount is too high",
+      "payment-too-high-description": "The remaining unpaid amount is {amount}"
     },
     "quote": {
       "created": "A Quote has been created",
@@ -284,7 +292,8 @@
     "invoices": {
       "create": "Add new invoice",
       "update": "Update invoice",
-      "delete": "Are you sure you wanna delete the invoice "
+      "delete": "Are you sure you wanna delete the invoice ",
+      "add-payment": "Add payment"
     },
     "organizations": {
       "create": "Add new organization",

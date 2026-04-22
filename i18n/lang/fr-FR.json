@@ -34,6 +34,7 @@
     "toggle-create-invoice": "Ajouter une nouvelle facture",
     "toggle-create-org": "Créer une organisation",
     "edit": "Modifier",
+    "add-payment": "Ajouter un paiement",
     "delete": "Supprimer",
     "print": "Imprimer",
     "to-order": "Créer une commande",
@@ -57,6 +58,7 @@
     "address": "Adresse",
     "actions": "Actions",
     "description": "Description",
+    "amount": "Montant",
     "status": "Statut",
     "price": "Prix",
     "purchase-price": "Prix d'achat",
@@ -88,6 +90,7 @@
     "no-match": "aucune correspondance trouvée",
     "subtotal": "Sous-total",
     "balance": "Solde",
+    "payments": "Paiements",
     "currency": "MAD"
   },
   "placeholders": {
@@ -95,7 +98,9 @@
     "no-client-selected": "Aucun client sélectionné",
     "no-email": "Pas d'email",
     "no-address": "Pas d'adresse",
-    "no-phone": "Pas de téléphone"
+    "no-phone": "Pas de téléphone",
+    "payment-description": "Note de paiement facultative",
+    "no-payments": "Aucun paiement enregistré"
   },
   "status": {
     "pending": "En attente",
@@ -232,7 +237,10 @@
     "invoice": {
       "created": "Une facture a été créée",
       "updated": "La facture a été mise à jour",
-      "deleted": "La facture a été supprimée"
+      "deleted": "La facture a été supprimée",
+      "payment-added": "Le paiement a été ajouté à la facture",
+      "payment-too-high": "Le montant du paiement est trop élevé",
+      "payment-too-high-description": "Le montant impayé restant est de {amount}"
     },
     "quote": {
       "created": "Un devis a été créé",
@@ -283,7 +291,8 @@
     "invoices": {
       "create": "Ajouter une nouvelle facture",
       "update": "Mettre à jour la facture",
-      "delete": "Êtes-vous sûr de vouloir supprimer la facture"
+      "delete": "Êtes-vous sûr de vouloir supprimer la facture",
+      "add-payment": "Ajouter un paiement"
     },
     "organizations": {
       "create": "Ajouter une nouvelle organisation",

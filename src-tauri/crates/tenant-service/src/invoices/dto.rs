@@ -17,8 +17,8 @@ pub struct ListInvoicesArgs {
 pub struct SelectInvoices {
     pub id: String,
     pub created_at: String,
-    #[specta(type = f32)]
-    pub paid_amount: f32,
+    #[specta(type = f64)]
+    pub paid_amount: f64,
     pub client_id: String,
     pub full_name: String,
     pub status: String,
@@ -33,8 +33,8 @@ pub struct SelectInvoiceDetails {
     pub id: String,
     pub order_id: String,
     pub created_at: String,
-    #[specta(type = f32)]
-    pub paid_amount: f32,
+    #[specta(type = f64)]
+    pub paid_amount: f64,
     pub full_name: String,
     pub address: Option<String>,
     pub phone_number: Option<String>,
@@ -71,8 +71,6 @@ pub struct NewInvoice {
     pub client_id: String,
     pub order_id: Option<String>,
     pub status: String,
-    #[specta(type = f32)]
-    pub paid_amount: f32,
     pub items: Vec<NewInvoiceItem>,
 }
 
@@ -81,8 +79,6 @@ pub struct UpdateInvoice {
     pub id: String,
     pub client_id: String,
     pub status: String,
-    #[specta(type = f32)]
-    pub paid_amount: f32,
     pub items: Vec<UpdateInvoiceItem>,
 }
 
@@ -114,13 +110,16 @@ pub struct InvoiceWithClient {
     pub created_at: String,
     pub status: String,
     pub identifier: Option<String>,
-    #[specta(type = f32)]
-    pub paid_amount: f32,
+    #[specta(type = f64)]
+    pub paid_amount: f64,
+    #[specta(type = f64)]
+    pub total: f64,
     pub full_name: String,
     pub email: Option<String>,
     pub address: Option<String>,
     pub phone_number: Option<String>,
     pub items: Vec<SelectInvoicesItemsForUpdate>,
+    pub payments: Vec<SelectInvoicePayment>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]
@@ -129,12 +128,13 @@ pub struct InvoiceDetailsResponse {
     pub created_at: String,
     pub status: String,
     pub identifier: String,
-    #[specta(type = f32)]
-    pub paid_amount: f32,
+    #[specta(type = f64)]
+    pub paid_amount: f64,
     #[specta(type = f64)]
     pub total: f64,
     pub client: InvoiceClientInfo,
     pub items: Vec<SelectInvoicesItems>,
+    pub payments: Vec<SelectInvoicePayment>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]
@@ -164,4 +164,22 @@ pub struct SelectInvoicesItems {
     pub price: f64,
     #[specta(type = f64)]
     pub quantity: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, FromQueryResult, Type)]
+pub struct SelectInvoicePayment {
+    pub id: String,
+    pub payment_date: String,
+    pub description: Option<String>,
+    #[specta(type = f64)]
+    pub amount: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Type)]
+pub struct AddInvoicePayment {
+    pub invoice_id: String,
+    pub payment_date: String,
+    pub description: Option<String>,
+    #[specta(type = f64)]
+    pub amount: f64,
 }

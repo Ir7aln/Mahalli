@@ -1,8 +1,9 @@
 use tauri::State;
 
 use tenant_service::invoices::{
-    InvoiceDetailsResponse, InvoiceProductItem, InvoiceWithClient, InvoicesResponse,
-    InvoicesService, ListInvoicesArgs, NewInvoice, UpdateInvoice, UpdateInvoiceStatus,
+    AddInvoicePayment, InvoiceDetailsResponse, InvoiceProductItem, InvoiceWithClient,
+    InvoicesResponse, InvoicesService, ListInvoicesArgs, NewInvoice, UpdateInvoice,
+    UpdateInvoiceStatus,
 };
 
 use crate::AppState;
@@ -92,6 +93,26 @@ pub async fn update_invoice(state: State<'_, AppState>, invoice: UpdateInvoice) 
             error: None,
             message: Option::Some(String::from("update invoices success")),
             data: None,
+        }),
+        Err(err) => Err(Fail {
+            error: Some(err.to_string()),
+            message: None,
+        }),
+    }
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn add_invoice_payment(
+    state: State<'_, AppState>,
+    payment: AddInvoicePayment,
+) -> SResult<String> {
+    let db_conn = tenant_db_or_fail(&state).await?;
+    match InvoicesService::add_invoice_payment(&db_conn, payment).await {
+        Ok(id) => Ok(Success {
+            error: None,
+            message: Option::Some(String::from("invoice payment added successfully")),
+            data: Some(id),
         }),
         Err(err) => Err(Fail {
             error: Some(err.to_string()),

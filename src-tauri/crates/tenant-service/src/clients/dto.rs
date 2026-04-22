@@ -69,6 +69,6 @@ pub struct ClientInvoiceDebtItem {
     pub identifier: String,
     #[specta(type = f64)]
     pub total: f64,
-    #[specta(type = f32)]
-    pub paid_amount: f32,
+    #[specta(type = f64)]
+    pub paid_amount: f64,
 }

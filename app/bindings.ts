@@ -55,6 +55,7 @@ export const commands = {
 	getInvoiceDetails: (id: string) => typedError<Success<InvoiceDetailsResponse>, Fail>(__TAURI_INVOKE("get_invoice_details", { id })),
 	createInvoice: (invoice: NewInvoice) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_invoice", { invoice })),
 	updateInvoice: (invoice: UpdateInvoice) => typedError<Success<null>, Fail>(__TAURI_INVOKE("update_invoice", { invoice })),
+	addInvoicePayment: (payment: AddInvoicePayment) => typedError<Success<string>, Fail>(__TAURI_INVOKE("add_invoice_payment", { payment })),
 	deleteInvoice: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_invoice", { id })),
 	listInvoiceProducts: (id: string) => typedError<Success<InvoiceProductItem[]>, Fail>(__TAURI_INVOKE("list_invoice_products", { id })),
 	createInvoiceFromOrder: (id: string) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_invoice_from_order", { id })),
@@ -70,6 +71,13 @@ export const commands = {
 };
 
 /* Types */
+export type AddInvoicePayment = {
+	invoice_id: string,
+	payment_date: string,
+	description: string | null,
+	amount: number,
+};
+
 export type Client = {
 	id: string,
 	full_name: string,
@@ -169,6 +177,7 @@ export type InvoiceDetailsResponse = {
 	total: number,
 	client: InvoiceClientInfo,
 	items: SelectInvoicesItems[],
+	payments: SelectInvoicePayment[],
 };
 
 export type InvoiceProductItem = {
@@ -184,11 +193,13 @@ export type InvoiceWithClient = {
 	status: string,
 	identifier: string | null,
 	paid_amount: number,
+	total: number,
 	full_name: string,
 	email: string | null,
 	address: string | null,
 	phone_number: string | null,
 	items: SelectInvoicesItemsForUpdate[],
+	payments: SelectInvoicePayment[],
 };
 
 export type InvoicesResponse = {
@@ -277,7 +288,6 @@ export type NewInvoice = {
 	client_id: string,
 	order_id: string | null,
 	status: string,
-	paid_amount: number,
 	items: NewInvoiceItem[],
 };
 
@@ -445,6 +455,13 @@ export type SelectInventory = {
 	transaction_type: string,
 };
 
+export type SelectInvoicePayment = {
+	id: string,
+	payment_date: string,
+	description: string | null,
+	amount: number,
+};
+
 export type SelectInvoices = {
 	id: string,
 	created_at: string,
@@ -600,7 +617,6 @@ export type UpdateInvoice = {
 	id: string,
 	client_id: string,
 	status: string,
-	paid_amount: number,
 	items: UpdateInvoiceItem[],
 };
 

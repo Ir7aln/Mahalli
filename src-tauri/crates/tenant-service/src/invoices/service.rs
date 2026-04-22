@@ -1,6 +1,9 @@
 use super::dto::*;
+use chrono::{DateTime, NaiveDate, NaiveDateTime};
 use sea_orm::{
-    sea_query::{Alias, Cond, Expr, Func, Query, SqliteQueryBuilder},
+    sea_query::{
+        Alias, Cond, Expr, Func, Query, SimpleExpr, SqliteQueryBuilder, SubQueryStatement,
+    },
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
@@ -9,6 +12,9 @@ use tenant_entity::{
         ActiveModel as InventoryActiveModel, Entity as InventoryTransactions,
     },
     invoice_items::{self, ActiveModel as InvoiceItemActiveModel, Entity as InvoiceItems},
+    invoice_payments::{
+        self, ActiveModel as InvoicePaymentActiveModel, Entity as InvoicePayments,
+    },
     invoices::{self, ActiveModel as InvoiceActiveModel, Entity as Invoices},
     order_items::{self, Entity as OrderItems},
     orders::{ActiveModel as OrderActiveModel, Entity as Orders},
@@ -21,6 +27,177 @@ fn requested_order(direction: Option<&str>) -> Order {
     } else {
         Order::Desc
     }
+}
+
+fn invoice_products_count_expr() -> SimpleExpr {
+    SimpleExpr::SubQuery(
+        None,
+        Box::new(SubQueryStatement::SelectStatement(
+            Query::select()
+                .expr(Expr::expr(Func::coalesce([
+                    Expr::expr(Func::count(Expr::col((InvoiceItems, invoice_items::Column::Id)))),
+                    Expr::val(0i64),
+                ])))
+                .from(InvoiceItems)
+                .cond_where(
+                    Expr::col((InvoiceItems, invoice_items::Column::InvoiceId))
+                        .equals((Invoices, invoices::Column::Id)),
+                )
+                .to_owned(),
+        )),
+    )
+}
+
+fn invoice_total_expr() -> SimpleExpr {
+    SimpleExpr::SubQuery(
+        None,
+        Box::new(SubQueryStatement::SelectStatement(
+            Query::select()
+                .expr(Expr::expr(Func::coalesce([
+                    Expr::expr(Func::sum(
+                        Expr::col((InvoiceItems, invoice_items::Column::Quantity))
+                            .mul(Expr::col((InvoiceItems, invoice_items::Column::Price))),
+                    )),
+                    Expr::val(0.0f64),
+                ])))
+                .from(InvoiceItems)
+                .cond_where(
+                    Expr::col((InvoiceItems, invoice_items::Column::InvoiceId))
+                        .equals((Invoices, invoices::Column::Id)),
+                )
+                .to_owned(),
+        )),
+    )
+}
+
+fn invoice_paid_amount_expr() -> SimpleExpr {
+    SimpleExpr::SubQuery(
+        None,
+        Box::new(SubQueryStatement::SelectStatement(
+            Query::select()
+                .expr(Expr::expr(Func::coalesce([
+                    Expr::expr(Func::sum(Expr::col((
+                        InvoicePayments,
+                        invoice_payments::Column::Amount,
+                    )))),
+                    Expr::val(0.0f64),
+                ])))
+                .from(InvoicePayments)
+                .cond_where(
+                    Expr::col((InvoicePayments, invoice_payments::Column::InvoiceId))
+                        .equals((Invoices, invoices::Column::Id)),
+                )
+                .to_owned(),
+        )),
+    )
+}
+
+async fn invoice_total_by_id<C>(db: &C, invoice_id: &str) -> Result<f64, DbErr>
+where
+    C: ConnectionTrait,
+{
+    let total = InvoiceItems::find()
+        .select_only()
+        .expr_as(
+            Func::coalesce([
+                Expr::expr(Func::sum(
+                    Expr::col(invoice_items::Column::Quantity)
+                        .mul(Expr::col(invoice_items::Column::Price)),
+                )),
+                Expr::val(0.0f64),
+            ]),
+            "total",
+        )
+        .filter(invoice_items::Column::InvoiceId.eq(invoice_id))
+        .into_tuple::<f64>()
+        .one(db)
+        .await?
+        .unwrap_or(0.0);
+
+    Ok(total)
+}
+
+async fn invoice_paid_by_id<C>(db: &C, invoice_id: &str) -> Result<f64, DbErr>
+where
+    C: ConnectionTrait,
+{
+    let paid = InvoicePayments::find()
+        .select_only()
+        .expr_as(
+            Func::coalesce([
+                Expr::expr(Func::sum(Expr::col(invoice_payments::Column::Amount))),
+                Expr::val(0.0f64),
+            ]),
+            "paid_amount",
+        )
+        .filter(invoice_payments::Column::InvoiceId.eq(invoice_id))
+        .into_tuple::<f64>()
+        .one(db)
+        .await?
+        .unwrap_or(0.0);
+
+    Ok(paid)
+}
+
+async fn invoice_payments_by_id<C>(
+    db: &C,
+    invoice_id: &str,
+) -> Result<Vec<SelectInvoicePayment>, DbErr>
+where
+    C: ConnectionTrait,
+{
+    let payments = InvoicePayments::find()
+        .select_only()
+        .columns([
+            invoice_payments::Column::Id,
+            invoice_payments::Column::Description,
+            invoice_payments::Column::Amount,
+        ])
+        .expr_as(
+            Expr::col(invoice_payments::Column::PaymentDate),
+            "payment_date",
+        )
+        .filter(invoice_payments::Column::InvoiceId.eq(invoice_id))
+        .order_by(invoice_payments::Column::PaymentDate, Order::Desc)
+        .into_model::<SelectInvoicePayment>()
+        .all(db)
+        .await?;
+
+    Ok(payments)
+}
+
+fn parse_payment_date(value: &str) -> Result<NaiveDateTime, DbErr> {
+    if let Ok(date) = NaiveDate::parse_from_str(value, "%Y-%m-%d") {
+        return date
+            .and_hms_opt(0, 0, 0)
+            .ok_or_else(|| DbErr::Custom("invalid payment date".to_string()));
+    }
+
+    if let Ok(date_time) = DateTime::parse_from_rfc3339(value) {
+        return Ok(date_time.naive_utc());
+    }
+
+    if let Ok(date_time) = NaiveDateTime::parse_from_str(value, "%Y-%m-%d %H:%M:%S") {
+        return Ok(date_time);
+    }
+
+    Err(DbErr::Custom("invalid payment date".to_string()))
+}
+
+fn normalize_invoice_status(current_status: &str, total: f64, paid_amount: f64) -> Option<String> {
+    if current_status == "CANCELLED" || total <= 0.0 {
+        return None;
+    }
+
+    if paid_amount >= total {
+        return Some("PAID".to_string());
+    }
+
+    if paid_amount > 0.0 {
+        return Some("PARTIALLY_PAID".to_string());
+    }
+
+    None
 }
 
 pub struct InvoicesService;
@@ -69,34 +246,11 @@ impl InvoicesService {
                 Expr::col((Invoices, invoices::Column::Identifier)),
                 Expr::col((Invoices, invoices::Column::CreatedAt)),
                 Expr::col((Invoices, invoices::Column::ClientId)),
-                Expr::col((Invoices, invoices::Column::PaidAmount)),
                 Expr::col((Clients, clients::Column::FullName)),
             ])
-            .expr_as(
-                Func::coalesce([
-                    Expr::expr(Func::count(Expr::col((
-                        InvoiceItems,
-                        invoice_items::Column::Id,
-                    )))),
-                    Expr::val(0i64),
-                ]),
-                Alias::new("products"),
-            )
-            .expr_as(
-                Func::coalesce([
-                    Expr::expr(Func::sum(
-                        Expr::col((InvoiceItems, invoice_items::Column::Quantity))
-                            .mul(Expr::col((InvoiceItems, invoice_items::Column::Price))),
-                    )),
-                    Expr::val(0.0f64),
-                ]),
-                Alias::new("total"),
-            )
-            .left_join(
-                InvoiceItems,
-                Expr::col((InvoiceItems, invoice_items::Column::InvoiceId))
-                    .equals((Invoices, invoices::Column::Id)),
-            )
+            .expr_as(invoice_products_count_expr(), Alias::new("products"))
+            .expr_as(invoice_total_expr(), Alias::new("total"))
+            .expr_as(invoice_paid_amount_expr(), Alias::new("paid_amount"))
             .join(
                 JoinType::Join,
                 Clients,
@@ -138,6 +292,7 @@ impl InvoicesService {
             )
             .limit(args.limit)
             .offset((args.page - 1) * args.limit);
+
         match args.sort.as_deref() {
             Some("identifier") => {
                 query.order_by(
@@ -170,8 +325,8 @@ impl InvoicesService {
                 );
             }
             Some("paid_amount") => {
-                query.order_by(
-                    (Invoices, invoices::Column::PaidAmount),
+                query.order_by_expr(
+                    Expr::cust("paid_amount"),
                     requested_order(args.direction.as_deref()),
                 );
             }
@@ -185,9 +340,8 @@ impl InvoicesService {
                 query.order_by((Invoices, invoices::Column::CreatedAt), Order::Desc);
             }
         }
-        query.group_by_col((Invoices, invoices::Column::Id));
-        let (sql, values) = query.to_owned().build(SqliteQueryBuilder);
 
+        let (sql, values) = query.to_owned().build(SqliteQueryBuilder);
         let result = SelectInvoices::find_by_statement(Statement::from_sql_and_values(
             DbBackend::Sqlite,
             sql,
@@ -241,13 +395,18 @@ impl InvoicesService {
                 .all(db)
                 .await?;
 
+                let total = invoice_total_by_id(db, &id).await?;
+                let paid_amount = invoice_paid_by_id(db, &id).await?;
+                let payments = invoice_payments_by_id(db, &id).await?;
+
                 let (invoice_data, client_data) = invoice;
                 let client = client_data.unwrap();
 
                 Ok(InvoiceWithClient {
                     id: invoice_data.id,
                     client_id: invoice_data.client_id,
-                    paid_amount: invoice_data.paid_amount,
+                    paid_amount,
+                    total,
                     created_at: invoice_data.created_at.to_string(),
                     status: invoice_data.status,
                     identifier: invoice_data.identifier,
@@ -256,6 +415,7 @@ impl InvoicesService {
                     address: client.address,
                     phone_number: client.phone_number,
                     items,
+                    payments,
                 })
             }
             None => Err(DbErr::RecordNotFound(String::from("no invoice"))),
@@ -296,25 +456,11 @@ impl InvoicesService {
                 Expr::col((Invoices, invoices::Column::Id)),
                 Expr::col((Invoices, invoices::Column::Status)),
                 Expr::col((Invoices, invoices::Column::Identifier)),
-                Expr::col((Invoices, invoices::Column::PaidAmount)),
                 Expr::col((Invoices, invoices::Column::CreatedAt)),
                 Expr::col((Invoices, invoices::Column::OrderId)),
             ])
-            .expr_as(
-                Func::coalesce([
-                    Expr::expr(Func::sum(
-                        Expr::col((InvoiceItems, invoice_items::Column::Quantity))
-                            .mul(Expr::col((InvoiceItems, invoice_items::Column::Price))),
-                    )),
-                    Expr::val(0.0f64),
-                ]),
-                Alias::new("total"),
-            )
-            .left_join(
-                InvoiceItems,
-                Expr::col((InvoiceItems, invoice_items::Column::InvoiceId))
-                    .equals((Invoices, invoices::Column::Id)),
-            )
+            .expr_as(invoice_total_expr(), Alias::new("total"))
+            .expr_as(invoice_paid_amount_expr(), Alias::new("paid_amount"))
             .join(
                 JoinType::Join,
                 Clients,
@@ -363,6 +509,8 @@ impl InvoicesService {
                 .all(db)
                 .await?;
 
+                let payments = invoice_payments_by_id(db, &invoice.id).await?;
+
                 Ok(InvoiceDetailsResponse {
                     id: invoice.id,
                     paid_amount: invoice.paid_amount,
@@ -377,6 +525,7 @@ impl InvoicesService {
                         phone_number: invoice.phone_number,
                     },
                     items,
+                    payments,
                 })
             }
             None => Err(DbErr::RecordNotFound(String::from("no invoice"))),
@@ -389,19 +538,25 @@ impl InvoicesService {
     ) -> Result<String, TransactionError<DbErr>> {
         db.transaction::<_, String, DbErr>(|txn| {
             Box::pin(async move {
-                let created_order = OrderActiveModel {
-                    client_id: ActiveValue::Set(invoice.client_id.clone()),
-                    status: ActiveValue::Set("PENDING".to_string()),
-                    ..Default::default()
-                }
-                .insert(txn)
-                .await?;
+                let order_id = match invoice.order_id.clone() {
+                    Some(order_id) => order_id,
+                    None => {
+                        let created_order = OrderActiveModel {
+                            client_id: ActiveValue::Set(invoice.client_id.clone()),
+                            status: ActiveValue::Set("PENDING".to_string()),
+                            ..Default::default()
+                        }
+                        .insert(txn)
+                        .await?;
+
+                        created_order.id
+                    }
+                };
 
                 let created_invoice = InvoiceActiveModel {
                     client_id: ActiveValue::Set(invoice.client_id),
                     status: ActiveValue::Set(invoice.status),
-                    paid_amount: ActiveValue::Set(invoice.paid_amount),
-                    order_id: ActiveValue::Set(created_order.id),
+                    order_id: ActiveValue::Set(order_id),
                     ..Default::default()
                 }
                 .insert(txn)
@@ -427,6 +582,7 @@ impl InvoicesService {
                         ..Default::default()
                     });
                 }
+
                 if !invoice_items.is_empty() {
                     InvoiceItems::insert_many(invoice_items).exec(txn).await?;
                 }
@@ -447,7 +603,6 @@ impl InvoicesService {
                 let mut invoice_active: InvoiceActiveModel = invoice_model.unwrap().into();
                 invoice_active.client_id = ActiveValue::Set(invoice.client_id);
                 invoice_active.status = ActiveValue::Set(invoice.status);
-                invoice_active.paid_amount = ActiveValue::Set(invoice.paid_amount);
                 invoice_active.save(txn).await?;
 
                 let mut new_items = Vec::<InvoiceItemActiveModel>::new();
@@ -487,10 +642,67 @@ impl InvoicesService {
                         }
                     }
                 }
+
                 if !new_items.is_empty() {
                     InvoiceItems::insert_many(new_items).exec(txn).await?;
                 }
+
                 Ok(())
+            })
+        })
+        .await
+    }
+
+    pub async fn add_invoice_payment(
+        db: &DbConn,
+        payment: AddInvoicePayment,
+    ) -> Result<String, TransactionError<DbErr>> {
+        db.transaction::<_, String, DbErr>(|txn| {
+            Box::pin(async move {
+                if payment.amount <= 0.0 {
+                    return Err(DbErr::Custom("payment amount must be greater than zero".into()));
+                }
+
+                let invoice_model = Invoices::find_by_id(payment.invoice_id.clone()).one(txn).await?;
+                let invoice_model = invoice_model
+                    .ok_or_else(|| DbErr::RecordNotFound("no invoice".to_string()))?;
+
+                if invoice_model.is_deleted {
+                    return Err(DbErr::Custom("cannot add payment to a deleted invoice".into()));
+                }
+
+                let total = invoice_total_by_id(txn, &payment.invoice_id).await?;
+                let paid_amount = invoice_paid_by_id(txn, &payment.invoice_id).await?;
+                let remaining = (total - paid_amount).max(0.0);
+
+                if payment.amount > remaining {
+                    return Err(DbErr::Custom(format!(
+                        "payment amount exceeds unpaid amount ({remaining})"
+                    )));
+                }
+
+                let payment_date = parse_payment_date(&payment.payment_date)?;
+                let created_payment = InvoicePaymentActiveModel {
+                    invoice_id: ActiveValue::Set(payment.invoice_id.clone()),
+                    payment_date: ActiveValue::Set(payment_date),
+                    description: ActiveValue::Set(payment.description),
+                    amount: ActiveValue::Set(payment.amount),
+                    ..Default::default()
+                }
+                .insert(txn)
+                .await?;
+
+                if let Some(next_status) = normalize_invoice_status(
+                    &invoice_model.status,
+                    total,
+                    paid_amount + payment.amount,
+                ) {
+                    let mut invoice_active: InvoiceActiveModel = invoice_model.into();
+                    invoice_active.status = ActiveValue::Set(next_status);
+                    invoice_active.save(txn).await?;
+                }
+
+                Ok(created_payment.id)
             })
         })
         .await
@@ -512,7 +724,6 @@ impl InvoicesService {
                         Some(order) => {
                             let invoice = InvoiceActiveModel {
                                 client_id: ActiveValue::Set(order.client_id),
-                                paid_amount: ActiveValue::Set(0.0f32),
                                 status: ActiveValue::Set("DRAFT".to_string()),
                                 order_id: ActiveValue::Set(order.id),
                                 ..Default::default()
@@ -546,9 +757,11 @@ impl InvoicesService {
                                     ..Default::default()
                                 });
                             }
+
                             if !invoice_items.is_empty() {
                                 InvoiceItems::insert_many(invoice_items).exec(txn).await?;
                             }
+
                             Ok(invoice.id)
                         }
                         None => Err(DbErr::RecordNotFound("no order".to_string())),

@@ -8,6 +8,7 @@ use sea_orm::{
 use tenant_entity::{
     clients::{self, ActiveModel as ClientActiveModel, Entity as Clients},
     invoice_items::{self, Entity as InvoiceItems},
+    invoice_payments::{self, Entity as InvoicePayments},
     invoices::{self, Entity as Invoices},
 };
 
@@ -57,14 +58,20 @@ fn client_credit_expr() -> SimpleExpr {
         None,
         Box::new(SubQueryStatement::SelectStatement(
             Query::select()
-                .from(Invoices)
+                .from(InvoicePayments)
                 .expr(Expr::expr(Func::coalesce([
                     Expr::expr(Func::sum(Expr::col((
-                        Invoices,
-                        invoices::Column::PaidAmount,
+                        InvoicePayments,
+                        invoice_payments::Column::Amount,
                     )))),
                     Expr::val(0.0f64),
                 ])))
+                .join(
+                    JoinType::Join,
+                    Invoices,
+                    Expr::col((InvoicePayments, invoice_payments::Column::InvoiceId))
+                        .equals((Invoices, invoices::Column::Id)),
+                )
                 .cond_where(
                     Cond::all()
                         .add(Expr::col((Invoices, invoices::Column::Status)).is_not_in([
@@ -186,7 +193,6 @@ impl ClientsService {
             .exprs([
                 Expr::col((Invoices, invoices::Column::Id)),
                 Expr::col((Invoices, invoices::Column::Identifier)),
-                Expr::col((Invoices, invoices::Column::PaidAmount)),
             ])
             .expr_as(
                 Func::coalesce([
@@ -197,6 +203,28 @@ impl ClientsService {
                     Expr::val(0.0f64),
                 ]),
                 Alias::new("total"),
+            )
+            .expr_as(
+                SimpleExpr::SubQuery(
+                    None,
+                    Box::new(SubQueryStatement::SelectStatement(
+                        Query::select()
+                            .expr(Expr::expr(Func::coalesce([
+                                Expr::expr(Func::sum(Expr::col((
+                                    InvoicePayments,
+                                    invoice_payments::Column::Amount,
+                                )))),
+                                Expr::val(0.0f64),
+                            ])))
+                            .from(InvoicePayments)
+                            .cond_where(
+                                Expr::col((InvoicePayments, invoice_payments::Column::InvoiceId))
+                                    .equals((Invoices, invoices::Column::Id)),
+                            )
+                            .to_owned(),
+                    )),
+                ),
+                Alias::new("paid_amount"),
             )
             .left_join(
                 InvoiceItems,

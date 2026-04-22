@@ -3,6 +3,7 @@ import {
   commands,
   type ClientDetails,
   type ClientSearch,
+  type SelectInvoicePayment,
   type InvoiceWithClient,
   type ProductSearch,
   type UpdateInvoice,
@@ -38,12 +39,13 @@ const clients = ref<ClientOption[]>([]);
 const products = ref<ProductOption[]>([]);
 const selectedClient = ref<Partial<ClientDetails> | null>(null);
 const isPosting = ref(false);
+const invoicePaidAmount = ref(0);
+const invoicePayments = ref<SelectInvoicePayment[]>([]);
 
 const invoiceSchema = z.object({
   id: z.string(),
   client_id: z.string().min(1),
   created_at: z.string().optional(),
-  paid_amount: z.coerce.number().min(0),
   status: z.enum(INVOICE_STATUSES),
   full_name: z.string(),
   items: z.array(
@@ -72,7 +74,7 @@ const subtotal = computed(() =>
   }, 0),
 );
 
-const balance = computed(() => subtotal.value - Number(values.paid_amount ?? 0));
+const balance = computed(() => subtotal.value - invoicePaidAmount.value);
 
 const clientDetails = computed(() => [
   selectedClient.value?.email || t("placeholders.no-email"),
@@ -94,7 +96,6 @@ if (getResult.status === "error") {
     values: {
       id: res.id,
       client_id: res.client_id,
-      paid_amount: res.paid_amount,
       status: res.status as (typeof INVOICE_STATUSES)[number],
       full_name: res.full_name,
       created_at: res.created_at,
@@ -108,6 +109,8 @@ if (getResult.status === "error") {
       })),
     },
   });
+  invoicePaidAmount.value = Number(res.paid_amount ?? 0);
+  invoicePayments.value = res.payments ?? [];
 
   selectedClient.value = {
     id: res.client_id,
@@ -166,7 +169,6 @@ const onSubmit = handleSubmit(async (formValues) => {
       id: formValues.id,
       client_id: formValues.client_id,
       status: formValues.status,
-      paid_amount: formValues.paid_amount,
       items: (formValues.items ?? []).map((item) => ({
         id: item.id ?? null,
         invoice_id: null,
@@ -459,18 +461,57 @@ function deleteInvoiceItem(index: number) {
                   <span>{{ t("fields.balance") }}</span>
                   <span>{{ formatMoney(balance) }}</span>
                 </div>
-                <FormField v-slot="{ componentField }" name="paid_amount">
-                  <FormItem class="pt-2">
-                    <FormLabel>{{ t("fields.paid") }}</FormLabel>
-                    <FormControl>
-                      <Input v-bind="componentField" type="number">
-                        <template #unite>
-                          {{ t("fields.currency") }}
-                        </template>
-                      </Input>
-                    </FormControl>
-                  </FormItem>
-                </FormField>
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-slate-500">{{ t("fields.paid") }}</span>
+                  <span class="font-medium text-slate-900">{{
+                    formatMoney(invoicePaidAmount)
+                  }}</span>
+                </div>
+              </div>
+
+              <div class="mt-6 border-t border-slate-200 pt-4">
+                <div class="flex items-center justify-between gap-4 pb-4">
+                  <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+                    {{ t("fields.payments") }}
+                  </p>
+                  <span class="text-sm text-slate-500">
+                    {{ invoicePayments.length }}
+                  </span>
+                </div>
+
+                <div
+                  v-if="invoicePayments.length"
+                  class="overflow-hidden border border-slate-200"
+                >
+                  <div
+                    class="grid grid-cols-[160px_minmax(0,1fr)_140px] bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500"
+                  >
+                    <span>{{ t("fields.date") }}</span>
+                    <span>{{ t("fields.description") }}</span>
+                    <span class="text-right">{{ t("fields.amount") }}</span>
+                  </div>
+                  <div class="divide-y divide-slate-200">
+                    <div
+                      v-for="payment in invoicePayments"
+                      :key="payment.id"
+                      class="grid grid-cols-[160px_minmax(0,1fr)_140px] gap-3 px-4 py-3 text-sm"
+                    >
+                      <span>{{ d(new Date(payment.payment_date), 'short') }}</span>
+                      <span class="truncate text-slate-500">{{
+                        payment.description || "--"
+                      }}</span>
+                      <span class="text-right font-medium">{{
+                        formatMoney(payment.amount)
+                      }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  v-else
+                  class="border border-dashed border-slate-200 px-4 py-6 text-sm text-slate-500"
+                >
+                  {{ t("placeholders.no-payments") }}
+                </div>
               </div>
             </div>
           </section>

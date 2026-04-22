@@ -34,7 +34,6 @@ const isPosting = ref(false);
 
 const invoiceSchema = z.object({
   client_id: z.string().min(1),
-  paid_amount: z.number().min(0),
   items: z.array(
     z.object({
       product_id: z.string().min(1),
@@ -48,7 +47,6 @@ const { handleSubmit, setFieldValue, values } = useForm({
   validationSchema: toTypedSchema(invoiceSchema),
   initialValues: {
     client_id: "",
-    paid_amount: 0,
     items: [
       {
         product_id: "",
@@ -69,7 +67,7 @@ const subtotal = computed(() =>
   }, 0),
 );
 
-const balance = computed(() => subtotal.value - Number(values.paid_amount ?? 0));
+const balance = computed(() => subtotal.value);
 
 const clientDetails = computed(() => [
   selectedClient.value?.email || t("placeholders.no-email"),
@@ -132,7 +130,6 @@ const onSubmit = handleSubmit(async (formValues) => {
       client_id: formValues.client_id,
       order_id: null,
       status: "DRAFT",
-      paid_amount: formValues.paid_amount,
       items: formValues.items,
     };
     const result = await commands.createInvoice(payload);
@@ -380,18 +377,6 @@ const onSubmit = handleSubmit(async (formValues) => {
                   <span>{{ t("fields.balance") }}</span>
                   <span>{{ formatMoney(balance) }}</span>
                 </div>
-                <FormField v-slot="{ componentField }" name="paid_amount">
-                  <FormItem class="pt-2">
-                    <FormLabel>{{ t("fields.paid") }}</FormLabel>
-                    <FormControl>
-                      <Input v-bind="componentField" type="number">
-                        <template #unite>
-                          {{ t("fields.currency") }}
-                        </template>
-                      </Input>
-                    </FormControl>
-                  </FormItem>
-                </FormField>
               </div>
             </div>
           </section>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { commands, type InvoiceProductItem, type SelectInvoices } from "@/bindings";
-import { FilePenLine, GripHorizontal, Printer, Trash2 } from "lucide-vue-next";
+import { CircleDollarSign, FilePenLine, GripHorizontal, Printer, Trash2 } from "lucide-vue-next";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
-import { InvoiceDelete, InvoiceUpdate } from "#components";
+import { InvoiceAddPayment, InvoiceDelete, InvoiceUpdate } from "#components";
 import { INVOICE_STATUSES, STATUS_COLORS } from "@/consts";
 import { queryString } from "@/utils/query";
 
@@ -56,6 +56,14 @@ function toggleThisInvoice(invoice: SelectInvoices, name: "delete" | "update") {
       identifier: invoice.identifier,
     });
   }
+}
+
+function openAddPayment(invoice: SelectInvoices) {
+  modal.open(InvoiceAddPayment, {
+    sheet: true,
+    id: invoice.id,
+    identifier: invoice.identifier,
+  });
 }
 
 async function updateInvoiceStatus(id: string, status: string) {
@@ -245,6 +253,13 @@ async function updateInvoiceStatus(id: string, status: string) {
                   <DropdownMenuItem @click="toggleThisInvoice(invoice, 'update')">
                     <FilePenLine :size="20" class="text-slate-800 inline mr-2" />
                     {{ t("buttons.edit") }}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    :disabled="toNumber(invoice.total) - toNumber(invoice.paid_amount) <= 0"
+                    @click="openAddPayment(invoice)"
+                  >
+                    <CircleDollarSign :size="20" class="text-slate-800 inline mr-2" />
+                    {{ t("buttons.add-payment") }}
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <NuxtLink

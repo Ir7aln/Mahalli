@@ -3,13 +3,11 @@
 use chrono::Utc;
 use sea_orm::{entity::prelude::*, Set};
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
+#[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel)]
 #[sea_orm(table_name = "invoices")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: String,
-    #[sea_orm(column_type = "Float")]
-    pub paid_amount: f32,
     pub client_id: String,
     #[sea_orm(unique)]
     pub order_id: String,
@@ -32,6 +30,8 @@ pub enum Relation {
     Clients,
     #[sea_orm(has_many = "super::invoice_items::Entity")]
     InvoiceItems,
+    #[sea_orm(has_many = "super::invoice_payments::Entity")]
+    InvoicePayments,
     #[sea_orm(
         belongs_to = "super::orders::Entity",
         from = "Column::OrderId",
@@ -51,6 +51,12 @@ impl Related<super::clients::Entity> for Entity {
 impl Related<super::invoice_items::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::InvoiceItems.def()
+    }
+}
+
+impl Related<super::invoice_payments::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::InvoicePayments.def()
     }
 }
 

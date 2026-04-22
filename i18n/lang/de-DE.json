@@ -34,6 +34,7 @@
     "toggle-create-invoice": "Neue Rechnung hinzufügen",
     "toggle-create-org": "Organisation erstellen",
     "edit": "Bearbeiten",
+    "add-payment": "Zahlung hinzufügen",
     "delete": "Löschen",
     "print": "Drucken",
     "to-order": "Bestellung erstellen",
@@ -57,6 +58,7 @@
     "address": "Adresse",
     "actions": "Aktionen",
     "description": "Beschreibung",
+    "amount": "Betrag",
     "status": "Status",
     "price": "Preis",
     "purchase-price": "Einkaufspreis",
@@ -88,6 +90,7 @@
     "no-match": "keine Übereinstimmung gefunden",
     "subtotal": "Zwischensumme",
     "balance": "Saldo",
+    "payments": "Zahlungen",
     "currency": "MAD"
   },
   "placeholders": {
@@ -95,7 +98,9 @@
     "no-client-selected": "Kein Kunde ausgewählt",
     "no-email": "Keine E-Mail",
     "no-address": "Keine Adresse",
-    "no-phone": "Kein Telefon"
+    "no-phone": "Kein Telefon",
+    "payment-description": "Optionale Zahlungsnotiz",
+    "no-payments": "Noch keine Zahlungen erfasst"
   },
   "status": {
     "pending": "Ausstehend",
@@ -233,7 +238,10 @@
     "invoice": {
       "created": "Eine Rechnung wurde erstellt",
       "updated": "Die Rechnung wurde aktualisiert",
-      "deleted": "Die Rechnung wurde gelöscht"
+      "deleted": "Die Rechnung wurde gelöscht",
+      "payment-added": "Zahlung zur Rechnung hinzugefügt",
+      "payment-too-high": "Der Zahlungsbetrag ist zu hoch",
+      "payment-too-high-description": "Der verbleibende offene Betrag ist {amount}"
     },
     "quote": {
       "created": "Ein Angebot wurde erstellt",
@@ -284,7 +292,8 @@
     "invoices": {
       "create": "Neue Rechnung hinzufügen",
       "update": "Rechnung aktualisieren",
-      "delete": "Sind Sie sicher, dass Sie die Rechnung löschen möchten?"
+      "delete": "Sind Sie sicher, dass Sie die Rechnung löschen möchten?",
+      "add-payment": "Zahlung hinzufügen"
     },
     "organizations": {
       "create": "Neue Organisation hinzufügen",

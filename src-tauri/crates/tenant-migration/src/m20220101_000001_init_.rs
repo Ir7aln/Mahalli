@@ -361,12 +361,6 @@ impl MigrationTrait for Migration {
                             .not_null()
                             .primary_key(),
                     )
-                    .col(
-                        ColumnDef::new(Invoice::PaidAmount)
-                            .float()
-                            .not_null()
-                            .default(0),
-                    )
                     .col(ColumnDef::new(Invoice::ClientId).string().not_null())
                     .foreign_key(
                         ForeignKey::create()
@@ -407,6 +401,43 @@ impl MigrationTrait for Migration {
                             .date_time()
                             .not_null()
                             .default(Expr::current_timestamp()),
+                    )
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_table(
+                Table::create()
+                    .table(InvoicePayment::Table)
+                    .if_not_exists()
+                    .col(
+                        ColumnDef::new(InvoicePayment::Id)
+                            .string()
+                            .not_null()
+                            .primary_key(),
+                    )
+                    .col(ColumnDef::new(InvoicePayment::InvoiceId).string().not_null())
+                    .col(ColumnDef::new(InvoicePayment::PaymentDate).date_time().not_null())
+                    .col(ColumnDef::new(InvoicePayment::Description).string())
+                    .col(
+                        ColumnDef::new(InvoicePayment::Amount)
+                            .double()
+                            .not_null()
+                            .default(0),
+                    )
+                    .col(
+                        ColumnDef::new(InvoicePayment::CreatedAt)
+                            .date_time()
+                            .not_null()
+                            .default(Expr::current_timestamp()),
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_invoice_payments_invoice_id")
+                            .from(InvoicePayment::Table, InvoicePayment::InvoiceId)
+                            .to(Invoice::Table, Invoice::Id)
+                            .on_delete(ForeignKeyAction::Cascade),
                     )
                     .to_owned(),
             )
@@ -555,6 +586,26 @@ impl MigrationTrait for Migration {
                     .table(Invoice::Table)
                     .col(Invoice::Status)
                     .name("idx_invoices_status")
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .table(InvoicePayment::Table)
+                    .col(InvoicePayment::InvoiceId)
+                    .name("idx_invoice_payments_invoice_id")
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .table(InvoicePayment::Table)
+                    .col(InvoicePayment::PaymentDate)
+                    .name("idx_invoice_payments_payment_date")
                     .to_owned(),
             )
             .await?;
@@ -794,6 +845,22 @@ impl MigrationTrait for Migration {
         manager
             .drop_index(
                 Index::drop()
+                    .table(InvoicePayment::Table)
+                    .name("idx_invoice_payments_invoice_id")
+                    .to_owned(),
+            )
+            .await?;
+        manager
+            .drop_index(
+                Index::drop()
+                    .table(InvoicePayment::Table)
+                    .name("idx_invoice_payments_payment_date")
+                    .to_owned(),
+            )
+            .await?;
+        manager
+            .drop_index(
+                Index::drop()
                     .table(InvoiceItem::Table)
                     .name("idx_invoice_items_invoice_id")
                     .to_owned(),
@@ -801,6 +868,9 @@ impl MigrationTrait for Migration {
             .await?;
         manager
             .drop_table(Table::drop().table(InvoiceItem::Table).to_owned())
+            .await?;
+        manager
+            .drop_table(Table::drop().table(InvoicePayment::Table).to_owned())
             .await?;
         manager
             .drop_table(Table::drop().table(Invoice::Table).to_owned())
@@ -999,8 +1069,6 @@ pub enum Invoice {
     // status: paid, cancel, ongoing
     #[sea_orm(iden = "status")]
     Status,
-    #[sea_orm(iden = "paid_amount")]
-    PaidAmount,
     #[sea_orm(iden = "created_at")]
     CreatedAt,
     #[sea_orm(iden = "is_deleted")]
@@ -1009,6 +1077,23 @@ pub enum Invoice {
     IsArchived,
     #[sea_orm(iden = "identifier")]
     Identifier,
+}
+
+#[derive(DeriveIden)]
+pub enum InvoicePayment {
+    #[sea_orm(iden = "invoice_payments")]
+    Table,
+    Id,
+    #[sea_orm(iden = "invoice_id")]
+    InvoiceId,
+    #[sea_orm(iden = "payment_date")]
+    PaymentDate,
+    #[sea_orm(iden = "description")]
+    Description,
+    #[sea_orm(iden = "amount")]
+    Amount,
+    #[sea_orm(iden = "created_at")]
+    CreatedAt,
 }
 
 #[derive(DeriveIden)]

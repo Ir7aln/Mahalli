@@ -3,6 +3,7 @@
 pub use super::clients::Entity as Clients;
 pub use super::inventory_transactions::Entity as InventoryTransactions;
 pub use super::invoice_items::Entity as InvoiceItems;
+pub use super::invoice_payments::Entity as InvoicePayments;
 pub use super::invoices::Entity as Invoices;
 pub use super::order_items::Entity as OrderItems;
 pub use super::orders::Entity as Orders;

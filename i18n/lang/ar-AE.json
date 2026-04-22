@@ -34,6 +34,7 @@
     "toggle-create-invoice": "إضافة فاتورة جديدة",
     "toggle-create-org": "إنشاء منظمة",
     "edit": "تحرير",
+    "add-payment": "إضافة دفعة",
     "delete": "حذف",
     "print": "طباعة",
     "to-order": "إنشاء طلب",
@@ -57,6 +58,7 @@
     "address": "العنوان",
     "actions": "الإجراءات",
     "description": "الوصف",
+    "amount": "المبلغ",
     "status": "الحالة",
     "price": "السعر",
     "purchase-price": "سعر الشراء",
@@ -88,6 +90,7 @@
     "no-match": "لم يتم العثور على تطابق",
     "subtotal": "المجموع الفرعي",
     "balance": "الرصيد",
+    "payments": "الدفعات",
     "currency": "درهم"
   },
   "placeholders": {
@@ -95,7 +98,9 @@
     "no-client-selected": "لم يتم اختيار عميل بعد",
     "no-email": "لا يوجد بريد إلكتروني",
     "no-address": "لا يوجد عنوان",
-    "no-phone": "لا يوجد هاتف"
+    "no-phone": "لا يوجد هاتف",
+    "payment-description": "ملاحظة دفع اختيارية",
+    "no-payments": "لا توجد دفعات مسجلة بعد"
   },
   "status": {
     "pending": "قيد الانتظار",
@@ -232,7 +237,10 @@
     "invoice": {
       "created": "تم إنشاء فاتورة",
       "updated": "تم تحديث الفاتورة",
-      "deleted": "تم حذف الفاتورة"
+      "deleted": "تم حذف الفاتورة",
+      "payment-added": "تمت إضافة الدفعة إلى الفاتورة",
+      "payment-too-high": "قيمة الدفعة أكبر من المسموح",
+      "payment-too-high-description": "المبلغ غير المدفوع المتبقي هو {amount}"
     },
     "quote": {
       "created": "تم إنشاء عرض",
@@ -283,7 +291,8 @@
     "invoices": {
       "create": "إضافة فاتورة جديدة",
       "update": "تحديث الفاتورة",
-      "delete": "هل أنت متأكد أنك تريد حذف الفاتورة"
+      "delete": "هل أنت متأكد أنك تريد حذف الفاتورة",
+      "add-payment": "إضافة دفعة"
     },
     "organizations": {
       "create": "إضافة منظمة جديدة",

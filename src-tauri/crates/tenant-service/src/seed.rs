@@ -28,6 +28,7 @@ impl SeedService {
         Self::seed_order_items(db).await?;
         Self::seed_invoices(db).await?;
         Self::seed_invoice_items(db).await?;
+        Self::seed_invoice_payments(db).await?;
         Self::seed_quotes(db).await?;
         Self::seed_quote_items(db).await?;
         Ok(())
@@ -192,15 +193,10 @@ impl SeedService {
         for _ in 0..100 {
             let id = ulid::Ulid::new();
             let status = get_random_item(&statuses);
-            let paid: u8 = Faker.fake();
             let insert_invoice = Statement::from_sql_and_values(
                 sea_orm::DatabaseBackend::Sqlite,
-                r#"INSERT INTO invoices (id, status, client_id, paid_amount, order_id) VALUES ($1, $2, (SELECT id FROM clients ORDER BY RANDOM() LIMIT 1), $3, (SELECT id FROM orders ORDER BY RANDOM() LIMIT 1)) ON CONFLICT DO NOTHING"#,
-                [
-                    id.to_string().into(),
-                    status.to_string().into(),
-                    (paid as f32).into(),
-                ],
+                r#"INSERT INTO invoices (id, status, client_id, order_id) VALUES ($1, $2, (SELECT id FROM clients ORDER BY RANDOM() LIMIT 1), (SELECT id FROM orders ORDER BY RANDOM() LIMIT 1)) ON CONFLICT DO NOTHING"#,
+                [id.to_string().into(), status.to_string().into()],
             );
             db.execute_raw(insert_invoice).await?;
         }
@@ -231,6 +227,40 @@ impl SeedService {
                 ],
             );
             db.execute_raw(insert_item).await?;
+        }
+        Ok(())
+    }
+
+    async fn seed_invoice_payments(db: &DatabaseConnection) -> Result<(), DbErr> {
+        for _ in 0..150 {
+            let id = ulid::Ulid::new();
+            let amount: u8 = (10..100).fake();
+            let insert_payment = Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                r#"
+                    INSERT INTO invoice_payments (id, invoice_id, payment_date, amount, description)
+                    SELECT
+                        $1,
+                        invoices.id,
+                        CURRENT_TIMESTAMP,
+                        MIN($2, COALESCE(invoice_totals.total_amount, 0)),
+                        $3
+                    FROM invoices
+                    LEFT JOIN (
+                        SELECT invoice_id, SUM(price * quantity) AS total_amount
+                        FROM invoice_items
+                        GROUP BY invoice_id
+                    ) AS invoice_totals ON invoice_totals.invoice_id = invoices.id
+                    ORDER BY RANDOM()
+                    LIMIT 1
+                "#,
+                [
+                    id.to_string().into(),
+                    (amount as f64).into(),
+                    String::from("Seed payment").into(),
+                ],
+            );
+            db.execute_raw(insert_payment).await?;
         }
         Ok(())
     }

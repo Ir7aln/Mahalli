@@ -4,30 +4,20 @@ use chrono::Utc;
 use sea_orm::{entity::prelude::*, Set};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
-#[sea_orm(table_name = "invoice_items")]
+#[sea_orm(table_name = "invoice_payments")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: String,
     pub invoice_id: String,
-    pub product_id: String,
+    pub payment_date: DateTime,
+    pub description: Option<String>,
     #[sea_orm(column_type = "Double")]
-    pub price: f64,
-    #[sea_orm(column_type = "Double")]
-    pub quantity: f64,
-    pub inventory_id: Option<String>,
+    pub amount: f64,
     pub created_at: DateTime,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    #[sea_orm(
-        belongs_to = "super::inventory_transactions::Entity",
-        from = "Column::InventoryId",
-        to = "super::inventory_transactions::Column::Id",
-        on_update = "NoAction",
-        on_delete = "SetNull"
-    )]
-    InventoryTransactions,
     #[sea_orm(
         belongs_to = "super::invoices::Entity",
         from = "Column::InvoiceId",
@@ -36,31 +26,11 @@ pub enum Relation {
         on_delete = "Cascade"
     )]
     Invoices,
-    #[sea_orm(
-        belongs_to = "super::products::Entity",
-        from = "Column::ProductId",
-        to = "super::products::Column::Id",
-        on_update = "NoAction",
-        on_delete = "Restrict"
-    )]
-    Products,
-}
-
-impl Related<super::inventory_transactions::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::InventoryTransactions.def()
-    }
 }
 
 impl Related<super::invoices::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Invoices.def()
-    }
-}
-
-impl Related<super::products::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Products.def()
     }
 }
 
