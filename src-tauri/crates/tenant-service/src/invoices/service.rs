@@ -12,9 +12,7 @@ use tenant_entity::{
         ActiveModel as InventoryActiveModel, Entity as InventoryTransactions,
     },
     invoice_items::{self, ActiveModel as InvoiceItemActiveModel, Entity as InvoiceItems},
-    invoice_payments::{
-        self, ActiveModel as InvoicePaymentActiveModel, Entity as InvoicePayments,
-    },
+    invoice_payments::{self, ActiveModel as InvoicePaymentActiveModel, Entity as InvoicePayments},
     invoices::{self, ActiveModel as InvoiceActiveModel, Entity as Invoices},
     order_items::{self, Entity as OrderItems},
     orders::{ActiveModel as OrderActiveModel, Entity as Orders},
@@ -35,7 +33,10 @@ fn invoice_products_count_expr() -> SimpleExpr {
         Box::new(SubQueryStatement::SelectStatement(
             Query::select()
                 .expr(Expr::expr(Func::coalesce([
-                    Expr::expr(Func::count(Expr::col((InvoiceItems, invoice_items::Column::Id)))),
+                    Expr::expr(Func::count(Expr::col((
+                        InvoiceItems,
+                        invoice_items::Column::Id,
+                    )))),
                     Expr::val(0i64),
                 ])))
                 .from(InvoiceItems)
@@ -660,15 +661,21 @@ impl InvoicesService {
         db.transaction::<_, String, DbErr>(|txn| {
             Box::pin(async move {
                 if payment.amount <= 0.0 {
-                    return Err(DbErr::Custom("payment amount must be greater than zero".into()));
+                    return Err(DbErr::Custom(
+                        "payment amount must be greater than zero".into(),
+                    ));
                 }
 
-                let invoice_model = Invoices::find_by_id(payment.invoice_id.clone()).one(txn).await?;
-                let invoice_model = invoice_model
-                    .ok_or_else(|| DbErr::RecordNotFound("no invoice".to_string()))?;
+                let invoice_model = Invoices::find_by_id(payment.invoice_id.clone())
+                    .one(txn)
+                    .await?;
+                let invoice_model =
+                    invoice_model.ok_or_else(|| DbErr::RecordNotFound("no invoice".to_string()))?;
 
                 if invoice_model.is_deleted {
-                    return Err(DbErr::Custom("cannot add payment to a deleted invoice".into()));
+                    return Err(DbErr::Custom(
+                        "cannot add payment to a deleted invoice".into(),
+                    ));
                 }
 
                 let total = invoice_total_by_id(txn, &payment.invoice_id).await?;

@@ -417,8 +417,16 @@ impl MigrationTrait for Migration {
                             .not_null()
                             .primary_key(),
                     )
-                    .col(ColumnDef::new(InvoicePayment::InvoiceId).string().not_null())
-                    .col(ColumnDef::new(InvoicePayment::PaymentDate).date_time().not_null())
+                    .col(
+                        ColumnDef::new(InvoicePayment::InvoiceId)
+                            .string()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(InvoicePayment::PaymentDate)
+                            .date_time()
+                            .not_null(),
+                    )
                     .col(ColumnDef::new(InvoicePayment::Description).string())
                     .col(
                         ColumnDef::new(InvoicePayment::Amount)
