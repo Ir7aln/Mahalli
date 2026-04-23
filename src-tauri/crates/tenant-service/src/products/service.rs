@@ -60,10 +60,8 @@ fn product_inventory_expr() -> SimpleExpr {
                 .join(
                     JoinType::Join,
                     OrderItems,
-                    Expr::col((OrderItems, order_items::Column::InventoryId)).equals((
-                        InventoryTransactions,
-                        inventory_transactions::Column::Id,
-                    )),
+                    Expr::col((OrderItems, order_items::Column::InventoryId))
+                        .equals((InventoryTransactions, inventory_transactions::Column::Id)),
                 )
                 .join(
                     JoinType::Join,
@@ -115,18 +113,23 @@ impl ProductsService {
             .apply_if(args.selling_price_max, |query, value| {
                 query.filter(Expr::col((Products, products::Column::SellingPrice)).lte(value))
             })
-            .apply_if(args.stock_status.clone(), |query, stock_status| match stock_status.as_str() {
-                "out" => query.filter(product_inventory_expr().lte(0.0)),
-                "low" => query.filter(
-                    product_inventory_expr()
-                        .gt(0.0)
-                        .and(product_inventory_expr().lte(Expr::col((Products, products::Column::MinQuantity)))),
-                ),
-                "healthy" => query.filter(
-                    product_inventory_expr().gt(Expr::col((Products, products::Column::MinQuantity))),
-                ),
-                _ => query,
-            })
+            .apply_if(
+                args.stock_status.clone(),
+                |query, stock_status| match stock_status.as_str() {
+                    "out" => query.filter(product_inventory_expr().lte(0.0)),
+                    "low" => query.filter(
+                        product_inventory_expr().gt(0.0).and(
+                            product_inventory_expr()
+                                .lte(Expr::col((Products, products::Column::MinQuantity))),
+                        ),
+                    ),
+                    "healthy" => query.filter(
+                        product_inventory_expr()
+                            .gt(Expr::col((Products, products::Column::MinQuantity))),
+                    ),
+                    _ => query,
+                },
+            )
             .count(db)
             .await?;
 
