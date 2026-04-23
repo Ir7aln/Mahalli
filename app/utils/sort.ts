@@ -8,11 +8,7 @@ function normalizeSortValue(value: SortValue) {
   return value;
 }
 
-export function sortItems<T>(
-  items: T[],
-  direction: SortDirection,
-  getter: (item: T) => SortValue,
-) {
+export function sortItems<T>(items: T[], direction: SortDirection, getter: (item: T) => SortValue) {
   const factor = direction === "asc" ? 1 : -1;
 
   return [...items].sort((left, right) => {
@@ -23,9 +19,11 @@ export function sortItems<T>(
       return (a - b) * factor;
     }
 
-    return String(a).localeCompare(String(b), undefined, {
-      numeric: true,
-      sensitivity: "base",
-    }) * factor;
+    return (
+      String(a).localeCompare(String(b), undefined, {
+        numeric: true,
+        sensitivity: "base",
+      }) * factor
+    );
   });
 }

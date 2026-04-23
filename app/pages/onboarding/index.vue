@@ -55,7 +55,9 @@ async function createInitialDatabase() {
 <template>
   <div class="grid w-full gap-10 lg:grid-cols-[1.1fr_0.9fr]">
     <section class="space-y-8 text-left rtl:text-right">
-      <div class="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white/80 px-4 py-2 text-sm text-sky-700 shadow-sm rtl:flex-row-reverse">
+      <div
+        class="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white/80 px-4 py-2 text-sm text-sky-700 shadow-sm rtl:flex-row-reverse"
+      >
         <Sparkles :size="16" />
         {{ t("database.onboarding.badge") }}
       </div>
@@ -70,12 +72,16 @@ async function createInitialDatabase() {
       </div>
     </section>
 
-    <section class="rounded-s border border-white/70 bg-white/90 p-7 shadow-xl shadow-sky-100/80 text-left rtl:text-right">
+    <section
+      class="rounded-s border border-white/70 bg-white/90 p-7 shadow-xl shadow-sky-100/80 text-left rtl:text-right"
+    >
       <div class="space-y-2">
         <p class="text-sm font-medium uppercase tracking-[0.25em] text-slate-500">
           {{ t("database.onboarding.initial-tenant") }}
         </p>
-        <h2 class="text-2xl font-semibold text-slate-950">{{ t("database.onboarding.form-title") }}</h2>
+        <h2 class="text-2xl font-semibold text-slate-950">
+          {{ t("database.onboarding.form-title") }}
+        </h2>
         <p class="text-sm leading-6 text-slate-500">
           {{ t("database.onboarding.form-description") }}
         </p>
@@ -84,7 +90,11 @@ async function createInitialDatabase() {
       <div class="mt-6 space-y-5">
         <div class="space-y-2">
           <Label for="initial-db-name">{{ t("database.fields.database-name") }}</Label>
-          <Input id="initial-db-name" v-model="form.name" :placeholder="t('database.placeholders.initial-name')" />
+          <Input
+            id="initial-db-name"
+            v-model="form.name"
+            :placeholder="t('database.placeholders.initial-name')"
+          />
         </div>
 
         <div class="space-y-2">
@@ -106,7 +116,11 @@ async function createInitialDatabase() {
         </div>
 
         <Button class="w-full" :disabled="isSubmitting" @click="createInitialDatabase">
-          {{ isSubmitting ? t("database.onboarding.creating") : t("database.onboarding.create-and-continue") }}
+          {{
+            isSubmitting
+              ? t("database.onboarding.creating")
+              : t("database.onboarding.create-and-continue")
+          }}
         </Button>
       </div>
     </section>

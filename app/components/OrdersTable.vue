@@ -18,7 +18,9 @@ const modal = useModal();
 const { t, d, locale, n } = useI18n();
 const localePath = useLocalePath();
 const sortKey = computed(() => queryString(route.query.sort));
-const sortDirection = computed(() => (queryString(route.query.direction) === "desc" ? "desc" : "asc"));
+const sortDirection = computed(() =>
+  queryString(route.query.direction) === "desc" ? "desc" : "asc",
+);
 
 function toggleSort(key: string) {
   if (sortKey.value !== key) {

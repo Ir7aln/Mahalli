@@ -90,6 +90,15 @@ fn client_credit_expr() -> SimpleExpr {
     ))
 }
 
+fn client_search_condition(search: &str) -> Cond {
+    let pattern = format!("%{}%", search);
+    Cond::any()
+        .add(Expr::col((Clients, clients::Column::FullName)).like(pattern.clone()))
+        .add(Expr::col((Clients, clients::Column::Email)).like(pattern.clone()))
+        .add(Expr::col((Clients, clients::Column::PhoneNumber)).like(pattern.clone()))
+        .add(Expr::col((Clients, clients::Column::Address)).like(pattern))
+}
+
 pub struct ClientsService;
 
 impl ClientsService {
@@ -102,11 +111,11 @@ impl ClientsService {
                 Cond::all()
                     .add(Expr::col((Clients, clients::Column::IsArchived)).eq(false))
                     .add(Expr::col((Clients, clients::Column::IsDeleted)).eq(false))
-                    .add(
-                        Expr::col((Clients, clients::Column::FullName))
-                            .like(format!("{}%", args.search)),
-                    ),
+                    .add(client_search_condition(&args.search)),
             )
+            .apply_if(args.credit_only, |query, credit_only| {
+                query.filter(client_credit_expr().gt(if credit_only { 0.0 } else { -1.0 }))
+            })
             .count(db)
             .await?;
 
@@ -126,10 +135,14 @@ impl ClientsService {
                 Cond::all()
                     .add(Expr::col((Clients, clients::Column::IsArchived)).eq(false))
                     .add(Expr::col((Clients, clients::Column::IsDeleted)).eq(false))
-                    .add(
-                        Expr::col((Clients, clients::Column::FullName))
-                            .like(format!("{}%", args.search)),
-                    ),
+                    .add(client_search_condition(&args.search)),
+            )
+            .conditions(
+                args.credit_only == Some(true),
+                |query| {
+                    query.and_where(client_credit_expr().gt(0.0));
+                },
+                |_| {},
             )
             .limit(args.limit)
             .offset((args.page - 1) * args.limit);
@@ -263,7 +276,7 @@ impl ClientsService {
             .expr_as(Expr::col(clients::Column::FullName), "label")
             .expr_as(Expr::col(clients::Column::Id), "value")
             .filter(clients::Column::IsDeleted.eq(false))
-            .filter(clients::Column::FullName.like(format!("{}%", search)))
+            .filter(clients::Column::FullName.like(format!("%{}%", search)))
             .into_model::<ClientSearch>()
             .all(db)
             .await?;

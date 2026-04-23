@@ -45,6 +45,22 @@
     "generate-quote": "Generate quote"
   },
   "translationTitle": "Change Language",
+  "filters": {
+    "more": "More filters",
+    "clear-all": "Clear all",
+    "from": "From",
+    "to": "To",
+    "min": "Min",
+    "max": "Max",
+    "required": "Required",
+    "credit-only": "Clients with outstanding credit",
+    "has-email": "Has email",
+    "has-phone": "Has phone",
+    "stock-status": "Stock status",
+    "out-of-stock": "Out of stock",
+    "low-stock": "Low stock",
+    "healthy-stock": "Healthy stock"
+  },
   "dropZone": "Drag and drop or select",
   "plrz": {
     "i": "no items |  item |  items",

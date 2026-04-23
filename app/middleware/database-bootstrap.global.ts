@@ -11,7 +11,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return navigateTo(onboardingPath);
   }
 
-  if (status.value.has_any_database && status.value.has_active_database && to.path === onboardingPath) {
+  if (
+    status.value.has_any_database &&
+    status.value.has_active_database &&
+    to.path === onboardingPath
+  ) {
     return navigateTo(localePath("/"));
   }
 });

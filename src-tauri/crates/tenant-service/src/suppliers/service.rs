@@ -13,6 +13,15 @@ fn requested_order(direction: Option<&str>) -> Order {
     }
 }
 
+fn supplier_search_condition(search: &str) -> Cond {
+    let pattern = format!("%{}%", search);
+    Cond::any()
+        .add(Expr::col((Suppliers, suppliers::Column::FullName)).like(pattern.clone()))
+        .add(Expr::col((Suppliers, suppliers::Column::Email)).like(pattern.clone()))
+        .add(Expr::col((Suppliers, suppliers::Column::PhoneNumber)).like(pattern.clone()))
+        .add(Expr::col((Suppliers, suppliers::Column::Address)).like(pattern))
+}
+
 pub struct SuppliersService;
 
 impl SuppliersService {
@@ -25,11 +34,22 @@ impl SuppliersService {
                 Cond::all()
                     .add(Expr::col((Suppliers, suppliers::Column::IsArchived)).eq(false))
                     .add(Expr::col((Suppliers, suppliers::Column::IsDeleted)).eq(false))
-                    .add(
-                        Expr::col((Suppliers, suppliers::Column::FullName))
-                            .like(format!("{}%", args.search)),
-                    ),
+                    .add(supplier_search_condition(&args.search)),
             )
+            .apply_if(args.has_email, |query, has_email| {
+                query.filter(if has_email {
+                    Expr::col((Suppliers, suppliers::Column::Email)).is_not_null()
+                } else {
+                    Expr::col((Suppliers, suppliers::Column::Email)).is_null()
+                })
+            })
+            .apply_if(args.has_phone, |query, has_phone| {
+                query.filter(if has_phone {
+                    Expr::col((Suppliers, suppliers::Column::PhoneNumber)).is_not_null()
+                } else {
+                    Expr::col((Suppliers, suppliers::Column::PhoneNumber)).is_null()
+                })
+            })
             .count(db)
             .await?;
 
@@ -48,10 +68,23 @@ impl SuppliersService {
                 Cond::all()
                     .add(Expr::col((Suppliers, suppliers::Column::IsArchived)).eq(false))
                     .add(Expr::col((Suppliers, suppliers::Column::IsDeleted)).eq(false))
-                    .add(
-                        Expr::col((Suppliers, suppliers::Column::FullName))
-                            .like(format!("{}%", args.search)),
-                    ),
+                    .add(supplier_search_condition(&args.search)),
+            )
+            .conditions(
+                args.has_email == Some(true),
+                |query| {
+                    query.and_where(Expr::col((Suppliers, suppliers::Column::Email)).is_not_null());
+                },
+                |_| {},
+            )
+            .conditions(
+                args.has_phone == Some(true),
+                |query| {
+                    query.and_where(
+                        Expr::col((Suppliers, suppliers::Column::PhoneNumber)).is_not_null(),
+                    );
+                },
+                |_| {},
             )
             .limit(args.limit)
             .offset((args.page - 1) * args.limit);
@@ -109,7 +142,7 @@ impl SuppliersService {
             .expr_as(Expr::col(suppliers::Column::FullName), "label")
             .expr_as(Expr::col(suppliers::Column::Id), "value")
             .filter(suppliers::Column::IsDeleted.eq(false))
-            .filter(suppliers::Column::FullName.like(format!("{}%", search)))
+            .filter(suppliers::Column::FullName.like(format!("%{}%", search)))
             .into_model::<SupplierSearch>()
             .all(db)
             .await?;

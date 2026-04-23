@@ -45,6 +45,22 @@
     "generate-quote": "Générer le devis"
   },
   "translationTitle": "Changer de langue",
+  "filters": {
+    "more": "Plus de filtres",
+    "clear-all": "Tout effacer",
+    "from": "Du",
+    "to": "Au",
+    "min": "Min",
+    "max": "Max",
+    "required": "Requis",
+    "credit-only": "Clients avec un crédit impayé",
+    "has-email": "Avec e-mail",
+    "has-phone": "Avec téléphone",
+    "stock-status": "État du stock",
+    "out-of-stock": "Rupture de stock",
+    "low-stock": "Stock faible",
+    "healthy-stock": "Stock sain"
+  },
   "dropZone": "Glissez-déposez ou sélectionnez",
   "plrz": {
     "i": "aucun élément | élément | éléments",

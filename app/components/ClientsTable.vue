@@ -19,7 +19,9 @@ const modal = useModal();
 const clientInvoiceDebts = ref<ClientInvoiceDebtItem[]>([]);
 const debtCache = reactive<Record<string, ClientInvoiceDebtItem[]>>({});
 const sortKey = computed(() => queryString(route.query.sort));
-const sortDirection = computed(() => (queryString(route.query.direction) === "desc" ? "desc" : "asc"));
+const sortDirection = computed(() =>
+  queryString(route.query.direction) === "desc" ? "desc" : "asc",
+);
 
 let previewDebtsTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -188,11 +190,7 @@ function toggleThisClient(client: SelectClients, name: "delete" | "update") {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr
-                        v-for="invoice in clientInvoiceDebts"
-                        :key="invoice.id"
-                        class="text-sm"
-                      >
+                      <tr v-for="invoice in clientInvoiceDebts" :key="invoice.id" class="text-sm">
                         <td class="py-1">
                           <NuxtLink
                             :to="
@@ -207,7 +205,9 @@ function toggleThisClient(client: SelectClients, name: "delete" | "update") {
                           </NuxtLink>
                         </td>
                         <td class="py-1 text-nowrap text-end italic text-red-600">
-                          -{{ n(toNumber(invoice.total) - toNumber(invoice.paid_amount), "currency") }}
+                          -{{
+                            n(toNumber(invoice.total) - toNumber(invoice.paid_amount), "currency")
+                          }}
                         </td>
                       </tr>
                     </tbody>

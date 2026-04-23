@@ -8,8 +8,11 @@ const props = defineProps<{
 const route = useRoute();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const { t, d, locale, n } = useI18n();
+const localePath = useLocalePath();
 const sortKey = computed(() => queryString(route.query.sort));
-const sortDirection = computed(() => (queryString(route.query.direction) === "desc" ? "desc" : "asc"));
+const sortDirection = computed(() =>
+  queryString(route.query.direction) === "desc" ? "desc" : "asc",
+);
 
 function toggleSort(key: string) {
   if (sortKey.value !== key) {
@@ -74,7 +77,50 @@ function toggleSort(key: string) {
       <TableBody>
         <TableRow v-for="(tx, index) in props.inventory" :key="tx.id" v-fade="index">
           <TableCell class="p-2 font-medium">
-            {{ tx?.name }}
+            <div class="flex items-center justify-between gap-3">
+              <span class="min-w-0 truncate">{{ tx?.name }}</span>
+              <div
+                v-if="tx.order_identifier || tx.invoice_identifier || tx.quote_identifier"
+                class="flex shrink-0 flex-wrap justify-end gap-2 text-xs font-normal"
+              >
+                <NuxtLink
+                  v-if="tx.invoice_identifier"
+                  :to="
+                    localePath({
+                      path: '/invoices/',
+                      query: { page: 1, search: tx.invoice_identifier },
+                    })
+                  "
+                  class="text-slate-700 underline decoration-slate-300 underline-offset-4 hover:text-slate-950"
+                >
+                  {{ tx.invoice_identifier }}
+                </NuxtLink>
+                <NuxtLink
+                  v-if="tx.order_identifier"
+                  :to="
+                    localePath({
+                      path: '/orders/',
+                      query: { page: 1, search: tx.order_identifier },
+                    })
+                  "
+                  class="text-slate-700 underline decoration-slate-300 underline-offset-4 hover:text-slate-950"
+                >
+                  {{ tx.order_identifier }}
+                </NuxtLink>
+                <NuxtLink
+                  v-if="tx.quote_identifier"
+                  :to="
+                    localePath({
+                      path: '/quotes/',
+                      query: { page: 1, search: tx.quote_identifier },
+                    })
+                  "
+                  class="text-slate-700 underline decoration-slate-300 underline-offset-4 hover:text-slate-950"
+                >
+                  {{ tx.quote_identifier }}
+                </NuxtLink>
+              </div>
+            </div>
           </TableCell>
           <TableCell class="p-2">
             {{ n(toNumber(tx?.price), "currency") }}

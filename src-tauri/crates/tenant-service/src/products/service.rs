@@ -20,6 +20,81 @@ fn requested_order(direction: Option<&str>) -> Order {
     }
 }
 
+fn product_inventory_expr() -> SimpleExpr {
+    SimpleExpr::SubQuery(
+        None,
+        Box::new(SubQueryStatement::SelectStatement(
+            Query::select()
+                .from(InventoryTransactions)
+                .expr(Func::coalesce([
+                    Expr::expr(Func::sum(Expr::col(
+                        inventory_transactions::Column::Quantity,
+                    ))),
+                    Expr::val(0.0f64),
+                ]))
+                .cond_where(
+                    Cond::all()
+                        .add(inventory_transactions::Column::TransactionType.eq(String::from("IN")))
+                        .add(
+                            Expr::col((
+                                InventoryTransactions,
+                                inventory_transactions::Column::ProductId,
+                            ))
+                            .equals((Products, products::Column::Id)),
+                        ),
+                )
+                .to_owned(),
+        )),
+    )
+    .sub(SimpleExpr::SubQuery(
+        None,
+        Box::new(SubQueryStatement::SelectStatement(
+            Query::select()
+                .from(InventoryTransactions)
+                .expr(Func::coalesce([
+                    Expr::expr(Func::sum(Expr::col(
+                        inventory_transactions::Column::Quantity,
+                    ))),
+                    Expr::val(0.0f64),
+                ]))
+                .join(
+                    JoinType::Join,
+                    OrderItems,
+                    Expr::col((OrderItems, order_items::Column::InventoryId)).equals((
+                        InventoryTransactions,
+                        inventory_transactions::Column::Id,
+                    )),
+                )
+                .join(
+                    JoinType::Join,
+                    Orders,
+                    Expr::col((Orders, orders::Column::Id))
+                        .equals((OrderItems, order_items::Column::OrderId)),
+                )
+                .cond_where(
+                    Cond::all()
+                        .add(
+                            Expr::col((
+                                InventoryTransactions,
+                                inventory_transactions::Column::ProductId,
+                            ))
+                            .equals((Products, products::Column::Id)),
+                        )
+                        .add(orders::Column::Status.is_in(["DELIVERED", "SHIPPED"]))
+                        .add(orders::Column::IsDeleted.eq(false)),
+                )
+                .to_owned(),
+        )),
+    ))
+}
+
+fn product_search_condition(search: &str) -> Cond {
+    let pattern = format!("%{}%", search);
+    Cond::any()
+        .add(Expr::col((Products, products::Column::Name)).like(pattern.clone()))
+        .add(Expr::col((Products, products::Column::Description)).like(pattern))
+}
+
 pub struct ProductsService;
 
 impl ProductsService {
@@ -32,11 +107,26 @@ impl ProductsService {
                 Cond::all()
                     .add(Expr::col((Products, products::Column::IsArchived)).eq(false))
                     .add(Expr::col((Products, products::Column::IsDeleted)).eq(false))
-                    .add(
-                        Expr::col((Products, products::Column::Name))
-                            .like(format!("{}%", args.search)),
-                    ),
+                    .add(product_search_condition(&args.search)),
             )
+            .apply_if(args.selling_price_min, |query, value| {
+                query.filter(Expr::col((Products, products::Column::SellingPrice)).gte(value))
+            })
+            .apply_if(args.selling_price_max, |query, value| {
+                query.filter(Expr::col((Products, products::Column::SellingPrice)).lte(value))
+            })
+            .apply_if(args.stock_status.clone(), |query, stock_status| match stock_status.as_str() {
+                "out" => query.filter(product_inventory_expr().lte(0.0)),
+                "low" => query.filter(
+                    product_inventory_expr()
+                        .gt(0.0)
+                        .and(product_inventory_expr().lte(Expr::col((Products, products::Column::MinQuantity)))),
+                ),
+                "healthy" => query.filter(
+                    product_inventory_expr().gt(Expr::col((Products, products::Column::MinQuantity))),
+                ),
+                _ => query,
+            })
             .count(db)
             .await?;
 
@@ -53,85 +143,61 @@ impl ProductsService {
                 Expr::col((Products, products::Column::PurchasePrice)),
                 Expr::col((Products, products::Column::MinQuantity)),
             ])
-            .expr_as(
-                SimpleExpr::SubQuery(
-                    None,
-                    Box::new(SubQueryStatement::SelectStatement(
-                        Query::select()
-                            .from(InventoryTransactions)
-                            .expr(Func::coalesce([
-                                Expr::expr(Func::sum(Expr::col(
-                                    inventory_transactions::Column::Quantity,
-                                ))),
-                                Expr::val(0.0f64),
-                            ]))
-                            .cond_where(
-                                Cond::all()
-                                    .add(
-                                        inventory_transactions::Column::TransactionType
-                                            .eq(String::from("IN")),
-                                    )
-                                    .add(
-                                        Expr::col((
-                                            InventoryTransactions,
-                                            inventory_transactions::Column::ProductId,
-                                        ))
-                                        .equals((Products, products::Column::Id)),
-                                    ),
-                            )
-                            .to_owned(),
-                    )),
-                )
-                .sub(SimpleExpr::SubQuery(
-                    None,
-                    Box::new(SubQueryStatement::SelectStatement(
-                        Query::select()
-                            .from(InventoryTransactions)
-                            .expr(Func::coalesce([
-                                Expr::expr(Func::sum(Expr::col(
-                                    inventory_transactions::Column::Quantity,
-                                ))),
-                                Expr::val(0.0f64),
-                            ]))
-                            .join(
-                                JoinType::Join,
-                                OrderItems,
-                                Expr::col((OrderItems, order_items::Column::InventoryId)).equals((
-                                    InventoryTransactions,
-                                    inventory_transactions::Column::Id,
-                                )),
-                            )
-                            .join(
-                                JoinType::Join,
-                                Orders,
-                                Expr::col((Orders, orders::Column::Id))
-                                    .equals((OrderItems, order_items::Column::OrderId)),
-                            )
-                            .cond_where(
-                                Cond::all()
-                                    .add(
-                                        Expr::col((
-                                            InventoryTransactions,
-                                            inventory_transactions::Column::ProductId,
-                                        ))
-                                        .equals((Products, products::Column::Id)),
-                                    )
-                                    .add(orders::Column::Status.is_in(["DELIVERED", "SHIPPED"]))
-                                    .add(orders::Column::IsDeleted.eq(false)),
-                            )
-                            .to_owned(),
-                    )),
-                )),
-                Alias::new("inventory"),
-            )
+            .expr_as(product_inventory_expr(), Alias::new("inventory"))
             .cond_where(
                 Cond::all()
                     .add(Expr::col((Products, products::Column::IsArchived)).eq(false))
                     .add(Expr::col((Products, products::Column::IsDeleted)).eq(false))
-                    .add(
-                        Expr::col((Products, products::Column::Name))
-                            .like(format!("{}%", args.search)),
-                    ),
+                    .add(product_search_condition(&args.search)),
+            )
+            .conditions(
+                args.selling_price_min.is_some(),
+                |query| {
+                    query.and_where(
+                        Expr::col((Products, products::Column::SellingPrice))
+                            .gte(args.selling_price_min),
+                    );
+                },
+                |_| {},
+            )
+            .conditions(
+                args.selling_price_max.is_some(),
+                |query| {
+                    query.and_where(
+                        Expr::col((Products, products::Column::SellingPrice))
+                            .lte(args.selling_price_max),
+                    );
+                },
+                |_| {},
+            )
+            .conditions(
+                args.stock_status.as_deref() == Some("out"),
+                |query| {
+                    query.and_where(product_inventory_expr().lte(0.0));
+                },
+                |_| {},
+            )
+            .conditions(
+                args.stock_status.as_deref() == Some("low"),
+                |query| {
+                    query.and_where(
+                        product_inventory_expr().gt(0.0).and(
+                            product_inventory_expr()
+                                .lte(Expr::col((Products, products::Column::MinQuantity))),
+                        ),
+                    );
+                },
+                |_| {},
+            )
+            .conditions(
+                args.stock_status.as_deref() == Some("healthy"),
+                |query| {
+                    query.and_where(
+                        product_inventory_expr()
+                            .gt(Expr::col((Products, products::Column::MinQuantity))),
+                    );
+                },
+                |_| {},
             )
             .limit(args.limit)
             .offset((args.page - 1) * args.limit);
@@ -196,7 +262,7 @@ impl ProductsService {
             .expr_as(Expr::col(products::Column::Id), "value")
             .expr_as(Expr::col(products::Column::SellingPrice), "price")
             .filter(products::Column::IsDeleted.eq(false))
-            .filter(products::Column::Name.like(format!("{}%", search)))
+            .filter(products::Column::Name.like(format!("%{}%", search)))
             .into_model::<ProductSearch>()
             .all(db)
             .await?;

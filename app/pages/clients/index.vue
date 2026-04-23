@@ -5,33 +5,36 @@ import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
 import { commands, type SelectClients } from "@/bindings";
 import { ClientCreate } from "#components";
-import type { QueryParams } from "@/types/query";
-import { queryString } from "@/utils/query";
+import { queryBoolean, queryNumber, queryString } from "@/utils/query";
 
 const route = useRoute();
 const { t } = useI18n();
 const modal = useModal();
 const { updateQueryParams } = useUpdateRouteQueryParams();
-const searchQuery = ref(route.query.search as string);
+
+const searchQuery = ref(queryString(route.query.search));
+const creditOnly = ref<boolean>(queryBoolean(route.query.credit_only, false) ?? false);
 
 const LIMIT = 50;
 
 const queryParams = computed(() => ({
-  search: route.query.search,
-  page: route.query.page,
-  refresh: route.query.refresh,
-  limit: route.query.limit,
-  sort: route.query.sort,
-  direction: route.query.direction,
+  search: queryString(route.query.search),
+  page: queryNumber(route.query.page, 1),
+  limit: route.query.limit ? queryNumber(route.query.limit, LIMIT) : LIMIT,
+  credit_only: queryBoolean(route.query.credit_only, false) ?? false,
+  refresh: queryString(route.query.refresh),
+  sort: queryString(route.query.sort) || null,
+  direction: queryString(route.query.direction) || null,
 }));
 
 async function fetchClients() {
   const result = await commands.listClients({
-    search: String(queryParams.value.search ?? ""),
-    page: Number(queryParams.value.page ?? 1),
-    limit: queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT,
-    sort: queryString(route.query.sort) || null,
-    direction: queryString(route.query.direction) || null,
+    search: queryParams.value.search,
+    page: queryParams.value.page,
+    limit: queryParams.value.limit,
+    credit_only: queryParams.value.credit_only ? true : null,
+    sort: queryParams.value.sort,
+    direction: queryParams.value.direction,
   });
   if (result.status === "error") {
     toast.error(t("notifications.error.title"), {
@@ -50,31 +53,71 @@ const { data: clientsData } = await useAsyncData(fetchClients, {
 
 const clients = computed<SelectClients[]>(() => clientsData.value?.clients ?? []);
 const totalRows = computed<number>(() => clientsData.value?.count ?? 0);
+const activeFilters = computed(() =>
+  creditOnly.value ? [{ key: "credit_only", label: t("fields.credit"), value: "> 0" }] : [],
+);
 
 provide("count", totalRows);
-provide("itemsPerPage", queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT);
+provide("itemsPerPage", queryParams.value.limit);
 
 const debouncedSearch = useDebounceFn(() => {
-  updateQueryParams({ search: searchQuery.value });
-}, 500);
+  updateQueryParams({ search: searchQuery.value, page: 1 });
+}, 350);
 
 watch(searchQuery, debouncedSearch);
+
+watch(creditOnly, () => {
+  updateQueryParams({
+    credit_only: creditOnly.value ? true : null,
+    page: 1,
+  });
+});
+
+function clearFilter(key: string) {
+  if (key === "credit_only") creditOnly.value = false;
+}
+
+function clearAllFilters() {
+  creditOnly.value = false;
+}
 
 const openCreateClientModal = () => modal.open(ClientCreate, {});
 </script>
 
 <template>
-  <main class="w-full h-full">
-    <div class="w-full h-full flex flex-col items-start justify-start">
-      <div class="flex justify-between w-full gap-9 mb-2">
-        <div class="w-full max-w-md">
-          <Input v-model="searchQuery" type="text" :placeholder="t('search')" />
-        </div>
-        <Button class="gap-2 text-nowrap" @click="openCreateClientModal()">
-          <Plus :size="20" />
-          {{ t("buttons.toggle-create-client") }}
-        </Button>
-      </div>
+  <main class="h-full w-full">
+    <div class="flex h-full w-full flex-col items-start justify-start">
+      <ListFilterBar
+        :search="searchQuery"
+        :active-filters="activeFilters"
+        :advanced-label="t('filters.more')"
+        @update:search="(value) => (searchQuery = value)"
+        @clear-filter="clearFilter"
+        @clear-all="clearAllFilters"
+      >
+        <template #advanced>
+          <div class="space-y-3">
+            <div class="space-y-2">
+              <p class="text-sm font-medium text-slate-600">
+                {{ t("fields.credit") }}
+              </p>
+              <Button
+                class="w-full justify-start"
+                :variant="creditOnly ? 'default' : 'outline'"
+                @click="creditOnly = !creditOnly"
+              >
+                {{ t("filters.credit-only") }}
+              </Button>
+            </div>
+          </div>
+        </template>
+        <template #actions>
+          <Button class="gap-2 text-nowrap" @click="openCreateClientModal()">
+            <Plus :size="20" />
+            {{ t("buttons.toggle-create-client") }}
+          </Button>
+        </template>
+      </ListFilterBar>
       <ClientsTable :clients="clients" />
     </div>
   </main>

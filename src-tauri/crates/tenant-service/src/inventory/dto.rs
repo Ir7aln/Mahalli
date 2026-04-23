@@ -8,7 +8,16 @@ pub struct ListInventoryArgs {
     pub limit: u64,
     pub search: String,
     pub transaction_type: Option<String>,
-    pub created_at: Option<String>,
+    pub created_from: Option<String>,
+    pub created_to: Option<String>,
+    #[specta(type = Option<f32>)]
+    pub quantity_min: Option<f32>,
+    #[specta(type = Option<f32>)]
+    pub quantity_max: Option<f32>,
+    #[specta(type = Option<f32>)]
+    pub price_min: Option<f32>,
+    #[specta(type = Option<f32>)]
+    pub price_max: Option<f32>,
     pub sort: Option<String>,
     pub direction: Option<String>,
 }
@@ -23,6 +32,12 @@ pub struct SelectInventory {
     #[specta(type = f32)]
     pub quantity: f32,
     pub transaction_type: String,
+    pub order_id: Option<String>,
+    pub order_identifier: Option<String>,
+    pub invoice_id: Option<String>,
+    pub invoice_identifier: Option<String>,
+    pub quote_id: Option<String>,
+    pub quote_identifier: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]

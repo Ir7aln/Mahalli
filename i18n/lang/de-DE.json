@@ -45,6 +45,22 @@
     "generate-quote": "Angebot erstellen"
   },
   "translationTitle": "Sprache ändern",
+  "filters": {
+    "more": "Mehr Filter",
+    "clear-all": "Alles löschen",
+    "from": "Von",
+    "to": "Bis",
+    "min": "Min",
+    "max": "Max",
+    "required": "Erforderlich",
+    "credit-only": "Kunden mit offenem Guthaben",
+    "has-email": "Mit E-Mail",
+    "has-phone": "Mit Telefon",
+    "stock-status": "Lagerstatus",
+    "out-of-stock": "Nicht vorrätig",
+    "low-stock": "Niedriger Bestand",
+    "healthy-stock": "Guter Bestand"
+  },
   "dropZone": "Ziehen und ablegen oder auswählen",
   "plrz": {
     "i": "kein Element | Element | Elemente",

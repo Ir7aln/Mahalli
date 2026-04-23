@@ -23,6 +23,13 @@ fn requested_order(direction: Option<&str>) -> Order {
     }
 }
 
+fn order_search_condition(search: &str) -> Cond {
+    let pattern = format!("%{}%", search);
+    Cond::any()
+        .add(Expr::col((Clients, clients::Column::FullName)).like(pattern.clone()))
+        .add(Expr::col((Orders, orders::Column::Identifier)).like(pattern))
+}
+
 pub struct OrdersService;
 
 impl OrdersService {
@@ -33,17 +40,20 @@ impl OrdersService {
                 Cond::all()
                     .add(Expr::col((Orders, orders::Column::IsArchived)).eq(false))
                     .add(Expr::col((Orders, orders::Column::IsDeleted)).eq(false))
-                    .add(
-                        Expr::col((Clients, clients::Column::FullName))
-                            .like(format!("{}%", args.search)),
-                    ),
+                    .add(order_search_condition(&args.search)),
             )
             .apply_if(args.status.clone(), |query, v| {
                 query.filter(Expr::col((Orders, orders::Column::Status)).eq(v))
             })
-            .apply_if(args.created_at.clone(), |query, v| {
+            .apply_if(args.created_from.clone(), |query, v| {
                 query.filter(Expr::cust_with_values(
-                    "strftime('%Y-%m-%d', orders.created_at) = strftime('%Y-%m-%d', ?)",
+                    "strftime('%Y-%m-%d', orders.created_at) >= strftime('%Y-%m-%d', ?)",
+                    [v],
+                ))
+            })
+            .apply_if(args.created_to.clone(), |query, v| {
+                query.filter(Expr::cust_with_values(
+                    "strftime('%Y-%m-%d', orders.created_at) <= strftime('%Y-%m-%d', ?)",
                     [v],
                 ))
             })
@@ -103,10 +113,7 @@ impl OrdersService {
                 Cond::all()
                     .add(Expr::col((Orders, orders::Column::IsArchived)).eq(false))
                     .add(Expr::col((Orders, orders::Column::IsDeleted)).eq(false))
-                    .add(
-                        Expr::col((Clients, clients::Column::FullName))
-                            .like(format!("{}%", args.search)),
-                    ),
+                    .add(order_search_condition(&args.search)),
             )
             .conditions(
                 args.status.clone().is_some(),
@@ -116,11 +123,21 @@ impl OrdersService {
                 |_| {},
             )
             .conditions(
-                args.created_at.clone().is_some(),
+                args.created_from.clone().is_some(),
                 |x| {
                     x.and_where(Expr::cust_with_values(
-                        "strftime('%Y-%m-%d', orders.created_at) = strftime('%Y-%m-%d', ?)",
-                        args.created_at,
+                        "strftime('%Y-%m-%d', orders.created_at) >= strftime('%Y-%m-%d', ?)",
+                        args.created_from,
+                    ));
+                },
+                |_| {},
+            )
+            .conditions(
+                args.created_to.clone().is_some(),
+                |x| {
+                    x.and_where(Expr::cust_with_values(
+                        "strftime('%Y-%m-%d', orders.created_at) <= strftime('%Y-%m-%d', ?)",
+                        args.created_to,
                     ));
                 },
                 |_| {},

@@ -7,9 +7,12 @@ use tenant_entity::{
     inventory_transactions::{
         self, ActiveModel as InventoryActiveModel, Entity as InventoryTransactions,
     },
+    invoice_items::{self, Entity as InvoiceItems},
+    invoices::{self, Entity as Invoices},
     order_items::{self, Entity as OrderItems},
     orders::{self, Entity as Orders},
     products::{self, Entity as Products},
+    quotes::{self, Entity as Quotes},
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
@@ -18,6 +21,13 @@ fn requested_order(direction: Option<&str>) -> Order {
     } else {
         Order::Desc
     }
+}
+
+fn inventory_price_expr() -> sea_orm::sea_query::SimpleExpr {
+    Expr::expr(Func::coalesce([
+        Expr::col((OrderItems, order_items::Column::Price)),
+        Expr::col((Products, products::Column::PurchasePrice)),
+    ]))
 }
 
 pub struct InventoryService;
@@ -50,7 +60,7 @@ impl InventoryService {
                     ),
             )
             .apply_if(Some(args.search.clone()), |query, v| {
-                query.filter(Expr::col((Products, products::Column::Name)).like(format!("{}%", v)))
+                query.filter(Expr::col((Products, products::Column::Name)).like(format!("%{}%", v)))
             })
             .apply_if(args.transaction_type.clone(), |query, v| {
                 query.filter(
@@ -61,12 +71,32 @@ impl InventoryService {
                     .eq(v),
                 )
             })
-            .apply_if(args.created_at.clone(), |query, v| {
+            .apply_if(args.created_from.clone(), |query, v| {
                 query.filter(Expr::cust_with_values(
-                    "strftime('%Y-%m-%d', inventory_transactions.created_at) = strftime('%Y-%m-%d', ?)",
+                    "strftime('%Y-%m-%d', inventory_transactions.created_at) >= strftime('%Y-%m-%d', ?)",
                     [v],
                 ))
             })
+            .apply_if(args.created_to.clone(), |query, v| {
+                query.filter(Expr::cust_with_values(
+                    "strftime('%Y-%m-%d', inventory_transactions.created_at) <= strftime('%Y-%m-%d', ?)",
+                    [v],
+                ))
+            })
+            .apply_if(args.quantity_min, |query, value| {
+                query.filter(
+                    Expr::col((InventoryTransactions, inventory_transactions::Column::Quantity))
+                        .gte(value),
+                )
+            })
+            .apply_if(args.quantity_max, |query, value| {
+                query.filter(
+                    Expr::col((InventoryTransactions, inventory_transactions::Column::Quantity))
+                        .lte(value),
+                )
+            })
+            .apply_if(args.price_min, |query, value| query.filter(inventory_price_expr().gte(value)))
+            .apply_if(args.price_max, |query, value| query.filter(inventory_price_expr().lte(value)))
             .count(db)
             .await?;
 
@@ -81,12 +111,30 @@ impl InventoryService {
                 Expr::col((InventoryTransactions, inventory_transactions::Column::CreatedAt)),
             ])
             .expr_as(
-                Func::coalesce([
-                    Expr::col((OrderItems, order_items::Column::Price)),
-                    Expr::col((Products, products::Column::PurchasePrice)),
-                ]),
-                Alias::new("price"),
+                Expr::col((Orders, orders::Column::Id)),
+                Alias::new("order_id"),
             )
+            .expr_as(
+                Expr::col((Orders, orders::Column::Identifier)),
+                Alias::new("order_identifier"),
+            )
+            .expr_as(
+                Expr::col((Invoices, invoices::Column::Id)),
+                Alias::new("invoice_id"),
+            )
+            .expr_as(
+                Expr::col((Invoices, invoices::Column::Identifier)),
+                Alias::new("invoice_identifier"),
+            )
+            .expr_as(
+                Expr::col((Quotes, quotes::Column::Id)),
+                Alias::new("quote_id"),
+            )
+            .expr_as(
+                Expr::col((Quotes, quotes::Column::Identifier)),
+                Alias::new("quote_identifier"),
+            )
+            .expr_as(inventory_price_expr(), Alias::new("price"))
             .join(
                 JoinType::Join,
                 Products,
@@ -103,11 +151,31 @@ impl InventoryService {
             )
             .join(
                 JoinType::LeftJoin,
+                InvoiceItems,
+                Expr::col((InvoiceItems, invoice_items::Column::InventoryId)).equals((
+                    InventoryTransactions,
+                    inventory_transactions::Column::Id,
+                )),
+            )
+            .join(
+                JoinType::LeftJoin,
+                Invoices,
+                Expr::col((Invoices, invoices::Column::Id))
+                    .equals((InvoiceItems, invoice_items::Column::InvoiceId)),
+            )
+            .join(
+                JoinType::LeftJoin,
                 Orders,
                 Expr::col((Orders, orders::Column::Id)).equals((
                     OrderItems,
                     order_items::Column::OrderId,
                 )),
+            )
+            .join(
+                JoinType::LeftJoin,
+                Quotes,
+                Expr::col((Quotes, quotes::Column::Id))
+                    .equals((Orders, orders::Column::QuoteId)),
             )
             .cond_where(
                 Cond::all().add(
@@ -126,10 +194,7 @@ impl InventoryService {
                     .eq(false),
                 ),
             )
-            .and_where(Expr::col((Products, products::Column::Name)).like(format!(
-                "{}%",
-                args.search
-            )))
+            .and_where(Expr::col((Products, products::Column::Name)).like(format!("%{}%", args.search)))
             .conditions(
                 args.transaction_type.clone().is_some(),
                 |x| {
@@ -144,12 +209,56 @@ impl InventoryService {
                 |_| {},
             )
             .conditions(
-                args.created_at.clone().is_some(),
+                args.created_from.clone().is_some(),
                 |x| {
                     x.and_where(Expr::cust_with_values(
-                        "strftime('%Y-%m-%d', inventory_transactions.created_at) = strftime('%Y-%m-%d', ?)",
-                        args.created_at,
+                        "strftime('%Y-%m-%d', inventory_transactions.created_at) >= strftime('%Y-%m-%d', ?)",
+                        args.created_from,
                     ));
+                },
+                |_| {},
+            )
+            .conditions(
+                args.created_to.clone().is_some(),
+                |x| {
+                    x.and_where(Expr::cust_with_values(
+                        "strftime('%Y-%m-%d', inventory_transactions.created_at) <= strftime('%Y-%m-%d', ?)",
+                        args.created_to,
+                    ));
+                },
+                |_| {},
+            )
+            .conditions(
+                args.quantity_min.is_some(),
+                |x| {
+                    x.and_where(
+                        Expr::col((InventoryTransactions, inventory_transactions::Column::Quantity))
+                            .gte(args.quantity_min),
+                    );
+                },
+                |_| {},
+            )
+            .conditions(
+                args.quantity_max.is_some(),
+                |x| {
+                    x.and_where(
+                        Expr::col((InventoryTransactions, inventory_transactions::Column::Quantity))
+                            .lte(args.quantity_max),
+                    );
+                },
+                |_| {},
+            )
+            .conditions(
+                args.price_min.is_some(),
+                |x| {
+                    x.and_where(inventory_price_expr().gte(args.price_min));
+                },
+                |_| {},
+            )
+            .conditions(
+                args.price_max.is_some(),
+                |x| {
+                    x.and_where(inventory_price_expr().lte(args.price_max));
                 },
                 |_| {},
             )

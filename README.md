@@ -31,9 +31,11 @@ Mahalli provides comprehensive tools to manage each step of this process efficie
 Mahalli uses a two-layer SQLite database architecture:
 
 ### System Database (`catalog.sqlite`)
+
 A permanent catalog database that runs at all times. It tracks all registered tenant databases — their names, slugs, file paths, and which one is currently active.
 
 ### Tenant Databases
+
 Each tenant database is an independent SQLite file that holds all business data (clients, products, orders, quotes, invoices, inventory) for a given workspace. The active tenant connection is hot-swappable at runtime — users can create new workspaces, clone existing ones, and switch between them without restarting the app.
 
 ### Crate Structure
@@ -88,34 +90,34 @@ bun run tauri build
 
 ### Development
 
-| Command | Description |
-|---|---|
-| `make dev` | Start the development server |
-| `make build` | Build a debug desktop executable |
-| `make check` | Run `cargo check` on the Rust code |
-| `make lint` | Format Rust code and lint frontend code |
+| Command      | Description                             |
+| ------------ | --------------------------------------- |
+| `make dev`   | Start the development server            |
+| `make build` | Build a debug desktop executable        |
+| `make check` | Run `cargo check` on the Rust code      |
+| `make lint`  | Format Rust code and lint frontend code |
 
 ### Tenant Database (business data)
 
-| Command | Description |
-|---|---|
-| `make tenant-migrationsup` | Run all pending tenant migrations |
-| `make tenant-migrationslast` | Revert the last tenant migration |
-| `make tenant-migrationsdown` | Drop and reset the tenant database |
-| `make tenant-entity` | Regenerate SeaORM entities from the tenant DB |
-| `make migration name=<name>` | Generate a new tenant migration file |
+| Command                      | Description                                   |
+| ---------------------------- | --------------------------------------------- |
+| `make tenant-migrationsup`   | Run all pending tenant migrations             |
+| `make tenant-migrationslast` | Revert the last tenant migration              |
+| `make tenant-migrationsdown` | Drop and reset the tenant database            |
+| `make tenant-entity`         | Regenerate SeaORM entities from the tenant DB |
+| `make migration name=<name>` | Generate a new tenant migration file          |
 
 Shorthands `make migrationsup`, `make migrationslast`, `make migrationsdown`, and `make entity` all target the tenant database.
 
 ### System Database (catalog)
 
-| Command | Description |
-|---|---|
-| `make system-migrationsup` | Run all pending system migrations |
-| `make system-migrationslast` | Revert the last system migration |
-| `make system-migrationsdown` | Drop and reset the system database |
-| `make system-entity` | Regenerate SeaORM entities from the system DB |
-| `make system-migration name=<name>` | Generate a new system migration file |
+| Command                             | Description                                   |
+| ----------------------------------- | --------------------------------------------- |
+| `make system-migrationsup`          | Run all pending system migrations             |
+| `make system-migrationslast`        | Revert the last system migration              |
+| `make system-migrationsdown`        | Drop and reset the system database            |
+| `make system-entity`                | Regenerate SeaORM entities from the system DB |
+| `make system-migration name=<name>` | Generate a new system migration file          |
 
 ### Version
 

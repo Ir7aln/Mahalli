@@ -77,7 +77,9 @@ async function switchDatabase(id: string) {
               <p class="font-medium">{{ database.name }}</p>
               <p class="mt-1 truncate text-xs text-muted-foreground">{{ database.file_path }}</p>
             </div>
-            <span class="shrink-0 inline-flex items-center gap-2 text-xs font-medium text-muted-foreground">
+            <span
+              class="shrink-0 inline-flex items-center gap-2 text-xs font-medium text-muted-foreground"
+            >
               <LoaderCircle v-if="isSwitching === database.id" class="animate-spin" :size="14" />
               {{
                 isSwitching === database.id

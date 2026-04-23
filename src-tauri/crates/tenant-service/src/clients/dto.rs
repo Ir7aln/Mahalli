@@ -7,6 +7,7 @@ pub struct ListClientsArgs {
     pub page: u64,
     pub limit: u64,
     pub search: String,
+    pub credit_only: Option<bool>,
     pub sort: Option<String>,
     pub direction: Option<String>,
 }

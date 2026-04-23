@@ -19,6 +19,17 @@ export function queryNumber(
   return Number.isFinite(n) ? n : fallback;
 }
 
+export function queryBoolean(
+  value: LocationQueryValue | LocationQueryValue[] | undefined,
+  fallback?: boolean,
+) {
+  const v = firstQueryValue(value);
+  if (v == null || v === "") return fallback;
+  if (v === "true") return true;
+  if (v === "false") return false;
+  return fallback;
+}
+
 export function toQueryValueRaw(value: string | number | null): LocationQueryValueRaw | undefined {
   if (value === null) return undefined;
   return value;

@@ -1,9 +1,5 @@
 <script setup lang="ts">
-import {
-  commands,
-  type AddInvoicePayment,
-  type SelectInvoicePayment,
-} from "@/bindings";
+import { commands, type AddInvoicePayment, type SelectInvoicePayment } from "@/bindings";
 import * as Logger from "@tauri-apps/plugin-log";
 import { CalendarDays, WalletCards, X } from "lucide-vue-next";
 import { toast } from "vue-sonner";

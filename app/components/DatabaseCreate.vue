@@ -72,7 +72,11 @@ async function createDatabase() {
       <CardContent class="space-y-4">
         <div class="space-y-2">
           <Label for="database-name">{{ t("fields.name") }}</Label>
-          <Input id="database-name" v-model="form.name" :placeholder="t('database.placeholders.name')" />
+          <Input
+            id="database-name"
+            v-model="form.name"
+            :placeholder="t('database.placeholders.name')"
+          />
         </div>
 
         <div class="space-y-2">
@@ -93,7 +97,9 @@ async function createDatabase() {
           class="flex items-start justify-between gap-3 rounded-md border border-slate-200 p-3 text-left rtl:text-right"
         >
           <div class="min-w-0 flex-1">
-            <p class="text-sm font-medium text-slate-900">{{ t("database.create.make-active-title") }}</p>
+            <p class="text-sm font-medium text-slate-900">
+              {{ t("database.create.make-active-title") }}
+            </p>
             <p class="text-xs text-slate-500">
               {{ t("database.create.make-active-description") }}
             </p>
@@ -102,11 +108,20 @@ async function createDatabase() {
         </label>
       </CardContent>
       <CardFooter class="grid grid-cols-3">
-        <Button type="button" variant="outline" class="col-span-1" :disabled="loading" @click="close">
+        <Button
+          type="button"
+          variant="outline"
+          class="col-span-1"
+          :disabled="loading"
+          @click="close"
+        >
           {{ t("buttons.cancel") }}
         </Button>
         <Button type="submit" class="col-span-2" :disabled="loading">
-          <span v-if="loading" class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          <span
+            v-if="loading"
+            class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+          />
           {{ loading ? t("database.actions.creating") : t("database.actions.create") }}
         </Button>
       </CardFooter>

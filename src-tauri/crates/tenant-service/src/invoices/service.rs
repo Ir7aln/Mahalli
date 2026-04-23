@@ -201,6 +201,13 @@ fn normalize_invoice_status(current_status: &str, total: f64, paid_amount: f64) 
     None
 }
 
+fn invoice_search_condition(search: &str) -> Cond {
+    let pattern = format!("%{}%", search);
+    Cond::any()
+        .add(Expr::col((Clients, clients::Column::FullName)).like(pattern.clone()))
+        .add(Expr::col((Invoices, invoices::Column::Identifier)).like(pattern))
+}
+
 pub struct InvoicesService;
 
 impl InvoicesService {
@@ -214,24 +221,20 @@ impl InvoicesService {
                 Cond::all()
                     .add(Expr::col((Invoices, invoices::Column::IsArchived)).eq(false))
                     .add(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
-                    .add(
-                        Cond::any()
-                            .add(
-                                Expr::col((Clients, clients::Column::FullName))
-                                    .like(format!("{}%", args.search)),
-                            )
-                            .add(
-                                Expr::col((Invoices, invoices::Column::Identifier))
-                                    .like(format!("{}%", args.search)),
-                            ),
-                    ),
+                    .add(invoice_search_condition(&args.search)),
             )
             .apply_if(args.status.clone(), |query, v| {
                 query.filter(Expr::col((Invoices, invoices::Column::Status)).eq(v))
             })
-            .apply_if(args.created_at.clone(), |query, v| {
+            .apply_if(args.created_from.clone(), |query, v| {
                 query.filter(Expr::cust_with_values(
-                    "strftime('%Y-%m-%d', invoices.created_at) = strftime('%Y-%m-%d', ?)",
+                    "strftime('%Y-%m-%d', invoices.created_at) >= strftime('%Y-%m-%d', ?)",
+                    [v],
+                ))
+            })
+            .apply_if(args.created_to.clone(), |query, v| {
+                query.filter(Expr::cust_with_values(
+                    "strftime('%Y-%m-%d', invoices.created_at) <= strftime('%Y-%m-%d', ?)",
                     [v],
                 ))
             })
@@ -262,17 +265,7 @@ impl InvoicesService {
                 Cond::all()
                     .add(Expr::col((Invoices, invoices::Column::IsArchived)).eq(false))
                     .add(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
-                    .add(
-                        Cond::any()
-                            .add(
-                                Expr::col((Clients, clients::Column::FullName))
-                                    .like(format!("{}%", args.search)),
-                            )
-                            .add(
-                                Expr::col((Invoices, invoices::Column::Identifier))
-                                    .like(format!("{}%", args.search)),
-                            ),
-                    ),
+                    .add(invoice_search_condition(&args.search)),
             )
             .conditions(
                 args.status.clone().is_some(),
@@ -282,11 +275,21 @@ impl InvoicesService {
                 |_| {},
             )
             .conditions(
-                args.created_at.clone().is_some(),
+                args.created_from.clone().is_some(),
                 |x| {
                     x.and_where(Expr::cust_with_values(
-                        "strftime('%Y-%m-%d', invoices.created_at) = strftime('%Y-%m-%d', ?)",
-                        args.created_at,
+                        "strftime('%Y-%m-%d', invoices.created_at) >= strftime('%Y-%m-%d', ?)",
+                        args.created_from,
+                    ));
+                },
+                |_| {},
+            )
+            .conditions(
+                args.created_to.clone().is_some(),
+                |x| {
+                    x.and_where(Expr::cust_with_values(
+                        "strftime('%Y-%m-%d', invoices.created_at) <= strftime('%Y-%m-%d', ?)",
+                        args.created_to,
                     ));
                 },
                 |_| {},

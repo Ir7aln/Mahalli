@@ -7,7 +7,8 @@ pub struct ListQuotesArgs {
     pub page: u64,
     pub limit: u64,
     pub search: String,
-    pub created_at: Option<String>,
+    pub created_from: Option<String>,
+    pub created_to: Option<String>,
     pub sort: Option<String>,
     pub direction: Option<String>,
 }

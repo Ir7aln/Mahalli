@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { commands } from "@/bindings";
-import { Calendar as CalendarIcon, Plus } from "lucide-vue-next";
+import { Plus } from "lucide-vue-next";
 import { useDebounceFn } from "@vueuse/core";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
@@ -12,31 +12,32 @@ const route = useRoute();
 const { t, d } = useI18n();
 const modal = useModal();
 const { updateQueryParams } = useUpdateRouteQueryParams();
-const searchQuery = ref<string>((route.query.search as string) ?? "");
-const created_at = ref<string>(queryString(route.query.created_at));
 
+const searchQuery = ref(queryString(route.query.search));
+const createdFrom = ref(queryString(route.query.created_from));
+const createdTo = ref(queryString(route.query.created_to));
 const quoteProducts = ref<QuoteProductItem[]>([]);
 
 const LIMIT = 50;
 
-const queryParams = computed(() => {
-  return {
-    search: queryString(route.query.search),
-    page: queryNumber(route.query.page, 1),
-    limit: route.query.limit ? queryNumber(route.query.limit, LIMIT) : LIMIT,
-    created_at: queryString(route.query.created_at) || null,
-    refresh: queryString(route.query.refresh) || "",
-    sort: queryString(route.query.sort) || "",
-    direction: queryString(route.query.direction) || "",
-  };
-});
+const queryParams = computed(() => ({
+  search: queryString(route.query.search),
+  page: queryNumber(route.query.page, 1),
+  limit: route.query.limit ? queryNumber(route.query.limit, LIMIT) : LIMIT,
+  created_from: queryString(route.query.created_from) || null,
+  created_to: queryString(route.query.created_to) || null,
+  refresh: queryString(route.query.refresh),
+  sort: queryString(route.query.sort) || null,
+  direction: queryString(route.query.direction) || null,
+}));
 
 async function fetchQuotes() {
   const result = await commands.listQuotes({
     search: queryParams.value.search,
     page: queryParams.value.page,
     limit: queryParams.value.limit,
-    created_at: queryParams.value.created_at,
+    created_from: queryParams.value.created_from,
+    created_to: queryParams.value.created_to,
     sort: queryParams.value.sort,
     direction: queryParams.value.direction,
   });
@@ -57,19 +58,40 @@ const { data: quotesData } = await useAsyncData(fetchQuotes, {
 
 const quotes = computed<SelectQuotes[]>(() => quotesData.value?.quotes ?? []);
 const totalRows = computed<number>(() => quotesData.value?.count ?? 0);
+const activeFilters = computed(
+  () =>
+    [
+      createdFrom.value
+        ? {
+            key: "created_from",
+            label: t("filters.from"),
+            value: d(new Date(createdFrom.value), "short"),
+          }
+        : null,
+      createdTo.value
+        ? {
+            key: "created_to",
+            label: t("filters.to"),
+            value: d(new Date(createdTo.value), "short"),
+          }
+        : null,
+    ].filter(Boolean) as Array<{ key: string; label: string; value: string }>,
+);
 
 provide("count", totalRows);
-provide("itemsPerPage", queryParams.value.limit ? Number(queryParams.value.limit) : LIMIT);
+provide("itemsPerPage", queryParams.value.limit);
 
 const debouncedSearch = useDebounceFn(() => {
-  updateQueryParams({ search: searchQuery.value || "" });
-}, 500);
+  updateQueryParams({ search: searchQuery.value || "", page: 1 });
+}, 350);
 
 watch(searchQuery, debouncedSearch);
 
-watch(created_at, () => {
+watch([createdFrom, createdTo], () => {
   updateQueryParams({
-    created_at: created_at.value ? new Date(created_at.value).toISOString() : "",
+    created_from: createdFrom.value || null,
+    created_to: createdTo.value || null,
+    page: 1,
   });
 });
 
@@ -90,42 +112,53 @@ async function listQuoteProducts(id?: string) {
   quoteProducts.value = result.data.data ?? [];
 }
 
+function clearFilter(key: string) {
+  if (key === "created_from") createdFrom.value = "";
+  if (key === "created_to") createdTo.value = "";
+}
+
+function clearAllFilters() {
+  createdFrom.value = "";
+  createdTo.value = "";
+}
+
 const openCreateQuoteModal = () => modal.open(QuoteCreate, { sheet: true });
 </script>
 
 <template>
-  <main class="w-full h-full">
-    <div class="w-full h-full flex flex-col items-start justify-start">
-      <div class="flex justify-between w-full gap-9 mb-2">
-        <div class="w-full grid grid-cols-2 gap-2 lg:max-w-screen-md">
-          <Input v-model="searchQuery" type="text" :placeholder="t('search')" />
-          <Popover>
-            <PopoverTrigger as-child>
-              <Button
-                variant="outline"
-                :class="
-                  cn(
-                    'w-full justify-start text-left font-normal',
-                    !created_at && 'text-muted-foreground',
-                  )
-                "
-              >
-                <CalendarIcon class="mr-2 h-4 w-4" />
-                <span class="text-nowrap">{{
-                  created_at ? d(new Date(created_at), "short") : t("pick-date")
-                }}</span>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent class="w-auto p-0">
-              <Calendar v-model="created_at" />
-            </PopoverContent>
-          </Popover>
-        </div>
-        <Button class="gap-2 text-nowrap" @click="openCreateQuoteModal">
-          <Plus :size="20" />
-          {{ t("buttons.toggle-create-quote") }}
-        </Button>
-      </div>
+  <main class="h-full w-full">
+    <div class="flex h-full w-full flex-col items-start justify-start">
+      <ListFilterBar
+        :search="searchQuery"
+        :active-filters="activeFilters"
+        :advanced-label="t('filters.more')"
+        @update:search="(value) => (searchQuery = value)"
+        @clear-filter="clearFilter"
+        @clear-all="clearAllFilters"
+      >
+        <template #advanced>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div class="space-y-2">
+              <p class="text-sm font-medium text-slate-600">
+                {{ t("filters.from") }}
+              </p>
+              <Input v-model="createdFrom" type="date" />
+            </div>
+            <div class="space-y-2">
+              <p class="text-sm font-medium text-slate-600">
+                {{ t("filters.to") }}
+              </p>
+              <Input v-model="createdTo" type="date" />
+            </div>
+          </div>
+        </template>
+        <template #actions>
+          <Button class="gap-2 text-nowrap" @click="openCreateQuoteModal">
+            <Plus :size="20" />
+            {{ t("buttons.toggle-create-quote") }}
+          </Button>
+        </template>
+      </ListFilterBar>
       <QuotesTable
         :quotes="quotes"
         :quote-products="quoteProducts"

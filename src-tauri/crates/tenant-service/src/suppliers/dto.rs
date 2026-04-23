@@ -7,6 +7,8 @@ pub struct ListSuppliersArgs {
     pub page: u64,
     pub limit: u64,
     pub search: String,
+    pub has_email: Option<bool>,
+    pub has_phone: Option<bool>,
     pub sort: Option<String>,
     pub direction: Option<String>,
 }

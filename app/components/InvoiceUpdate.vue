@@ -479,10 +479,7 @@ function deleteInvoiceItem(index: number) {
                   </span>
                 </div>
 
-                <div
-                  v-if="invoicePayments.length"
-                  class="overflow-hidden border border-slate-200"
-                >
+                <div v-if="invoicePayments.length" class="overflow-hidden border border-slate-200">
                   <div
                     class="grid grid-cols-[160px_minmax(0,1fr)_140px] bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500"
                   >
@@ -496,13 +493,9 @@ function deleteInvoiceItem(index: number) {
                       :key="payment.id"
                       class="grid grid-cols-[160px_minmax(0,1fr)_140px] gap-3 px-4 py-3 text-sm"
                     >
-                      <span>{{ d(new Date(payment.payment_date), 'short') }}</span>
-                      <span class="truncate text-slate-500">{{
-                        payment.description || "--"
-                      }}</span>
-                      <span class="text-right font-medium">{{
-                        formatMoney(payment.amount)
-                      }}</span>
+                      <span>{{ d(new Date(payment.payment_date), "short") }}</span>
+                      <span class="truncate text-slate-500">{{ payment.description || "--" }}</span>
+                      <span class="text-right font-medium">{{ formatMoney(payment.amount) }}</span>
                     </div>
                   </div>
                 </div>

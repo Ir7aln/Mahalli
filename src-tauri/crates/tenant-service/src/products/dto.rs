@@ -7,6 +7,11 @@ pub struct ListProductsArgs {
     pub page: u64,
     pub limit: u64,
     pub search: String,
+    pub stock_status: Option<String>,
+    #[specta(type = Option<f32>)]
+    pub selling_price_min: Option<f32>,
+    #[specta(type = Option<f32>)]
+    pub selling_price_max: Option<f32>,
     pub sort: Option<String>,
     pub direction: Option<String>,
 }

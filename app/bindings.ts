@@ -6,675 +6,764 @@ import { invoke as __TAURI_INVOKE } from "@tauri-apps/api/core";
 
 /** Commands */
 export const commands = {
-	listProducts: (args: ListProductsArgs) => typedError<Success<ProductsResponse>, Fail>(__TAURI_INVOKE("list_products", { args })),
-	searchProducts: (search: string) => typedError<Success<ProductSearch[]>, Fail>(__TAURI_INVOKE("search_products", { search })),
-	createProduct: (product: NewProduct) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_product", { product })),
-	updateProduct: (product: Product) => typedError<Success<string>, Fail>(__TAURI_INVOKE("update_product", { product })),
-	deleteProduct: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_product", { id })),
-	listDatabases: () => typedError<Success<DatabaseRecord[]>, Fail>(__TAURI_INVOKE("list_databases")),
-	getDatabaseBootstrapStatus: () => typedError<Success<DatabaseBootstrapStatus>, Fail>(__TAURI_INVOKE("get_database_bootstrap_status")),
-	getActiveDatabase: () => typedError<Success<DatabaseRecord>, Fail>(__TAURI_INVOKE("get_active_database")),
-	createDatabase: (input: CreateTenantDatabaseRequest) => typedError<Success<DatabaseRecord>, Fail>(__TAURI_INVOKE("create_database", { input })),
-	switchDatabase: (id: string) => typedError<Success<DatabaseRecord>, Fail>(__TAURI_INVOKE("switch_database", { id })),
-	listInventory: (args: ListInventoryArgs) => typedError<Success<InventoryResponse>, Fail>(__TAURI_INVOKE("list_inventory", { args })),
-	createInventory: (transaction: NewInventory) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_inventory", { transaction })),
-	deleteInventory: (id: string) => typedError<Success<string>, Fail>(__TAURI_INVOKE("delete_inventory", { id })),
-	listClients: (args: ListClientsArgs) => typedError<Success<ClientsResponse>, Fail>(__TAURI_INVOKE("list_clients", { args })),
-	listClientInvoiceDebts: (clientId: string) => typedError<Success<ClientInvoiceDebtItem[]>, Fail>(__TAURI_INVOKE("list_client_invoice_debts", { clientId })),
-	searchClients: (search: string) => typedError<Success<ClientSearch[]>, Fail>(__TAURI_INVOKE("search_clients", { search })),
-	getClient: (id: string) => typedError<Success<ClientDetails>, Fail>(__TAURI_INVOKE("get_client", { id })),
-	createClient: (client: NewClient) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_client", { client })),
-	updateClient: (client: Client) => typedError<Success<string>, Fail>(__TAURI_INVOKE("update_client", { client })),
-	deleteClient: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_client", { id })),
-	listSuppliers: (args: ListSuppliersArgs) => typedError<Success<SuppliersResponse>, Fail>(__TAURI_INVOKE("list_suppliers", { args })),
-	searchSuppliers: (search: string) => typedError<Success<SupplierSearch[]>, Fail>(__TAURI_INVOKE("search_suppliers", { search })),
-	createSupplier: (supplier: NewSupplier) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_supplier", { supplier })),
-	updateSupplier: (supplier: Supplier) => typedError<Success<string>, Fail>(__TAURI_INVOKE("update_supplier", { supplier })),
-	deleteSupplier: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_supplier", { id })),
-	listOrders: (args: ListOrdersArgs) => typedError<Success<OrdersResponse>, Fail>(__TAURI_INVOKE("list_orders", { args })),
-	getOrder: (id: string) => typedError<Success<OrderWithClient>, Fail>(__TAURI_INVOKE("get_order", { id })),
-	getOrderDetails: (id: string) => typedError<Success<OrderDetailsResponse>, Fail>(__TAURI_INVOKE("get_order_details", { id })),
-	createOrder: (order: NewOrder) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_order", { order })),
-	updateOrder: (order: UpdateOrder) => typedError<Success<null>, Fail>(__TAURI_INVOKE("update_order", { order })),
-	deleteOrder: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_order", { id })),
-	listOrderProducts: (id: string) => typedError<Success<OrderProductItem[]>, Fail>(__TAURI_INVOKE("list_order_products", { id })),
-	createOrderFromQuote: (id: string) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_order_from_quote", { id })),
-	updateOrderStatus: (order: UpdateOrderStatus) => typedError<Success<null>, Fail>(__TAURI_INVOKE("update_order_status", { order })),
-	listQuotes: (args: ListQuotesArgs) => typedError<Success<QuotesResponse>, Fail>(__TAURI_INVOKE("list_quotes", { args })),
-	getQuote: (id: string) => typedError<Success<QuoteWithClient>, Fail>(__TAURI_INVOKE("get_quote", { id })),
-	getQuoteDetails: (id: string) => typedError<Success<QuoteDetailsResponse>, Fail>(__TAURI_INVOKE("get_quote_details", { id })),
-	createQuote: (quote: NewQuote) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_quote", { quote })),
-	updateQuote: (quote: UpdateQuote) => typedError<Success<null>, Fail>(__TAURI_INVOKE("update_quote", { quote })),
-	deleteQuote: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_quote", { id })),
-	listQuoteProducts: (id: string) => typedError<Success<QuoteProductItem[]>, Fail>(__TAURI_INVOKE("list_quote_products", { id })),
-	createTemplate: (template: NewTemplate) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_template", { template })),
-	deleteQuoteItem: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_quote_item", { id })),
-	deleteOrderItem: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_order_item", { id })),
-	listInvoices: (args: ListInvoicesArgs) => typedError<Success<InvoicesResponse>, Fail>(__TAURI_INVOKE("list_invoices", { args })),
-	getInvoice: (id: string) => typedError<Success<InvoiceWithClient>, Fail>(__TAURI_INVOKE("get_invoice", { id })),
-	getInvoiceDetails: (id: string) => typedError<Success<InvoiceDetailsResponse>, Fail>(__TAURI_INVOKE("get_invoice_details", { id })),
-	createInvoice: (invoice: NewInvoice) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_invoice", { invoice })),
-	updateInvoice: (invoice: UpdateInvoice) => typedError<Success<null>, Fail>(__TAURI_INVOKE("update_invoice", { invoice })),
-	addInvoicePayment: (payment: AddInvoicePayment) => typedError<Success<string>, Fail>(__TAURI_INVOKE("add_invoice_payment", { payment })),
-	deleteInvoice: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_invoice", { id })),
-	listInvoiceProducts: (id: string) => typedError<Success<InvoiceProductItem[]>, Fail>(__TAURI_INVOKE("list_invoice_products", { id })),
-	createInvoiceFromOrder: (id: string) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_invoice_from_order", { id })),
-	updateInvoiceStatus: (invoice: UpdateInvoiceStatus) => typedError<Success<null>, Fail>(__TAURI_INVOKE("update_invoice_status", { invoice })),
-	deleteInvoiceItem: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_invoice_item", { id })),
-	listInventoryStats: () => typedError<Success<SelectTransaction[]>, Fail>(__TAURI_INVOKE("list_inventory_stats")),
-	listTopClients: () => typedError<Success<SelectTops[]>, Fail>(__TAURI_INVOKE("list_top_clients")),
-	listTopSuppliers: () => typedError<Success<SelectTops[]>, Fail>(__TAURI_INVOKE("list_top_suppliers")),
-	listTopProducts: () => typedError<Success<SelectTopProducts[]>, Fail>(__TAURI_INVOKE("list_top_products")),
-	listStatusCount: () => typedError<Success<StatusCountResponse>, Fail>(__TAURI_INVOKE("list_status_count")),
-	listFinancialMetrics: () => typedError<Success<FinancialMetricsResponse>, Fail>(__TAURI_INVOKE("list_financial_metrics")),
-	seedDatabase: () => typedError<Success<null>, Fail>(__TAURI_INVOKE("seed_database")),
+  listProducts: (args: ListProductsArgs) =>
+    typedError<Success<ProductsResponse>, Fail>(__TAURI_INVOKE("list_products", { args })),
+  searchProducts: (search: string) =>
+    typedError<Success<ProductSearch[]>, Fail>(__TAURI_INVOKE("search_products", { search })),
+  createProduct: (product: NewProduct) =>
+    typedError<Success<string>, Fail>(__TAURI_INVOKE("create_product", { product })),
+  updateProduct: (product: Product) =>
+    typedError<Success<string>, Fail>(__TAURI_INVOKE("update_product", { product })),
+  deleteProduct: (id: string) =>
+    typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_product", { id })),
+  listDatabases: () =>
+    typedError<Success<DatabaseRecord[]>, Fail>(__TAURI_INVOKE("list_databases")),
+  getDatabaseBootstrapStatus: () =>
+    typedError<Success<DatabaseBootstrapStatus>, Fail>(
+      __TAURI_INVOKE("get_database_bootstrap_status"),
+    ),
+  getActiveDatabase: () =>
+    typedError<Success<DatabaseRecord>, Fail>(__TAURI_INVOKE("get_active_database")),
+  createDatabase: (input: CreateTenantDatabaseRequest) =>
+    typedError<Success<DatabaseRecord>, Fail>(__TAURI_INVOKE("create_database", { input })),
+  switchDatabase: (id: string) =>
+    typedError<Success<DatabaseRecord>, Fail>(__TAURI_INVOKE("switch_database", { id })),
+  listInventory: (args: ListInventoryArgs) =>
+    typedError<Success<InventoryResponse>, Fail>(__TAURI_INVOKE("list_inventory", { args })),
+  createInventory: (transaction: NewInventory) =>
+    typedError<Success<string>, Fail>(__TAURI_INVOKE("create_inventory", { transaction })),
+  deleteInventory: (id: string) =>
+    typedError<Success<string>, Fail>(__TAURI_INVOKE("delete_inventory", { id })),
+  listClients: (args: ListClientsArgs) =>
+    typedError<Success<ClientsResponse>, Fail>(__TAURI_INVOKE("list_clients", { args })),
+  listClientInvoiceDebts: (clientId: string) =>
+    typedError<Success<ClientInvoiceDebtItem[]>, Fail>(
+      __TAURI_INVOKE("list_client_invoice_debts", { clientId }),
+    ),
+  searchClients: (search: string) =>
+    typedError<Success<ClientSearch[]>, Fail>(__TAURI_INVOKE("search_clients", { search })),
+  getClient: (id: string) =>
+    typedError<Success<ClientDetails>, Fail>(__TAURI_INVOKE("get_client", { id })),
+  createClient: (client: NewClient) =>
+    typedError<Success<string>, Fail>(__TAURI_INVOKE("create_client", { client })),
+  updateClient: (client: Client) =>
+    typedError<Success<string>, Fail>(__TAURI_INVOKE("update_client", { client })),
+  deleteClient: (id: string) =>
+    typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_client", { id })),
+  listSuppliers: (args: ListSuppliersArgs) =>
+    typedError<Success<SuppliersResponse>, Fail>(__TAURI_INVOKE("list_suppliers", { args })),
+  searchSuppliers: (search: string) =>
+    typedError<Success<SupplierSearch[]>, Fail>(__TAURI_INVOKE("search_suppliers", { search })),
+  createSupplier: (supplier: NewSupplier) =>
+    typedError<Success<string>, Fail>(__TAURI_INVOKE("create_supplier", { supplier })),
+  updateSupplier: (supplier: Supplier) =>
+    typedError<Success<string>, Fail>(__TAURI_INVOKE("update_supplier", { supplier })),
+  deleteSupplier: (id: string) =>
+    typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_supplier", { id })),
+  listOrders: (args: ListOrdersArgs) =>
+    typedError<Success<OrdersResponse>, Fail>(__TAURI_INVOKE("list_orders", { args })),
+  getOrder: (id: string) =>
+    typedError<Success<OrderWithClient>, Fail>(__TAURI_INVOKE("get_order", { id })),
+  getOrderDetails: (id: string) =>
+    typedError<Success<OrderDetailsResponse>, Fail>(__TAURI_INVOKE("get_order_details", { id })),
+  createOrder: (order: NewOrder) =>
+    typedError<Success<string>, Fail>(__TAURI_INVOKE("create_order", { order })),
+  updateOrder: (order: UpdateOrder) =>
+    typedError<Success<null>, Fail>(__TAURI_INVOKE("update_order", { order })),
+  deleteOrder: (id: string) =>
+    typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_order", { id })),
+  listOrderProducts: (id: string) =>
+    typedError<Success<OrderProductItem[]>, Fail>(__TAURI_INVOKE("list_order_products", { id })),
+  createOrderFromQuote: (id: string) =>
+    typedError<Success<string>, Fail>(__TAURI_INVOKE("create_order_from_quote", { id })),
+  updateOrderStatus: (order: UpdateOrderStatus) =>
+    typedError<Success<null>, Fail>(__TAURI_INVOKE("update_order_status", { order })),
+  listQuotes: (args: ListQuotesArgs) =>
+    typedError<Success<QuotesResponse>, Fail>(__TAURI_INVOKE("list_quotes", { args })),
+  getQuote: (id: string) =>
+    typedError<Success<QuoteWithClient>, Fail>(__TAURI_INVOKE("get_quote", { id })),
+  getQuoteDetails: (id: string) =>
+    typedError<Success<QuoteDetailsResponse>, Fail>(__TAURI_INVOKE("get_quote_details", { id })),
+  createQuote: (quote: NewQuote) =>
+    typedError<Success<string>, Fail>(__TAURI_INVOKE("create_quote", { quote })),
+  updateQuote: (quote: UpdateQuote) =>
+    typedError<Success<null>, Fail>(__TAURI_INVOKE("update_quote", { quote })),
+  deleteQuote: (id: string) =>
+    typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_quote", { id })),
+  listQuoteProducts: (id: string) =>
+    typedError<Success<QuoteProductItem[]>, Fail>(__TAURI_INVOKE("list_quote_products", { id })),
+  createTemplate: (template: NewTemplate) =>
+    typedError<Success<string>, Fail>(__TAURI_INVOKE("create_template", { template })),
+  deleteQuoteItem: (id: string) =>
+    typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_quote_item", { id })),
+  deleteOrderItem: (id: string) =>
+    typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_order_item", { id })),
+  listInvoices: (args: ListInvoicesArgs) =>
+    typedError<Success<InvoicesResponse>, Fail>(__TAURI_INVOKE("list_invoices", { args })),
+  getInvoice: (id: string) =>
+    typedError<Success<InvoiceWithClient>, Fail>(__TAURI_INVOKE("get_invoice", { id })),
+  getInvoiceDetails: (id: string) =>
+    typedError<Success<InvoiceDetailsResponse>, Fail>(
+      __TAURI_INVOKE("get_invoice_details", { id }),
+    ),
+  createInvoice: (invoice: NewInvoice) =>
+    typedError<Success<string>, Fail>(__TAURI_INVOKE("create_invoice", { invoice })),
+  updateInvoice: (invoice: UpdateInvoice) =>
+    typedError<Success<null>, Fail>(__TAURI_INVOKE("update_invoice", { invoice })),
+  addInvoicePayment: (payment: AddInvoicePayment) =>
+    typedError<Success<string>, Fail>(__TAURI_INVOKE("add_invoice_payment", { payment })),
+  deleteInvoice: (id: string) =>
+    typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_invoice", { id })),
+  listInvoiceProducts: (id: string) =>
+    typedError<Success<InvoiceProductItem[]>, Fail>(
+      __TAURI_INVOKE("list_invoice_products", { id }),
+    ),
+  createInvoiceFromOrder: (id: string) =>
+    typedError<Success<string>, Fail>(__TAURI_INVOKE("create_invoice_from_order", { id })),
+  updateInvoiceStatus: (invoice: UpdateInvoiceStatus) =>
+    typedError<Success<null>, Fail>(__TAURI_INVOKE("update_invoice_status", { invoice })),
+  deleteInvoiceItem: (id: string) =>
+    typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_invoice_item", { id })),
+  listInventoryStats: () =>
+    typedError<Success<SelectTransaction[]>, Fail>(__TAURI_INVOKE("list_inventory_stats")),
+  listTopClients: () => typedError<Success<SelectTops[]>, Fail>(__TAURI_INVOKE("list_top_clients")),
+  listTopSuppliers: () =>
+    typedError<Success<SelectTops[]>, Fail>(__TAURI_INVOKE("list_top_suppliers")),
+  listTopProducts: () =>
+    typedError<Success<SelectTopProducts[]>, Fail>(__TAURI_INVOKE("list_top_products")),
+  listStatusCount: () =>
+    typedError<Success<StatusCountResponse>, Fail>(__TAURI_INVOKE("list_status_count")),
+  listFinancialMetrics: () =>
+    typedError<Success<FinancialMetricsResponse>, Fail>(__TAURI_INVOKE("list_financial_metrics")),
+  seedDatabase: () => typedError<Success<null>, Fail>(__TAURI_INVOKE("seed_database")),
 };
 
 /* Types */
 export type AddInvoicePayment = {
-	invoice_id: string,
-	payment_date: string,
-	description: string | null,
-	amount: number,
+  invoice_id: string;
+  payment_date: string;
+  description: string | null;
+  amount: number;
 };
 
 export type Client = {
-	id: string,
-	full_name: string,
-	address: string | null,
-	phone_number: string | null,
-	email: string | null,
-	image: string | null,
+  id: string;
+  full_name: string;
+  address: string | null;
+  phone_number: string | null;
+  email: string | null;
+  image: string | null;
 };
 
 export type ClientDetails = {
-	id: string,
-	full_name: string,
-	email: string | null,
-	phone_number: string | null,
-	address: string | null,
-	image: string | null,
+  id: string;
+  full_name: string;
+  email: string | null;
+  phone_number: string | null;
+  address: string | null;
+  image: string | null;
 };
 
 export type ClientInvoiceDebtItem = {
-	id: string,
-	identifier: string,
-	total: number,
-	paid_amount: number,
+  id: string;
+  identifier: string;
+  total: number;
+  paid_amount: number;
 };
 
 export type ClientSearch = {
-	label: string,
-	value: string,
+  label: string;
+  value: string;
 };
 
 export type ClientsResponse = {
-	count: number,
-	clients: SelectClients[],
+  count: number;
+  clients: SelectClients[];
 };
 
 export type CreateTenantDatabaseRequest = {
-	name: string,
-	clone_from_database_id: string | null,
-	make_active: boolean,
+  name: string;
+  clone_from_database_id: string | null;
+  make_active: boolean;
 };
 
 export type DatabaseBootstrapStatus = {
-	databases: DatabaseRecord[],
-	active_database: DatabaseRecord | null,
-	has_any_database: boolean,
-	has_active_database: boolean,
+  databases: DatabaseRecord[];
+  active_database: DatabaseRecord | null;
+  has_any_database: boolean;
+  has_active_database: boolean;
 };
 
 export type DatabaseRecord = {
-	id: string,
-	name: string,
-	slug: string,
-	file_name: string,
-	file_path: string,
-	is_active: boolean,
-	created_from_database_id: string | null,
-	created_at: string,
-	updated_at: string,
-	last_opened_at: string | null,
+  id: string;
+  name: string;
+  slug: string;
+  file_name: string;
+  file_path: string;
+  is_active: boolean;
+  created_from_database_id: string | null;
+  created_at: string;
+  updated_at: string;
+  last_opened_at: string | null;
 };
 
 export type Fail = {
-	error: string | null,
-	message: string | null,
+  error: string | null;
+  message: string | null;
 };
 
 export type FinancialMetricsResponse = {
-	current_revenue: number,
-	last_month_revenue: number,
-	current_expenses: number,
-	last_month_expenses: number,
-	current_net_profit: number,
-	last_month_net_profit: number,
-	revenue_growth_percentage: number,
-	expenses_growth_percentage: number,
-	net_profit_growth_percentage: number,
+  current_revenue: number;
+  last_month_revenue: number;
+  current_expenses: number;
+  last_month_expenses: number;
+  current_net_profit: number;
+  last_month_net_profit: number;
+  revenue_growth_percentage: number;
+  expenses_growth_percentage: number;
+  net_profit_growth_percentage: number;
 };
 
 export type InventoryResponse = {
-	count: number,
-	inventory: SelectInventory[],
+  count: number;
+  inventory: SelectInventory[];
 };
 
 export type InvoiceClientInfo = {
-	full_name: string,
-	email: string | null,
-	address: string | null,
-	phone_number: string | null,
+  full_name: string;
+  email: string | null;
+  address: string | null;
+  phone_number: string | null;
 };
 
 export type InvoiceDetailsResponse = {
-	id: string,
-	created_at: string,
-	status: string,
-	identifier: string,
-	paid_amount: number,
-	total: number,
-	client: InvoiceClientInfo,
-	items: SelectInvoicesItems[],
-	payments: SelectInvoicePayment[],
+  id: string;
+  created_at: string;
+  status: string;
+  identifier: string;
+  paid_amount: number;
+  total: number;
+  client: InvoiceClientInfo;
+  items: SelectInvoicesItems[];
+  payments: SelectInvoicePayment[];
 };
 
 export type InvoiceProductItem = {
-	name: string,
-	price: number,
-	quantity: number,
+  name: string;
+  price: number;
+  quantity: number;
 };
 
 export type InvoiceWithClient = {
-	id: string,
-	client_id: string,
-	created_at: string,
-	status: string,
-	identifier: string | null,
-	paid_amount: number,
-	total: number,
-	full_name: string,
-	email: string | null,
-	address: string | null,
-	phone_number: string | null,
-	items: SelectInvoicesItemsForUpdate[],
-	payments: SelectInvoicePayment[],
+  id: string;
+  client_id: string;
+  created_at: string;
+  status: string;
+  identifier: string | null;
+  paid_amount: number;
+  total: number;
+  full_name: string;
+  email: string | null;
+  address: string | null;
+  phone_number: string | null;
+  items: SelectInvoicesItemsForUpdate[];
+  payments: SelectInvoicePayment[];
 };
 
 export type InvoicesResponse = {
-	count: number,
-	invoices: SelectInvoices[],
+  count: number;
+  invoices: SelectInvoices[];
 };
 
 export type ListClientsArgs = {
-	page: number,
-	limit: number,
-	search: string,
-	sort: string | null,
-	direction: string | null,
+  page: number;
+  limit: number;
+  search: string;
+  credit_only: boolean | null;
+  sort: string | null;
+  direction: string | null;
 };
 
 export type ListInventoryArgs = {
-	page: number,
-	limit: number,
-	search: string,
-	transaction_type: string | null,
-	created_at: string | null,
-	sort: string | null,
-	direction: string | null,
+  page: number;
+  limit: number;
+  search: string;
+  transaction_type: string | null;
+  created_from: string | null;
+  created_to: string | null;
+  quantity_min: number | null;
+  quantity_max: number | null;
+  price_min: number | null;
+  price_max: number | null;
+  sort: string | null;
+  direction: string | null;
 };
 
 export type ListInvoicesArgs = {
-	page: number,
-	limit: number,
-	search: string,
-	status: string | null,
-	created_at: string | null,
-	sort: string | null,
-	direction: string | null,
+  page: number;
+  limit: number;
+  search: string;
+  status: string | null;
+  created_from: string | null;
+  created_to: string | null;
+  sort: string | null;
+  direction: string | null;
 };
 
 export type ListOrdersArgs = {
-	page: number,
-	limit: number,
-	search: string,
-	status: string | null,
-	created_at: string | null,
-	sort: string | null,
-	direction: string | null,
+  page: number;
+  limit: number;
+  search: string;
+  status: string | null;
+  created_from: string | null;
+  created_to: string | null;
+  sort: string | null;
+  direction: string | null;
 };
 
 export type ListProductsArgs = {
-	page: number,
-	limit: number,
-	search: string,
-	sort: string | null,
-	direction: string | null,
+  page: number;
+  limit: number;
+  search: string;
+  stock_status: string | null;
+  selling_price_min: number | null;
+  selling_price_max: number | null;
+  sort: string | null;
+  direction: string | null;
 };
 
 export type ListQuotesArgs = {
-	page: number,
-	limit: number,
-	search: string,
-	created_at: string | null,
-	sort: string | null,
-	direction: string | null,
+  page: number;
+  limit: number;
+  search: string;
+  created_from: string | null;
+  created_to: string | null;
+  sort: string | null;
+  direction: string | null;
 };
 
 export type ListSuppliersArgs = {
-	page: number,
-	limit: number,
-	search: string,
-	sort: string | null,
-	direction: string | null,
+  page: number;
+  limit: number;
+  search: string;
+  has_email: boolean | null;
+  has_phone: boolean | null;
+  sort: string | null;
+  direction: string | null;
 };
 
 export type NewClient = {
-	full_name: string,
-	address: string | null,
-	phone_number: string | null,
-	email: string | null,
-	image: string | null,
+  full_name: string;
+  address: string | null;
+  phone_number: string | null;
+  email: string | null;
+  image: string | null;
 };
 
 export type NewInventory = {
-	transaction_type: string,
-	product_id: string,
-	quantity: number,
+  transaction_type: string;
+  product_id: string;
+  quantity: number;
 };
 
 export type NewInvoice = {
-	client_id: string,
-	order_id: string | null,
-	status: string,
-	items: NewInvoiceItem[],
+  client_id: string;
+  order_id: string | null;
+  status: string;
+  items: NewInvoiceItem[];
 };
 
 export type NewInvoiceItem = {
-	price: number,
-	quantity: number,
-	product_id: string,
+  price: number;
+  quantity: number;
+  product_id: string;
 };
 
 export type NewOrder = {
-	client_id: string,
-	status: string,
-	items: NewOrderItem[],
+  client_id: string;
+  status: string;
+  items: NewOrderItem[];
 };
 
 export type NewOrderItem = {
-	price: number,
-	quantity: number,
-	product_id: string,
+  price: number;
+  quantity: number;
+  product_id: string;
 };
 
 export type NewProduct = {
-	name: string,
-	description: string | null,
-	selling_price: number,
-	purchase_price: number,
-	min_quantity: number,
-	image: string | null,
+  name: string;
+  description: string | null;
+  selling_price: number;
+  purchase_price: number;
+  min_quantity: number;
+  image: string | null;
 };
 
 export type NewQuote = {
-	client_id: string,
-	items: NewQuoteItem[],
+  client_id: string;
+  items: NewQuoteItem[];
 };
 
 export type NewQuoteItem = {
-	price: number,
-	quantity: number,
-	product_id: string,
+  price: number;
+  quantity: number;
+  product_id: string;
 };
 
 export type NewSupplier = {
-	full_name: string,
-	address: string | null,
-	phone_number: string | null,
-	email: string | null,
-	image: string | null,
+  full_name: string;
+  address: string | null;
+  phone_number: string | null;
+  email: string | null;
+  image: string | null;
 };
 
 export type NewTemplate = {
-	values_json: string,
+  values_json: string;
 };
 
 export type OrderClientInfo = {
-	full_name: string,
-	email: string | null,
-	address: string | null,
-	phone_number: string | null,
+  full_name: string;
+  email: string | null;
+  address: string | null;
+  phone_number: string | null;
 };
 
 export type OrderDetailsResponse = {
-	id: string,
-	created_at: string,
-	status: string,
-	identifier: string,
-	total: number,
-	client: OrderClientInfo,
-	items: SelectOrdersItems[],
+  id: string;
+  created_at: string;
+  status: string;
+  identifier: string;
+  total: number;
+  client: OrderClientInfo;
+  items: SelectOrdersItems[];
 };
 
 export type OrderProductItem = {
-	name: string,
-	price: number,
-	quantity: number,
+  name: string;
+  price: number;
+  quantity: number;
 };
 
 export type OrderWithClient = {
-	id: string,
-	client_id: string,
-	created_at: string,
-	status: string,
-	identifier: string | null,
-	full_name: string,
-	items: SelectOrdersItemsForUpdate[],
+  id: string;
+  client_id: string;
+  created_at: string;
+  status: string;
+  identifier: string | null;
+  full_name: string;
+  items: SelectOrdersItemsForUpdate[];
 };
 
 export type OrdersResponse = {
-	count: number,
-	orders: SelectOrders[],
+  count: number;
+  orders: SelectOrders[];
 };
 
 export type Product = {
-	id: string,
-	name: string,
-	description: string | null,
-	selling_price: number,
-	purchase_price: number,
-	min_quantity: number,
-	image: string | null,
+  id: string;
+  name: string;
+  description: string | null;
+  selling_price: number;
+  purchase_price: number;
+  min_quantity: number;
+  image: string | null;
 };
 
 export type ProductSearch = {
-	label: string,
-	value: string,
-	price: number,
+  label: string;
+  value: string;
+  price: number;
 };
 
 export type ProductsResponse = {
-	count: number,
-	products: SelectProducts[],
+  count: number;
+  products: SelectProducts[];
 };
 
 export type QuoteClientInfo = {
-	full_name: string,
-	email: string | null,
-	address: string | null,
-	phone_number: string | null,
+  full_name: string;
+  email: string | null;
+  address: string | null;
+  phone_number: string | null;
 };
 
 export type QuoteDetailsResponse = {
-	id: string,
-	created_at: string,
-	identifier: string,
-	total: number,
-	client: QuoteClientInfo,
-	items: SelectQuotesItems[],
+  id: string;
+  created_at: string;
+  identifier: string;
+  total: number;
+  client: QuoteClientInfo;
+  items: SelectQuotesItems[];
 };
 
 export type QuoteProductItem = {
-	name: string,
-	price: number,
-	quantity: number,
+  name: string;
+  price: number;
+  quantity: number;
 };
 
 export type QuoteWithClient = {
-	id: string,
-	client_id: string,
-	created_at: string,
-	identifier: string | null,
-	full_name: string,
-	items: SelectQuotesItemsForUpdate[],
+  id: string;
+  client_id: string;
+  created_at: string;
+  identifier: string | null;
+  full_name: string;
+  items: SelectQuotesItemsForUpdate[];
 };
 
 export type QuotesResponse = {
-	count: number,
-	quotes: SelectQuotes[],
+  count: number;
+  quotes: SelectQuotes[];
 };
 
 export type SelectClients = {
-	id: string,
-	full_name: string,
-	address: string | null,
-	phone_number: string | null,
-	email: string | null,
-	image: string | null,
-	credit: number,
+  id: string;
+  full_name: string;
+  address: string | null;
+  phone_number: string | null;
+  email: string | null;
+  image: string | null;
+  credit: number;
 };
 
 export type SelectInventory = {
-	id: string,
-	name: string,
-	created_at: string,
-	price: number,
-	quantity: number,
-	transaction_type: string,
+  id: string;
+  name: string;
+  created_at: string;
+  price: number;
+  quantity: number;
+  transaction_type: string;
+  order_id: string | null;
+  order_identifier: string | null;
+  invoice_id: string | null;
+  invoice_identifier: string | null;
+  quote_id: string | null;
+  quote_identifier: string | null;
 };
 
 export type SelectInvoicePayment = {
-	id: string,
-	payment_date: string,
-	description: string | null,
-	amount: number,
+  id: string;
+  payment_date: string;
+  description: string | null;
+  amount: number;
 };
 
 export type SelectInvoices = {
-	id: string,
-	created_at: string,
-	paid_amount: number,
-	client_id: string,
-	full_name: string,
-	status: string,
-	identifier: string,
-	products: number,
-	total: number,
+  id: string;
+  created_at: string;
+  paid_amount: number;
+  client_id: string;
+  full_name: string;
+  status: string;
+  identifier: string;
+  products: number;
+  total: number;
 };
 
 export type SelectInvoicesItems = {
-	name: string,
-	price: number,
-	quantity: number,
+  name: string;
+  price: number;
+  quantity: number;
 };
 
 export type SelectInvoicesItemsForUpdate = {
-	id: string,
-	inventory_id: string | null,
-	name: string,
-	price: number,
-	quantity: number,
-	product_id: string,
+  id: string;
+  inventory_id: string | null;
+  name: string;
+  price: number;
+  quantity: number;
+  product_id: string;
 };
 
 export type SelectOrders = {
-	id: string,
-	created_at: string,
-	client_id: string,
-	full_name: string,
-	status: string,
-	identifier: string,
-	products: number,
-	total: number,
+  id: string;
+  created_at: string;
+  client_id: string;
+  full_name: string;
+  status: string;
+  identifier: string;
+  products: number;
+  total: number;
 };
 
 export type SelectOrdersItems = {
-	name: string,
-	price: number,
-	quantity: number,
+  name: string;
+  price: number;
+  quantity: number;
 };
 
 export type SelectOrdersItemsForUpdate = {
-	id: string,
-	inventory_id: string,
-	name: string,
-	price: number,
-	quantity: number,
-	product_id: string,
+  id: string;
+  inventory_id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  product_id: string;
 };
 
 export type SelectProducts = {
-	id: string,
-	name: string,
-	created_at: string,
-	description: string | null,
-	image: string | null,
-	selling_price: number,
-	purchase_price: number,
-	inventory: number,
-	min_quantity: number,
+  id: string;
+  name: string;
+  created_at: string;
+  description: string | null;
+  image: string | null;
+  selling_price: number;
+  purchase_price: number;
+  inventory: number;
+  min_quantity: number;
 };
 
 export type SelectQuotes = {
-	id: string,
-	created_at: string,
-	client_id: string,
-	full_name: string,
-	products: number,
-	identifier: string,
-	total: number,
+  id: string;
+  created_at: string;
+  client_id: string;
+  full_name: string;
+  products: number;
+  identifier: string;
+  total: number;
 };
 
 export type SelectQuotesItems = {
-	name: string,
-	price: number,
-	quantity: number,
+  name: string;
+  price: number;
+  quantity: number;
 };
 
 export type SelectQuotesItemsForUpdate = {
-	id: string,
-	name: string,
-	price: number,
-	quantity: number,
-	product_id: string,
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  product_id: string;
 };
 
 export type SelectStatusCount = {
-	status: string,
-	status_count: number,
+  status: string;
+  status_count: number;
 };
 
 export type SelectSuppliers = {
-	id: string,
-	full_name: string,
-	address: string | null,
-	phone_number: string | null,
-	email: string | null,
-	image: string | null,
+  id: string;
+  full_name: string;
+  address: string | null;
+  phone_number: string | null;
+  email: string | null;
+  image: string | null;
 };
 
 export type SelectTopProducts = {
-	name: string,
-	quantity: number,
+  name: string;
+  quantity: number;
 };
 
 export type SelectTops = {
-	full_name: string,
-	price: number,
-	quantity: number,
+  full_name: string;
+  price: number;
+  quantity: number;
 };
 
 export type SelectTransaction = {
-	created_at: string,
-	price: number,
-	quantity: number,
-	transaction_type: string,
+  created_at: string;
+  price: number;
+  quantity: number;
+  transaction_type: string;
 };
 
 export type StatusCountResponse = {
-	orders: SelectStatusCount[],
-	invoices: SelectStatusCount[],
+  orders: SelectStatusCount[];
+  invoices: SelectStatusCount[];
 };
 
 export type Success<T> = {
-	error: string | null,
-	message: string | null,
-	data: T | null,
+  error: string | null;
+  message: string | null;
+  data: T | null;
 };
 
 export type Supplier = {
-	id: string,
-	full_name: string,
-	address: string | null,
-	phone_number: string | null,
-	email: string | null,
-	image: string | null,
+  id: string;
+  full_name: string;
+  address: string | null;
+  phone_number: string | null;
+  email: string | null;
+  image: string | null;
 };
 
 export type SupplierSearch = {
-	label: string,
-	value: string,
+  label: string;
+  value: string;
 };
 
 export type SuppliersResponse = {
-	count: number,
-	suppliers: SelectSuppliers[],
+  count: number;
+  suppliers: SelectSuppliers[];
 };
 
 export type UpdateInvoice = {
-	id: string,
-	client_id: string,
-	status: string,
-	items: UpdateInvoiceItem[],
+  id: string;
+  client_id: string;
+  status: string;
+  items: UpdateInvoiceItem[];
 };
 
 export type UpdateInvoiceItem = {
-	id: string | null,
-	invoice_id: string | null,
-	inventory_id: string | null,
-	price: number,
-	quantity: number,
-	product_id: string,
+  id: string | null;
+  invoice_id: string | null;
+  inventory_id: string | null;
+  price: number;
+  quantity: number;
+  product_id: string;
 };
 
 export type UpdateInvoiceStatus = {
-	id: string,
-	status: string,
+  id: string;
+  status: string;
 };
 
 export type UpdateOrder = {
-	id: string,
-	client_id: string,
-	status: string,
-	items: UpdateOrderItem[],
+  id: string;
+  client_id: string;
+  status: string;
+  items: UpdateOrderItem[];
 };
 
 export type UpdateOrderItem = {
-	id: string | null,
-	order_id: string | null,
-	inventory_id: string | null,
-	price: number,
-	quantity: number,
-	product_id: string,
+  id: string | null;
+  order_id: string | null;
+  inventory_id: string | null;
+  price: number;
+  quantity: number;
+  product_id: string;
 };
 
 export type UpdateOrderStatus = {
-	id: string,
-	status: string,
+  id: string;
+  status: string;
 };
 
 export type UpdateQuote = {
-	id: string,
-	client_id: string,
-	items: UpdateQuoteItem[],
+  id: string;
+  client_id: string;
+  items: UpdateQuoteItem[];
 };
 
 export type UpdateQuoteItem = {
-	id: string | null,
-	price: number,
-	quantity: number,
-	product_id: string,
+  id: string | null;
+  price: number;
+  quantity: number;
+  product_id: string;
 };
 
 /* Tauri Specta runtime */
-async function typedError<T, E>(result: Promise<T>): Promise<{ status: "ok"; data: T } | { status: "error"; error: E }> {
-    try {
-        return { status: "ok", data: await result };
-    } catch (e) {
-        if (e instanceof Error) throw e;
-        return { status: "error", error: e as any };
-    }
+async function typedError<T, E>(
+  result: Promise<T>,
+): Promise<{ status: "ok"; data: T } | { status: "error"; error: E }> {
+  try {
+    return { status: "ok", data: await result };
+  } catch (e) {
+    if (e instanceof Error) throw e;
+    return { status: "error", error: e as any };
+  }
 }
-

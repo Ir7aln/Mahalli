@@ -163,7 +163,10 @@ export function usePdfGenerator() {
     if (!page || !font) return;
 
     const headerText = capitalizeFirstLetter(t(`fields.${type}`));
-    const totalText = n(toNumber(data.total) + toNumber(data.total) * (config.vat / 100), "currency");
+    const totalText = n(
+      toNumber(data.total) + toNumber(data.total) * (config.vat / 100),
+      "currency",
+    );
 
     page.drawText(headerText, {
       x: config.marginX - 1,
