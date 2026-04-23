@@ -135,6 +135,12 @@ function toggleThisSupplier(supplier: SelectSuppliers, name: "delete" | "update"
             </div>
           </TableCell>
         </TableRow>
+        <TableEmpty v-if="!props.suppliers.length" :colspan="6">
+          <div class="space-y-1 text-center">
+            <p class="font-medium text-slate-900">{{ t("tables.empty.title") }}</p>
+            <p class="text-sm text-slate-500">{{ t("tables.empty.description") }}</p>
+          </div>
+        </TableEmpty>
       </TableBody>
     </Table>
     <Pagination />

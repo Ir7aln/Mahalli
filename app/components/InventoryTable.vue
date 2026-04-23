@@ -147,6 +147,12 @@ function toggleSort(key: string) {
             {{ d(new Date(tx.created_at), "long") }}
           </TableCell>
         </TableRow>
+        <TableEmpty v-if="!props.inventory.length" :colspan="5">
+          <div class="space-y-1 text-center">
+            <p class="font-medium text-slate-900">{{ t("tables.empty.title") }}</p>
+            <p class="text-sm text-slate-500">{{ t("tables.empty.description") }}</p>
+          </div>
+        </TableEmpty>
       </TableBody>
     </Table>
     <Pagination />

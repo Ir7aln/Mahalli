@@ -143,6 +143,12 @@
     "bp": "Best Selling Products (quantity)",
     "b3s": "Best suppliers based on expenses"
   },
+  "tables": {
+    "empty": {
+      "title": "No results found",
+      "description": "Try adjusting your search or filters."
+    }
+  },
   "database": {
     "common": {
       "none": "None",

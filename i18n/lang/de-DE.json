@@ -143,6 +143,12 @@
     "bp": "Bestseller (Menge)",
     "b3s": "Beste Lieferanten basierend auf Ausgaben"
   },
+  "tables": {
+    "empty": {
+      "title": "Keine Ergebnisse gefunden",
+      "description": "Versuchen Sie, Ihre Suche oder Filter anzupassen."
+    }
+  },
   "database": {
     "common": {
       "none": "Keine",
