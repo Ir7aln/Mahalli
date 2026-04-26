@@ -145,63 +145,45 @@ const openCreateInvoiceModal = () => modal.open(InvoiceCreate, { sheet: true });
       <ListFilterBar
         :search="searchQuery"
         :active-filters="activeFilters"
-        :advanced-label="t('filters.more')"
         @update:search="(value) => (searchQuery = value)"
         @clear-filter="clearFilter"
         @clear-all="clearAllFilters"
       >
         <template #advanced>
-          <div class="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1.4fr)]">
-            <section class="rounded-md border border-slate-200 bg-slate-50/70 p-4">
-              <div class="mb-3 space-y-1">
-                <h3 class="text-sm font-semibold text-slate-900">
-                  {{ t("fields.status") }}
-                </h3>
-                <p class="text-xs text-slate-500">
-                  {{ t("select-status") }}
-                </p>
-              </div>
-              <Select v-model="status" name="status">
-                <SelectTrigger class="bg-white">
-                  <SelectValue class="text-muted-foreground" :placeholder="t('select-status')" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem
-                    v-for="invoiceStatus in INVOICE_STATUSES"
-                    :key="invoiceStatus"
-                    :value="invoiceStatus"
-                  >
-                    {{ t(`status.${invoiceStatus.toLowerCase()}`) }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </section>
-
-            <section class="rounded-md border border-slate-200 bg-slate-50/70 p-4">
-              <div class="mb-3 space-y-1">
-                <h3 class="text-sm font-semibold text-slate-900">
-                  {{ t("fields.date") }}
-                </h3>
-                <p class="text-xs text-slate-500">
-                  {{ t("filters.from") }} / {{ t("filters.to") }}
-                </p>
-              </div>
-              <div class="grid gap-3 sm:grid-cols-2">
-                <div class="space-y-2">
-                  <p class="text-xs font-medium text-slate-500">
-                    {{ t("filters.from") }}
-                  </p>
-                  <Input v-model="createdFrom" type="date" class="bg-white" />
+          <DropdownMenuGroup>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>{{ t("fields.status") }}</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuCheckboxItem
+                  v-for="invoiceStatus in INVOICE_STATUSES"
+                  :key="invoiceStatus"
+                  :checked="status === invoiceStatus"
+                  @select.prevent
+                  @update:checked="status = status === invoiceStatus ? '' : invoiceStatus"
+                >
+                  {{ t(`status.${invoiceStatus.toLowerCase()}`) }}
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>{{ t("fields.date") }}</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent class="w-52 p-3">
+                <div class="space-y-5">
+                  <div class="space-y-2">
+                    <p class="text-xs text-muted-foreground">{{ t("filters.from") }}</p>
+                    <Input v-model="createdFrom" type="date" />
+                  </div>
+                  <div class="space-y-2">
+                    <p class="text-xs text-muted-foreground">{{ t("filters.to") }}</p>
+                    <Input v-model="createdTo" type="date" />
+                  </div>
                 </div>
-                <div class="space-y-2">
-                  <p class="text-xs font-medium text-slate-500">
-                    {{ t("filters.to") }}
-                  </p>
-                  <Input v-model="createdTo" type="date" class="bg-white" />
-                </div>
-              </div>
-            </section>
-          </div>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuGroup>
         </template>
         <template #actions>
           <Button class="gap-2 text-nowrap" @click="openCreateInvoiceModal()">

@@ -131,34 +131,28 @@ const openCreateQuoteModal = () => modal.open(QuoteCreate, { sheet: true });
       <ListFilterBar
         :search="searchQuery"
         :active-filters="activeFilters"
-        :advanced-label="t('filters.more')"
         @update:search="(value) => (searchQuery = value)"
         @clear-filter="clearFilter"
         @clear-all="clearAllFilters"
       >
         <template #advanced>
-          <section class="rounded-md border border-slate-200 bg-slate-50/70 p-4">
-            <div class="mb-3 space-y-1">
-              <h3 class="text-sm font-semibold text-slate-900">
-                {{ t("fields.date") }}
-              </h3>
-              <p class="text-xs text-slate-500">{{ t("filters.from") }} / {{ t("filters.to") }}</p>
-            </div>
-            <div class="grid gap-3 sm:grid-cols-2">
-              <div class="space-y-2">
-                <p class="text-xs font-medium text-slate-500">
-                  {{ t("filters.from") }}
-                </p>
-                <Input v-model="createdFrom" type="date" class="bg-white" />
-              </div>
-              <div class="space-y-2">
-                <p class="text-xs font-medium text-slate-500">
-                  {{ t("filters.to") }}
-                </p>
-                <Input v-model="createdTo" type="date" class="bg-white" />
-              </div>
-            </div>
-          </section>
+          <DropdownMenuGroup>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>{{ t("fields.date") }}</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent class="w-52 p-3">
+                <div class="space-y-5">
+                  <div class="space-y-2">
+                    <p class="text-xs text-muted-foreground">{{ t("filters.from") }}</p>
+                    <Input v-model="createdFrom" type="date" />
+                  </div>
+                  <div class="space-y-2">
+                    <p class="text-xs text-muted-foreground">{{ t("filters.to") }}</p>
+                    <Input v-model="createdTo" type="date" />
+                  </div>
+                </div>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuGroup>
         </template>
         <template #actions>
           <Button class="gap-2 text-nowrap" @click="openCreateQuoteModal">

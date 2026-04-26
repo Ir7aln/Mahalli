@@ -1,9 +1,17 @@
 <script setup lang="ts">
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Filter, Search, SlidersHorizontal, X } from "lucide-vue-next";
+import {
+  Search,
+  SlidersHorizontal,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-vue-next";
 
 type ActiveFilter = {
   key: string;
@@ -16,12 +24,10 @@ const props = withDefaults(
     search: string;
     activeFilters?: ActiveFilter[];
     searchPlaceholder?: string;
-    advancedLabel?: string;
   }>(),
   {
     activeFilters: () => [],
     searchPlaceholder: "",
-    advancedLabel: "Filters",
   },
 );
 
@@ -31,21 +37,25 @@ const emit = defineEmits<{
   (e: "clear-all"): void;
 }>();
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
+
+const dir = computed(() => (locale.value === "ar" ? "rtl" : "ltr"));
 </script>
 
 <template>
-  <div class="mb-3 flex w-full flex-col gap-2">
-    <div class="flex w-full items-center justify-end gap-2">
+  <div class="mb-3 flex w-full flex-col gap-2" :dir="dir">
+    <div class="flex w-full items-center justify-start gap-2">
       <slot name="actions" />
     </div>
 
-    <div class="flex w-full flex-col gap-2 lg:flex-row lg:items-center">
-      <div class="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
-        <div class="w-full sm:max-w-sm">
+    <div class="flex w-full flex-wrap items-center gap-2">
+      <DropdownMenu :dir="dir">
+        <div class="relative w-full sm:w-auto sm:max-w-sm">
           <Input
             :model-value="search"
             type="text"
+            :dir="dir"
+            :class="$slots.advanced ? 'pe-9' : ''"
             :placeholder="searchPlaceholder || t('search')"
             @update:model-value="(value) => emit('update:search', String(value))"
           >
@@ -53,64 +63,52 @@ const { t } = useI18n();
               <Search class="size-4" />
             </template>
           </Input>
+
+          <DropdownMenuTrigger v-if="$slots.advanced" as-child>
+            <button
+              type="button"
+              :class="[
+                'absolute end-2.5 top-1/2 z-10 -translate-y-1/2 transition-opacity duration-300',
+                activeFilters.length > 0 ? 'opacity-100' : 'opacity-40 hover:opacity-100',
+              ]"
+            >
+               <SlidersHorizontal class="size-4" />
+            </button>
+          </DropdownMenuTrigger>
         </div>
 
-        <slot name="quick" />
+        <DropdownMenuContent
+          v-if="$slots.advanced"
+          :dir="dir"
+          align="start"
+          class="min-w-48 [&_[data-radix-vue-dropdown-menu-sub-trigger]]:flex [&_[data-radix-vue-dropdown-menu-sub-trigger]]:items-center [&_[data-radix-vue-dropdown-menu-sub-trigger]]:gap-2 [&_[data-radix-vue-dropdown-menu-sub-trigger]>svg]:ms-auto [&_[data-radix-vue-dropdown-menu-sub-trigger]>svg]:me-0 rtl:[&_[data-radix-vue-dropdown-menu-sub-trigger]>svg]:rotate-180"
+        >
+          <slot name="advanced" />
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-        <Popover v-if="$slots.advanced">
-          <PopoverTrigger as-child>
-            <Button variant="outline" class="gap-2">
-              <SlidersHorizontal class="size-4" />
-              {{ advancedLabel }}
-              <Badge
-                v-if="activeFilters.length"
-                variant="secondary"
-                class="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700"
-              >
-                {{ activeFilters.length }}
-              </Badge>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent class="w-[min(92vw,36rem)] p-4">
-            <div class="space-y-4">
-              <div class="flex items-center justify-between gap-3">
-                <div class="flex items-center gap-2 text-sm font-medium text-slate-900">
-                  <Filter class="size-4" />
-                  {{ advancedLabel }}
-                </div>
-                <Button
-                  v-if="activeFilters.length"
-                  variant="ghost"
-                  size="sm"
-                  class="h-8 px-2 text-slate-600"
-                  @click="emit('clear-all')"
-                >
-                  {{ t("filters.clear-all") }}
-                </Button>
-              </div>
-              <slot name="advanced" />
-            </div>
-          </PopoverContent>
-        </Popover>
-      </div>
-    </div>
+      <slot name="quick" />
 
-    <div v-if="activeFilters.length" class="flex flex-wrap gap-2">
-      <Badge
-        v-for="filter in activeFilters"
-        :key="filter.key"
-        variant="secondary"
-        class="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-slate-700"
-      >
-        <span class="text-xs font-medium">{{ filter.label }}: {{ filter.value }}</span>
+      <template v-if="activeFilters.length">
         <button
+          v-for="filter in activeFilters"
+          :key="filter.key"
           type="button"
-          class="rounded-full text-slate-500 hover:text-slate-900"
+          class="group flex h-9 items-center gap-1 rounded-md bg-secondary px-2.5 text-xs font-normal text-muted-foreground hover:bg-secondary/80"
           @click="emit('clear-filter', filter.key)"
         >
-          <X class="size-3.5" />
+          <X class="size-0 shrink-0 transition-all duration-200 group-hover:size-3.5" />
+          <span>{{ filter.label }}: {{ filter.value }}</span>
         </button>
-      </Badge>
+
+        <button
+          type="button"
+          class="h-9 px-2 text-xs text-muted-foreground hover:text-foreground"
+          @click="emit('clear-all')"
+        >
+          {{ t("filters.clear-all") }}
+        </button>
+      </template>
     </div>
   </div>
 </template>

@@ -104,38 +104,25 @@ const openCreateSupplierModal = () => modal.open(SupplierCreate, {});
       <ListFilterBar
         :search="searchQuery"
         :active-filters="activeFilters"
-        :advanced-label="t('filters.more')"
         @update:search="(value) => (searchQuery = value)"
         @clear-filter="clearFilter"
         @clear-all="clearAllFilters"
       >
         <template #advanced>
-          <section class="rounded-md border border-slate-200 bg-slate-50/70 p-4">
-            <div class="mb-3 space-y-1">
-              <h3 class="text-sm font-semibold text-slate-900">
-                {{ t("filters.more") }}
-              </h3>
-              <p class="text-xs text-slate-500">
-                {{ t("filters.has-email") }} / {{ t("filters.has-phone") }}
-              </p>
-            </div>
-            <div class="grid gap-3 sm:grid-cols-2">
-              <Button
-                class="w-full justify-start"
-                :variant="hasEmail ? 'default' : 'outline'"
-                @click="hasEmail = !hasEmail"
-              >
-                {{ t("filters.has-email") }}
-              </Button>
-              <Button
-                class="w-full justify-start"
-                :variant="hasPhone ? 'default' : 'outline'"
-                @click="hasPhone = !hasPhone"
-              >
-                {{ t("filters.has-phone") }}
-              </Button>
-            </div>
-          </section>
+          <DropdownMenuCheckboxItem
+            :checked="hasEmail"
+            @select.prevent
+            @update:checked="hasEmail = $event"
+          >
+            {{ t("filters.has-email") }}
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            :checked="hasPhone"
+            @select.prevent
+            @update:checked="hasPhone = $event"
+          >
+            {{ t("filters.has-phone") }}
+          </DropdownMenuCheckboxItem>
         </template>
         <template #actions>
           <Button class="gap-2 text-nowrap" @click="openCreateSupplierModal">

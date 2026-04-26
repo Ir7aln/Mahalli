@@ -124,83 +124,57 @@ const openCreateProductModal = () => modal.open(ProductCreate, {});
       <ListFilterBar
         :search="searchQuery"
         :active-filters="activeFilters"
-        :advanced-label="t('filters.more')"
         @update:search="(value) => (searchQuery = value)"
         @clear-filter="clearFilter"
         @clear-all="clearAllFilters"
       >
         <template #advanced>
-          <div class="space-y-4">
-            <section class="rounded-md border border-slate-200 bg-slate-50/70 p-4">
-              <div class="mb-3 space-y-1">
-                <h3 class="text-sm font-semibold text-slate-900">
-                  {{ t("filters.stock-status") }}
-                </h3>
-                <p class="text-xs text-slate-500">
-                  {{ t("filters.out-of-stock") }} / {{ t("filters.low-stock") }} /
-                  {{ t("filters.healthy-stock") }}
-                </p>
-              </div>
-              <div class="grid gap-2 sm:grid-cols-3">
-                <Button
-                  class="w-full justify-start"
-                  :variant="stockStatus === 'out' ? 'default' : 'outline'"
-                  @click="stockStatus = stockStatus === 'out' ? '' : 'out'"
+          <DropdownMenuGroup>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>{{ t("filters.stock-status") }}</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuCheckboxItem
+                  :checked="stockStatus === 'out'"
+                  @select.prevent
+                  @update:checked="stockStatus = stockStatus === 'out' ? '' : 'out'"
                 >
                   {{ t("filters.out-of-stock") }}
-                </Button>
-                <Button
-                  class="w-full justify-start"
-                  :variant="stockStatus === 'low' ? 'default' : 'outline'"
-                  @click="stockStatus = stockStatus === 'low' ? '' : 'low'"
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  :checked="stockStatus === 'low'"
+                  @select.prevent
+                  @update:checked="stockStatus = stockStatus === 'low' ? '' : 'low'"
                 >
                   {{ t("filters.low-stock") }}
-                </Button>
-                <Button
-                  class="w-full justify-start"
-                  :variant="stockStatus === 'healthy' ? 'default' : 'outline'"
-                  @click="stockStatus = stockStatus === 'healthy' ? '' : 'healthy'"
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  :checked="stockStatus === 'healthy'"
+                  @select.prevent
+                  @update:checked="stockStatus = stockStatus === 'healthy' ? '' : 'healthy'"
                 >
                   {{ t("filters.healthy-stock") }}
-                </Button>
-              </div>
-            </section>
-
-            <section class="rounded-md border border-slate-200 bg-slate-50/70 p-4">
-              <div class="mb-3 space-y-1">
-                <h3 class="text-sm font-semibold text-slate-900">
-                  {{ t("fields.selling-price") }}
-                </h3>
-                <p class="text-xs text-slate-500">
-                  {{ t("filters.min") }} / {{ t("filters.max") }}
-                </p>
-              </div>
-              <div class="grid gap-3 sm:grid-cols-2">
-                <div class="space-y-2">
-                  <p class="text-xs font-medium text-slate-500">
-                    {{ t("filters.min") }}
-                  </p>
-                  <Input
-                    v-model="sellingPriceMin"
-                    type="number"
-                    class="bg-white"
-                    :placeholder="t('filters.min')"
-                  />
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>{{ t("fields.selling-price") }}</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent class="w-52 p-3">
+                <div class="space-y-5">
+                  <div class="space-y-2">
+                    <p class="text-xs text-muted-foreground">{{ t("filters.min") }}</p>
+                    <Input v-model="sellingPriceMin" type="number" :placeholder="t('filters.min')" />
+                  </div>
+                  <div class="space-y-2">
+                    <p class="text-xs text-muted-foreground">{{ t("filters.max") }}</p>
+                    <Input v-model="sellingPriceMax" type="number" :placeholder="t('filters.max')" />
+                  </div>
                 </div>
-                <div class="space-y-2">
-                  <p class="text-xs font-medium text-slate-500">
-                    {{ t("filters.max") }}
-                  </p>
-                  <Input
-                    v-model="sellingPriceMax"
-                    type="number"
-                    class="bg-white"
-                    :placeholder="t('filters.max')"
-                  />
-                </div>
-              </div>
-            </section>
-          </div>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuGroup>
         </template>
         <template #actions>
           <Button class="gap-2 text-nowrap" @click="openCreateProductModal">
