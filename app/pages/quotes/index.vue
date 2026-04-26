@@ -137,20 +137,28 @@ const openCreateQuoteModal = () => modal.open(QuoteCreate, { sheet: true });
         @clear-all="clearAllFilters"
       >
         <template #advanced>
-          <div class="grid gap-3 sm:grid-cols-2">
-            <div class="space-y-2">
-              <p class="text-sm font-medium text-slate-600">
-                {{ t("filters.from") }}
-              </p>
-              <Input v-model="createdFrom" type="date" />
+          <section class="rounded-md border border-slate-200 bg-slate-50/70 p-4">
+            <div class="mb-3 space-y-1">
+              <h3 class="text-sm font-semibold text-slate-900">
+                {{ t("fields.date") }}
+              </h3>
+              <p class="text-xs text-slate-500">{{ t("filters.from") }} / {{ t("filters.to") }}</p>
             </div>
-            <div class="space-y-2">
-              <p class="text-sm font-medium text-slate-600">
-                {{ t("filters.to") }}
-              </p>
-              <Input v-model="createdTo" type="date" />
+            <div class="grid gap-3 sm:grid-cols-2">
+              <div class="space-y-2">
+                <p class="text-xs font-medium text-slate-500">
+                  {{ t("filters.from") }}
+                </p>
+                <Input v-model="createdFrom" type="date" class="bg-white" />
+              </div>
+              <div class="space-y-2">
+                <p class="text-xs font-medium text-slate-500">
+                  {{ t("filters.to") }}
+                </p>
+                <Input v-model="createdTo" type="date" class="bg-white" />
+              </div>
             </div>
-          </div>
+          </section>
         </template>
         <template #actions>
           <Button class="gap-2 text-nowrap" @click="openCreateQuoteModal">

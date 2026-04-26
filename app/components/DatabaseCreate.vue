@@ -2,6 +2,7 @@
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
 import { commands, type DatabaseRecord } from "@/bindings";
+import { X } from "lucide-vue-next";
 
 const props = defineProps<{
   databases: DatabaseRecord[];
@@ -62,14 +63,20 @@ async function createDatabase() {
 
 <template>
   <form class="w-full flex justify-center" @submit.prevent="createDatabase">
-    <Card class="w-4/6 lg:w-1/2">
-      <CardHeader>
-        <CardTitle class="text-center">{{ t("database.create.title") }}</CardTitle>
-        <CardDescription class="text-center">
-          {{ t("database.create.description") }}
-        </CardDescription>
-      </CardHeader>
-      <CardContent class="space-y-4">
+    <Card class="card-modal-shell w-4/6 lg:w-1/2">
+      <div class="card-modal-header">
+        <div class="card-modal-header-inner">
+          <div class="space-y-1">
+            <p class="card-modal-eyebrow">{{ t("routes.settings") }}</p>
+            <h2 class="card-modal-title">{{ t("database.create.title") }}</h2>
+            <p class="card-modal-description">{{ t("database.create.description") }}</p>
+          </div>
+          <Button type="button" variant="ghost" size="icon" class="rounded-full" @click="close">
+            <X class="size-5" />
+          </Button>
+        </div>
+      </div>
+      <CardContent class="card-modal-body space-y-4">
         <div class="space-y-2">
           <Label for="database-name">{{ t("fields.name") }}</Label>
           <Input
@@ -107,24 +114,20 @@ async function createDatabase() {
           <Switch v-model:checked="form.makeActive" class="mt-0.5 shrink-0" />
         </label>
       </CardContent>
-      <CardFooter class="grid grid-cols-3">
-        <Button
-          type="button"
-          variant="outline"
-          class="col-span-1"
-          :disabled="loading"
-          @click="close"
-        >
-          {{ t("buttons.cancel") }}
-        </Button>
-        <Button type="submit" class="col-span-2" :disabled="loading">
-          <span
-            v-if="loading"
-            class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
-          />
-          {{ loading ? t("database.actions.creating") : t("database.actions.create") }}
-        </Button>
-      </CardFooter>
+      <div class="card-modal-footer">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+          <Button type="button" variant="outline" :disabled="loading" @click="close">
+            {{ t("buttons.cancel") }}
+          </Button>
+          <Button type="submit" :disabled="loading">
+            <span
+              v-if="loading"
+              class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+            />
+            {{ loading ? t("database.actions.creating") : t("database.actions.create") }}
+          </Button>
+        </div>
+      </div>
     </Card>
   </form>
 </template>

@@ -45,6 +45,7 @@
     "generate-quote": "Générer le devis"
   },
   "translationTitle": "Changer de langue",
+  "translationDescription": "Choisissez la langue à utiliser dans Mahalli.",
   "filters": {
     "more": "Plus de filtres",
     "clear-all": "Tout effacer",
@@ -287,39 +288,66 @@
     "clients": {
       "create": "Ajouter un client",
       "update": "Mettre à jour le client",
-      "delete": "Êtes-vous sûr de vouloir supprimer le client"
+      "delete": "Supprimer le client"
     },
     "suppliers": {
       "create": "Ajouter un fournisseur",
       "update": "Mettre à jour le fournisseur",
-      "delete": "Êtes-vous sûr de vouloir supprimer le fournisseur"
+      "delete": "Supprimer le fournisseur"
     },
     "products": {
       "create": "Ajouter un produit",
       "update": "Mettre à jour le produit",
       "update-inventory": "Mettre à jour l'inventaire du produit",
-      "delete": "Êtes-vous sûr de vouloir supprimer le produit"
+      "delete": "Supprimer le produit"
     },
     "orders": {
       "create": "Ajouter une nouvelle commande",
       "update": "Mettre à jour la commande",
-      "delete": "Êtes-vous sûr de vouloir supprimer la commande"
+      "delete": "Supprimer la commande"
     },
     "quotes": {
       "create": "Ajouter un nouveau devis",
       "update": "Mettre à jour le devis",
-      "delete": "Êtes-vous sûr de vouloir supprimer le devis"
+      "delete": "Supprimer le devis"
     },
     "invoices": {
       "create": "Ajouter une nouvelle facture",
       "update": "Mettre à jour la facture",
-      "delete": "Êtes-vous sûr de vouloir supprimer la facture",
+      "delete": "Supprimer la facture",
       "add-payment": "Ajouter un paiement"
     },
     "organizations": {
       "create": "Ajouter une nouvelle organisation",
       "update": "Mettre à jour l'organisation",
       "delete": "Êtes-vous sûr de vouloir supprimer l'organisation ?"
+    }
+  },
+  "modalDescriptions": {
+    "clients": {
+      "create": "Ajoutez les coordonnées et les informations de facturation d’un nouveau client.",
+      "update": "Vérifiez la fiche client et enregistrez les dernières modifications.",
+      "delete": "Cette action supprimera définitivement le client de votre espace de travail."
+    },
+    "suppliers": {
+      "create": "Ajoutez les coordonnées du fournisseur pour suivre facilement vos achats.",
+      "update": "Mettez à jour les informations du fournisseur avant d’enregistrer.",
+      "delete": "Cette action supprimera définitivement le fournisseur de votre espace de travail."
+    },
+    "products": {
+      "create": "Définissez les prix, le seuil de stock et la quantité initiale du produit.",
+      "update": "Ajustez les prix, les seuils et les détails du produit avant d’enregistrer.",
+      "update-inventory": "Indiquez la quantité que vous souhaitez ajouter au stock.",
+      "delete": "Cette action supprimera définitivement le produit de votre catalogue."
+    },
+    "orders": {
+      "delete": "Cette action supprimera définitivement la commande et ses lignes associées."
+    },
+    "quotes": {
+      "delete": "Cette action supprimera définitivement le devis et ses lignes associées."
+    },
+    "invoices": {
+      "delete": "Cette action supprimera définitivement la facture et ses lignes associées."
     }
   }
 }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { buttonVariants } from "./ui/button";
+import { X } from "lucide-vue-next";
 
 const { t } = useI18n();
 const switchLocalePath = useSwitchLocalePath();
@@ -7,13 +8,20 @@ const { close } = useModal();
 </script>
 
 <template>
-  <Card>
-    <CardHeader>
-      <CardTitle>
-        {{ t("translationTitle") }}
-      </CardTitle>
-    </CardHeader>
-    <CardContent>
+  <Card class="card-modal-shell max-w-xl">
+    <div class="card-modal-header">
+      <div class="card-modal-header-inner">
+        <div class="space-y-1">
+          <p class="card-modal-eyebrow">{{ t("routes.settings") }}</p>
+          <h2 class="card-modal-title">{{ t("translationTitle") }}</h2>
+          <p class="card-modal-description">{{ t("translationDescription") }}</p>
+        </div>
+        <Button type="button" variant="ghost" size="icon" class="rounded-full" @click="close">
+          <X class="size-5" />
+        </Button>
+      </div>
+    </div>
+    <CardContent class="card-modal-body">
       <div class="grid grid-cols-2 gap-2">
         <NuxtLink :class="buttonVariants({ variant: 'ghost' })" :to="switchLocalePath('en')">
           <span class="w-3/5 items-center h-full text-start flex justify-center gap-2">
@@ -83,10 +91,12 @@ const { close } = useModal();
         </NuxtLink>
       </div>
     </CardContent>
-    <CardFooter>
-      <Button class="col-span-3" type="button" variant="outline" @click="close">
-        {{ t("buttons.cancel") }}
-      </Button>
-    </CardFooter>
+    <div class="card-modal-footer">
+      <div class="flex justify-end">
+        <Button type="button" variant="outline" @click="close">
+          {{ t("buttons.cancel") }}
+        </Button>
+      </div>
+    </div>
   </Card>
 </template>

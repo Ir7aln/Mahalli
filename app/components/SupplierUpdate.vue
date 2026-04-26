@@ -5,6 +5,7 @@ import type { Supplier } from "@/bindings";
 import { useForm } from "vee-validate";
 import { z } from "zod";
 import * as Logger from "@tauri-apps/plugin-log";
+import { X } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 
 const props = defineProps<{
@@ -87,13 +88,20 @@ const onSubmit = form.handleSubmit((values) => {
 
 <template>
   <form class="w-full flex justify-center" @submit="onSubmit">
-    <Card class="w-4/6 lg:w-1/2">
-      <CardHeader>
-        <CardTitle>
-          {{ t("titles.suppliers.update") }}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+    <Card class="card-modal-shell w-4/6 lg:w-1/2">
+      <div class="card-modal-header">
+        <div class="card-modal-header-inner">
+          <div class="space-y-1">
+            <p class="card-modal-eyebrow">{{ t("routes.suppliers") }}</p>
+            <h2 class="card-modal-title">{{ t("titles.suppliers.update") }}</h2>
+            <p class="card-modal-description">{{ t("modalDescriptions.suppliers.update") }}</p>
+          </div>
+          <Button type="button" variant="ghost" size="icon" class="rounded-full" @click="close">
+            <X class="size-5" />
+          </Button>
+        </div>
+      </div>
+      <CardContent class="card-modal-body">
         <FormField v-slot="{ componentField }" name="full_name">
           <FormItem>
             <FormLabel>{{ t("fields.full-name") }}</FormLabel>
@@ -127,14 +135,16 @@ const onSubmit = form.handleSubmit((values) => {
           </FormItem>
         </FormField>
       </CardContent>
-      <CardFooter>
-        <Button type="button" variant="outline" @click="close">
-          {{ t("buttons.cancel") }}
-        </Button>
-        <Button type="submit" class="col-span-2">
-          {{ t("buttons.update", { name: fullName }) }}
-        </Button>
-      </CardFooter>
+      <div class="card-modal-footer">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+          <Button type="button" variant="outline" @click="close">
+            {{ t("buttons.cancel") }}
+          </Button>
+          <Button type="submit">
+            {{ t("buttons.update", { name: fullName }) }}
+          </Button>
+        </div>
+      </div>
     </Card>
   </form>
 </template>

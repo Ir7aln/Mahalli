@@ -151,13 +151,18 @@ const openCreateOrderModal = () => modal.open(OrderCreate, { sheet: true });
         @clear-all="clearAllFilters"
       >
         <template #advanced>
-          <div class="grid gap-4 sm:grid-cols-2">
-            <div class="space-y-2">
-              <p class="text-sm font-medium text-slate-600">
-                {{ t("fields.status") }}
-              </p>
+          <div class="grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1.4fr)]">
+            <section class="rounded-md border border-slate-200 bg-slate-50/70 p-4">
+              <div class="mb-3 space-y-1">
+                <h3 class="text-sm font-semibold text-slate-900">
+                  {{ t("fields.status") }}
+                </h3>
+                <p class="text-xs text-slate-500">
+                  {{ t("select-status") }}
+                </p>
+              </div>
               <Select v-model="status" name="status">
-                <SelectTrigger>
+                <SelectTrigger class="bg-white">
                   <SelectValue class="text-muted-foreground" :placeholder="t('select-status')" />
                 </SelectTrigger>
                 <SelectContent>
@@ -170,22 +175,32 @@ const openCreateOrderModal = () => modal.open(OrderCreate, { sheet: true });
                   </SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </section>
 
-            <div class="grid gap-3 sm:grid-cols-2">
-              <div class="space-y-2">
-                <p class="text-sm font-medium text-slate-600">
-                  {{ t("filters.from") }}
+            <section class="rounded-md border border-slate-200 bg-slate-50/70 p-4">
+              <div class="mb-3 space-y-1">
+                <h3 class="text-sm font-semibold text-slate-900">
+                  {{ t("fields.date") }}
+                </h3>
+                <p class="text-xs text-slate-500">
+                  {{ t("filters.from") }} / {{ t("filters.to") }}
                 </p>
-                <Input v-model="createdFrom" type="date" />
               </div>
-              <div class="space-y-2">
-                <p class="text-sm font-medium text-slate-600">
-                  {{ t("filters.to") }}
-                </p>
-                <Input v-model="createdTo" type="date" />
+              <div class="grid gap-3 sm:grid-cols-2">
+                <div class="space-y-2">
+                  <p class="text-xs font-medium text-slate-500">
+                    {{ t("filters.from") }}
+                  </p>
+                  <Input v-model="createdFrom" type="date" class="bg-white" />
+                </div>
+                <div class="space-y-2">
+                  <p class="text-xs font-medium text-slate-500">
+                    {{ t("filters.to") }}
+                  </p>
+                  <Input v-model="createdTo" type="date" class="bg-white" />
+                </div>
               </div>
-            </div>
+            </section>
           </div>
         </template>
         <template #actions>

@@ -45,6 +45,7 @@
     "generate-quote": "Generate quote"
   },
   "translationTitle": "Change Language",
+  "translationDescription": "Choose the language you want to use across Mahalli.",
   "filters": {
     "more": "More filters",
     "clear-all": "Clear all",
@@ -288,39 +289,66 @@
     "clients": {
       "create": "Add a client",
       "update": "Update client",
-      "delete": "Are you sure you wanna delete the client"
+      "delete": "Delete client"
     },
     "suppliers": {
       "create": "Add a supplier",
       "update": "Update supplier",
-      "delete": "Are you sure you wanna delete the supplier"
+      "delete": "Delete supplier"
     },
     "products": {
       "create": "Add a product",
       "update": "Update product",
       "update-inventory": "Update product inventory",
-      "delete": "Are you sure you wanna delete the product "
+      "delete": "Delete product"
     },
     "orders": {
       "create": "Add new order",
       "update": "Update order",
-      "delete": "Are you sure you wanna delete the order "
+      "delete": "Delete order"
     },
     "quotes": {
       "create": "Add new quote",
       "update": "Update quote",
-      "delete": "Are you sure you wanna delete the quote "
+      "delete": "Delete quote"
     },
     "invoices": {
       "create": "Add new invoice",
       "update": "Update invoice",
-      "delete": "Are you sure you wanna delete the invoice ",
+      "delete": "Delete invoice",
       "add-payment": "Add payment"
     },
     "organizations": {
       "create": "Add new organization",
       "update": "Update organization",
       "delete": "Are you sure you want to delete the organization?"
+    }
+  },
+  "modalDescriptions": {
+    "clients": {
+      "create": "Add contact details and billing information for a new client.",
+      "update": "Review the client profile and save any contact changes.",
+      "delete": "This will permanently remove the client from your workspace."
+    },
+    "suppliers": {
+      "create": "Add supplier contact details so you can track purchasing activity.",
+      "update": "Update supplier details before saving the latest changes.",
+      "delete": "This will permanently remove the supplier from your workspace."
+    },
+    "products": {
+      "create": "Set pricing, stock thresholds, and opening quantity for this product.",
+      "update": "Adjust pricing, thresholds, and product details before saving.",
+      "update-inventory": "Record the quantity you want to add back into stock.",
+      "delete": "This will permanently remove the product from your catalog."
+    },
+    "orders": {
+      "delete": "This will permanently remove the order and its linked line items."
+    },
+    "quotes": {
+      "delete": "This will permanently remove the quote and its linked line items."
+    },
+    "invoices": {
+      "delete": "This will permanently remove the invoice and its linked line items."
     }
   }
 }

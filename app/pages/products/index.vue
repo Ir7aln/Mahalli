@@ -131,10 +131,16 @@ const openCreateProductModal = () => modal.open(ProductCreate, {});
       >
         <template #advanced>
           <div class="space-y-4">
-            <div class="space-y-2">
-              <p class="text-sm font-medium text-slate-600">
-                {{ t("filters.stock-status") }}
-              </p>
+            <section class="rounded-md border border-slate-200 bg-slate-50/70 p-4">
+              <div class="mb-3 space-y-1">
+                <h3 class="text-sm font-semibold text-slate-900">
+                  {{ t("filters.stock-status") }}
+                </h3>
+                <p class="text-xs text-slate-500">
+                  {{ t("filters.out-of-stock") }} / {{ t("filters.low-stock") }} /
+                  {{ t("filters.healthy-stock") }}
+                </p>
+              </div>
               <div class="grid gap-2 sm:grid-cols-3">
                 <Button
                   class="w-full justify-start"
@@ -158,22 +164,42 @@ const openCreateProductModal = () => modal.open(ProductCreate, {});
                   {{ t("filters.healthy-stock") }}
                 </Button>
               </div>
-            </div>
+            </section>
 
-            <div class="grid gap-3 sm:grid-cols-2">
-              <div class="space-y-2">
-                <p class="text-sm font-medium text-slate-600">
-                  {{ t("filters.min") }}
+            <section class="rounded-md border border-slate-200 bg-slate-50/70 p-4">
+              <div class="mb-3 space-y-1">
+                <h3 class="text-sm font-semibold text-slate-900">
+                  {{ t("fields.selling-price") }}
+                </h3>
+                <p class="text-xs text-slate-500">
+                  {{ t("filters.min") }} / {{ t("filters.max") }}
                 </p>
-                <Input v-model="sellingPriceMin" type="number" :placeholder="t('filters.min')" />
               </div>
-              <div class="space-y-2">
-                <p class="text-sm font-medium text-slate-600">
-                  {{ t("filters.max") }}
-                </p>
-                <Input v-model="sellingPriceMax" type="number" :placeholder="t('filters.max')" />
+              <div class="grid gap-3 sm:grid-cols-2">
+                <div class="space-y-2">
+                  <p class="text-xs font-medium text-slate-500">
+                    {{ t("filters.min") }}
+                  </p>
+                  <Input
+                    v-model="sellingPriceMin"
+                    type="number"
+                    class="bg-white"
+                    :placeholder="t('filters.min')"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <p class="text-xs font-medium text-slate-500">
+                    {{ t("filters.max") }}
+                  </p>
+                  <Input
+                    v-model="sellingPriceMax"
+                    type="number"
+                    class="bg-white"
+                    :placeholder="t('filters.max')"
+                  />
+                </div>
               </div>
-            </div>
+            </section>
           </div>
         </template>
         <template #actions>

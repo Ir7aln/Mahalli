@@ -2,6 +2,7 @@
 import { commands, type NewClient } from "@/bindings";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as Logger from "@tauri-apps/plugin-log";
+import { X } from "lucide-vue-next";
 import { useForm } from "vee-validate";
 import { toast } from "vue-sonner";
 import { z } from "zod";
@@ -84,11 +85,20 @@ function cleanImage() {
 
 <template>
   <form class="w-full flex justify-center" @submit="onSubmit">
-    <Card class="w-4/6 lg:w-1/2">
-      <CardHeader>
-        <CardTitle> {{ t("titles.clients.create") }} </CardTitle>
-      </CardHeader>
-      <CardContent>
+    <Card class="card-modal-shell w-4/6 lg:w-1/2">
+      <div class="card-modal-header">
+        <div class="card-modal-header-inner">
+          <div class="space-y-1">
+            <p class="card-modal-eyebrow">{{ t("routes.clients") }}</p>
+            <h2 class="card-modal-title">{{ t("titles.clients.create") }}</h2>
+            <p class="card-modal-description">{{ t("modalDescriptions.clients.create") }}</p>
+          </div>
+          <Button type="button" variant="ghost" size="icon" class="rounded-full" @click="close">
+            <X class="size-5" />
+          </Button>
+        </div>
+      </div>
+      <CardContent class="card-modal-body">
         <UiUploader
           name="Image"
           :extensions="['png', 'jpeg', 'webp', 'jpg']"
@@ -128,14 +138,16 @@ function cleanImage() {
           </FormItem>
         </FormField>
       </CardContent>
-      <CardFooter>
-        <Button type="button" variant="outline" @click="close">
-          {{ t("buttons.cancel") }}
-        </Button>
-        <Button type="submit" class="col-span-2">
-          {{ t("buttons.add") }}
-        </Button>
-      </CardFooter>
+      <div class="card-modal-footer">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+          <Button type="button" variant="outline" @click="close">
+            {{ t("buttons.cancel") }}
+          </Button>
+          <Button type="submit">
+            {{ t("buttons.add") }}
+          </Button>
+        </div>
+      </div>
     </Card>
   </form>
 </template>

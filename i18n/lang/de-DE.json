@@ -45,6 +45,7 @@
     "generate-quote": "Angebot erstellen"
   },
   "translationTitle": "Sprache ändern",
+  "translationDescription": "Wählen Sie die Sprache, die Sie in Mahalli verwenden möchten.",
   "filters": {
     "more": "Mehr Filter",
     "clear-all": "Alles löschen",
@@ -288,39 +289,66 @@
     "clients": {
       "create": "Kunden hinzufügen",
       "update": "Kunden aktualisieren",
-      "delete": "Sind Sie sicher, dass Sie den Kunden löschen möchten?"
+      "delete": "Kunden löschen"
     },
     "suppliers": {
       "create": "Lieferanten hinzufügen",
       "update": "Lieferanten aktualisieren",
-      "delete": "Sind Sie sicher, dass Sie den Lieferanten löschen möchten?"
+      "delete": "Lieferanten löschen"
     },
     "products": {
       "create": "Produkt hinzufügen",
       "update": "Produkt aktualisieren",
       "update-inventory": "Lagerbestand des Produkts aktualisieren",
-      "delete": "Sind Sie sicher, dass Sie das Produkt löschen möchten?"
+      "delete": "Produkt löschen"
     },
     "orders": {
       "create": "Neue Bestellung hinzufügen",
       "update": "Bestellung aktualisieren",
-      "delete": "Sind Sie sicher, dass Sie die Bestellung löschen möchten?"
+      "delete": "Bestellung löschen"
     },
     "quotes": {
       "create": "Neues Angebot hinzufügen",
       "update": "Angebot aktualisieren",
-      "delete": "Sind Sie sicher, dass Sie das Angebot löschen möchten?"
+      "delete": "Angebot löschen"
     },
     "invoices": {
       "create": "Neue Rechnung hinzufügen",
       "update": "Rechnung aktualisieren",
-      "delete": "Sind Sie sicher, dass Sie die Rechnung löschen möchten?",
+      "delete": "Rechnung löschen",
       "add-payment": "Zahlung hinzufügen"
     },
     "organizations": {
       "create": "Neue Organisation hinzufügen",
       "update": "Organisation aktualisieren",
       "delete": "Sind Sie sicher, dass Sie die Organisation löschen möchten?"
+    }
+  },
+  "modalDescriptions": {
+    "clients": {
+      "create": "Fügen Sie Kontakt- und Rechnungsdaten für einen neuen Kunden hinzu.",
+      "update": "Prüfen Sie das Kundenprofil und speichern Sie die letzten Änderungen.",
+      "delete": "Diese Aktion entfernt den Kunden dauerhaft aus Ihrem Arbeitsbereich."
+    },
+    "suppliers": {
+      "create": "Fügen Sie Lieferantendaten hinzu, damit Einkäufe leichter nachverfolgt werden können.",
+      "update": "Aktualisieren Sie die Lieferantendaten, bevor Sie speichern.",
+      "delete": "Diese Aktion entfernt den Lieferanten dauerhaft aus Ihrem Arbeitsbereich."
+    },
+    "products": {
+      "create": "Legen Sie Preise, Mindestbestand und Anfangsmenge für dieses Produkt fest.",
+      "update": "Passen Sie Preise, Schwellenwerte und Produktdetails vor dem Speichern an.",
+      "update-inventory": "Tragen Sie die Menge ein, die dem Bestand hinzugefügt werden soll.",
+      "delete": "Diese Aktion entfernt das Produkt dauerhaft aus Ihrem Katalog."
+    },
+    "orders": {
+      "delete": "Diese Aktion entfernt die Bestellung und ihre Positionen dauerhaft."
+    },
+    "quotes": {
+      "delete": "Diese Aktion entfernt das Angebot und seine Positionen dauerhaft."
+    },
+    "invoices": {
+      "delete": "Diese Aktion entfernt die Rechnung und ihre Positionen dauerhaft."
     }
   }
 }

@@ -110,22 +110,32 @@ const openCreateSupplierModal = () => modal.open(SupplierCreate, {});
         @clear-all="clearAllFilters"
       >
         <template #advanced>
-          <div class="grid gap-3 sm:grid-cols-2">
-            <Button
-              class="w-full justify-start"
-              :variant="hasEmail ? 'default' : 'outline'"
-              @click="hasEmail = !hasEmail"
-            >
-              {{ t("filters.has-email") }}
-            </Button>
-            <Button
-              class="w-full justify-start"
-              :variant="hasPhone ? 'default' : 'outline'"
-              @click="hasPhone = !hasPhone"
-            >
-              {{ t("filters.has-phone") }}
-            </Button>
-          </div>
+          <section class="rounded-md border border-slate-200 bg-slate-50/70 p-4">
+            <div class="mb-3 space-y-1">
+              <h3 class="text-sm font-semibold text-slate-900">
+                {{ t("filters.more") }}
+              </h3>
+              <p class="text-xs text-slate-500">
+                {{ t("filters.has-email") }} / {{ t("filters.has-phone") }}
+              </p>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <Button
+                class="w-full justify-start"
+                :variant="hasEmail ? 'default' : 'outline'"
+                @click="hasEmail = !hasEmail"
+              >
+                {{ t("filters.has-email") }}
+              </Button>
+              <Button
+                class="w-full justify-start"
+                :variant="hasPhone ? 'default' : 'outline'"
+                @click="hasPhone = !hasPhone"
+              >
+                {{ t("filters.has-phone") }}
+              </Button>
+            </div>
+          </section>
         </template>
         <template #actions>
           <Button class="gap-2 text-nowrap" @click="openCreateSupplierModal">

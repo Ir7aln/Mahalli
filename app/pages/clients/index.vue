@@ -96,20 +96,23 @@ const openCreateClientModal = () => modal.open(ClientCreate, {});
         @clear-all="clearAllFilters"
       >
         <template #advanced>
-          <div class="space-y-3">
-            <div class="space-y-2">
-              <p class="text-sm font-medium text-slate-600">
+          <section class="rounded-md border border-slate-200 bg-slate-50/70 p-4">
+            <div class="mb-3 space-y-1">
+              <h3 class="text-sm font-semibold text-slate-900">
                 {{ t("fields.credit") }}
-              </p>
-              <Button
-                class="w-full justify-start"
-                :variant="creditOnly ? 'default' : 'outline'"
-                @click="creditOnly = !creditOnly"
-              >
+              </h3>
+              <p class="text-xs text-slate-500">
                 {{ t("filters.credit-only") }}
-              </Button>
+              </p>
             </div>
-          </div>
+            <Button
+              class="w-full justify-start"
+              :variant="creditOnly ? 'default' : 'outline'"
+              @click="creditOnly = !creditOnly"
+            >
+              {{ t("filters.credit-only") }}
+            </Button>
+          </section>
         </template>
         <template #actions>
           <Button class="gap-2 text-nowrap" @click="openCreateClientModal()">
