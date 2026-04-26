@@ -118,7 +118,7 @@ async function seedDatabase() {
 
         <div class="mt-5 grid gap-4 md:grid-cols-2">
           <div class="rounded-md border border-slate-200 bg-slate-50 p-4 text-left rtl:text-right">
-            <p class="text-xs font-medium uppercase tracking-[0.2em] text-slate-500">
+            <p class="text-xs font-medium text-slate-500">
               {{ t("database.settings.active-title") }}
             </p>
             <p class="mt-3 text-lg font-semibold text-slate-900">
@@ -129,7 +129,7 @@ async function seedDatabase() {
             </p>
           </div>
           <div class="rounded-md border border-slate-200 bg-slate-50 p-4 text-left rtl:text-right">
-            <p class="text-xs font-medium uppercase tracking-[0.2em] text-slate-500">
+            <p class="text-xs font-medium text-slate-500">
               {{ t("database.settings.catalog-title") }}
             </p>
             <p class="mt-3 text-lg font-semibold text-slate-900">
@@ -262,10 +262,7 @@ async function seedDatabase() {
                     >
                       {{ t("database.actions.switch") }}
                     </Button>
-                    <span
-                      v-else
-                      class="text-xs font-medium uppercase tracking-[0.2em] text-slate-400"
-                    >
+                    <span v-else class="text-xs font-medium text-slate-400">
                       {{ t("database.status.current") }}
                     </span>
                   </td>

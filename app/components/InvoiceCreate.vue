@@ -164,7 +164,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     >
       <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
         <div class="space-y-1">
-          <p class="text-xs font-medium uppercase tracking-[0.35em] text-slate-500">
+          <p class="text-xs font-medium text-slate-500">
             {{ t("routes.invoices") }}
           </p>
           <h2 class="text-xl font-semibold">
@@ -191,7 +191,7 @@ const onSubmit = handleSubmit(async (formValues) => {
                 </p>
               </div>
               <div class="text-left sm:text-right">
-                <p class="text-xs uppercase tracking-[0.3em] text-slate-500">
+                <p class="text-xs text-slate-500">
                   {{ t("fields.total") }}
                 </p>
                 <p class="mt-2 text-3xl font-semibold tracking-tight">
@@ -223,7 +223,7 @@ const onSubmit = handleSubmit(async (formValues) => {
 
               <div class="space-y-4">
                 <div class="space-y-2">
-                  <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+                  <p class="text-xs font-semibold text-slate-500">
                     {{ t("fields.bill-to") }}
                   </p>
                   <FormField v-slot="{ field }" name="client_id">
@@ -257,7 +257,7 @@ const onSubmit = handleSubmit(async (formValues) => {
 
             <div class="py-6">
               <div class="flex items-center justify-between gap-4 pb-4">
-                <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+                <p class="text-xs font-semibold text-slate-500">
                   {{ t("fields.items") }}
                 </p>
                 <Button
@@ -273,7 +273,7 @@ const onSubmit = handleSubmit(async (formValues) => {
 
               <div class="border-y border-slate-200">
                 <div
-                  class="hidden bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 md:grid md:grid-cols-[minmax(0,2fr)_100px_140px_120px_40px] md:gap-3"
+                  class="hidden bg-slate-50 px-4 py-3 text-xs font-semibold text-slate-500 md:grid md:grid-cols-[minmax(0,2fr)_100px_140px_120px_40px] md:gap-3"
                 >
                   <span>{{ t("fields.name") }}</span>
                   <span>{{ t("fields.quantity") }}</span>
@@ -338,9 +338,7 @@ const onSubmit = handleSubmit(async (formValues) => {
                     </FormField>
 
                     <div class="space-y-1">
-                      <p
-                        class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 md:hidden"
-                      >
+                      <p class="text-xs font-semibold text-slate-500 md:hidden">
                         {{ t("fields.total") }}
                       </p>
                       <div class="flex h-10 items-center text-sm font-medium text-slate-900">

@@ -76,7 +76,7 @@ async function createInitialDatabase() {
       class="rounded-s border border-white/70 bg-white/90 p-7 shadow-xl shadow-sky-100/80 text-left rtl:text-right"
     >
       <div class="space-y-2">
-        <p class="text-sm font-medium uppercase tracking-[0.25em] text-slate-500">
+        <p class="text-sm font-medium text-slate-500">
           {{ t("database.onboarding.initial-tenant") }}
         </p>
         <h2 class="text-2xl font-semibold text-slate-950">

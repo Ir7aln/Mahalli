@@ -225,7 +225,7 @@ function deleteInvoiceItem(index: number) {
     >
       <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
         <div class="space-y-1">
-          <p class="text-xs font-medium uppercase tracking-[0.35em] text-slate-500">
+          <p class="text-xs font-medium text-slate-500">
             {{ t("routes.invoices") }}
           </p>
           <h2 class="text-xl font-semibold">
@@ -252,7 +252,7 @@ function deleteInvoiceItem(index: number) {
                 </p>
               </div>
               <div class="text-left sm:text-right">
-                <p class="text-xs uppercase tracking-[0.3em] text-slate-500">
+                <p class="text-xs text-slate-500">
                   {{ t("fields.total") }}
                 </p>
                 <p class="mt-2 text-3xl font-semibold tracking-tight">
@@ -301,7 +301,7 @@ function deleteInvoiceItem(index: number) {
 
               <div class="space-y-4">
                 <div class="space-y-2">
-                  <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+                  <p class="text-xs font-semibold text-slate-500">
                     {{ t("fields.bill-to") }}
                   </p>
                   <FormField v-slot="{ field }" name="client_id">
@@ -340,7 +340,7 @@ function deleteInvoiceItem(index: number) {
 
             <div class="py-6">
               <div class="flex items-center justify-between gap-4 pb-4">
-                <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+                <p class="text-xs font-semibold text-slate-500">
                   {{ t("fields.items") }}
                 </p>
                 <Button
@@ -356,7 +356,7 @@ function deleteInvoiceItem(index: number) {
 
               <div class="border-y border-slate-200">
                 <div
-                  class="hidden bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 md:grid md:grid-cols-[minmax(0,2fr)_100px_140px_120px_40px] md:gap-3"
+                  class="hidden bg-slate-50 px-4 py-3 text-xs font-semibold text-slate-500 md:grid md:grid-cols-[minmax(0,2fr)_100px_140px_120px_40px] md:gap-3"
                 >
                   <span>{{ t("fields.name") }}</span>
                   <span>{{ t("fields.quantity") }}</span>
@@ -422,9 +422,7 @@ function deleteInvoiceItem(index: number) {
                     </FormField>
 
                     <div class="space-y-1">
-                      <p
-                        class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 md:hidden"
-                      >
+                      <p class="text-xs font-semibold text-slate-500 md:hidden">
                         {{ t("fields.total") }}
                       </p>
                       <div class="flex h-10 items-center text-sm font-medium text-slate-900">
@@ -471,7 +469,7 @@ function deleteInvoiceItem(index: number) {
 
               <div class="mt-6 border-t border-slate-200 pt-4">
                 <div class="flex items-center justify-between gap-4 pb-4">
-                  <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+                  <p class="text-xs font-semibold text-slate-500">
                     {{ t("fields.payments") }}
                   </p>
                   <span class="text-sm text-slate-500">
@@ -481,7 +479,7 @@ function deleteInvoiceItem(index: number) {
 
                 <div v-if="invoicePayments.length" class="overflow-hidden border border-slate-200">
                   <div
-                    class="grid grid-cols-[160px_minmax(0,1fr)_140px] bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500"
+                    class="grid grid-cols-[160px_minmax(0,1fr)_140px] bg-slate-50 px-4 py-3 text-xs font-semibold text-slate-500"
                   >
                     <span>{{ t("fields.date") }}</span>
                     <span>{{ t("fields.description") }}</span>

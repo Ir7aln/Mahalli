@@ -125,7 +125,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     >
       <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
         <div class="space-y-1">
-          <p class="text-xs font-medium uppercase tracking-[0.35em] text-slate-500">
+          <p class="text-xs font-medium text-slate-500">
             {{ t("routes.invoices") }}
           </p>
           <h2 class="text-xl font-semibold">
@@ -141,26 +141,26 @@ const onSubmit = handleSubmit(async (formValues) => {
         <section class="space-y-6 border border-slate-200 bg-white px-6 py-6 sm:px-7">
           <div class="grid gap-4 sm:grid-cols-3">
             <div class="border border-slate-200 px-4 py-4">
-              <p class="text-xs uppercase tracking-[0.3em] text-slate-500">
+              <p class="text-xs text-slate-500">
                 {{ t("fields.total") }}
               </p>
-              <p class="mt-2 text-2xl font-semibold">
+              <p class="mt-2 text-xl font-semibold sm:text-xl lg:text-2xl">
                 {{ formatMoney(totalAmount) }}
               </p>
             </div>
             <div class="border border-slate-200 px-4 py-4">
-              <p class="text-xs uppercase tracking-[0.3em] text-slate-500">
+              <p class="text-xs text-slate-500">
                 {{ t("fields.paid") }}
               </p>
-              <p class="mt-2 text-2xl font-semibold">
+              <p class="mt-2 text-xl font-semibold sm:text-xl lg:text-2xl">
                 {{ formatMoney(paidAmount) }}
               </p>
             </div>
             <div class="border border-slate-200 px-4 py-4">
-              <p class="text-xs uppercase tracking-[0.3em] text-slate-500">
+              <p class="text-xs text-slate-500">
                 {{ t("fields.balance") }}
               </p>
-              <p class="mt-2 text-2xl font-semibold">
+              <p class="mt-2 text-xl font-semibold sm:text-xl lg:text-2xl">
                 {{ formatMoney(unpaidAmount) }}
               </p>
             </div>
@@ -223,7 +223,7 @@ const onSubmit = handleSubmit(async (formValues) => {
 
           <div class="border-t border-slate-200 pt-4">
             <div class="flex items-center justify-between gap-4 pb-4">
-              <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+              <p class="text-xs font-semibold text-slate-500">
                 {{ t("fields.payments") }}
               </p>
               <span class="text-sm text-slate-500">{{ payments.length }}</span>
@@ -231,7 +231,7 @@ const onSubmit = handleSubmit(async (formValues) => {
 
             <div v-if="payments.length" class="overflow-hidden border border-slate-200">
               <div
-                class="grid grid-cols-[160px_minmax(0,1fr)_140px] bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500"
+                class="grid grid-cols-[160px_minmax(0,1fr)_140px] bg-slate-50 px-4 py-3 text-xs font-semibold text-slate-500"
               >
                 <span>{{ t("fields.date") }}</span>
                 <span>{{ t("fields.description") }}</span>
