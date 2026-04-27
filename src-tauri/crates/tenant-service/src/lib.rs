@@ -5,10 +5,12 @@ pub mod invoices;
 pub mod orders;
 pub mod products;
 pub mod quotes;
+pub mod status;
 mod seed;
 pub mod suppliers;
 pub mod templates;
 
 pub use seed::*;
+pub use status::{InvoiceStatus, OrderStatus};
 
 pub use sea_orm;

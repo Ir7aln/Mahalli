@@ -78,7 +78,7 @@ fn product_inventory_expr() -> SimpleExpr {
                             ))
                             .equals((Products, products::Column::Id)),
                         )
-                        .add(orders::Column::Status.is_in(["DELIVERED", "SHIPPED"]))
+                        .add(orders::Column::Status.eq("COMPLETED"))
                         .add(orders::Column::IsDeleted.eq(false)),
                 )
                 .to_owned(),

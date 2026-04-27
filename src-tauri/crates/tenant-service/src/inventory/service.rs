@@ -53,6 +53,14 @@ impl InventoryService {
                     )
                     .add(
                         Expr::expr(Func::coalesce([
+                            Expr::col((Invoices, invoices::Column::Status)),
+                            Expr::expr("PENDING"),
+                        ]))
+                        .eq("CANCELLED")
+                        .not(),
+                    )
+                    .add(
+                        Expr::expr(Func::coalesce([
                             Expr::col((Orders, orders::Column::IsDeleted)),
                             Expr::expr(false),
                         ]))
@@ -181,6 +189,14 @@ impl InventoryService {
                 Cond::all().add(
                     Expr::expr(Func::coalesce([
                         Expr::col((Orders, orders::Column::Status)),
+                        Expr::expr("PENDING"),
+                    ]))
+                    .eq("CANCELLED")
+                    .not(),
+                )
+                .add(
+                    Expr::expr(Func::coalesce([
+                        Expr::col((Invoices, invoices::Column::Status)),
                         Expr::expr("PENDING"),
                     ]))
                     .eq("CANCELLED")

@@ -1,4 +1,5 @@
 use super::dto::*;
+use crate::OrderStatus;
 use sea_orm::{
     sea_query::{Alias, Cond, Expr, Func, Query, SqliteQueryBuilder},
     DatabaseConnection as DbConn, *,
@@ -570,9 +571,25 @@ impl OrdersService {
     }
 
     pub async fn update_order_status(db: &DbConn, data: UpdateOrderStatus) -> Result<(), DbErr> {
+        let next_status = OrderStatus::from_str(&data.status)
+            .ok_or_else(|| DbErr::Custom(format!("invalid order status: {}", data.status)))?;
+
         let order_model = Orders::find_by_id(data.id).one(db).await?;
-        let mut order_active: OrderActiveModel = order_model.unwrap().into();
-        order_active.status = ActiveValue::Set(data.status);
+        let order = order_model.ok_or_else(|| DbErr::RecordNotFound("order not found".to_string()))?;
+
+        let current_status = OrderStatus::from_str(&order.status)
+            .ok_or_else(|| DbErr::Custom(format!("corrupted order status: {}", order.status)))?;
+
+        if !current_status.is_valid_transition(&next_status) {
+            return Err(DbErr::Custom(format!(
+                "invalid status transition from {} to {}",
+                current_status.as_str(),
+                next_status.as_str()
+            )));
+        }
+
+        let mut order_active: OrderActiveModel = order.into();
+        order_active.status = ActiveValue::Set(next_status.as_str().to_string());
         match order_active.update(db).await {
             Ok(_) => Ok(()),
             Err(err) => Err(err),

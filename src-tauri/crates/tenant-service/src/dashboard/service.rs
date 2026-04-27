@@ -239,10 +239,16 @@ impl DashboardService {
                     .equals((OrderItems, order_items::Column::InventoryId)),
             )
             .cond_where(
-                Cond::all().add(
-                    Expr::expr(Expr::col((Invoices, invoices::Column::Status)))
-                        .is_not_in(["CANCELLED", "DRAFT"]),
-                ),
+                Cond::all()
+                    .add(
+                        Expr::expr(Expr::col((Orders, orders::Column::Status)))
+                            .eq("CANCELLED")
+                            .not(),
+                    )
+                    .add(
+                        Expr::expr(Expr::col((Invoices, invoices::Column::Status)))
+                            .is_not_in(["CANCELLED", "DRAFT"]),
+                    ),
             )
             .add_group_by([Expr::col((Clients, clients::Column::Id)).into()])
             .order_by_expr(
@@ -309,10 +315,12 @@ impl DashboardService {
                     .equals((OrderItems, order_items::Column::InventoryId)),
             )
             .cond_where(
-                Cond::all().add(
-                    Expr::expr(Expr::col((Orders, orders::Column::Status)))
-                        .is_not_in(["CANCELLED", "PENDING"]),
-                ),
+                Cond::all()
+                    .add(
+                        Expr::expr(Expr::col((Orders, orders::Column::Status)))
+                            .eq("CANCELLED")
+                            .not(),
+                    ),
             )
             .add_group_by([Expr::col((Suppliers, suppliers::Column::Id)).into()])
             .order_by_expr(
@@ -446,7 +454,8 @@ impl DashboardService {
                             "PAID",
                             "PARTIALLY_PAID",
                         ]))
-                        .and(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false)))
+                        .and(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
+                        .and(Expr::col((Orders, orders::Column::Status)).eq("CANCELLED").not()))
                         .to_owned(),
                     )),
                 )),
@@ -501,7 +510,8 @@ impl DashboardService {
                             "PAID",
                             "PARTIALLY_PAID",
                         ]))
-                        .and(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false)))
+                        .and(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
+                        .and(Expr::col((Orders, orders::Column::Status)).eq("CANCELLED").not()))
                         .to_owned(),
                     )),
                 )),
@@ -556,7 +566,8 @@ impl DashboardService {
                             "PAID",
                             "PARTIALLY_PAID",
                         ]))
-                        .and(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false)))
+                        .and(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
+                        .and(Expr::col((Orders, orders::Column::Status)).eq("CANCELLED").not()))
                         .to_owned(),
                     )),
                 )),
@@ -611,7 +622,8 @@ impl DashboardService {
                             "PAID",
                             "PARTIALLY_PAID",
                         ]))
-                        .and(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false)))
+                        .and(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
+                        .and(Expr::col((Orders, orders::Column::Status)).eq("CANCELLED").not()))
                         .to_owned(),
                     )),
                 )),

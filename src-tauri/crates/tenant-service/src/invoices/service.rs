@@ -1,4 +1,5 @@
 use super::dto::*;
+use crate::InvoiceStatus;
 use chrono::{DateTime, NaiveDate, NaiveDateTime};
 use sea_orm::{
     sea_query::{
@@ -194,7 +195,7 @@ fn normalize_invoice_status(current_status: &str, total: f64, paid_amount: f64) 
         return Some("PAID".to_string());
     }
 
-    if paid_amount > 0.0 {
+    if paid_amount > 0.0 && paid_amount < total {
         return Some("PARTIALLY_PAID".to_string());
     }
 
@@ -786,9 +787,25 @@ impl InvoicesService {
         db: &DbConn,
         data: UpdateInvoiceStatus,
     ) -> Result<(), DbErr> {
+        let next_status = InvoiceStatus::from_str(&data.status)
+            .ok_or_else(|| DbErr::Custom(format!("invalid invoice status: {}", data.status)))?;
+
         let invoice_model = Invoices::find_by_id(data.id).one(db).await?;
-        let mut invoice_active: InvoiceActiveModel = invoice_model.unwrap().into();
-        invoice_active.status = ActiveValue::Set(data.status);
+        let invoice = invoice_model.ok_or_else(|| DbErr::RecordNotFound("invoice not found".to_string()))?;
+
+        let current_status = InvoiceStatus::from_str(&invoice.status)
+            .ok_or_else(|| DbErr::Custom(format!("corrupted invoice status: {}", invoice.status)))?;
+
+        if !current_status.is_valid_transition(&next_status) {
+            return Err(DbErr::Custom(format!(
+                "invalid status transition from {} to {}",
+                current_status.as_str(),
+                next_status.as_str()
+            )));
+        }
+
+        let mut invoice_active: InvoiceActiveModel = invoice.into();
+        invoice_active.status = ActiveValue::Set(next_status.as_str().to_string());
         match invoice_active.update(db).await {
             Ok(_) => Ok(()),
             Err(err) => Err(err),
