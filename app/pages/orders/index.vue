@@ -4,7 +4,7 @@ import { Plus } from "lucide-vue-next";
 import { useDebounceFn } from "@vueuse/core";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
-import { OrderCreate } from "#components";
+import { OrderCreate, ColumnVisibilityDropdown } from "#components";
 import { ORDER_STATUSES } from "@/consts";
 import type { OrderProductItem, SelectOrders } from "@/bindings";
 import { queryNumber, queryString } from "@/utils/query";
@@ -15,6 +15,17 @@ const { showErrorToast } = useCommandError();
 const modal = useModal();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const orderProducts = ref<OrderProductItem[]>([]);
+
+const orderTableColumns = [
+  { key: "identifier", label: t("fields.identifier") },
+  { key: "full_name", label: t("fields.full-name") },
+  { key: "products", label: t("fields.items") },
+  { key: "status", label: t("fields.status") },
+  { key: "created_at", label: t("fields.date") },
+  { key: "total", label: t("fields.total") },
+];
+
+const visibleColumns = ref<string[]>(orderTableColumns.map((col) => col.key));
 
 const searchQuery = ref(queryString(route.query.search));
 const status = ref(queryString(route.query.status));
@@ -105,6 +116,20 @@ watch([status, createdFrom, createdTo], () => {
   });
 });
 
+onMounted(async () => {
+  const preferences = await commands.getColumnPreferences("orders");
+  if (preferences.status === "ok" && preferences.data?.data?.visible_columns) {
+    visibleColumns.value = preferences.data.data.visible_columns;
+  }
+});
+
+watch(visibleColumns, async (newColumns) => {
+  await commands.saveColumnPreferences({
+    page: "orders",
+    visible_columns: newColumns,
+  });
+}, { deep: true });
+
 async function listOrderProducts(id?: string) {
   if (!id) {
     orderProducts.value = [];
@@ -144,6 +169,19 @@ const openCreateOrderModal = () => modal.open(OrderCreate, { sheet: true });
         @clear-filter="clearFilter"
         @clear-all="clearAllFilters"
       >
+        <template #actions>
+          <Button class="gap-2 text-nowrap" @click="openCreateOrderModal">
+            <Plus :size="20" />
+            {{ t("buttons.toggle-create-order") }}
+          </Button>
+        </template>
+        <template #columns>
+          <ColumnVisibilityDropdown
+            :columns="orderTableColumns"
+            :visible-columns="visibleColumns"
+            @update:visible-columns="(cols) => (visibleColumns = cols)"
+          />
+        </template>
         <template #advanced>
           <DropdownMenuGroup>
             <DropdownMenuSub>
@@ -180,16 +218,11 @@ const openCreateOrderModal = () => modal.open(OrderCreate, { sheet: true });
             </DropdownMenuSub>
           </DropdownMenuGroup>
         </template>
-        <template #actions>
-          <Button class="gap-2 text-nowrap" @click="openCreateOrderModal">
-            <Plus :size="20" />
-            {{ t("buttons.toggle-create-order") }}
-          </Button>
-        </template>
       </ListFilterBar>
       <OrdersTable
         :orders="orders"
         :order-products="orderProducts"
+        :visible-columns="visibleColumns"
         @list-order-products="listOrderProducts"
       />
     </div>

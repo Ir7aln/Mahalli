@@ -7,6 +7,7 @@ pub struct ListClientsArgs {
     pub page: u64,
     pub limit: u64,
     pub search: String,
+    pub search_field: Option<String>,
     pub credit_only: Option<bool>,
     pub sort: Option<String>,
     pub direction: Option<String>,
@@ -20,6 +21,10 @@ pub struct SelectClients {
     pub phone_number: Option<String>,
     pub email: Option<String>,
     pub image: Option<String>,
+    pub ice: Option<String>,
+    pub if_number: Option<String>,
+    pub rc: Option<String>,
+    pub patente: Option<String>,
     pub credit: f64,
 }
 
@@ -30,6 +35,10 @@ pub struct NewClient {
     pub phone_number: Option<String>,
     pub email: Option<String>,
     pub image: Option<String>,
+    pub ice: Option<String>,
+    pub if_number: Option<String>,
+    pub rc: Option<String>,
+    pub patente: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]
@@ -40,6 +49,10 @@ pub struct Client {
     pub phone_number: Option<String>,
     pub email: Option<String>,
     pub image: Option<String>,
+    pub ice: Option<String>,
+    pub if_number: Option<String>,
+    pub rc: Option<String>,
+    pub patente: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]
@@ -62,6 +75,10 @@ pub struct ClientDetails {
     pub phone_number: Option<String>,
     pub address: Option<String>,
     pub image: Option<String>,
+    pub ice: Option<String>,
+    pub if_number: Option<String>,
+    pub rc: Option<String>,
+    pub patente: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromQueryResult, Type)]

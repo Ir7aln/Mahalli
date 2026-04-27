@@ -10,6 +10,7 @@ import { queryString } from "@/utils/query";
 
 const props = defineProps<{
   clients: SelectClients[];
+  visibleColumns?: string[];
 }>();
 const route = useRoute();
 const { updateQueryParams } = useUpdateRouteQueryParams();
@@ -19,6 +20,19 @@ const localePath = useLocalePath();
 const modal = useModal();
 const clientInvoiceDebts = ref<ClientInvoiceDebtItem[]>([]);
 const debtCache = reactive<Record<string, ClientInvoiceDebtItem[]>>({});
+
+const visibleCols = computed(() => props.visibleColumns ?? [
+  "avatar",
+  "full_name",
+  "email",
+  "phone_number",
+  "address",
+  "ice",
+  "if_number",
+  "rc",
+  "patente",
+  "credit",
+]);
 const sortKey = computed(() => queryString(route.query.sort));
 const sortDirection = computed(() =>
   queryString(route.query.direction) === "desc" ? "desc" : "asc",
@@ -89,6 +103,10 @@ function toggleThisClient(client: SelectClients, name: "delete" | "update") {
       email: client.email ?? undefined,
       phoneNumber: client.phone_number ?? undefined,
       address: client.address ?? undefined,
+      ice: client.ice ?? undefined,
+      ifNumber: client.if_number ?? undefined,
+      rc: client.rc ?? undefined,
+      patente: client.patente ?? undefined,
     });
   }
 }
@@ -99,8 +117,8 @@ function toggleThisClient(client: SelectClients, name: "delete" | "update") {
     <Table :dir="locale === 'ar' ? 'rtl' : 'ltr'">
       <TableHeader>
         <TableRow>
-          <TableHead class="w-14" />
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('avatar')" class="w-14" />
+          <TableHead v-if="visibleCols.includes('full_name')">
             <TableSortHeader
               :label="t('fields.full-name')"
               :active="sortKey === 'full_name'"
@@ -108,7 +126,7 @@ function toggleThisClient(client: SelectClients, name: "delete" | "update") {
               @click="toggleSort('full_name')"
             />
           </TableHead>
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('email')">
             <TableSortHeader
               :label="t('fields.email')"
               :active="sortKey === 'email'"
@@ -116,7 +134,7 @@ function toggleThisClient(client: SelectClients, name: "delete" | "update") {
               @click="toggleSort('email')"
             />
           </TableHead>
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('phone_number')">
             <TableSortHeader
               :label="t('fields.phone')"
               :active="sortKey === 'phone_number'"
@@ -124,7 +142,7 @@ function toggleThisClient(client: SelectClients, name: "delete" | "update") {
               @click="toggleSort('phone_number')"
             />
           </TableHead>
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('address')">
             <TableSortHeader
               :label="t('fields.address')"
               :active="sortKey === 'address'"
@@ -132,7 +150,39 @@ function toggleThisClient(client: SelectClients, name: "delete" | "update") {
               @click="toggleSort('address')"
             />
           </TableHead>
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('ice')">
+            <TableSortHeader
+              :label="t('fields.ice')"
+              :active="sortKey === 'ice'"
+              :direction="sortDirection"
+              @click="toggleSort('ice')"
+            />
+          </TableHead>
+          <TableHead v-if="visibleCols.includes('if_number')">
+            <TableSortHeader
+              :label="t('fields.if-number')"
+              :active="sortKey === 'if_number'"
+              :direction="sortDirection"
+              @click="toggleSort('if_number')"
+            />
+          </TableHead>
+          <TableHead v-if="visibleCols.includes('rc')">
+            <TableSortHeader
+              :label="t('fields.rc')"
+              :active="sortKey === 'rc'"
+              :direction="sortDirection"
+              @click="toggleSort('rc')"
+            />
+          </TableHead>
+          <TableHead v-if="visibleCols.includes('patente')">
+            <TableSortHeader
+              :label="t('fields.patente')"
+              :active="sortKey === 'patente'"
+              :direction="sortDirection"
+              @click="toggleSort('patente')"
+            />
+          </TableHead>
+          <TableHead v-if="visibleCols.includes('credit')">
             <TableSortHeader
               :label="t('fields.credit')"
               :active="sortKey === 'credit'"
@@ -147,7 +197,7 @@ function toggleThisClient(client: SelectClients, name: "delete" | "update") {
       </TableHeader>
       <TableBody>
         <TableRow v-for="(client, index) in props.clients" :key="client.id" v-fade="index">
-          <TableCell class="p-2 flex justify-center">
+          <TableCell v-if="visibleCols.includes('avatar')" class="p-2 flex justify-center">
             <Avatar>
               <AvatarImage v-if="client.image" :src="convertFileSrc(client.image)" />
               <AvatarFallback class="text-xs">
@@ -155,19 +205,31 @@ function toggleThisClient(client: SelectClients, name: "delete" | "update") {
               </AvatarFallback>
             </Avatar>
           </TableCell>
-          <TableCell class="p-2 whitespace-nowrap font-medium">
+          <TableCell v-if="visibleCols.includes('full_name')" class="p-2 whitespace-nowrap font-medium">
             {{ client?.full_name }}
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('email')" class="p-2">
             {{ client.email || "--" }}
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('phone_number')" class="p-2">
             {{ client.phone_number || "--" }}
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('address')" class="p-2">
             {{ client.address || "--" }}
           </TableCell>
-          <TableCell class="p-2 whitespace-nowrap">
+          <TableCell v-if="visibleCols.includes('ice')" class="p-2">
+            {{ client.ice || "--" }}
+          </TableCell>
+          <TableCell v-if="visibleCols.includes('if_number')" class="p-2">
+            {{ client.if_number || "--" }}
+          </TableCell>
+          <TableCell v-if="visibleCols.includes('rc')" class="p-2">
+            {{ client.rc || "--" }}
+          </TableCell>
+          <TableCell v-if="visibleCols.includes('patente')" class="p-2">
+            {{ client.patente || "--" }}
+          </TableCell>
+          <TableCell v-if="visibleCols.includes('credit')" class="p-2 whitespace-nowrap">
             <Popover v-if="toNumber(client.credit) > 0">
               <PopoverTrigger as-child>
                 <Button
@@ -240,7 +302,7 @@ function toggleThisClient(client: SelectClients, name: "delete" | "update") {
             </div>
           </TableCell>
         </TableRow>
-        <TableEmpty v-if="!props.clients.length" :colspan="7">
+        <TableEmpty v-if="!props.clients.length" :colspan="visibleCols.length + 1">
           <div class="space-y-1 text-center">
             <p class="font-medium text-slate-900">{{ t("tables.empty.title") }}</p>
             <p class="text-sm text-slate-500">{{ t("tables.empty.description") }}</p>

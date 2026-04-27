@@ -90,13 +90,21 @@ fn client_credit_expr() -> SimpleExpr {
     ))
 }
 
-fn client_search_condition(search: &str) -> Cond {
+fn client_search_condition(search: &str, search_field: Option<&str>) -> Cond {
     let pattern = format!("%{}%", search);
-    Cond::any()
-        .add(Expr::col((Clients, clients::Column::FullName)).like(pattern.clone()))
-        .add(Expr::col((Clients, clients::Column::Email)).like(pattern.clone()))
-        .add(Expr::col((Clients, clients::Column::PhoneNumber)).like(pattern.clone()))
-        .add(Expr::col((Clients, clients::Column::Address)).like(pattern))
+    match search_field {
+        Some("email") => Cond::any().add(Expr::col((Clients, clients::Column::Email)).like(pattern)),
+        Some("phone_number") => Cond::any().add(Expr::col((Clients, clients::Column::PhoneNumber)).like(pattern)),
+        Some("address") => Cond::any().add(Expr::col((Clients, clients::Column::Address)).like(pattern)),
+        Some("ice") => Cond::any().add(Expr::col((Clients, clients::Column::Ice)).like(pattern)),
+        Some("if_number") => Cond::any().add(Expr::col((Clients, clients::Column::IfNumber)).like(pattern)),
+        Some("rc") => Cond::any().add(Expr::col((Clients, clients::Column::Rc)).like(pattern)),
+        Some("patente") => Cond::any().add(Expr::col((Clients, clients::Column::Patente)).like(pattern)),
+        _ => {
+            Cond::any()
+                .add(Expr::col((Clients, clients::Column::FullName)).like(pattern))
+        }
+    }
 }
 
 pub struct ClientsService;
@@ -111,7 +119,7 @@ impl ClientsService {
                 Cond::all()
                     .add(Expr::col((Clients, clients::Column::IsArchived)).eq(false))
                     .add(Expr::col((Clients, clients::Column::IsDeleted)).eq(false))
-                    .add(client_search_condition(&args.search)),
+                    .add(client_search_condition(&args.search, args.search_field.as_deref())),
             )
             .apply_if(args.credit_only, |query, credit_only| {
                 query.filter(client_credit_expr().gt(if credit_only { 0.0 } else { -1.0 }))
@@ -129,13 +137,17 @@ impl ClientsService {
                 Expr::col((Clients, clients::Column::PhoneNumber)),
                 Expr::col((Clients, clients::Column::Image)),
                 Expr::col((Clients, clients::Column::Email)),
+                Expr::col((Clients, clients::Column::Ice)),
+                Expr::col((Clients, clients::Column::IfNumber)),
+                Expr::col((Clients, clients::Column::Rc)),
+                Expr::col((Clients, clients::Column::Patente)),
             ])
             .expr_as(client_credit_expr(), Alias::new("credit"))
             .cond_where(
                 Cond::all()
                     .add(Expr::col((Clients, clients::Column::IsArchived)).eq(false))
                     .add(Expr::col((Clients, clients::Column::IsDeleted)).eq(false))
-                    .add(client_search_condition(&args.search)),
+                    .add(client_search_condition(&args.search, args.search_field.as_deref())),
             )
             .conditions(
                 args.credit_only == Some(true),
@@ -168,6 +180,30 @@ impl ClientsService {
             Some("address") => {
                 query.order_by(
                     clients::Column::Address,
+                    requested_order(args.direction.as_deref()),
+                );
+            }
+            Some("ice") => {
+                query.order_by(
+                    clients::Column::Ice,
+                    requested_order(args.direction.as_deref()),
+                );
+            }
+            Some("if_number") => {
+                query.order_by(
+                    clients::Column::IfNumber,
+                    requested_order(args.direction.as_deref()),
+                );
+            }
+            Some("rc") => {
+                query.order_by(
+                    clients::Column::Rc,
+                    requested_order(args.direction.as_deref()),
+                );
+            }
+            Some("patente") => {
+                query.order_by(
+                    clients::Column::Patente,
                     requested_order(args.direction.as_deref()),
                 );
             }
@@ -294,6 +330,10 @@ impl ClientsService {
                 phone_number: client.phone_number,
                 address: client.address,
                 image: client.image,
+                ice: client.ice,
+                if_number: client.if_number,
+                rc: client.rc,
+                patente: client.patente,
             }),
             None => Err(DbErr::RecordNotFound(String::from("no client"))),
         }
@@ -306,6 +346,10 @@ impl ClientsService {
             phone_number: ActiveValue::Set(client.phone_number),
             address: ActiveValue::Set(client.address),
             image: ActiveValue::Set(client.image),
+            ice: ActiveValue::Set(client.ice),
+            if_number: ActiveValue::Set(client.if_number),
+            rc: ActiveValue::Set(client.rc),
+            patente: ActiveValue::Set(client.patente),
             ..Default::default()
         };
         match client.insert(db).await {
@@ -321,6 +365,10 @@ impl ClientsService {
         client_active.email = ActiveValue::Set(client.email);
         client_active.phone_number = ActiveValue::Set(client.phone_number);
         client_active.address = ActiveValue::Set(client.address);
+        client_active.ice = ActiveValue::Set(client.ice);
+        client_active.if_number = ActiveValue::Set(client.if_number);
+        client_active.rc = ActiveValue::Set(client.rc);
+        client_active.patente = ActiveValue::Set(client.patente);
         match client_active.update(db).await {
             Ok(_) => Ok(()),
             Err(err) => Err(err),

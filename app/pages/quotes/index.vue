@@ -4,7 +4,7 @@ import { Plus } from "lucide-vue-next";
 import { useDebounceFn } from "@vueuse/core";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
-import { QuoteCreate } from "#components";
+import { QuoteCreate, ColumnVisibilityDropdown } from "#components";
 import type { QuoteProductItem, SelectQuotes } from "@/bindings";
 import { queryNumber, queryString } from "@/utils/query";
 
@@ -13,6 +13,16 @@ const { t, d } = useI18n();
 const { showErrorToast } = useCommandError();
 const modal = useModal();
 const { updateQueryParams } = useUpdateRouteQueryParams();
+
+const quoteTableColumns = [
+  { key: "identifier", label: t("fields.identifier") },
+  { key: "full_name", label: t("fields.full-name") },
+  { key: "products", label: t("fields.items") },
+  { key: "created_at", label: t("fields.date") },
+  { key: "total", label: t("fields.total") },
+];
+
+const visibleColumns = ref<string[]>(quoteTableColumns.map((col) => col.key));
 
 const searchQuery = ref(queryString(route.query.search));
 const createdFrom = ref(queryString(route.query.created_from));
@@ -93,6 +103,20 @@ watch([createdFrom, createdTo], () => {
   });
 });
 
+onMounted(async () => {
+  const preferences = await commands.getColumnPreferences("quotes");
+  if (preferences.status === "ok" && preferences.data?.data?.visible_columns) {
+    visibleColumns.value = preferences.data.data.visible_columns;
+  }
+});
+
+watch(visibleColumns, async (newColumns) => {
+  await commands.saveColumnPreferences({
+    page: "quotes",
+    visible_columns: newColumns,
+  });
+}, { deep: true });
+
 async function listQuoteProducts(id?: string) {
   if (!id) {
     quoteProducts.value = [];
@@ -130,6 +154,19 @@ const openCreateQuoteModal = () => modal.open(QuoteCreate, { sheet: true });
         @clear-filter="clearFilter"
         @clear-all="clearAllFilters"
       >
+        <template #actions>
+          <Button class="gap-2 text-nowrap" @click="openCreateQuoteModal">
+            <Plus :size="20" />
+            {{ t("buttons.toggle-create-quote") }}
+          </Button>
+        </template>
+        <template #columns>
+          <ColumnVisibilityDropdown
+            :columns="quoteTableColumns"
+            :visible-columns="visibleColumns"
+            @update:visible-columns="(cols) => (visibleColumns = cols)"
+          />
+        </template>
         <template #advanced>
           <DropdownMenuGroup>
             <DropdownMenuSub>
@@ -149,16 +186,11 @@ const openCreateQuoteModal = () => modal.open(QuoteCreate, { sheet: true });
             </DropdownMenuSub>
           </DropdownMenuGroup>
         </template>
-        <template #actions>
-          <Button class="gap-2 text-nowrap" @click="openCreateQuoteModal">
-            <Plus :size="20" />
-            {{ t("buttons.toggle-create-quote") }}
-          </Button>
-        </template>
       </ListFilterBar>
       <QuotesTable
         :quotes="quotes"
         :quote-products="quoteProducts"
+        :visible-columns="visibleColumns"
         @list-quote-products="listQuoteProducts"
       />
     </div>

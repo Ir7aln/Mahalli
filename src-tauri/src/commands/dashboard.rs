@@ -39,20 +39,6 @@ pub async fn list_top_clients(state: State<'_, AppState>) -> SResult<Vec<SelectT
 
 #[tauri::command]
 #[specta::specta]
-pub async fn list_top_suppliers(state: State<'_, AppState>) -> SResult<Vec<SelectTops>> {
-    let db_conn = tenant_db_or_fail(&state).await?;
-    match DashboardService::list_top_suppliers(&db_conn).await {
-        Ok(res) => Ok(Success {
-            error: None,
-            message: None,
-            data: Some(res),
-        }),
-        Err(err) => Err(err.into()),
-    }
-}
-
-#[tauri::command]
-#[specta::specta]
 pub async fn list_top_products(state: State<'_, AppState>) -> SResult<Vec<SelectTopProducts>> {
     let db_conn = tenant_db_or_fail(&state).await?;
     match DashboardService::list_top_products(&db_conn).await {

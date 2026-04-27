@@ -4,7 +4,7 @@ import { useDebounceFn } from "@vueuse/core";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
 import { commands, type SelectProducts } from "@/bindings";
-import { ProductCreate } from "#components";
+import { ProductCreate, ColumnVisibilityDropdown } from "#components";
 import { queryNumber, queryString } from "@/utils/query";
 
 const route = useRoute();
@@ -12,6 +12,17 @@ const { t } = useI18n();
 const { showErrorToast } = useCommandError();
 const modal = useModal();
 const { updateQueryParams } = useUpdateRouteQueryParams();
+
+const productTableColumns = [
+  { key: "image", label: "Image" },
+  { key: "name", label: t("fields.name") },
+  { key: "inventory", label: t("fields.inventory") },
+  { key: "threshold", label: t("fields.threshold") },
+  { key: "purchase_price", label: t("fields.purchase-price") },
+  { key: "selling_price", label: t("fields.selling-price") },
+];
+
+const visibleColumns = ref<string[]>(productTableColumns.map((col) => col.key));
 
 const searchQuery = ref(queryString(route.query.search));
 const stockStatus = ref(queryString(route.query.stock_status));
@@ -101,6 +112,20 @@ const debouncedFilters = useDebounceFn(() => {
 watch(searchQuery, debouncedSearch);
 watch([stockStatus, sellingPriceMin, sellingPriceMax], debouncedFilters);
 
+onMounted(async () => {
+  const preferences = await commands.getColumnPreferences("products");
+  if (preferences.status === "ok" && preferences.data?.data?.visible_columns) {
+    visibleColumns.value = preferences.data.data.visible_columns;
+  }
+});
+
+watch(visibleColumns, async (newColumns) => {
+  await commands.saveColumnPreferences({
+    page: "products",
+    visible_columns: newColumns,
+  });
+}, { deep: true });
+
 function clearFilter(key: string) {
   if (key === "stock_status") stockStatus.value = "";
   if (key === "selling_price_min") sellingPriceMin.value = "";
@@ -126,6 +151,19 @@ const openCreateProductModal = () => modal.open(ProductCreate, {});
         @clear-filter="clearFilter"
         @clear-all="clearAllFilters"
       >
+        <template #actions>
+          <Button class="gap-2 text-nowrap" @click="openCreateProductModal">
+            <Plus :size="20" />
+            {{ t("buttons.toggle-create-product") }}
+          </Button>
+        </template>
+        <template #columns>
+          <ColumnVisibilityDropdown
+            :columns="productTableColumns"
+            :visible-columns="visibleColumns"
+            @update:visible-columns="(cols) => (visibleColumns = cols)"
+          />
+        </template>
         <template #advanced>
           <DropdownMenuGroup>
             <DropdownMenuSub>
@@ -174,14 +212,8 @@ const openCreateProductModal = () => modal.open(ProductCreate, {});
             </DropdownMenuSub>
           </DropdownMenuGroup>
         </template>
-        <template #actions>
-          <Button class="gap-2 text-nowrap" @click="openCreateProductModal">
-            <Plus :size="20" />
-            {{ t("buttons.toggle-create-product") }}
-          </Button>
-        </template>
       </ListFilterBar>
-      <ProductsTable :products="products" />
+      <ProductsTable :products="products" :visible-columns="visibleColumns" />
     </div>
   </main>
 </template>

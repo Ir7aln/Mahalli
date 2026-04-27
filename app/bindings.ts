@@ -26,11 +26,6 @@ export const commands = {
 	createClient: (client: NewClient) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_client", { client })),
 	updateClient: (client: Client) => typedError<Success<string>, Fail>(__TAURI_INVOKE("update_client", { client })),
 	deleteClient: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_client", { id })),
-	listSuppliers: (args: ListSuppliersArgs) => typedError<Success<SuppliersResponse>, Fail>(__TAURI_INVOKE("list_suppliers", { args })),
-	searchSuppliers: (search: string) => typedError<Success<SupplierSearch[]>, Fail>(__TAURI_INVOKE("search_suppliers", { search })),
-	createSupplier: (supplier: NewSupplier) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_supplier", { supplier })),
-	updateSupplier: (supplier: Supplier) => typedError<Success<string>, Fail>(__TAURI_INVOKE("update_supplier", { supplier })),
-	deleteSupplier: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_supplier", { id })),
 	listOrders: (args: ListOrdersArgs) => typedError<Success<OrdersResponse>, Fail>(__TAURI_INVOKE("list_orders", { args })),
 	getOrder: (id: string) => typedError<Success<OrderWithClient>, Fail>(__TAURI_INVOKE("get_order", { id })),
 	getOrderDetails: (id: string) => typedError<Success<OrderDetailsResponse>, Fail>(__TAURI_INVOKE("get_order_details", { id })),
@@ -63,10 +58,11 @@ export const commands = {
 	deleteInvoiceItem: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_invoice_item", { id })),
 	listInventoryStats: () => typedError<Success<SelectTransaction[]>, Fail>(__TAURI_INVOKE("list_inventory_stats")),
 	listTopClients: () => typedError<Success<SelectTops[]>, Fail>(__TAURI_INVOKE("list_top_clients")),
-	listTopSuppliers: () => typedError<Success<SelectTops[]>, Fail>(__TAURI_INVOKE("list_top_suppliers")),
 	listTopProducts: () => typedError<Success<SelectTopProducts[]>, Fail>(__TAURI_INVOKE("list_top_products")),
 	listStatusCount: () => typedError<Success<StatusCountResponse>, Fail>(__TAURI_INVOKE("list_status_count")),
 	listFinancialMetrics: () => typedError<Success<FinancialMetricsResponse>, Fail>(__TAURI_INVOKE("list_financial_metrics")),
+	getColumnPreferences: (page: string) => typedError<Success<ColumnPreference | null>, Fail>(__TAURI_INVOKE("get_column_preferences", { page })),
+	saveColumnPreferences: (args: SaveColumnPreferenceArgs) => typedError<Success<null>, Fail>(__TAURI_INVOKE("save_column_preferences", { args })),
 	seedDatabase: () => typedError<Success<null>, Fail>(__TAURI_INVOKE("seed_database")),
 };
 
@@ -85,6 +81,10 @@ export type Client = {
 	phone_number: string | null,
 	email: string | null,
 	image: string | null,
+	ice: string | null,
+	if_number: string | null,
+	rc: string | null,
+	patente: string | null,
 };
 
 export type ClientDetails = {
@@ -94,6 +94,10 @@ export type ClientDetails = {
 	phone_number: string | null,
 	address: string | null,
 	image: string | null,
+	ice: string | null,
+	if_number: string | null,
+	rc: string | null,
+	patente: string | null,
 };
 
 export type ClientInvoiceDebtItem = {
@@ -111,6 +115,11 @@ export type ClientSearch = {
 export type ClientsResponse = {
 	count: number,
 	clients: SelectClients[],
+};
+
+export type ColumnPreference = {
+	page: string,
+	visible_columns: string[],
 };
 
 export type CreateTenantDatabaseRequest = {
@@ -213,6 +222,7 @@ export type ListClientsArgs = {
 	page: number,
 	limit: number,
 	search: string,
+	search_field: string | null,
 	credit_only: boolean | null,
 	sort: string | null,
 	direction: string | null,
@@ -276,22 +286,16 @@ export type ListQuotesArgs = {
 	direction: string | null,
 };
 
-export type ListSuppliersArgs = {
-	page: number,
-	limit: number,
-	search: string,
-	has_email: boolean | null,
-	has_phone: boolean | null,
-	sort: string | null,
-	direction: string | null,
-};
-
 export type NewClient = {
 	full_name: string,
 	address: string | null,
 	phone_number: string | null,
 	email: string | null,
 	image: string | null,
+	ice: string | null,
+	if_number: string | null,
+	rc: string | null,
+	patente: string | null,
 };
 
 export type NewInventory = {
@@ -343,14 +347,6 @@ export type NewQuoteItem = {
 	price: number,
 	quantity: number,
 	product_id: string,
-};
-
-export type NewSupplier = {
-	full_name: string,
-	address: string | null,
-	phone_number: string | null,
-	email: string | null,
-	image: string | null,
 };
 
 export type NewTemplate = {
@@ -452,6 +448,11 @@ export type QuotesResponse = {
 	quotes: SelectQuotes[],
 };
 
+export type SaveColumnPreferenceArgs = {
+	page: string,
+	visible_columns: string[],
+};
+
 export type SelectClients = {
 	id: string,
 	full_name: string,
@@ -459,6 +460,10 @@ export type SelectClients = {
 	phone_number: string | null,
 	email: string | null,
 	image: string | null,
+	ice: string | null,
+	if_number: string | null,
+	rc: string | null,
+	patente: string | null,
 	credit: number,
 };
 
@@ -578,15 +583,6 @@ export type SelectStatusCount = {
 	status_count: number,
 };
 
-export type SelectSuppliers = {
-	id: string,
-	full_name: string,
-	address: string | null,
-	phone_number: string | null,
-	email: string | null,
-	image: string | null,
-};
-
 export type SelectTopProducts = {
 	name: string,
 	quantity: number,
@@ -614,25 +610,6 @@ export type Success<T> = {
 	error: string | null,
 	message: string | null,
 	data: T | null,
-};
-
-export type Supplier = {
-	id: string,
-	full_name: string,
-	address: string | null,
-	phone_number: string | null,
-	email: string | null,
-	image: string | null,
-};
-
-export type SupplierSearch = {
-	label: string,
-	value: string,
-};
-
-export type SuppliersResponse = {
-	count: number,
-	suppliers: SelectSuppliers[],
 };
 
 export type UpdateInvoice = {

@@ -1,14 +1,26 @@
 <script setup lang="ts">
+import { Plus } from "lucide-vue-next";
 import { useDebounceFn } from "@vueuse/core";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
 import { commands, type SelectInventory } from "@/bindings";
+import { ColumnVisibilityDropdown } from "#components";
 import { queryNumber, queryString } from "@/utils/query";
 
 const route = useRoute();
 const { t, d } = useI18n();
 const { showErrorToast } = useCommandError();
 const { updateQueryParams } = useUpdateRouteQueryParams();
+
+const inventoryTableColumns = [
+  { key: "name", label: t("fields.name") },
+  { key: "price", label: t("fields.price") },
+  { key: "quantity", label: t("fields.quantity") },
+  { key: "transaction_type", label: t("fields.status") },
+  { key: "created_at", label: t("fields.date") },
+];
+
+const visibleColumns = ref<string[]>(inventoryTableColumns.map((col) => col.key));
 
 const searchQuery = ref(queryString(route.query.search));
 const transactionType = ref(queryString(route.query.transaction_type));
@@ -131,6 +143,20 @@ watch(
   debouncedFilters,
 );
 
+onMounted(async () => {
+  const preferences = await commands.getColumnPreferences("inventory");
+  if (preferences.status === "ok" && preferences.data?.data?.visible_columns) {
+    visibleColumns.value = preferences.data.data.visible_columns;
+  }
+});
+
+watch(visibleColumns, async (newColumns) => {
+  await commands.saveColumnPreferences({
+    page: "inventory",
+    visible_columns: newColumns,
+  });
+}, { deep: true });
+
 function clearFilter(key: string) {
   if (key === "transaction_type") transactionType.value = "";
   if (key === "created_from") createdFrom.value = "";
@@ -162,6 +188,13 @@ function clearAllFilters() {
         @clear-filter="clearFilter"
         @clear-all="clearAllFilters"
       >
+        <template #columns>
+          <ColumnVisibilityDropdown
+            :columns="inventoryTableColumns"
+            :visible-columns="visibleColumns"
+            @update:visible-columns="(cols) => (visibleColumns = cols)"
+          />
+        </template>
         <template #advanced>
           <DropdownMenuGroup>
             <DropdownMenuSub>
@@ -240,7 +273,7 @@ function clearAllFilters() {
           </DropdownMenuGroup>
         </template>
       </ListFilterBar>
-      <InventoryTable :inventory="inventory" />
+      <InventoryTable :inventory="inventory" :visible-columns="visibleColumns" />
     </div>
   </main>
 </template>

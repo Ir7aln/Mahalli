@@ -44,8 +44,13 @@ const dir = computed(() => (locale.value === "ar" ? "rtl" : "ltr"));
 
 <template>
   <div class="mb-3 flex w-full flex-col gap-2" :dir="dir">
-    <div class="flex w-full flex-wrap items-center justify-between gap-2">
-      <div class="flex flex-wrap items-center gap-1">
+    <div class="flex w-full flex-col gap-2">
+      <div class="flex w-full items-center justify-between">
+        <div />
+        <slot name="actions" />
+      </div>
+      <div class="flex w-full flex-wrap items-center justify-between gap-2">
+        <div class="flex flex-wrap items-center gap-1">
         <DropdownMenu :dir="dir">
           <div class="relative w-full sm:w-auto sm:max-w-sm">
             <Input
@@ -108,7 +113,8 @@ const dir = computed(() => (locale.value === "ar" ? "rtl" : "ltr"));
         </template>
       </div>
 
-      <slot name="actions" />
+      <slot name="columns" />
+      </div>
     </div>
   </div>
 </template>

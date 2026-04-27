@@ -22,7 +22,6 @@ pub struct SeedService;
 impl SeedService {
     pub async fn seed_database(db: &DatabaseConnection) -> Result<(), DbErr> {
         Self::seed_clients(db).await?;
-        Self::seed_suppliers(db).await?;
         Self::seed_products(db).await?;
         Self::seed_orders(db).await?;
         Self::seed_order_items(db).await?;
@@ -45,33 +44,6 @@ impl SeedService {
             let insert = Statement::from_sql_and_values(
                 sea_orm::DatabaseBackend::Sqlite,
                 r#"INSERT INTO clients (id, full_name, is_deleted, is_archived, phone_number, email, address) VALUES ($1, $2, $3, $4, $5, $6, $7)"#,
-                [
-                    id.to_string().into(),
-                    full_name.into(),
-                    false.into(),
-                    false.into(),
-                    phone_number.into(),
-                    email.into(),
-                    address.into(),
-                ],
-            );
-
-            db.execute_raw(insert).await?;
-        }
-        Ok(())
-    }
-
-    async fn seed_suppliers(db: &DatabaseConnection) -> Result<(), DbErr> {
-        for _ in 0..200 {
-            let id = ulid::Ulid::new();
-            let full_name: String = Name().fake();
-            let phone_number: String = PhoneNumber().fake();
-            let email: String = FreeEmail().fake();
-            let address: String = SecondaryAddress().fake();
-
-            let insert = Statement::from_sql_and_values(
-                sea_orm::DatabaseBackend::Sqlite,
-                r#"INSERT INTO suppliers (id, full_name, is_deleted, is_archived, phone_number, email, address) VALUES ($1, $2, $3, $4, $5, $6, $7)"#,
                 [
                     id.to_string().into(),
                     full_name.into(),

@@ -12,11 +12,6 @@ const pages = ref([
     text: "products",
     path: "/products",
   },
-  // {
-  //   image: "/suppliers.jpeg",
-  //   text: "Suppliers",
-  //   path: "/suppliers/",
-  // },
   {
     image: "/devis.webp",
     text: "quotes",

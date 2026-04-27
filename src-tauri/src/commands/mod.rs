@@ -4,6 +4,7 @@ use tenant_service::sea_orm::DatabaseConnection as TenantDatabaseConnection;
 use tenant_service::sea_orm::{DbErr, TransactionError};
 
 pub mod clients;
+pub mod column_preferences;
 pub mod dashboard;
 pub mod databases;
 pub mod inventory;
@@ -15,7 +16,6 @@ pub mod products;
 pub mod quote_items;
 pub mod quotes;
 pub mod seed;
-pub mod suppliers;
 pub mod templates;
 
 #[derive(Deserialize, Serialize, Debug, Clone, Type)]

@@ -12,5 +12,5 @@ pub mod orders;
 pub mod products;
 pub mod quote_items;
 pub mod quotes;
-pub mod suppliers;
 pub mod templates;
+pub mod user_column_preferences;

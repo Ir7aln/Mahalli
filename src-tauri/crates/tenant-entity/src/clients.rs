@@ -16,6 +16,10 @@ pub struct Model {
     pub email: Option<String>,
     pub address: Option<String>,
     pub image: Option<String>,
+    pub ice: Option<String>,
+    pub if_number: Option<String>,
+    pub rc: Option<String>,
+    pub patente: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

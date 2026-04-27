@@ -9,7 +9,6 @@
   "routes": {
     "home": "Startseite",
     "clients": "Kunden",
-    "suppliers": "Lieferanten",
     "products": "Produkte",
     "orders": "Bestellungen",
     "invoices": "Rechnungen",
@@ -27,7 +26,6 @@
     "update": "Aktualisieren {name}",
     "add-product": "Produkt hinzufügen",
     "toggle-create-client": "Neuen Kunden hinzufügen",
-    "toggle-create-supplier": "Neuen Lieferanten hinzufügen",
     "toggle-create-product": "Neues Produkt hinzufügen",
     "toggle-create-order": "Neue Bestellung hinzufügen",
     "toggle-create-quote": "Neues Angebot hinzufügen",
@@ -60,7 +58,12 @@
     "stock-status": "Lagerstatus",
     "out-of-stock": "Nicht vorrätig",
     "low-stock": "Niedriger Bestand",
-    "healthy-stock": "Guter Bestand"
+    "healthy-stock": "Guter Bestand",
+    "search-by-field": "Nach Feld suchen"
+  },
+  "columns": {
+    "show-hide": "Spalten anzeigen/verbergen",
+    "all": "Alle"
   },
   "dropZone": "Ziehen und ablegen oder auswählen",
   "plrz": {
@@ -74,6 +77,8 @@
     "phone": "Telefonnummer",
     "address": "Adresse",
     "actions": "Aktionen",
+    "identifier": "Identifizierung",
+    "columns": "Spalten",
     "description": "Beschreibung",
     "amount": "Betrag",
     "status": "Status",
@@ -108,7 +113,11 @@
     "subtotal": "Zwischensumme",
     "balance": "Saldo",
     "payments": "Zahlungen",
-    "currency": "MAD"
+    "currency": "MAD",
+    "ice": "ICE",
+    "if-number": "IF",
+    "rc": "RC",
+    "patente": "Patente / TP"
   },
   "placeholders": {
     "select-client": "Wählen Sie einen Kunden",
@@ -141,8 +150,7 @@
     "expenses": "Gesamtkosten",
     "growth": " {n} gegenüber dem Vormonat",
     "b3c": "Beste Kunden basierend auf Ausgaben",
-    "bp": "Bestseller (Menge)",
-    "b3s": "Beste Lieferanten basierend auf Ausgaben"
+    "bp": "Bestseller (Menge)"
   },
   "tables": {
     "empty": {
@@ -196,7 +204,7 @@
       "empty-state": "Es sind noch keine Datenbanken registriert.",
       "seed-title": "Datenbank mit Beispieldaten füllen",
       "seed-description": "Füllen Sie die Datenbank mit Beispieldaten zum Testen und Entwickeln.",
-      "seed-card-note": "Dies fügt 200 Kunden, 200 Lieferanten, 400 Produkte, 100 Bestellungen, 100 Rechnungen und 150 Angebote mit Beispieldaten hinzu."
+      "seed-card-note": "Dies fügt 200 Kunden, 400 Produkte, 100 Bestellungen, 100 Rechnungen und 150 Angebote mit Beispieldaten hinzu."
     },
     "create": {
       "title": "Datenbank erstellen",
@@ -247,11 +255,6 @@
       "created": "Der Kunde {name} wurde hinzugefügt",
       "updated": "Der Kunde {name} wurde aktualisiert",
       "deleted": "Der Kunde {name} wurde gelöscht"
-    },
-    "supplier": {
-      "created": "Der Lieferant {name} wurde hinzugefügt",
-      "updated": "Der Lieferant {name} wurde aktualisiert",
-      "deleted": "Der Lieferant {name} wurde gelöscht"
     },
     "order": {
       "created": "Eine Bestellung wurde erstellt",
@@ -314,11 +317,6 @@
       "update": "Kunden aktualisieren",
       "delete": "Kunden löschen"
     },
-    "suppliers": {
-      "create": "Lieferanten hinzufügen",
-      "update": "Lieferanten aktualisieren",
-      "delete": "Lieferanten löschen"
-    },
     "products": {
       "create": "Produkt hinzufügen",
       "update": "Produkt aktualisieren",
@@ -352,11 +350,6 @@
       "create": "Fügen Sie Kontakt- und Rechnungsdaten für einen neuen Kunden hinzu.",
       "update": "Prüfen Sie das Kundenprofil und speichern Sie die letzten Änderungen.",
       "delete": "Diese Aktion entfernt den Kunden dauerhaft aus Ihrem Arbeitsbereich."
-    },
-    "suppliers": {
-      "create": "Fügen Sie Lieferantendaten hinzu, damit Einkäufe leichter nachverfolgt werden können.",
-      "update": "Aktualisieren Sie die Lieferantendaten, bevor Sie speichern.",
-      "delete": "Diese Aktion entfernt den Lieferanten dauerhaft aus Ihrem Arbeitsbereich."
     },
     "products": {
       "create": "Legen Sie Preise, Mindestbestand und Anfangsmenge für dieses Produkt fest.",

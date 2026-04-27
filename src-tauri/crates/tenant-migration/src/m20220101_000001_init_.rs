@@ -42,44 +42,10 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Client::Email).string())
                     .col(ColumnDef::new(Client::Address).string())
                     .col(ColumnDef::new(Client::Image).string())
-                    .to_owned(),
-            )
-            .await?;
-
-        manager
-            .create_table(
-                Table::create()
-                    .table(Supplier::Table)
-                    .if_not_exists()
-                    .col(
-                        ColumnDef::new(Supplier::Id)
-                            .string()
-                            .not_null()
-                            .primary_key(),
-                    )
-                    .col(ColumnDef::new(Supplier::Fullname).string().not_null())
-                    .col(
-                        ColumnDef::new(Supplier::CreatedAt)
-                            .date_time()
-                            .not_null()
-                            .default(Expr::current_timestamp()),
-                    )
-                    .col(
-                        ColumnDef::new(Supplier::IsDeleted)
-                            .boolean()
-                            .not_null()
-                            .default(false),
-                    )
-                    .col(
-                        ColumnDef::new(Supplier::IsArchived)
-                            .boolean()
-                            .not_null()
-                            .default(false),
-                    )
-                    .col(ColumnDef::new(Supplier::Phone).string())
-                    .col(ColumnDef::new(Supplier::Email).string())
-                    .col(ColumnDef::new(Supplier::Address).string())
-                    .col(ColumnDef::new(Supplier::Image).string())
+                    .col(ColumnDef::new(Client::Ice).string())
+                    .col(ColumnDef::new(Client::IfNumber).string())
+                    .col(ColumnDef::new(Client::Rc).string())
+                    .col(ColumnDef::new(Client::Patente).string())
                     .to_owned(),
             )
             .await?;
@@ -641,16 +607,6 @@ impl MigrationTrait for Migration {
         manager
             .create_index(
                 sea_query::Index::create()
-                    .table(Supplier::Table)
-                    .col(Supplier::Fullname)
-                    .name("idx_suppliers_fullname")
-                    .to_owned(),
-            )
-            .await?;
-
-        manager
-            .create_index(
-                sea_query::Index::create()
                     .table(Product::Table)
                     .col(Product::Name)
                     .name("idx_products_name")
@@ -758,14 +714,6 @@ impl MigrationTrait for Migration {
                 Index::drop()
                     .table(Client::Table)
                     .name("idx_clients_fullname")
-                    .to_owned(),
-            )
-            .await?;
-        manager
-            .drop_index(
-                Index::drop()
-                    .table(Supplier::Table)
-                    .name("idx_suppliers_fullname")
                     .to_owned(),
             )
             .await?;
@@ -902,9 +850,6 @@ impl MigrationTrait for Migration {
             .drop_table(Table::drop().table(Product::Table).to_owned())
             .await?;
         manager
-            .drop_table(Table::drop().table(Supplier::Table).to_owned())
-            .await?;
-        manager
             .drop_table(Table::drop().table(Client::Table).to_owned())
             .await?;
 
@@ -933,29 +878,14 @@ pub enum Client {
     IsDeleted,
     #[sea_orm(iden = "is_archived")]
     IsArchived,
-}
-
-#[derive(DeriveIden)]
-pub enum Supplier {
-    #[sea_orm(iden = "suppliers")]
-    Table,
-    Id,
-    #[sea_orm(iden = "full_name")]
-    Fullname,
-    #[sea_orm(iden = "phone_number")]
-    Phone,
-    #[sea_orm(iden = "created_at")]
-    CreatedAt,
-    #[sea_orm(iden = "image")]
-    Image,
-    #[sea_orm(iden = "email")]
-    Email,
-    #[sea_orm(iden = "address")]
-    Address,
-    #[sea_orm(iden = "is_deleted")]
-    IsDeleted,
-    #[sea_orm(iden = "is_archived")]
-    IsArchived,
+    #[sea_orm(iden = "ice")]
+    Ice,
+    #[sea_orm(iden = "if_number")]
+    IfNumber,
+    #[sea_orm(iden = "rc")]
+    Rc,
+    #[sea_orm(iden = "patente")]
+    Patente,
 }
 
 #[derive(DeriveIden)]

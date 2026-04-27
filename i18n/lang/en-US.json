@@ -9,7 +9,6 @@
   "routes": {
     "home": "Home",
     "clients": "Clients",
-    "suppliers": "Suppliers",
     "products": "Products",
     "orders": "Orders",
     "invoices": "Invoices",
@@ -27,7 +26,6 @@
     "update": "Update {name}",
     "add-product": "Add a product",
     "toggle-create-client": "Add new client",
-    "toggle-create-supplier": "Add new supplier",
     "toggle-create-product": "Add new product",
     "toggle-create-order": "Add new order",
     "toggle-create-quote": "Add new quote",
@@ -60,7 +58,12 @@
     "stock-status": "Stock status",
     "out-of-stock": "Out of stock",
     "low-stock": "Low stock",
-    "healthy-stock": "Healthy stock"
+    "healthy-stock": "Healthy stock",
+    "search-by-field": "Search by field"
+  },
+  "columns": {
+    "show-hide": "Show/Hide Columns",
+    "all": "All"
   },
   "dropZone": "Drag and drop or select",
   "plrz": {
@@ -74,6 +77,8 @@
     "phone": "Phoner number",
     "address": "Address",
     "actions": "Actions",
+    "identifier": "Identifier",
+    "columns": "Columns",
     "description": "Description",
     "amount": "Amount",
     "status": "Status",
@@ -108,7 +113,11 @@
     "subtotal": "Subtotal",
     "balance": "Balance",
     "payments": "Payments",
-    "currency": "MAD"
+    "currency": "MAD",
+    "ice": "ICE",
+    "if-number": "IF",
+    "rc": "RC",
+    "patente": "Patente / TP"
   },
   "placeholders": {
     "select-client": "Select a client",
@@ -141,8 +150,7 @@
     "expenses": "Total expenses",
     "growth": " {n} from last month",
     "b3c": "Best clients based on expenses",
-    "bp": "Best Selling Products (quantity)",
-    "b3s": "Best suppliers based on expenses"
+    "bp": "Best Selling Products (quantity)"
   },
   "tables": {
     "empty": {
@@ -196,7 +204,7 @@
       "empty-state": "No databases are registered yet.",
       "seed-title": "Seed Database",
       "seed-description": "Populate the database with sample data for testing and development.",
-      "seed-card-note": "This will add 200 clients, 200 suppliers, 400 products, 100 orders, 100 invoices, and 150 quotes with sample data."
+      "seed-card-note": "This will add 200 clients, 400 products, 100 orders, 100 invoices, and 150 quotes with sample data."
     },
     "create": {
       "title": "Create Database",
@@ -247,11 +255,6 @@
       "created": "Client {name} has been added",
       "updated": "Client {name} has been updated",
       "deleted": "Client {name} has been deleted"
-    },
-    "supplier": {
-      "created": "Supplier {name} has been added",
-      "updated": "Supplier {name} has been updated",
-      "deleted": "Supplier {name} has been deleted"
     },
     "order": {
       "created": "An Order has been created",
@@ -314,11 +317,6 @@
       "update": "Update client",
       "delete": "Delete client"
     },
-    "suppliers": {
-      "create": "Add a supplier",
-      "update": "Update supplier",
-      "delete": "Delete supplier"
-    },
     "products": {
       "create": "Add a product",
       "update": "Update product",
@@ -352,11 +350,6 @@
       "create": "Add contact details and billing information for a new client.",
       "update": "Review the client profile and save any contact changes.",
       "delete": "This will permanently remove the client from your workspace."
-    },
-    "suppliers": {
-      "create": "Add supplier contact details so you can track purchasing activity.",
-      "update": "Update supplier details before saving the latest changes.",
-      "delete": "This will permanently remove the supplier from your workspace."
     },
     "products": {
       "create": "Set pricing, stock thresholds, and opening quantity for this product.",

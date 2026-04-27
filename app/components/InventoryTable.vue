@@ -4,6 +4,7 @@ import { queryString } from "@/utils/query";
 
 const props = defineProps<{
   inventory: SelectInventory[];
+  visibleColumns?: string[];
 }>();
 const route = useRoute();
 const { updateQueryParams } = useUpdateRouteQueryParams();
@@ -13,6 +14,14 @@ const sortKey = computed(() => queryString(route.query.sort));
 const sortDirection = computed(() =>
   queryString(route.query.direction) === "desc" ? "desc" : "asc",
 );
+
+const visibleCols = computed(() => props.visibleColumns ?? [
+  "name",
+  "price",
+  "quantity",
+  "transaction_type",
+  "created_at",
+]);
 
 function toggleSort(key: string) {
   if (sortKey.value !== key) {
@@ -32,7 +41,7 @@ function toggleSort(key: string) {
     <Table :dir="locale === 'ar' ? 'rtl' : 'ltr'">
       <TableHeader>
         <TableRow>
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('name')">
             <TableSortHeader
               :label="t('fields.name')"
               :active="sortKey === 'name'"
@@ -40,7 +49,7 @@ function toggleSort(key: string) {
               @click="toggleSort('name')"
             />
           </TableHead>
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('price')">
             <TableSortHeader
               :label="t('fields.price')"
               :active="sortKey === 'price'"
@@ -48,7 +57,7 @@ function toggleSort(key: string) {
               @click="toggleSort('price')"
             />
           </TableHead>
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('quantity')">
             <TableSortHeader
               :label="t('fields.quantity')"
               :active="sortKey === 'quantity'"
@@ -56,7 +65,7 @@ function toggleSort(key: string) {
               @click="toggleSort('quantity')"
             />
           </TableHead>
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('transaction_type')">
             <TableSortHeader
               :label="t('fields.status')"
               :active="sortKey === 'transaction_type'"
@@ -64,7 +73,7 @@ function toggleSort(key: string) {
               @click="toggleSort('transaction_type')"
             />
           </TableHead>
-          <TableHead class="w-56">
+          <TableHead v-if="visibleCols.includes('created_at')" class="w-56">
             <TableSortHeader
               :label="t('fields.date')"
               :active="sortKey === 'created_at'"
@@ -76,7 +85,7 @@ function toggleSort(key: string) {
       </TableHeader>
       <TableBody>
         <TableRow v-for="(tx, index) in props.inventory" :key="tx.id" v-fade="index">
-          <TableCell class="p-2 font-medium">
+          <TableCell v-if="visibleCols.includes('name')" class="p-2 font-medium">
             <div class="flex items-center justify-between gap-3">
               <span class="min-w-0 truncate">{{ tx?.name }}</span>
               <div
@@ -122,13 +131,13 @@ function toggleSort(key: string) {
               </div>
             </div>
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('price')" class="p-2">
             {{ n(toNumber(tx?.price), "currency") }}
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('quantity')" class="p-2">
             {{ `${tx.quantity} ${t("plrz.i", { n: Math.ceil(tx.quantity) })}` }}
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('transaction_type')" class="p-2">
             <Badge
               variant="outline"
               :class="
@@ -143,11 +152,11 @@ function toggleSort(key: string) {
               {{ t(`status.${tx?.transaction_type.toLowerCase()}`) }}
             </Badge>
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('created_at')" class="p-2">
             {{ d(new Date(tx.created_at), "long") }}
           </TableCell>
         </TableRow>
-        <TableEmpty v-if="!props.inventory.length" :colspan="5">
+        <TableEmpty v-if="!props.inventory.length" :colspan="visibleCols.length">
           <div class="space-y-1 text-center">
             <p class="font-medium text-slate-900">{{ t("tables.empty.title") }}</p>
             <p class="text-sm text-slate-500">{{ t("tables.empty.description") }}</p>

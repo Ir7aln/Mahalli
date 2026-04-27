@@ -8,7 +8,7 @@ import { ORDER_STATUSES, STATUS_COLORS } from "@/consts";
 import type { OrderProductItem, SelectOrders } from "@/bindings";
 import { queryString } from "@/utils/query";
 
-const props = defineProps<{ orders: SelectOrders[]; orderProducts: OrderProductItem[] }>();
+const props = defineProps<{ orders: SelectOrders[]; orderProducts: OrderProductItem[]; visibleColumns?: string[] }>();
 const emits = defineEmits<{
   listOrderProducts: [id: string];
 }>();
@@ -22,6 +22,15 @@ const sortKey = computed(() => queryString(route.query.sort));
 const sortDirection = computed(() =>
   queryString(route.query.direction) === "desc" ? "desc" : "asc",
 );
+
+const visibleCols = computed(() => props.visibleColumns ?? [
+  "identifier",
+  "full_name",
+  "products",
+  "status",
+  "created_at",
+  "total",
+]);
 
 function toggleSort(key: string) {
   if (sortKey.value !== key) {
@@ -96,8 +105,8 @@ async function createInvoiceFromOrder(id: string) {
     <Table :dir="locale === 'ar' ? 'rtl' : 'ltr'">
       <TableHeader>
         <TableRow>
-          <TableHead class="w-24" />
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('identifier')" class="w-24" />
+          <TableHead v-if="visibleCols.includes('full_name')">
             <TableSortHeader
               :label="t('fields.full-name')"
               :active="sortKey === 'full_name'"
@@ -105,7 +114,7 @@ async function createInvoiceFromOrder(id: string) {
               @click="toggleSort('full_name')"
             />
           </TableHead>
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('products')">
             <TableSortHeader
               :label="t('fields.items')"
               :active="sortKey === 'products'"
@@ -113,7 +122,7 @@ async function createInvoiceFromOrder(id: string) {
               @click="toggleSort('products')"
             />
           </TableHead>
-          <TableHead class="w-fit">
+          <TableHead v-if="visibleCols.includes('status')" class="w-fit">
             <TableSortHeader
               :label="t('fields.status')"
               :active="sortKey === 'status'"
@@ -121,7 +130,7 @@ async function createInvoiceFromOrder(id: string) {
               @click="toggleSort('status')"
             />
           </TableHead>
-          <TableHead class="w-56">
+          <TableHead v-if="visibleCols.includes('created_at')" class="w-56">
             <TableSortHeader
               :label="t('fields.date')"
               :active="sortKey === 'created_at'"
@@ -129,7 +138,7 @@ async function createInvoiceFromOrder(id: string) {
               @click="toggleSort('created_at')"
             />
           </TableHead>
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('total')">
             <TableSortHeader
               :label="t('fields.total')"
               :active="sortKey === 'total'"
@@ -152,13 +161,13 @@ async function createInvoiceFromOrder(id: string) {
               order.id === $route.query.id && $route.query.highlight === 'true',
           }"
         >
-          <TableCell class="p-2 text-nowrap font-medium">
+          <TableCell v-if="visibleCols.includes('identifier')" class="p-2 text-nowrap font-medium">
             {{ order.identifier }}
           </TableCell>
-          <TableCell class="p-2 font-medium">
+          <TableCell v-if="visibleCols.includes('full_name')" class="p-2 font-medium">
             {{ order.full_name }}
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('products')" class="p-2">
             <Popover v-if="order.products && order.products > 0">
               <PopoverTrigger as-child>
                 <Button
@@ -209,7 +218,7 @@ async function createInvoiceFromOrder(id: string) {
               }}
             </template>
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('status')" class="p-2">
             <Popover>
               <PopoverTrigger as-child>
                 <Badge
@@ -234,10 +243,10 @@ async function createInvoiceFromOrder(id: string) {
               </PopoverContent>
             </Popover>
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('created_at')" class="p-2">
             {{ d(new Date(order.created_at!), "long") }}
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('total')" class="p-2">
             {{ n(toNumber(order.total), "currency") }}
           </TableCell>
           <TableCell class="p-2 sticky ltr:right-0 rtl:left-0 bg-background z-10">
@@ -282,7 +291,7 @@ async function createInvoiceFromOrder(id: string) {
             </div>
           </TableCell>
         </TableRow>
-        <TableEmpty v-if="!props.orders.length" :colspan="7">
+        <TableEmpty v-if="!props.orders.length" :colspan="visibleCols.length + 1">
           <div class="space-y-1 text-center">
             <p class="font-medium text-slate-900">{{ t("tables.empty.title") }}</p>
             <p class="text-sm text-slate-500">{{ t("tables.empty.description") }}</p>

@@ -17,6 +17,10 @@ const CreateClientSchema = z.object({
   email: z.string().optional(),
   phone_number: z.string().optional(),
   address: z.string().optional(),
+  ice: z.string().optional(),
+  if_number: z.string().optional(),
+  rc: z.string().optional(),
+  patente: z.string().optional(),
   image: z.string().optional(),
   credit: z.number().optional(),
 });
@@ -36,6 +40,10 @@ async function createNewClient(client: NewClient) {
       email: client.email ?? null,
       phone_number: client.phone_number ?? null,
       address: client.address ?? null,
+      ice: client.ice ?? null,
+      if_number: client.if_number ?? null,
+      rc: client.rc ?? null,
+      patente: client.patente ?? null,
       image: image.value ?? null,
     });
     if (result.status === "error") throw result.error;
@@ -68,6 +76,10 @@ const onSubmit = form.handleSubmit((values) => {
     email: values.email ?? null,
     phone_number: values.phone_number ?? null,
     address: values.address ?? null,
+    ice: values.ice ?? null,
+    if_number: values.if_number ?? null,
+    rc: values.rc ?? null,
+    patente: values.patente ?? null,
     image: null,
   });
 });
@@ -135,6 +147,40 @@ function cleanImage() {
             </FormControl>
           </FormItem>
         </FormField>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <FormField v-slot="{ componentField }" name="ice">
+            <FormItem>
+              <FormLabel>{{ t("fields.ice") }}</FormLabel>
+              <FormControl>
+                <Input :placeholder="t('fields.ice')" v-bind="componentField" />
+              </FormControl>
+            </FormItem>
+          </FormField>
+          <FormField v-slot="{ componentField }" name="if_number">
+            <FormItem>
+              <FormLabel>{{ t("fields.if-number") }}</FormLabel>
+              <FormControl>
+                <Input :placeholder="t('fields.if-number')" v-bind="componentField" />
+              </FormControl>
+            </FormItem>
+          </FormField>
+          <FormField v-slot="{ componentField }" name="rc">
+            <FormItem>
+              <FormLabel>{{ t("fields.rc") }}</FormLabel>
+              <FormControl>
+                <Input :placeholder="t('fields.rc')" v-bind="componentField" />
+              </FormControl>
+            </FormItem>
+          </FormField>
+          <FormField v-slot="{ componentField }" name="patente">
+            <FormItem>
+              <FormLabel>{{ t("fields.patente") }}</FormLabel>
+              <FormControl>
+                <Input :placeholder="t('fields.patente')" v-bind="componentField" />
+              </FormControl>
+            </FormItem>
+          </FormField>
+        </div>
       </CardContent>
       <div class="card-modal-footer">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">

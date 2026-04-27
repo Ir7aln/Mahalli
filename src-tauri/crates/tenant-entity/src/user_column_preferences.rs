@@ -4,18 +4,15 @@ use chrono::Utc;
 use sea_orm::{entity::prelude::*, Set};
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel)]
-#[sea_orm(table_name = "suppliers")]
+#[sea_orm(table_name = "user_column_preferences")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: String,
-    pub full_name: String,
+    pub page: String,
+    #[sea_orm(column_type = "Text")]
+    pub visible_columns: String,
     pub created_at: DateTime,
-    pub is_deleted: bool,
-    pub is_archived: bool,
-    pub phone_number: Option<String>,
-    pub email: Option<String>,
-    pub address: Option<String>,
-    pub image: Option<String>,
+    pub updated_at: DateTime,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

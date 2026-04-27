@@ -2,170 +2,122 @@
 
 ## Product Direction
 
-Mahalli should now prioritize **B2C for the Moroccan market**.
+Mahalli should prioritize a complete **B2B workflow for Moroccan businesses**.
 
-The current app already fits a simple B2B flow:
+The product should focus on company-to-company document flow, stock traceability,
+payment follow-up, and invoice compliance rather than retail POS/caisse features.
 
-- quote
-- order
-- invoice
-- inventory
-- partial payments
+## Target Workflow
 
-But the next product phase should focus on **retail / counter sales / fast checkout** rather than deeper B2B-only workflow.
+The core B2B flow should be:
 
-## B2C Priority
-
-The main target should be:
-
-- small shops
-- local commerce
-- quick over-the-counter sales
-- simple ticket / receipt flow
-- inventory linked to direct sales
-
-The app should feel closer to a lightweight **caisse / POS + stock + customer tracking** tool for Morocco.
+- quote / devis
+- customer order / bon de commande
+- delivery note / bon de livraison
+- invoice / facture
+- payment tracking
+- credit note / avoir when a finalized invoice needs correction
 
 ## Missing Features
 
-### 1. POS / Caisse mode
+### 1. Legal identity fields
 
-This is the biggest gap for B2C.
-
-Needed:
-
-- fast sale screen
-- add products quickly
-- barcode-friendly flow
-- cart / basket flow
-- direct checkout without quote or order first
-- receipt / ticket printing
-- reopen or reprint receipt
-
-### 2. Payment methods
+Clients and the seller profile need Moroccan business identifiers.
 
 Needed:
-
-- cash
-- card
-- bank transfer
-- mixed payment
-- partial payment at checkout
-- payment status per sale
-
-### 3. Receipt / ticket flow
-
-For B2C, invoice should not be the only output.
-
-Needed:
-
-- ticket de caisse
-- convert ticket to invoice when customer asks
-- customer-facing receipt details
-- clean print layout for retail
-
-### 4. Customer identity split
-
-Current client model is too B2B-shaped for future compliance and too generic for mixed use.
-
-Needed:
-
-- simple walk-in customer sale
-- optional named customer
-- optional pro customer
-- legal fields only when needed for pro invoice
-
-Suggested pro fields:
 
 - ICE
 - IF
 - RC
-- patente
+- patente / TP
+- legal name
+- address
+- city
+- tax settings
 
-### 5. Seller legal profile
+### 2. Seller legal profile
 
-The app also needs a real business profile for printed documents.
+Printed documents need a single source of truth for the issuing business.
 
 Needed:
 
-- shop / business legal name
+- legal business name
+- commercial name
 - address
 - phone
+- email
 - ICE
 - IF
 - RC
-- patente
+- patente / TP
 - logo
+- default payment terms
+- default invoice footer
 
-### 6. Credit note / avoir
+### 3. Delivery note / bon de livraison
 
-Even with B2C focus, this is still important.
+This is the main workflow gap.
 
 Needed:
 
-- refund flow
-- return flow
-- partial cancellation
-- avoir / credit note document
+- create delivery note from order
+- partial delivery support
+- delivery note PDF
+- delivery status on orders
+- link delivery notes to invoices
 
-### 7. Supplier purchasing flow
+### 4. Credit note / avoir
 
-This is not the main B2C focus, but still useful for shops.
+B2B invoice corrections should not rely on deleting finalized invoices.
 
-Needed later:
+Needed:
 
-- purchase order
-- goods receipt
-- supplier invoice
-- stock entry from supplier flow
+- full or partial credit note
+- returned quantities
+- corrected totals
+- credit note PDF
+- link credit notes to original invoices
 
-### 8. Cash register operations
+### 5. Invoice compliance
 
-Needed for real B2C use:
+Invoices should be stable, traceable, and ready for stricter requirements.
 
-- opening cash
-- closing cash
-- cash in / cash out
-- daily summary
-- cashier shift summary
+Needed:
 
-### 9. Multi-store / multi-register support
+- fiscal year numbering
+- immutable finalized invoices
+- due date
+- payment terms
+- VAT summary lines
+- legal footer
+- audit trail for document changes
 
-Useful later if the product grows.
+### 6. E-invoicing readiness
 
-Needed later:
+The app should prepare for Moroccan DGI electronic invoicing without requiring
+full integration immediately.
 
-- multiple points of sale
-- multiple registers
-- stock by location
-- transfers between locations
-
-### 10. E-invoicing readiness
-
-This is not the first B2C build priority, but it should remain on the roadmap.
-
-Needed later:
+Needed:
 
 - structured invoice export
-- immutable document trail
-- DGI-ready invoice metadata
-- future electronic invoicing integration
+- immutable invoice metadata
+- DGI-ready identifiers
+- future signed submission payload support
+- validation-ready tax totals
 
 ## Recommended Build Order
 
-1. POS / caisse mode
-2. payment methods
-3. receipt / ticket printing
-4. seller legal profile
-5. walk-in customer + optional pro customer fields
-6. refund / avoir flow
-7. supplier purchasing flow
-8. cash opening / closing
-9. multi-store support
-10. e-invoicing readiness
+1. Legal fields for clients and seller profile
+2. Delivery note / bon de livraison
+3. Quote -> order -> delivery note -> invoice conversion chain
+4. Credit note / avoir
+5. Compliance-grade invoice numbering and audit trail
+6. E-invoicing readiness
 
-## Notes
+## Out Of Scope For Now
 
-- Keep the current quote -> order -> invoice flow for businesses that need it.
-- Do not force B2C sales through quote creation first.
-- The B2C flow should be faster, simpler, and optimized for daily sales volume.
+- POS / caisse mode
+- ticket de caisse
+- walk-in customer checkout
+- cash register sessions
+- B2C receipt flow

@@ -9,7 +9,6 @@
   "routes": {
     "home": "Accueil",
     "clients": "Clients",
-    "suppliers": "Fournisseurs",
     "products": "Produits",
     "orders": "Commandes",
     "invoices": "Factures",
@@ -27,7 +26,6 @@
     "update": "Mettre à jour {name}",
     "add-product": "Ajouter un produit",
     "toggle-create-client": "Ajouter un nouveau client",
-    "toggle-create-supplier": "Ajouter un nouveau fournisseur",
     "toggle-create-product": "Ajouter un nouveau produit",
     "toggle-create-order": "Ajouter une nouvelle commande",
     "toggle-create-quote": "Ajouter un nouveau devis",
@@ -60,7 +58,12 @@
     "stock-status": "État du stock",
     "out-of-stock": "Rupture de stock",
     "low-stock": "Stock faible",
-    "healthy-stock": "Stock sain"
+    "healthy-stock": "Stock sain",
+    "search-by-field": "Rechercher par champ"
+  },
+  "columns": {
+    "show-hide": "Afficher/Masquer les colonnes",
+    "all": "Tous"
   },
   "dropZone": "Glissez-déposez ou sélectionnez",
   "plrz": {
@@ -74,6 +77,8 @@
     "phone": "Numéro de téléphone",
     "address": "Adresse",
     "actions": "Actions",
+    "identifier": "Identifiant",
+    "columns": "Colonnes",
     "description": "Description",
     "amount": "Montant",
     "status": "Statut",
@@ -108,7 +113,11 @@
     "subtotal": "Sous-total",
     "balance": "Solde",
     "payments": "Paiements",
-    "currency": "MAD"
+    "currency": "MAD",
+    "ice": "ICE",
+    "if-number": "IF",
+    "rc": "RC",
+    "patente": "Patente / TP"
   },
   "placeholders": {
     "select-client": "Sélectionnez un client",
@@ -140,8 +149,7 @@
     "expenses": "Dépenses totales",
     "growth": " {n} par rapport au mois dernier",
     "b3c": "Meilleurs clients en fonction des dépenses",
-    "bp": "Meilleurs produits vendus (quantité)",
-    "b3s": "Meilleurs fournisseurs en fonction des dépenses"
+    "bp": "Meilleurs produits vendus (quantité)"
   },
   "tables": {
     "empty": {
@@ -195,7 +203,7 @@
       "empty-state": "Aucune base n'est encore enregistrée.",
       "seed-title": "Remplir la base avec des données d'exemple",
       "seed-description": "Remplissez la base avec des données d'exemple pour tester et développer.",
-      "seed-card-note": "Cela ajoutera 200 clients, 200 fournisseurs, 400 produits, 100 commandes, 100 factures et 150 devis avec des données d'exemple."
+      "seed-card-note": "Cela ajoutera 200 clients, 400 produits, 100 commandes, 100 factures et 150 devis avec des données d'exemple."
     },
     "create": {
       "title": "Créer une base",
@@ -246,11 +254,6 @@
       "created": "Le client {name} a été ajouté",
       "updated": "Le client {name} a été mis à jour",
       "deleted": "Le client {name} a été supprimé"
-    },
-    "supplier": {
-      "created": "Le fournisseur {name} a été ajouté",
-      "updated": "Le fournisseur {name} a été mis à jour",
-      "deleted": "Le fournisseur {name} a été supprimé"
     },
     "order": {
       "created": "Une commande a été créée",
@@ -313,11 +316,6 @@
       "update": "Mettre à jour le client",
       "delete": "Supprimer le client"
     },
-    "suppliers": {
-      "create": "Ajouter un fournisseur",
-      "update": "Mettre à jour le fournisseur",
-      "delete": "Supprimer le fournisseur"
-    },
     "products": {
       "create": "Ajouter un produit",
       "update": "Mettre à jour le produit",
@@ -351,11 +349,6 @@
       "create": "Ajoutez les coordonnées et les informations de facturation d’un nouveau client.",
       "update": "Vérifiez la fiche client et enregistrez les dernières modifications.",
       "delete": "Cette action supprimera définitivement le client de votre espace de travail."
-    },
-    "suppliers": {
-      "create": "Ajoutez les coordonnées du fournisseur pour suivre facilement vos achats.",
-      "update": "Mettez à jour les informations du fournisseur avant d’enregistrer.",
-      "delete": "Cette action supprimera définitivement le fournisseur de votre espace de travail."
     },
     "products": {
       "create": "Définissez les prix, le seuil de stock et la quantité initiale du produit.",

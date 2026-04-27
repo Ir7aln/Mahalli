@@ -13,7 +13,6 @@ use tenant_entity::{
     order_items::{self, Entity as OrderItems},
     orders::{self, Entity as Orders},
     products::{self, Entity as Products},
-    suppliers::{self, Entity as Suppliers},
 };
 
 pub struct DashboardService;
@@ -251,77 +250,6 @@ impl DashboardService {
                     ),
             )
             .add_group_by([Expr::col((Clients, clients::Column::Id)).into()])
-            .order_by_expr(
-                Func::sum(
-                    Expr::col((OrderItems, order_items::Column::Price)).mul(Expr::col((
-                        InventoryTransactions,
-                        inventory_transactions::Column::Quantity,
-                    ))),
-                )
-                .into(),
-                Order::Desc,
-            )
-            .limit(5)
-            .to_owned()
-            .build(SqliteQueryBuilder);
-
-        let res = SelectTops::find_by_statement(Statement::from_sql_and_values(
-            DbBackend::Sqlite,
-            sql,
-            values,
-        ))
-        .all(db)
-        .await?;
-
-        Ok(res)
-    }
-
-    pub async fn list_top_suppliers(db: &DbConn) -> Result<Vec<SelectTops>, DbErr> {
-        let (sql, values) = Query::select()
-            .from(Suppliers)
-            .column((Suppliers, suppliers::Column::FullName))
-            .expr_as(
-                Func::sum(Expr::col((
-                    InventoryTransactions,
-                    inventory_transactions::Column::Quantity,
-                ))),
-                Alias::new("quantity"),
-            )
-            .expr_as(
-                Func::sum(
-                    Expr::col((OrderItems, order_items::Column::Price)).mul(Expr::col((
-                        InventoryTransactions,
-                        inventory_transactions::Column::Quantity,
-                    ))),
-                ),
-                Alias::new("price"),
-            )
-            .join(
-                JoinType::Join,
-                Orders,
-                Expr::col((Orders, orders::Column::ClientId))
-                    .equals((Suppliers, suppliers::Column::Id)),
-            )
-            .join(
-                JoinType::Join,
-                OrderItems,
-                Expr::col((OrderItems, order_items::Column::OrderId))
-                    .equals((Orders, orders::Column::Id)),
-            )
-            .join(
-                JoinType::Join,
-                InventoryTransactions,
-                Expr::col((InventoryTransactions, inventory_transactions::Column::Id))
-                    .equals((OrderItems, order_items::Column::InventoryId)),
-            )
-            .cond_where(
-                Cond::all().add(
-                    Expr::expr(Expr::col((Orders, orders::Column::Status)))
-                        .eq("CANCELLED")
-                        .not(),
-                ),
-            )
-            .add_group_by([Expr::col((Suppliers, suppliers::Column::Id)).into()])
             .order_by_expr(
                 Func::sum(
                     Expr::col((OrderItems, order_items::Column::Price)).mul(Expr::col((
