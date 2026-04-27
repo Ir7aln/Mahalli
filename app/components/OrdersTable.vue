@@ -16,6 +16,7 @@ const route = useRoute();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const modal = useModal();
 const { t, d, locale, n } = useI18n();
+const { showErrorToast } = useCommandError();
 const localePath = useLocalePath();
 const sortKey = computed(() => queryString(route.query.sort));
 const sortDirection = computed(() =>
@@ -61,10 +62,7 @@ function toggleThisOrder(order: SelectOrders, name: "delete" | "update") {
 async function updateOrderStatus(id: string, status: string) {
   const result = await commands.updateOrderStatus({ id, status });
   if (result.status === "error") {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(result.error);
     Logger.error(`ERROR UPDATE ORDER STATUS: ${JSON.stringify(result.error)}`);
     return;
   }
@@ -78,10 +76,7 @@ async function createInvoiceFromOrder(id: string) {
   const result = await commands.createInvoiceFromOrder(id);
   if (result.status === "error") {
     Logger.error(`GET ORDER FOR INVOICE: ${JSON.stringify(result.error)}`);
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(result.error);
     return;
   }
   Logger.info(`CREATE INVOICE FROM ORDER: ${id}`);
@@ -298,3 +293,5 @@ async function createInvoiceFromOrder(id: string) {
     <Pagination />
   </div>
 </template>
+
+

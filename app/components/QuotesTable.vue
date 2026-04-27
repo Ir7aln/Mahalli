@@ -15,6 +15,7 @@ const route = useRoute();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const modal = useModal();
 const { t, d, locale, n } = useI18n();
+const { showErrorToast } = useCommandError();
 const localePath = useLocalePath();
 const sortKey = computed(() => queryString(route.query.sort));
 const sortDirection = computed(() =>
@@ -60,10 +61,7 @@ function toggleThisQuote(quote: SelectQuotes, name: "delete" | "update") {
 async function createOrderFromQuote(id: string) {
   const result = await commands.createOrderFromQuote(id);
   if (result.status === "error") {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(result.error);
     Logger.error(`GET QUOTE FOR ORDER: ${JSON.stringify(result.error)}`);
     return;
   }
@@ -239,3 +237,5 @@ async function createOrderFromQuote(id: string) {
     <Pagination />
   </div>
 </template>
+
+

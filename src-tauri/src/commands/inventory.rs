@@ -4,7 +4,7 @@ use tenant_service::inventory::{
     InventoryResponse, InventoryService, ListInventoryArgs, NewInventory,
 };
 
-use crate::{commands::Fail, AppState};
+use crate::AppState;
 
 use super::{tenant_db_or_fail, SResult, Success};
 
@@ -21,10 +21,7 @@ pub async fn list_inventory(
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -41,10 +38,7 @@ pub async fn create_inventory(
             message: Option::Some(String::from("inventory created successfully")),
             data: Some(id),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -58,9 +52,6 @@ pub async fn delete_inventory(state: State<'_, AppState>, id: String) -> SResult
             message: Option::Some(String::from("inventory deleted successfully")),
             data: None,
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }

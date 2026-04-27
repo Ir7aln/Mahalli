@@ -25,10 +25,7 @@ pub async fn list_databases(state: State<'_, AppState>) -> SResult<Vec<DatabaseR
             message: None,
             data: Some(databases),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -54,10 +51,7 @@ pub async fn get_database_bootstrap_status(
                 active_database,
             }),
         }),
-        (Err(err), _) | (_, Err(err)) => Err(Fail {
-            error: Some(err),
-            message: None,
-        }),
+        (Err(err), _) | (_, Err(err)) => Err(err.into()),
     }
 }
 
@@ -74,14 +68,8 @@ pub async fn get_active_database(state: State<'_, AppState>) -> SResult<Database
             message: None,
             data: Some(database),
         }),
-        Ok(None) => Err(Fail {
-            error: Some(String::from("No active database found")),
-            message: None,
-        }),
-        Err(err) => Err(Fail {
-            error: Some(err),
-            message: None,
-        }),
+        Ok(None) => Err(String::from("No active database found").into()),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -102,10 +90,7 @@ pub async fn create_database(
                     .db_manager()
                     .open_active_tenant_database(state.system_db())
                     .await
-                    .map_err(|err| Fail {
-                        error: Some(err),
-                        message: None,
-                    })?;
+                    .map_err(Fail::from)?;
                 state.set_tenant_db(tenant_db).await;
             }
 
@@ -115,10 +100,7 @@ pub async fn create_database(
                 data: Some(database),
             })
         }
-        Err(err) => Err(Fail {
-            error: Some(err),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -138,9 +120,6 @@ pub async fn switch_database(state: State<'_, AppState>, id: String) -> SResult<
                 data: Some(database),
             })
         }
-        Err(err) => Err(Fail {
-            error: Some(err),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }

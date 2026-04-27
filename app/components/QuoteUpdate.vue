@@ -32,6 +32,7 @@ const props = defineProps<{
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const { t, d, n } = useI18n();
+const { showErrorToast } = useCommandError();
 const clients = ref<ClientOption[]>([]);
 const products = ref<ProductOption[]>([]);
 const selectedClient = ref<Partial<ClientDetails> | null>(null);
@@ -171,10 +172,7 @@ const onSubmit = handleSubmit(async (formValues) => {
       refresh: `refresh-update-${Math.random() * 9999}`,
     });
   } catch (err: any) {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(err);
     Logger.error(`ERROR UPDATE QUOTE: ${err.error ? err.error : err.message}`);
   } finally {
     isPosting.value = false;
@@ -185,10 +183,7 @@ const onSubmit = handleSubmit(async (formValues) => {
 async function deleteOneQuoteItem(id: string) {
   const result = await commands.deleteQuoteItem(id);
   if (result.status === "error") {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(result.error);
     Logger.error(`ERROR DELETE QUOTE ITEM: ${JSON.stringify(result.error)}`);
   }
 }
@@ -438,3 +433,5 @@ function deleteQuoteItem(index: number) {
     </div>
   </form>
 </template>
+
+

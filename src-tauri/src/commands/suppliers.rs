@@ -6,7 +6,7 @@ use tenant_service::suppliers::{
 
 use crate::AppState;
 
-use super::{tenant_db_or_fail, Fail, SResult, Success};
+use super::{tenant_db_or_fail, SResult, Success};
 
 #[tauri::command]
 #[specta::specta]
@@ -21,10 +21,7 @@ pub async fn list_suppliers(
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -41,10 +38,7 @@ pub async fn search_suppliers(
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -58,10 +52,7 @@ pub async fn create_supplier(state: State<'_, AppState>, supplier: NewSupplier) 
             message: Option::Some(String::from("supplier created successfully")),
             data: Some(id),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -75,10 +66,7 @@ pub async fn delete_supplier(state: State<'_, AppState>, id: String) -> SResult<
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -92,9 +80,6 @@ pub async fn update_supplier(state: State<'_, AppState>, supplier: Supplier) -> 
             message: Option::Some(String::from("update suppliers success")),
             data: None,
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }

@@ -282,6 +282,29 @@
     "error": {
       "title": "Oups ! Quelque chose s'est mal passé de notre côté.",
       "description": "Vous pouvez réessayer"
+    },
+    "errors": {
+      "database-required": "Sélectionnez une base de données avant d'utiliser l'application.",
+      "database-not-found": "La base de données sélectionnée est introuvable.",
+      "database-source-not-found": "La base de données source est introuvable.",
+      "database-source-file-missing": "Le fichier de la base de données source est manquant.",
+      "database-file-already-exists": "Un fichier de base de données avec le même nom existe déjà.",
+      "database-open-failed": "Impossible d'ouvrir le fichier de base de données.",
+      "database-create-incomplete": "La base de données a été créée, mais elle n'a pas pu être chargée ensuite.",
+      "client-not-found": "Le client est introuvable.",
+      "quote-not-found": "Le devis est introuvable.",
+      "order-not-found": "La commande est introuvable.",
+      "invoice-not-found": "La facture est introuvable.",
+      "invoice-payment-date-invalid": "La date du paiement est invalide.",
+      "invoice-payment-amount-invalid": "Le montant du paiement doit être supérieur à zéro.",
+      "invoice-payment-deleted": "Impossible d'ajouter un paiement à une facture supprimée.",
+      "invoice-payment-exceeds-remaining": "Le montant du paiement dépasse le reste à payer.",
+      "order-status-invalid": "Le statut de la commande est invalide.",
+      "invoice-status-invalid": "Le statut de la facture est invalide.",
+      "status-transition-invalid": "Ce changement de statut n'est pas autorisé.",
+      "inventory-transaction-missing": "Une transaction de stock liée est introuvable.",
+      "data-unavailable": "Aucune donnée n'est disponible pour cette vue pour le moment.",
+      "conflict": "Cette action entre en conflit avec des données existantes."
     }
   },
   "titles": {

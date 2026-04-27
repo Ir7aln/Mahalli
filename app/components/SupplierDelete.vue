@@ -11,6 +11,7 @@ const props = defineProps<{
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const { t } = useI18n();
+const { showErrorToast } = useCommandError();
 
 async function deleteTheSupplier() {
   try {
@@ -27,10 +28,7 @@ async function deleteTheSupplier() {
       refresh: `refresh-delete-${Math.random() * 9999}`,
     });
   } catch (err: any) {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(err);
     Logger.error(`ERROR DELETE SUPPLIER: ${err.error ? err.error : err.message}`);
   } finally {
     close();
@@ -70,3 +68,5 @@ async function deleteTheSupplier() {
     </div>
   </Card>
 </template>
+
+

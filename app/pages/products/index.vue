@@ -9,6 +9,7 @@ import { queryNumber, queryString } from "@/utils/query";
 
 const route = useRoute();
 const { t } = useI18n();
+const { showErrorToast } = useCommandError();
 const modal = useModal();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 
@@ -47,10 +48,7 @@ async function fetchProducts() {
     direction: queryParams.value.direction,
   });
   if (result.status === "error") {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(result.error);
     Logger.error(`LIST PRODUCTS: ${JSON.stringify(result.error)}`);
     return null;
   }
@@ -187,3 +185,5 @@ const openCreateProductModal = () => modal.open(ProductCreate, {});
     </div>
   </main>
 </template>
+
+

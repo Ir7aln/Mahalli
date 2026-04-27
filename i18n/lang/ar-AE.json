@@ -282,6 +282,29 @@
     "error": {
       "title": "عفواً! حدث خطأ ما من جانبنا.",
       "description": "يمكنك المحاولة مرة أخرى"
+    },
+    "errors": {
+      "database-required": "اختر قاعدة بيانات قبل استخدام التطبيق.",
+      "database-not-found": "تعذر العثور على قاعدة البيانات المحددة.",
+      "database-source-not-found": "تعذر العثور على قاعدة البيانات المصدر.",
+      "database-source-file-missing": "ملف قاعدة البيانات المصدر مفقود.",
+      "database-file-already-exists": "يوجد بالفعل ملف قاعدة بيانات بالاسم نفسه.",
+      "database-open-failed": "تعذر فتح ملف قاعدة البيانات.",
+      "database-create-incomplete": "تم إنشاء قاعدة البيانات ولكن تعذر تحميلها بعد ذلك.",
+      "client-not-found": "تعذر العثور على العميل.",
+      "quote-not-found": "تعذر العثور على عرض السعر.",
+      "order-not-found": "تعذر العثور على الطلب.",
+      "invoice-not-found": "تعذر العثور على الفاتورة.",
+      "invoice-payment-date-invalid": "تاريخ الدفعة غير صالح.",
+      "invoice-payment-amount-invalid": "يجب أن يكون مبلغ الدفعة أكبر من صفر.",
+      "invoice-payment-deleted": "لا يمكن إضافة دفعة إلى فاتورة محذوفة.",
+      "invoice-payment-exceeds-remaining": "مبلغ الدفعة يتجاوز المبلغ المتبقي غير المدفوع.",
+      "order-status-invalid": "حالة الطلب غير صالحة.",
+      "invoice-status-invalid": "حالة الفاتورة غير صالحة.",
+      "status-transition-invalid": "لا يُسمح بهذا التغيير في الحالة.",
+      "inventory-transaction-missing": "تعذر العثور على حركة المخزون المرتبطة.",
+      "data-unavailable": "لا توجد بيانات متاحة لهذا العرض حتى الآن.",
+      "conflict": "هذا الإجراء يتعارض مع بيانات موجودة."
     }
   },
   "titles": {

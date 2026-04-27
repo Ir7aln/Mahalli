@@ -7,7 +7,7 @@ use tenant_service::quotes::{
 
 use crate::AppState;
 
-use super::{tenant_db_or_fail, Fail, SResult, Success};
+use super::{tenant_db_or_fail, SResult, Success};
 
 #[tauri::command]
 #[specta::specta]
@@ -22,10 +22,7 @@ pub async fn list_quotes(
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -42,10 +39,7 @@ pub async fn list_quote_products(
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -59,10 +53,7 @@ pub async fn create_quote(state: State<'_, AppState>, quote: NewQuote) -> SResul
             message: None,
             data: Some(id),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -76,10 +67,7 @@ pub async fn update_quote(state: State<'_, AppState>, quote: UpdateQuote) -> SRe
             message: Option::Some(String::from("update quotes success")),
             data: None,
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -93,10 +81,7 @@ pub async fn delete_quote(state: State<'_, AppState>, id: String) -> SResult<u64
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -110,10 +95,7 @@ pub async fn get_quote(state: State<'_, AppState>, id: String) -> SResult<QuoteW
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -130,9 +112,6 @@ pub async fn get_quote_details(
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }

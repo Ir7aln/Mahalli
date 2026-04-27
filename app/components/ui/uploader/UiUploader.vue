@@ -23,6 +23,7 @@ const emits = defineEmits<{
   clear: [];
 }>();
 const { t } = useI18n();
+const { showErrorToast } = useCommandError();
 const dropZone = ref<HTMLDivElement>();
 const isOverDropZone = ref(false);
 const isFileSelected = ref(false);
@@ -95,10 +96,7 @@ async function processFile(filePath: string) {
       isFileSelected.value = true;
     }
   } catch (err: any) {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(err);
     Logger.error(`ERROR PROSSESING FILE: ${err}`);
   }
 }
@@ -115,10 +113,7 @@ async function handleOpenDialog() {
       await processFile(filePath);
     }
   } catch (err: any) {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(err);
     Logger.error(`ERROR OPENING DIALOG: ${err}`);
   }
 }
@@ -188,3 +183,5 @@ function clearFile() {
     </div>
   </div>
 </template>
+
+

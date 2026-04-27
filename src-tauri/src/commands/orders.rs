@@ -7,7 +7,7 @@ use tenant_service::orders::{
 
 use crate::AppState;
 
-use super::{tenant_db_or_fail, Fail, SResult, Success};
+use super::{tenant_db_or_fail, SResult, Success};
 
 #[tauri::command]
 #[specta::specta]
@@ -19,10 +19,7 @@ pub async fn create_order_from_quote(state: State<'_, AppState>, id: String) -> 
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -39,10 +36,7 @@ pub async fn list_orders(
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -59,10 +53,7 @@ pub async fn list_order_products(
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -76,10 +67,7 @@ pub async fn create_order(state: State<'_, AppState>, order: NewOrder) -> SResul
             message: None,
             data: Some(id),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -93,10 +81,7 @@ pub async fn update_order(state: State<'_, AppState>, order: UpdateOrder) -> SRe
             message: Option::Some(String::from("update orders success")),
             data: None,
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -113,10 +98,7 @@ pub async fn update_order_status(
             message: Option::Some(String::from("update orders success")),
             data: None,
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -130,10 +112,7 @@ pub async fn delete_order(state: State<'_, AppState>, id: String) -> SResult<u64
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -147,10 +126,7 @@ pub async fn get_order(state: State<'_, AppState>, id: String) -> SResult<OrderW
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -167,9 +143,6 @@ pub async fn get_order_details(
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }

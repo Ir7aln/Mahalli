@@ -3,7 +3,7 @@ use tenant_service::invoices::InvoicesService;
 
 use crate::AppState;
 
-use super::{tenant_db_or_fail, Fail, SResult, Success};
+use super::{tenant_db_or_fail, SResult, Success};
 
 #[tauri::command]
 #[specta::specta]
@@ -16,9 +16,6 @@ pub async fn delete_invoice_item(state: State<'_, AppState>, id: String) -> SRes
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }

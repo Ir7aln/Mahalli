@@ -4,7 +4,7 @@ use tenant_service::templates::{NewTemplate, TemplatesService};
 
 use crate::AppState;
 
-use super::{tenant_db_or_fail, Fail, SResult, Success};
+use super::{tenant_db_or_fail, SResult, Success};
 
 #[tauri::command]
 #[specta::specta]
@@ -16,9 +16,6 @@ pub async fn create_template(state: State<'_, AppState>, template: NewTemplate) 
             message: Option::Some(String::from("template created successfully")),
             data: Some(id),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }

@@ -9,6 +9,7 @@ import { queryBoolean, queryNumber, queryString } from "@/utils/query";
 
 const route = useRoute();
 const { t } = useI18n();
+const { showErrorToast } = useCommandError();
 const modal = useModal();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 
@@ -37,10 +38,7 @@ async function fetchClients() {
     direction: queryParams.value.direction,
   });
   if (result.status === "error") {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(result.error);
     Logger.error(`LIST CLIENTS: ${JSON.stringify(result.error)}`);
     return null;
   }
@@ -114,3 +112,5 @@ const openCreateClientModal = () => modal.open(ClientCreate, {});
     </div>
   </main>
 </template>
+
+

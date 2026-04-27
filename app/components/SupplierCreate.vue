@@ -8,6 +8,7 @@ import { toast } from "vue-sonner";
 import { z } from "zod";
 
 const { t } = useI18n();
+const { showErrorToast } = useCommandError();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const CreateSupplierSchema = z.object({
@@ -54,10 +55,7 @@ async function createNewSupplier(supplier: NewSupplier) {
       refresh: `refresh-create-${Math.random() * 9999}`,
     });
   } catch (err: any) {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(err);
     Logger.error(`ERROR CREATE SUPPLIER: ${err.error ? err.error : err.message}`);
   } finally {
     close();
@@ -151,3 +149,5 @@ function cleanImage() {
     </Card>
   </form>
 </template>
+
+

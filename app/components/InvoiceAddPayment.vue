@@ -13,6 +13,7 @@ const props = defineProps<{
 }>();
 
 const { t, d, n } = useI18n();
+const { showErrorToast, getErrorMessage } = useCommandError();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const isPosting = ref(false);
@@ -54,10 +55,7 @@ async function loadInvoice() {
     paidAmount.value = Number(invoice?.paid_amount ?? 0);
     payments.value = invoice?.payments ?? [];
   } catch (err: any) {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(err);
     Logger.error(`ERROR GET INVOICE FOR PAYMENT: ${err.error ? err.error : err.message}`);
     close();
   } finally {
@@ -108,7 +106,7 @@ const onSubmit = handleSubmit(async (formValues) => {
     });
   } catch (err: any) {
     toast.error(t("notifications.error.title"), {
-      description: err.error ?? err.message ?? t("notifications.error.description"),
+      description: getErrorMessage(err),
       closeButton: true,
     });
     Logger.error(`ERROR ADD INVOICE PAYMENT: ${err.error ? err.error : err.message}`);
@@ -275,3 +273,4 @@ const onSubmit = handleSubmit(async (formValues) => {
     </div>
   </form>
 </template>
+

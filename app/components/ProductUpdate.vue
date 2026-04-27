@@ -19,6 +19,7 @@ const props = defineProps<{
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const { t } = useI18n();
+const { showErrorToast } = useCommandError();
 const productSchema = toTypedSchema(
   z.object({
     name: z
@@ -86,10 +87,7 @@ async function updateTheProduct(product: {
       refresh: `refresh-update-${Math.random() * 9999}`,
     });
   } catch (err: any) {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(err);
     Logger.error(`ERROR UPDATE PRODUCT: ${err.error ? err.error : err.message}`);
   } finally {
     close();
@@ -185,3 +183,5 @@ const onSubmit = form.handleSubmit((values) => {
     </Card>
   </form>
 </template>
+
+

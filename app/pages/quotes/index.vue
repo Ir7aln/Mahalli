@@ -10,6 +10,7 @@ import { queryNumber, queryString } from "@/utils/query";
 
 const route = useRoute();
 const { t, d } = useI18n();
+const { showErrorToast } = useCommandError();
 const modal = useModal();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 
@@ -42,10 +43,7 @@ async function fetchQuotes() {
     direction: queryParams.value.direction,
   });
   if (result.status === "error") {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(result.error);
     Logger.error(`ERROR: ${JSON.stringify(result.error)}`);
     return null;
   }
@@ -102,10 +100,7 @@ async function listQuoteProducts(id?: string) {
   }
   const result = await commands.listQuoteProducts(id);
   if (result.status === "error") {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(result.error);
     Logger.error(`LIST QUOTE PRODUCTS: ${JSON.stringify(result.error)}`);
     return;
   }
@@ -169,3 +164,5 @@ const openCreateQuoteModal = () => modal.open(QuoteCreate, { sheet: true });
     </div>
   </main>
 </template>
+
+

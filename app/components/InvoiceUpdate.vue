@@ -35,6 +35,7 @@ const props = defineProps<{
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const { t, d, n } = useI18n();
+const { showErrorToast } = useCommandError();
 const clients = ref<ClientOption[]>([]);
 const products = ref<ProductOption[]>([]);
 const selectedClient = ref<Partial<ClientDetails> | null>(null);
@@ -201,10 +202,7 @@ const onSubmit = handleSubmit(async (formValues) => {
 async function deleteOneInvoiceItem(id: string) {
   const result = await commands.deleteInvoiceItem(id);
   if (result.status === "error") {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(result.error);
     Logger.error(`ERROR DELETE INVOICE ITEM: ${JSON.stringify(result.error)}`);
   }
 }
@@ -529,3 +527,5 @@ function deleteInvoiceItem(index: number) {
     </div>
   </form>
 </template>
+
+

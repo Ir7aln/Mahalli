@@ -8,14 +8,12 @@ import { toast } from "vue-sonner";
 import { INVOICE_STATUSES, ORDER_STATUSES, STATUS_COLORS } from "@/consts";
 
 const { t, d, n } = useI18n();
+const { showErrorToast } = useCommandError();
 const { data: inventoryTransactions } = useAsyncData(async () => {
   const result = await commands.listInventoryStats();
   if (result.status === "error") {
     Logger.error(`ERROR: ${JSON.stringify(result.error)}`);
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(result.error);
     return {
       result: {},
       transactionLabels: [],

@@ -6,6 +6,7 @@ import { toast } from "vue-sonner";
 import { ORDER_STATUSES } from "~/consts";
 
 const { t } = useI18n();
+const { showErrorToast } = useCommandError();
 const id = useRoute().params.id;
 const pdfContent = ref("");
 
@@ -13,10 +14,7 @@ const { config, generatePdf } = usePdfGenerator();
 const { data: order } = await useAsyncData(async () => {
   const result = await commands.getOrderDetails(id as string);
   if (result.status === "error") {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(result.error);
     Logger.error(`ERROR ORDER DETAILS: ${JSON.stringify(result.error)}`);
     return null;
   }
@@ -30,10 +28,7 @@ async function handleGeneratePdf() {
       pdfContent.value = pdfDataUri;
     }
   } catch (err: any) {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(err);
     Logger.error(`ERROR ORDER DETAILS: ${err.error ? err.error : err.message}`);
   }
 }

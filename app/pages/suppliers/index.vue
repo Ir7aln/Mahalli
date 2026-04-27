@@ -9,6 +9,7 @@ import { queryBoolean, queryNumber, queryString } from "@/utils/query";
 
 const route = useRoute();
 const { t } = useI18n();
+const { showErrorToast } = useCommandError();
 const modal = useModal();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 
@@ -40,10 +41,7 @@ async function fetchSuppliers() {
     direction: queryParams.value.direction,
   });
   if (result.status === "error") {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(result.error);
     Logger.error(`LIST SUPPLIERS: ${JSON.stringify(result.error)}`);
     return null;
   }
@@ -135,3 +133,5 @@ const openCreateSupplierModal = () => modal.open(SupplierCreate, {});
     </div>
   </main>
 </template>
+
+

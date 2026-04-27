@@ -25,6 +25,7 @@ interface ProductOption {
 }
 
 const { t, d, n } = useI18n();
+const { showErrorToast } = useCommandError();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const clients = ref<ClientOption[]>([]);
@@ -141,10 +142,7 @@ const onSubmit = handleSubmit(async (formValues) => {
       refresh: `refresh-create-${Math.random() * 9999}`,
     });
   } catch (err: any) {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(err);
     Logger.error(`ERROR CREATE ORDER: ${err.error ? err.error : err.message}`);
   } finally {
     isPosting.value = false;
@@ -391,3 +389,5 @@ const onSubmit = handleSubmit(async (formValues) => {
     </div>
   </form>
 </template>
+
+

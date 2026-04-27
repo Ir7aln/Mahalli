@@ -140,6 +140,8 @@ export type DatabaseRecord = {
 };
 
 export type Fail = {
+	code: string | null,
+	i18n_key: string | null,
 	error: string | null,
 	message: string | null,
 };

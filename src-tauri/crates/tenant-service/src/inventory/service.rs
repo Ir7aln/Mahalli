@@ -40,6 +40,8 @@ impl InventoryService {
         let count = InventoryTransactions::find()
             .join(JoinType::Join, inventory_transactions::Relation::Products.def())
             .join(JoinType::LeftJoin, inventory_transactions::Relation::OrderItems.def())
+            .join(JoinType::LeftJoin, inventory_transactions::Relation::InvoiceItems.def())
+            .join(JoinType::LeftJoin, invoice_items::Relation::Invoices.def())
             .join(JoinType::LeftJoin, order_items::Relation::Orders.def())
             .filter(
                 Cond::all()

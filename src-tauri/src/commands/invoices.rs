@@ -8,7 +8,7 @@ use tenant_service::invoices::{
 
 use crate::AppState;
 
-use super::{tenant_db_or_fail, Fail, SResult, Success};
+use super::{tenant_db_or_fail, SResult, Success};
 
 #[tauri::command]
 #[specta::specta]
@@ -20,10 +20,7 @@ pub async fn create_invoice_from_order(state: State<'_, AppState>, id: String) -
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -40,10 +37,7 @@ pub async fn list_invoices(
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -60,10 +54,7 @@ pub async fn list_invoice_products(
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -77,10 +68,7 @@ pub async fn create_invoice(state: State<'_, AppState>, invoice: NewInvoice) -> 
             message: None,
             data: Some(id),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -94,10 +82,7 @@ pub async fn update_invoice(state: State<'_, AppState>, invoice: UpdateInvoice) 
             message: Option::Some(String::from("update invoices success")),
             data: None,
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -114,10 +99,7 @@ pub async fn add_invoice_payment(
             message: Option::Some(String::from("invoice payment added successfully")),
             data: Some(id),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -134,10 +116,7 @@ pub async fn update_invoice_status(
             message: Option::Some(String::from("update invoices success")),
             data: None,
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -151,10 +130,7 @@ pub async fn delete_invoice(state: State<'_, AppState>, id: String) -> SResult<u
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -168,10 +144,7 @@ pub async fn get_invoice(state: State<'_, AppState>, id: String) -> SResult<Invo
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -188,9 +161,6 @@ pub async fn get_invoice_details(
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }

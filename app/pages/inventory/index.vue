@@ -7,6 +7,7 @@ import { queryNumber, queryString } from "@/utils/query";
 
 const route = useRoute();
 const { t, d } = useI18n();
+const { showErrorToast } = useCommandError();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 
 const searchQuery = ref(queryString(route.query.search));
@@ -56,10 +57,7 @@ async function fetchInventory() {
     direction: queryParams.value.direction,
   });
   if (result.status === "error") {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(result.error);
     Logger.error(`LIST INVENTORY: ${JSON.stringify(result.error)}`);
     return null;
   }
@@ -246,3 +244,5 @@ function clearAllFilters() {
     </div>
   </main>
 </template>
+
+

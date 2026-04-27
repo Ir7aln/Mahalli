@@ -283,6 +283,29 @@
     "error": {
       "title": "Oops! Something went wrong on our end.",
       "description": "You can try again"
+    },
+    "errors": {
+      "database-required": "Select a database before using the app.",
+      "database-not-found": "The selected database could not be found.",
+      "database-source-not-found": "The source database could not be found.",
+      "database-source-file-missing": "The source database file is missing.",
+      "database-file-already-exists": "A database file with the same name already exists.",
+      "database-open-failed": "The database file could not be opened.",
+      "database-create-incomplete": "The database was created, but it could not be loaded afterwards.",
+      "client-not-found": "The client could not be found.",
+      "quote-not-found": "The quote could not be found.",
+      "order-not-found": "The order could not be found.",
+      "invoice-not-found": "The invoice could not be found.",
+      "invoice-payment-date-invalid": "The payment date is invalid.",
+      "invoice-payment-amount-invalid": "The payment amount must be greater than zero.",
+      "invoice-payment-deleted": "Payments cannot be added to a deleted invoice.",
+      "invoice-payment-exceeds-remaining": "The payment amount exceeds the remaining unpaid amount.",
+      "order-status-invalid": "The order status is invalid.",
+      "invoice-status-invalid": "The invoice status is invalid.",
+      "status-transition-invalid": "That status change is not allowed.",
+      "inventory-transaction-missing": "A linked inventory transaction could not be found.",
+      "data-unavailable": "No data is available for this view yet.",
+      "conflict": "This action conflicts with existing data."
     }
   },
   "titles": {

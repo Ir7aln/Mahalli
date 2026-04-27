@@ -11,6 +11,7 @@ import { queryNumber, queryString } from "@/utils/query";
 
 const route = useRoute();
 const { t, d } = useI18n();
+const { showErrorToast } = useCommandError();
 const modal = useModal();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const invoiceProducts = ref<InvoiceProductItem[]>([]);
@@ -46,10 +47,7 @@ async function fetchInvoices() {
     direction: queryParams.value.direction,
   });
   if (result.status === "error") {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(result.error);
     Logger.error(`ERROR: ${JSON.stringify(result.error)}`);
     return null;
   }
@@ -114,10 +112,7 @@ async function listInvoiceProducts(id?: string) {
   }
   const result = await commands.listInvoiceProducts(id);
   if (result.status === "error") {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(result.error);
     Logger.error(`ERROR LIST INVOICES PRODUCTS: ${JSON.stringify(result.error)}`);
     return;
   }
@@ -200,3 +195,5 @@ const openCreateInvoiceModal = () => modal.open(InvoiceCreate, { sheet: true });
     </div>
   </main>
 </template>
+
+

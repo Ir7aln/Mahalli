@@ -7,7 +7,7 @@ use tenant_service::clients::{
 
 use crate::AppState;
 
-use super::{tenant_db_or_fail, Fail, SResult, Success};
+use super::{tenant_db_or_fail, SResult, Success};
 
 #[tauri::command]
 #[specta::specta]
@@ -22,10 +22,7 @@ pub async fn list_clients(
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -42,10 +39,7 @@ pub async fn list_client_invoice_debts(
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -62,10 +56,7 @@ pub async fn search_clients(
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -79,10 +70,7 @@ pub async fn get_client(state: State<'_, AppState>, id: String) -> SResult<Clien
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -96,10 +84,7 @@ pub async fn create_client(state: State<'_, AppState>, client: NewClient) -> SRe
             message: Option::Some(String::from("client created successfully")),
             data: Some(id),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -113,10 +98,7 @@ pub async fn delete_client(state: State<'_, AppState>, id: String) -> SResult<u6
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -130,9 +112,6 @@ pub async fn update_client(state: State<'_, AppState>, client: Client) -> SResul
             message: Option::Some(String::from("update clients success")),
             data: None,
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }

@@ -14,6 +14,7 @@ const props = defineProps<{
 const route = useRoute();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const { t, locale, n } = useI18n();
+const { showErrorToast } = useCommandError();
 const localePath = useLocalePath();
 const modal = useModal();
 const clientInvoiceDebts = ref<ClientInvoiceDebtItem[]>([]);
@@ -56,10 +57,7 @@ async function listClientInvoiceDebts(clientId?: string) {
   clientInvoiceDebts.value = [];
   const result = await commands.listClientInvoiceDebts(clientId);
   if (result.status === "error") {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(result.error);
     Logger.error(`ERROR LIST CLIENT INVOICE DEBTS: ${JSON.stringify(result.error)}`);
     return;
   }
@@ -253,3 +251,5 @@ function toggleThisClient(client: SelectClients, name: "delete" | "update") {
     <Pagination />
   </div>
 </template>
+
+

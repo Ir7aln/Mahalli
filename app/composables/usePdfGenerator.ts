@@ -1,12 +1,12 @@
 import { PDFDocument, PDFName, PDFPage, PageSizes, rgb } from "pdf-lib";
 import type { PDFFont } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
-import { toast } from "vue-sonner";
 import * as Logger from "@tauri-apps/plugin-log";
 import CairoRegular from "@/assets/fonts/Cairo-Regular.ttf";
 
 export function usePdfGenerator() {
   const { t, locale, n, d } = useI18n();
+  const { showErrorToast } = useCommandError();
   const { numberToText } = useNumberToText();
 
   const Width = ref(0);
@@ -456,10 +456,7 @@ export function usePdfGenerator() {
   }
 
   function handleError(err: any) {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(err);
     Logger.error(`ERROR PDF-LIB: ${err}`);
   }
 

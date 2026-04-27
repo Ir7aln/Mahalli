@@ -7,7 +7,7 @@ use tenant_service::dashboard::{
 
 use crate::AppState;
 
-use super::{tenant_db_or_fail, Fail, SResult, Success};
+use super::{tenant_db_or_fail, SResult, Success};
 
 #[tauri::command]
 #[specta::specta]
@@ -19,10 +19,7 @@ pub async fn list_inventory_stats(state: State<'_, AppState>) -> SResult<Vec<Sel
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -36,10 +33,7 @@ pub async fn list_top_clients(state: State<'_, AppState>) -> SResult<Vec<SelectT
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -53,10 +47,7 @@ pub async fn list_top_suppliers(state: State<'_, AppState>) -> SResult<Vec<Selec
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -70,10 +61,7 @@ pub async fn list_top_products(state: State<'_, AppState>) -> SResult<Vec<Select
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -87,10 +75,7 @@ pub async fn list_status_count(state: State<'_, AppState>) -> SResult<StatusCoun
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -106,9 +91,6 @@ pub async fn list_financial_metrics(
             message: None,
             data: Some(res),
         }),
-        Err(err) => Err(Fail {
-            error: Some(err.to_string()),
-            message: None,
-        }),
+        Err(err) => Err(err.into()),
     }
 }

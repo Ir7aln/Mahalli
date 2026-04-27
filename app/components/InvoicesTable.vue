@@ -18,6 +18,7 @@ const route = useRoute();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const modal = useModal();
 const { t, d, locale, n } = useI18n();
+const { showErrorToast } = useCommandError();
 const localePath = useLocalePath();
 const sortKey = computed(() => queryString(route.query.sort));
 const sortDirection = computed(() =>
@@ -71,10 +72,7 @@ function openAddPayment(invoice: SelectInvoices) {
 async function updateInvoiceStatus(id: string, status: string) {
   const result = await commands.updateInvoiceStatus({ id, status });
   if (result.status === "error") {
-    toast.error(t("notifications.error.title"), {
-      description: t("notifications.error.description"),
-      closeButton: true,
-    });
+    showErrorToast(result.error);
     Logger.error(`ERROR UPDATE INVOICE STATUS: ${JSON.stringify(result.error)}`);
     return;
   }
@@ -299,3 +297,5 @@ async function updateInvoiceStatus(id: string, status: string) {
     <Pagination />
   </div>
 </template>
+
+

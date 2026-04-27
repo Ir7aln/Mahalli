@@ -283,6 +283,29 @@
     "error": {
       "title": "Oops! Etwas ist schief gelaufen.",
       "description": "Sie können es erneut versuchen"
+    },
+    "errors": {
+      "database-required": "Wählen Sie eine Datenbank aus, bevor Sie die App verwenden.",
+      "database-not-found": "Die ausgewählte Datenbank wurde nicht gefunden.",
+      "database-source-not-found": "Die Quelldatenbank wurde nicht gefunden.",
+      "database-source-file-missing": "Die Quelldatenbankdatei fehlt.",
+      "database-file-already-exists": "Eine Datenbankdatei mit demselben Namen existiert bereits.",
+      "database-open-failed": "Die Datenbankdatei konnte nicht geöffnet werden.",
+      "database-create-incomplete": "Die Datenbank wurde erstellt, konnte danach aber nicht geladen werden.",
+      "client-not-found": "Der Kunde wurde nicht gefunden.",
+      "quote-not-found": "Das Angebot wurde nicht gefunden.",
+      "order-not-found": "Der Auftrag wurde nicht gefunden.",
+      "invoice-not-found": "Die Rechnung wurde nicht gefunden.",
+      "invoice-payment-date-invalid": "Das Zahlungsdatum ist ungültig.",
+      "invoice-payment-amount-invalid": "Der Zahlungsbetrag muss größer als null sein.",
+      "invoice-payment-deleted": "Zu einer gelöschten Rechnung kann keine Zahlung hinzugefügt werden.",
+      "invoice-payment-exceeds-remaining": "Der Zahlungsbetrag überschreitet den offenen Restbetrag.",
+      "order-status-invalid": "Der Auftragsstatus ist ungültig.",
+      "invoice-status-invalid": "Der Rechnungsstatus ist ungültig.",
+      "status-transition-invalid": "Dieser Statuswechsel ist nicht erlaubt.",
+      "inventory-transaction-missing": "Eine verknüpfte Lagertransaktion wurde nicht gefunden.",
+      "data-unavailable": "Für diese Ansicht sind noch keine Daten verfügbar.",
+      "conflict": "Diese Aktion steht im Konflikt mit vorhandenen Daten."
     }
   },
   "titles": {
