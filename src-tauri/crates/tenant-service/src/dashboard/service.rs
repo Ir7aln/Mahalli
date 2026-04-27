@@ -315,12 +315,11 @@ impl DashboardService {
                     .equals((OrderItems, order_items::Column::InventoryId)),
             )
             .cond_where(
-                Cond::all()
-                    .add(
-                        Expr::expr(Expr::col((Orders, orders::Column::Status)))
-                            .eq("CANCELLED")
-                            .not(),
-                    ),
+                Cond::all().add(
+                    Expr::expr(Expr::col((Orders, orders::Column::Status)))
+                        .eq("CANCELLED")
+                        .not(),
+                ),
             )
             .add_group_by([Expr::col((Suppliers, suppliers::Column::Id)).into()])
             .order_by_expr(

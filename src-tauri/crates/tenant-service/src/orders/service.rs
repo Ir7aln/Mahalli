@@ -575,7 +575,8 @@ impl OrdersService {
             .ok_or_else(|| DbErr::Custom(format!("invalid order status: {}", data.status)))?;
 
         let order_model = Orders::find_by_id(data.id).one(db).await?;
-        let order = order_model.ok_or_else(|| DbErr::RecordNotFound("order not found".to_string()))?;
+        let order =
+            order_model.ok_or_else(|| DbErr::RecordNotFound("order not found".to_string()))?;
 
         let current_status = OrderStatus::from_str(&order.status)
             .ok_or_else(|| DbErr::Custom(format!("corrupted order status: {}", order.status)))?;

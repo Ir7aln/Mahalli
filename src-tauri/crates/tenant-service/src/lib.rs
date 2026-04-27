@@ -5,8 +5,8 @@ pub mod invoices;
 pub mod orders;
 pub mod products;
 pub mod quotes;
-pub mod status;
 mod seed;
+pub mod status;
 pub mod suppliers;
 pub mod templates;
 

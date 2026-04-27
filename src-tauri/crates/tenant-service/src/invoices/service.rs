@@ -791,10 +791,12 @@ impl InvoicesService {
             .ok_or_else(|| DbErr::Custom(format!("invalid invoice status: {}", data.status)))?;
 
         let invoice_model = Invoices::find_by_id(data.id).one(db).await?;
-        let invoice = invoice_model.ok_or_else(|| DbErr::RecordNotFound("invoice not found".to_string()))?;
+        let invoice =
+            invoice_model.ok_or_else(|| DbErr::RecordNotFound("invoice not found".to_string()))?;
 
-        let current_status = InvoiceStatus::from_str(&invoice.status)
-            .ok_or_else(|| DbErr::Custom(format!("corrupted invoice status: {}", invoice.status)))?;
+        let current_status = InvoiceStatus::from_str(&invoice.status).ok_or_else(|| {
+            DbErr::Custom(format!("corrupted invoice status: {}", invoice.status))
+        })?;
 
         if !current_status.is_valid_transition(&next_status) {
             return Err(DbErr::Custom(format!(

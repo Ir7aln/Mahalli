@@ -181,12 +181,7 @@ impl SeedService {
     }
 
     async fn seed_invoices(db: &DatabaseConnection) -> Result<(), DbErr> {
-        let statuses = vec![
-            "DRAFT",
-            "PAID",
-            "PARTIALLY_PAID",
-            "CANCELLED",
-        ];
+        let statuses = vec!["DRAFT", "PAID", "PARTIALLY_PAID", "CANCELLED"];
 
         for _ in 0..100 {
             let id = ulid::Ulid::new();
