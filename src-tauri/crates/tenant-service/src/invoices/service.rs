@@ -252,6 +252,13 @@ impl InvoicesService {
                 Expr::col((Invoices, invoices::Column::CreatedAt)),
                 Expr::col((Invoices, invoices::Column::ClientId)),
                 Expr::col((Clients, clients::Column::FullName)),
+                Expr::col((Clients, clients::Column::Email)),
+                Expr::col((Clients, clients::Column::PhoneNumber)),
+                Expr::col((Clients, clients::Column::Address)),
+                Expr::col((Clients, clients::Column::Ice)),
+                Expr::col((Clients, clients::Column::IfNumber)),
+                Expr::col((Clients, clients::Column::Rc)),
+                Expr::col((Clients, clients::Column::Patente)),
             ])
             .expr_as(invoice_products_count_expr(), Alias::new("products"))
             .expr_as(invoice_total_expr(), Alias::new("total"))

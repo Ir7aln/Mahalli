@@ -183,7 +183,62 @@ async function createDeliveryNoteFromOrder(id: string) {
             {{ order.identifier }}
           </TableCell>
           <TableCell v-if="visibleCols.includes('full_name')" class="p-2 font-medium">
-            {{ order.full_name }}
+            <Popover>
+              <PopoverTrigger as-child>
+                <Button
+                  variant="link"
+                  class="underline px-0 h-fit text-nowrap"
+                >
+                  {{ order.full_name }}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent class="min-w-[18rem] p-3">
+                <div class="space-y-3">
+                  <div>
+                    <p class="text-xs text-muted-foreground">{{ t('fields.full-name') }}</p>
+                    <p class="text-sm font-medium">{{ order.full_name }}</p>
+                  </div>
+                  <div v-if="order.ice || order.if_number || order.rc || order.patente" class="border-t pt-2">
+                    <p class="text-xs text-muted-foreground mb-2">{{ t('fields.legal-identifiers') }}</p>
+                    <div class="space-y-1 text-sm">
+                      <div v-if="order.ice">
+                        <span class="text-xs text-slate-500">ICE:</span>
+                        <span class="font-mono">{{ order.ice }}</span>
+                      </div>
+                      <div v-if="order.if_number">
+                        <span class="text-xs text-slate-500">IF:</span>
+                        <span class="font-mono">{{ order.if_number }}</span>
+                      </div>
+                      <div v-if="order.rc">
+                        <span class="text-xs text-slate-500">RC:</span>
+                        <span class="font-mono">{{ order.rc }}</span>
+                      </div>
+                      <div v-if="order.patente">
+                        <span class="text-xs text-slate-500">{{ t('fields.patente') }}:</span>
+                        <span class="font-mono">{{ order.patente }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-if="order.email || order.phone_number || order.address" class="border-t pt-2">
+                    <p class="text-xs text-muted-foreground mb-2">{{ t('fields.contact') }}</p>
+                    <div class="space-y-1 text-sm">
+                      <div v-if="order.email">
+                        <span class="text-xs text-slate-500">{{ t('fields.email') }}:</span>
+                        <span>{{ order.email }}</span>
+                      </div>
+                      <div v-if="order.phone_number">
+                        <span class="text-xs text-slate-500">{{ t('fields.phone') }}:</span>
+                        <span>{{ order.phone_number }}</span>
+                      </div>
+                      <div v-if="order.address">
+                        <span class="text-xs text-slate-500">{{ t('fields.address') }}:</span>
+                        <span>{{ order.address }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           </TableCell>
           <TableCell v-if="visibleCols.includes('products')" class="p-2">
             <Popover v-if="order.products && order.products > 0">

@@ -71,6 +71,13 @@ impl OrdersService {
                 Expr::col((Orders, orders::Column::CreatedAt)),
                 Expr::col((Orders, orders::Column::ClientId)),
                 Expr::col((Clients, clients::Column::FullName)),
+                Expr::col((Clients, clients::Column::Email)),
+                Expr::col((Clients, clients::Column::PhoneNumber)),
+                Expr::col((Clients, clients::Column::Address)),
+                Expr::col((Clients, clients::Column::Ice)),
+                Expr::col((Clients, clients::Column::IfNumber)),
+                Expr::col((Clients, clients::Column::Rc)),
+                Expr::col((Clients, clients::Column::Patente)),
             ])
             .expr_as(
                 Func::coalesce([

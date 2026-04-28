@@ -62,6 +62,13 @@ impl QuotesService {
                 Expr::col((Quotes, quotes::Column::ClientId)),
                 Expr::col((Quotes, quotes::Column::Identifier)),
                 Expr::col((Clients, clients::Column::FullName)),
+                Expr::col((Clients, clients::Column::Email)),
+                Expr::col((Clients, clients::Column::PhoneNumber)),
+                Expr::col((Clients, clients::Column::Address)),
+                Expr::col((Clients, clients::Column::Ice)),
+                Expr::col((Clients, clients::Column::IfNumber)),
+                Expr::col((Clients, clients::Column::Rc)),
+                Expr::col((Clients, clients::Column::Patente)),
             ])
             .expr_as(
                 Func::coalesce([

@@ -72,6 +72,13 @@ impl DeliveryNotesService {
                 Expr::col((DeliveryNotes, delivery_notes::Column::ClientId)),
                 Expr::col((DeliveryNotes, delivery_notes::Column::OrderId)),
                 Expr::col((Clients, clients::Column::FullName)),
+                Expr::col((Clients, clients::Column::Email)),
+                Expr::col((Clients, clients::Column::PhoneNumber)),
+                Expr::col((Clients, clients::Column::Address)),
+                Expr::col((Clients, clients::Column::Ice)),
+                Expr::col((Clients, clients::Column::IfNumber)),
+                Expr::col((Clients, clients::Column::Rc)),
+                Expr::col((Clients, clients::Column::Patente)),
             ])
             .expr_as(
                 Expr::col((Orders, orders::Column::Identifier)),
