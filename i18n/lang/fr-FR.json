@@ -34,6 +34,7 @@
     "toggle-create-invoice": "Ajouter une nouvelle facture",
     "toggle-create-org": "Créer une organisation",
     "edit": "Modifier",
+    "finalize": "Finaliser",
     "add-payment": "Ajouter un paiement",
     "delete": "Supprimer",
     "print": "Imprimer",

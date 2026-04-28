@@ -34,6 +34,7 @@
     "toggle-create-invoice": "Add new invoice",
     "toggle-create-org": "Create an organisation",
     "edit": "Edit",
+    "finalize": "Finalize",
     "add-payment": "Add payment",
     "delete": "Delete",
     "print": "Print",

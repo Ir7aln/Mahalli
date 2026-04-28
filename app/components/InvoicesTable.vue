@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { commands, type InvoiceProductItem, type SelectInvoices } from "@/bindings";
-import { CircleDollarSign, FilePenLine, GripHorizontal, Printer, Trash2, ReceiptText } from "lucide-vue-next";
+import { CircleDollarSign, FilePenLine, GripHorizontal, Printer, Trash2, ReceiptText, CheckCircle2 } from "lucide-vue-next";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
 import { InvoiceAddPayment, InvoiceDelete, InvoiceUpdate } from "#components";
@@ -89,6 +89,19 @@ async function updateInvoiceStatus(id: string, status: string) {
     return;
   }
   Logger.info(`UPDATE INVOICE STATUS: ${JSON.stringify({ id, status })}`);
+  updateQueryParams({
+    refresh: `refresh-update-${Math.random() * 9999}`,
+  });
+}
+
+async function finalizeInvoice(id: string) {
+  const result = await commands.finalizeInvoice(id);
+  if (result.status === "error") {
+    showErrorToast(result.error);
+    Logger.error(`ERROR FINALIZE INVOICE: ${JSON.stringify(result.error)}`);
+    return;
+  }
+  Logger.info(`FINALIZE INVOICE: ${id}`);
   updateQueryParams({
     refresh: `refresh-update-${Math.random() * 9999}`,
   });
@@ -320,6 +333,13 @@ async function updateInvoiceStatus(id: string, status: string) {
                   <DropdownMenuItem @click="toggleThisInvoice(invoice, 'update')">
                     <FilePenLine :size="20" class="text-slate-800 inline mr-2" />
                     {{ t("buttons.edit") }}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    :disabled="invoice.status !== 'DRAFT'"
+                    @click="finalizeInvoice(invoice.id as string)"
+                  >
+                    <CheckCircle2 :size="20" class="text-slate-800 inline mr-2" />
+                    {{ t("buttons.finalize") }}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     :disabled="toNumber(invoice.total) - toNumber(invoice.paid_amount) <= 0"
