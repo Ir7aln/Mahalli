@@ -38,7 +38,7 @@ const creditNoteSchema = z.object({
 
 type Item = z.infer<typeof creditNoteSchema>["items"][number];
 
-const { handleSubmit, setFieldValue, values } = useForm({
+const { handleSubmit, resetForm, setFieldValue, values } = useForm({
   validationSchema: toTypedSchema(creditNoteSchema),
   initialValues: {
     reason: "",
@@ -58,37 +58,31 @@ function formatMoney(value: number | string) {
   return n(toNumber(value), "currency");
 }
 
-async function fetchInvoiceDetails() {
-  try {
-    const result = await commands.getInvoiceDetails(props.invoiceId);
-    if (result.status === "error") {
-      showErrorToast(result.error);
-      return;
-    }
+const getResult = await commands.getInvoice(props.invoiceId);
+if (getResult.status === "ok" && getResult.data?.data) {
+  const invoice = getResult.data.data;
+  invoiceDetails.value = invoice;
 
-    invoiceDetails.value = result.data;
-
-    // Set initial items from invoice details
-    const items = result.data?.items?.map((item: any) => ({
-      product_id: item.product_id,
-      quantity: item.quantity,
-      price: item.price,
-    })) || [];
-
-    items.forEach((item: Item) => {
-      push(item);
-    });
-  } catch (error) {
-    Logger.error(`ERROR FETCH INVOICE DETAILS: ${error}`);
-    showErrorToast({ message: "Failed to fetch invoice details" });
-  } finally {
-    loading.value = false;
-  }
+  resetForm({
+    values: {
+      reason: "",
+      items: (invoice?.items ?? []).map((item: any) => ({
+        product_id: item.product_id,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+    },
+  });
 }
+loading.value = false;
 
-onMounted(() => {
-  fetchInvoiceDetails();
-});
+function addItem() {
+  push({
+    product_id: "",
+    quantity: 1,
+    price: 0,
+  });
+}
 
 const onSubmit = handleSubmit(async (formData) => {
   isPosting.value = true;
@@ -116,14 +110,6 @@ const onSubmit = handleSubmit(async (formData) => {
     },
   });
 });
-
-function addItem() {
-  push({
-    product_id: "",
-    quantity: 1,
-    price: 0,
-  });
-}
 </script>
 
 <template>
@@ -142,11 +128,7 @@ function addItem() {
         </div>
       </div>
 
-      <CardContent v-if="loading" class="card-modal-body flex items-center justify-center py-8">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </CardContent>
-
-      <CardContent v-else class="card-modal-body space-y-4">
+      <CardContent class="card-modal-body space-y-4">
         <FormField v-slot="{ componentField }" name="reason">
           <FormItem>
             <FormLabel>{{ t("fields.reason") }}</FormLabel>
@@ -183,7 +165,7 @@ function addItem() {
                       <Input
                         v-bind="componentField"
                         disabled
-                        :value="invoiceDetails?.items[idx]?.product_name || ''"
+                        :value="invoiceDetails?.items?.[idx]?.product_name || ''"
                         class="bg-slate-50"
                       />
                     </FormControl>
