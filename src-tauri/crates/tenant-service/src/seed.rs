@@ -23,13 +23,17 @@ impl SeedService {
     pub async fn seed_database(db: &DatabaseConnection) -> Result<(), DbErr> {
         Self::seed_clients(db).await?;
         Self::seed_products(db).await?;
+        Self::seed_quotes(db).await?;
+        Self::seed_quote_items(db).await?;
         Self::seed_orders(db).await?;
         Self::seed_order_items(db).await?;
+        Self::seed_delivery_notes(db).await?;
+        Self::seed_delivery_note_items(db).await?;
         Self::seed_invoices(db).await?;
         Self::seed_invoice_items(db).await?;
         Self::seed_invoice_payments(db).await?;
-        Self::seed_quotes(db).await?;
-        Self::seed_quote_items(db).await?;
+        Self::seed_credit_notes(db).await?;
+        Self::seed_credit_note_items(db).await?;
         Ok(())
     }
 
@@ -43,11 +47,10 @@ impl SeedService {
 
             let insert = Statement::from_sql_and_values(
                 sea_orm::DatabaseBackend::Sqlite,
-                r#"INSERT INTO clients (id, full_name, is_deleted, phone_number, email, address) VALUES ($1, $2, $3, $5, $6, $7)"#,
+                r#"INSERT INTO clients (id, full_name, is_deleted, phone_number, email, address) VALUES ($1, $2, $3, $4, $5, $6)"#,
                 [
                     id.to_string().into(),
                     full_name.into(),
-                    false.into(),
                     false.into(),
                     phone_number.into(),
                     email.into(),
@@ -72,11 +75,10 @@ impl SeedService {
 
             let insert = Statement::from_sql_and_values(
                 sea_orm::DatabaseBackend::Sqlite,
-                r#"INSERT INTO products (id, name, is_deleted, description, purchase_price, selling_price, min_quantity) VALUES ($1, $2, $3, $5, $6, $7, $8)"#,
+                r#"INSERT INTO products (id, name, is_deleted, description, purchase_price, selling_price, min_quantity) VALUES ($1, $2, $3, $4, $5, $6, $7)"#,
                 [
                     id.to_string().into(),
                     format!("{}-{}", name, rand).into(),
-                    false.into(),
                     false.into(),
                     description.into(),
                     (purchase_price as f32).into(),
@@ -258,6 +260,76 @@ impl SeedService {
                 ],
             );
             db.execute_raw(insert_quote).await?;
+        }
+        Ok(())
+    }
+
+    async fn seed_delivery_notes(db: &DatabaseConnection) -> Result<(), DbErr> {
+        for _ in 0..80 {
+            let id = ulid::Ulid::new();
+            let insert_delivery_note = Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                r#"INSERT INTO delivery_notes (id, order_id, client_id, is_deleted) VALUES ($1, (SELECT id FROM orders ORDER BY RANDOM() LIMIT 1), (SELECT id FROM clients ORDER BY RANDOM() LIMIT 1), $2)"#,
+                [id.to_string().into(), false.into()],
+            );
+            db.execute_raw(insert_delivery_note).await?;
+        }
+        Ok(())
+    }
+
+    async fn seed_delivery_note_items(db: &DatabaseConnection) -> Result<(), DbErr> {
+        for _ in 0..250 {
+            let id = ulid::Ulid::new();
+            let price: u8 = Faker.fake();
+            let quantity: u8 = Faker.fake();
+            let insert_item = Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                r#"INSERT INTO delivery_note_items (id, delivery_note_id, product_id, price, quantity) VALUES ($1, (SELECT id FROM delivery_notes ORDER BY RANDOM() LIMIT 1), (SELECT id FROM products ORDER BY RANDOM() LIMIT 1), $2, $3)"#,
+                [
+                    id.to_string().into(),
+                    (price as f32).into(),
+                    (quantity as f32).into(),
+                ],
+            );
+            db.execute_raw(insert_item).await?;
+        }
+        Ok(())
+    }
+
+    async fn seed_credit_notes(db: &DatabaseConnection) -> Result<(), DbErr> {
+        for _ in 0..40 {
+            let id = ulid::Ulid::new();
+            let reasons = vec!["Defective product", "Wrong item shipped", "Quantity mismatch", "Customer request"];
+            let reason = get_random_item(&reasons);
+            let insert_credit_note = Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                r#"INSERT INTO credit_notes (id, invoice_id, client_id, is_deleted, reason) VALUES ($1, (SELECT id FROM invoices ORDER BY RANDOM() LIMIT 1), (SELECT client_id FROM invoices ORDER BY RANDOM() LIMIT 1), $2, $3)"#,
+                [
+                    id.to_string().into(),
+                    false.into(),
+                    reason.to_string().into(),
+                ],
+            );
+            db.execute_raw(insert_credit_note).await?;
+        }
+        Ok(())
+    }
+
+    async fn seed_credit_note_items(db: &DatabaseConnection) -> Result<(), DbErr> {
+        for _ in 0..120 {
+            let id = ulid::Ulid::new();
+            let price: u8 = Faker.fake();
+            let quantity: u8 = Faker.fake();
+            let insert_item = Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                r#"INSERT INTO credit_note_items (id, credit_note_id, product_id, price, quantity) VALUES ($1, (SELECT id FROM credit_notes ORDER BY RANDOM() LIMIT 1), (SELECT id FROM products ORDER BY RANDOM() LIMIT 1), $2, $3)"#,
+                [
+                    id.to_string().into(),
+                    (price as f32).into(),
+                    (quantity as f32).into(),
+                ],
+            );
+            db.execute_raw(insert_item).await?;
         }
         Ok(())
     }
