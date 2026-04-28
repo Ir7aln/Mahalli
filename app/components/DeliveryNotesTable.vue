@@ -262,8 +262,10 @@ async function createInvoiceFromDeliveryNote(id: string) {
                     {{ t("buttons.create-invoice") }}
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Printer :size="20" class="text-slate-800 inline mr-2" />
-                    {{ t("buttons.print") }}
+                    <NuxtLink :to="localePath(`/delivery-notes/${deliveryNote.id}`)">
+                      <Printer :size="20" class="text-slate-800 inline mr-2" />
+                      {{ t("buttons.print") }}
+                    </NuxtLink>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

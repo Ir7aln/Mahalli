@@ -2,16 +2,34 @@
 import * as Logger from "@tauri-apps/plugin-log";
 import { Plus, RefreshCw, Database } from "lucide-vue-next";
 import { toast } from "vue-sonner";
-import { commands, type DatabaseRecord } from "@/bindings";
+import { commands, type DatabaseRecord, type UpdateSellerProfileDTO } from "@/bindings";
 import { DatabaseCreate } from "#components";
 
 const { t } = useI18n();
 const { locale } = useI18n();
 const { status, refreshStatus } = useDatabaseBootstrap();
 const modal = useModal();
+const { showErrorToast } = useCommandError();
 
 const refreshKey = ref(0);
 const seeding = ref(false);
+const savingSellerProfile = ref(false);
+const sellerProfileForm = reactive<UpdateSellerProfileDTO>({
+  legal_name: "",
+  commercial_name: null,
+  address: null,
+  city: null,
+  phone_number: null,
+  email: null,
+  ice: null,
+  if_number: null,
+  rc: null,
+  patente: null,
+  logo: null,
+  default_currency: "MAD",
+  default_payment_terms_days: 30,
+  invoice_footer: null,
+});
 
 const {
   data: databasesData,
@@ -41,6 +59,75 @@ const databases = computed<DatabaseRecord[]>(() => databasesData.value?.database
 const activeDatabase = computed<DatabaseRecord | null>(
   () => databasesData.value?.activeDatabase ?? null,
 );
+
+const { data: sellerProfileData, refresh: refreshSellerProfile } = await useAsyncData(
+  "settings-seller-profile",
+  async () => {
+    const result = await commands.getSellerProfile();
+    if (result.status === "error") {
+      showErrorToast(result.error);
+      Logger.error(`GET SELLER PROFILE: ${JSON.stringify(result.error)}`);
+      return null;
+    }
+    return result.data.data;
+  },
+);
+
+watch(sellerProfileData, (profile) => {
+  if (!profile) return;
+  sellerProfileForm.legal_name = profile.legal_name;
+  sellerProfileForm.commercial_name = profile.commercial_name;
+  sellerProfileForm.address = profile.address;
+  sellerProfileForm.city = profile.city;
+  sellerProfileForm.phone_number = profile.phone_number;
+  sellerProfileForm.email = profile.email;
+  sellerProfileForm.ice = profile.ice;
+  sellerProfileForm.if_number = profile.if_number;
+  sellerProfileForm.rc = profile.rc;
+  sellerProfileForm.patente = profile.patente;
+  sellerProfileForm.logo = profile.logo;
+  sellerProfileForm.default_currency = profile.default_currency;
+  sellerProfileForm.default_payment_terms_days = profile.default_payment_terms_days;
+  sellerProfileForm.invoice_footer = profile.invoice_footer;
+}, { immediate: true });
+
+function emptyToNull(value: string | number | null) {
+  if (typeof value === "number") return value;
+  return value?.trim() ? value.trim() : null;
+}
+
+async function saveSellerProfile() {
+  savingSellerProfile.value = true;
+  const result = await commands.updateSellerProfile({
+    legal_name: emptyToNull(sellerProfileForm.legal_name),
+    commercial_name: emptyToNull(sellerProfileForm.commercial_name),
+    address: emptyToNull(sellerProfileForm.address),
+    city: emptyToNull(sellerProfileForm.city),
+    phone_number: emptyToNull(sellerProfileForm.phone_number),
+    email: emptyToNull(sellerProfileForm.email),
+    ice: emptyToNull(sellerProfileForm.ice),
+    if_number: emptyToNull(sellerProfileForm.if_number),
+    rc: emptyToNull(sellerProfileForm.rc),
+    patente: emptyToNull(sellerProfileForm.patente),
+    logo: emptyToNull(sellerProfileForm.logo),
+    default_currency: emptyToNull(sellerProfileForm.default_currency),
+    default_payment_terms_days: sellerProfileForm.default_payment_terms_days,
+    invoice_footer: emptyToNull(sellerProfileForm.invoice_footer),
+  });
+
+  if (result.status === "error") {
+    showErrorToast(result.error);
+    Logger.error(`UPDATE SELLER PROFILE: ${JSON.stringify(result.error)}`);
+    savingSellerProfile.value = false;
+    return;
+  }
+
+  toast.success(t("notifications.seller-profile.updated"), {
+    closeButton: true,
+  });
+  await refreshSellerProfile();
+  savingSellerProfile.value = false;
+}
 
 async function refreshPage() {
   refreshKey.value += 1;
@@ -139,6 +226,78 @@ async function seedDatabase() {
               {{ t("database.settings.catalog-description") }}
             </p>
           </div>
+        </div>
+      </section>
+
+      <section class="rounded-md border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="flex flex-col gap-2 text-left rtl:text-right">
+          <h2 class="text-lg font-semibold text-slate-900">
+            {{ t("seller-profile.title") }}
+          </h2>
+          <p class="text-sm text-slate-500">
+            {{ t("seller-profile.description") }}
+          </p>
+        </div>
+
+        <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div class="space-y-2">
+            <Label>{{ t("seller-profile.fields.legal-name") }}</Label>
+            <Input v-model="sellerProfileForm.legal_name" />
+          </div>
+          <div class="space-y-2">
+            <Label>{{ t("seller-profile.fields.commercial-name") }}</Label>
+            <Input v-model="sellerProfileForm.commercial_name" />
+          </div>
+          <div class="space-y-2">
+            <Label>{{ t("fields.email") }}</Label>
+            <Input v-model="sellerProfileForm.email" type="email" />
+          </div>
+          <div class="space-y-2">
+            <Label>{{ t("fields.phone") }}</Label>
+            <Input v-model="sellerProfileForm.phone_number" />
+          </div>
+          <div class="space-y-2">
+            <Label>{{ t("fields.address") }}</Label>
+            <Input v-model="sellerProfileForm.address" />
+          </div>
+          <div class="space-y-2">
+            <Label>{{ t("seller-profile.fields.city") }}</Label>
+            <Input v-model="sellerProfileForm.city" />
+          </div>
+          <div class="space-y-2">
+            <Label>{{ t("fields.ice") }}</Label>
+            <Input v-model="sellerProfileForm.ice" />
+          </div>
+          <div class="space-y-2">
+            <Label>{{ t("fields.if-number") }}</Label>
+            <Input v-model="sellerProfileForm.if_number" />
+          </div>
+          <div class="space-y-2">
+            <Label>{{ t("fields.rc") }}</Label>
+            <Input v-model="sellerProfileForm.rc" />
+          </div>
+          <div class="space-y-2">
+            <Label>{{ t("fields.patente") }}</Label>
+            <Input v-model="sellerProfileForm.patente" />
+          </div>
+          <div class="space-y-2">
+            <Label>{{ t("seller-profile.fields.currency") }}</Label>
+            <Input v-model="sellerProfileForm.default_currency" />
+          </div>
+          <div class="space-y-2">
+            <Label>{{ t("seller-profile.fields.payment-terms") }}</Label>
+            <Input v-model.number="sellerProfileForm.default_payment_terms_days" type="number" min="0" />
+          </div>
+          <div class="space-y-2 md:col-span-2 xl:col-span-3">
+            <Label>{{ t("seller-profile.fields.invoice-footer") }}</Label>
+            <Textarea v-model="sellerProfileForm.invoice_footer" />
+          </div>
+        </div>
+
+        <div class="mt-5 flex justify-end">
+          <Button :disabled="savingSellerProfile" :loading="savingSellerProfile" @click="saveSellerProfile">
+            {{ t("buttons.save") }}
+          </Button>
         </div>
       </section>
 

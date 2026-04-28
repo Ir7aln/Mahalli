@@ -1,6 +1,9 @@
 use tauri::State;
 
-use tenant_service::credit_notes::{CreateCreditNote, CreditNoteResponse, CreditNotesService, ListCreditNotesArgs, CreditNotesListResponse};
+use tenant_service::credit_notes::{
+    CreateCreditNote, CreditNoteDetailsResponse, CreditNoteResponse, CreditNotesListResponse,
+    CreditNotesService, ListCreditNotesArgs,
+};
 
 use crate::AppState;
 
@@ -45,7 +48,7 @@ pub async fn list_credit_notes(
 pub async fn get_credit_note(
     state: State<'_, AppState>,
     id: String,
-) -> SResult<CreditNoteResponse> {
+) -> SResult<CreditNoteDetailsResponse> {
     let db_conn = tenant_db_or_fail(&state).await?;
     match CreditNotesService::get_credit_note(&db_conn, id).await {
         Ok(res) => Ok(Success {

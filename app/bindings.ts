@@ -28,8 +28,11 @@ export const commands = {
 	deleteClient: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_client", { id })),
 	listDeliveryNotes: (args: ListDeliveryNotesArgs) => typedError<Success<DeliveryNotesResponse>, Fail>(__TAURI_INVOKE("list_delivery_notes", { args })),
 	listDeliveryNoteProducts: (id: string) => typedError<Success<DeliveryNoteProductItem[]>, Fail>(__TAURI_INVOKE("list_delivery_note_products", { id })),
+	getDeliveryNote: (id: string) => typedError<Success<DeliveryNoteDetailsResponse>, Fail>(__TAURI_INVOKE("get_delivery_note", { id })),
 	createDeliveryNoteFromOrder: (id: string) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_delivery_note_from_order", { id })),
 	createCreditNote: (creditNote: CreateCreditNote) => typedError<Success<CreditNoteResponse>, Fail>(__TAURI_INVOKE("create_credit_note", { creditNote })),
+	listCreditNotes: (args: ListCreditNotesArgs) => typedError<Success<CreditNotesListResponse>, Fail>(__TAURI_INVOKE("list_credit_notes", { args })),
+	getCreditNote: (id: string) => typedError<Success<CreditNoteDetailsResponse>, Fail>(__TAURI_INVOKE("get_credit_note", { id })),
 	listOrders: (args: ListOrdersArgs) => typedError<Success<OrdersResponse>, Fail>(__TAURI_INVOKE("list_orders", { args })),
 	getOrder: (id: string) => typedError<Success<OrderWithClient>, Fail>(__TAURI_INVOKE("get_order", { id })),
 	getOrderDetails: (id: string) => typedError<Success<OrderDetailsResponse>, Fail>(__TAURI_INVOKE("get_order_details", { id })),
@@ -141,8 +144,39 @@ export type CreateTenantDatabaseRequest = {
 	make_active: boolean,
 };
 
+export type CreditNoteClientInfo = {
+	full_name: string,
+	email: string | null,
+	address: string | null,
+	phone_number: string | null,
+	ice: string | null,
+	if_number: string | null,
+	rc: string | null,
+	patente: string | null,
+};
+
+export type CreditNoteDetailsResponse = {
+	id: string,
+	invoice_id: string,
+	invoice_identifier: string | null,
+	client_id: string,
+	identifier: string | null,
+	reason: string | null,
+	created_at: string,
+	total: number,
+	client: CreditNoteClientInfo,
+	items: CreditNoteProductItem[],
+};
+
 export type CreditNoteItemInput = {
 	product_id: string,
+	quantity: number,
+	price: number,
+};
+
+export type CreditNoteProductItem = {
+	product_id: string,
+	name: string,
 	quantity: number,
 	price: number,
 };
@@ -150,11 +184,18 @@ export type CreditNoteItemInput = {
 export type CreditNoteResponse = {
 	id: string,
 	invoice_id: string,
+	invoice_identifier: string | null,
 	client_id: string,
+	full_name: string,
 	identifier: string | null,
 	reason: string | null,
 	created_at: string,
 	total: number,
+};
+
+export type CreditNotesListResponse = {
+	count: number,
+	notes: CreditNoteResponse[],
 };
 
 export type DatabaseBootstrapStatus = {
@@ -175,6 +216,36 @@ export type DatabaseRecord = {
 	created_at: string,
 	updated_at: string,
 	last_opened_at: string | null,
+};
+
+export type DeliveryNoteClientInfo = {
+	full_name: string,
+	email: string | null,
+	phone_number: string | null,
+	address: string | null,
+	ice: string | null,
+	if_number: string | null,
+	rc: string | null,
+	patente: string | null,
+};
+
+export type DeliveryNoteDetailsResponse = {
+	id: string,
+	created_at: string,
+	client_id: string,
+	identifier: string | null,
+	order_id: string,
+	order_identifier: string | null,
+	total: number,
+	client: DeliveryNoteClientInfo,
+	items: DeliveryNoteProductDetailItem[],
+};
+
+export type DeliveryNoteProductDetailItem = {
+	product_id: string,
+	name: string,
+	price: number,
+	quantity: number,
 };
 
 export type DeliveryNoteProductItem = {
@@ -264,6 +335,14 @@ export type ListClientsArgs = {
 	search: string,
 	search_field: string | null,
 	credit_only: boolean | null,
+	sort: string | null,
+	direction: string | null,
+};
+
+export type ListCreditNotesArgs = {
+	limit: number,
+	offset: number,
+	search: string,
 	sort: string | null,
 	direction: string | null,
 };

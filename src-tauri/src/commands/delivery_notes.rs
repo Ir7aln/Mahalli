@@ -1,7 +1,8 @@
 use tauri::State;
 
 use tenant_service::delivery_notes::{
-    DeliveryNoteProductItem, DeliveryNotesResponse, DeliveryNotesService, ListDeliveryNotesArgs,
+    DeliveryNoteDetailsResponse, DeliveryNoteProductItem, DeliveryNotesResponse,
+    DeliveryNotesService, ListDeliveryNotesArgs,
 };
 
 use crate::AppState;
@@ -33,6 +34,23 @@ pub async fn list_delivery_note_products(
 ) -> SResult<Vec<DeliveryNoteProductItem>> {
     let db_conn = tenant_db_or_fail(&state).await?;
     match DeliveryNotesService::list_delivery_note_products(&db_conn, id).await {
+        Ok(res) => Ok(Success {
+            error: None,
+            message: None,
+            data: Some(res),
+        }),
+        Err(err) => Err(err.into()),
+    }
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn get_delivery_note(
+    state: State<'_, AppState>,
+    id: String,
+) -> SResult<DeliveryNoteDetailsResponse> {
+    let db_conn = tenant_db_or_fail(&state).await?;
+    match DeliveryNotesService::get_delivery_note(&db_conn, id).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,

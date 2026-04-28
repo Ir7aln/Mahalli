@@ -222,6 +222,72 @@ impl DeliveryNotesService {
             .await
     }
 
+    pub async fn get_delivery_note(
+        db: &DbConn,
+        id: String,
+    ) -> Result<DeliveryNoteDetailsResponse, DbErr> {
+        let delivery_note = DeliveryNotes::find_by_id(&id)
+            .one(db)
+            .await?
+            .ok_or_else(|| DbErr::RecordNotFound("delivery note not found".to_string()))?;
+
+        if delivery_note.is_deleted {
+            return Err(DbErr::RecordNotFound("delivery note not found".to_string()));
+        }
+
+        let client = Clients::find_by_id(&delivery_note.client_id)
+            .one(db)
+            .await?
+            .ok_or_else(|| DbErr::RecordNotFound("client for delivery note not found".to_string()))?;
+        let order = Orders::find_by_id(&delivery_note.order_id)
+            .one(db)
+            .await?
+            .ok_or_else(|| DbErr::RecordNotFound("order for delivery note not found".to_string()))?;
+        let items = DeliveryNoteItems::find()
+            .filter(delivery_note_items::Column::DeliveryNoteId.eq(delivery_note.id.clone()))
+            .all(db)
+            .await?;
+        let mut response_items = Vec::new();
+        let mut total = 0.0f32;
+
+        for item in items {
+            let product = Products::find_by_id(&item.product_id)
+                .one(db)
+                .await?
+                .ok_or_else(|| {
+                    DbErr::RecordNotFound("product for delivery note not found".to_string())
+                })?;
+            total += item.quantity * item.price;
+            response_items.push(DeliveryNoteProductDetailItem {
+                product_id: item.product_id,
+                name: product.name,
+                price: item.price,
+                quantity: item.quantity,
+            });
+        }
+
+        Ok(DeliveryNoteDetailsResponse {
+            id: delivery_note.id,
+            created_at: delivery_note.created_at.to_string(),
+            client_id: delivery_note.client_id,
+            identifier: delivery_note.identifier,
+            order_id: delivery_note.order_id,
+            order_identifier: order.identifier,
+            total,
+            client: DeliveryNoteClientInfo {
+                full_name: client.full_name,
+                email: client.email,
+                phone_number: client.phone_number,
+                address: client.address,
+                ice: client.ice,
+                if_number: client.if_number,
+                rc: client.rc,
+                patente: client.patente,
+            },
+            items: response_items,
+        })
+    }
+
     pub async fn create_delivery_note_from_order(
         db: &DbConn,
         id: String,

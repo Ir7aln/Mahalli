@@ -236,6 +236,86 @@ fn map_error_details(raw: &str) -> (&'static str, &'static str, String) {
         );
     }
 
+    if normalized.contains("only paid invoices can be finalized") {
+        return (
+            "INVOICE_FINALIZE_REQUIRES_PAID",
+            "notifications.errors.invoice-finalize-requires-paid",
+            String::from("Only fully paid invoices can be finalized."),
+        );
+    }
+
+    if normalized.contains("finalized invoices cannot be edited") {
+        return (
+            "INVOICE_FINALIZED_EDIT_BLOCKED",
+            "notifications.errors.invoice-finalized-edit-blocked",
+            String::from("Finalized invoices cannot be edited."),
+        );
+    }
+
+    if normalized.contains("finalized invoices cannot be deleted") {
+        return (
+            "INVOICE_FINALIZED_DELETE_BLOCKED",
+            "notifications.errors.invoice-finalized-delete-blocked",
+            String::from("Finalized invoices cannot be deleted."),
+        );
+    }
+
+    if normalized.contains("credit notes can only be created for finalized invoices") {
+        return (
+            "CREDIT_NOTE_REQUIRES_FINALIZED_INVOICE",
+            "notifications.errors.credit-note-requires-finalized-invoice",
+            String::from("Credit notes can only be created for finalized invoices."),
+        );
+    }
+
+    if normalized.contains("credit note must contain at least one item") {
+        return (
+            "CREDIT_NOTE_EMPTY",
+            "notifications.errors.credit-note-empty",
+            String::from("A credit note must contain at least one item."),
+        );
+    }
+
+    if normalized.contains("credit note item quantity must be greater than zero") {
+        return (
+            "CREDIT_NOTE_QUANTITY_INVALID",
+            "notifications.errors.credit-note-quantity-invalid",
+            String::from("Credit note quantities must be greater than zero."),
+        );
+    }
+
+    if normalized.contains("credit note item price cannot be negative") {
+        return (
+            "CREDIT_NOTE_PRICE_INVALID",
+            "notifications.errors.credit-note-price-invalid",
+            String::from("Credit note prices cannot be negative."),
+        );
+    }
+
+    if normalized.contains("credit note item does not belong to the invoice") {
+        return (
+            "CREDIT_NOTE_ITEM_NOT_ON_INVOICE",
+            "notifications.errors.credit-note-item-not-on-invoice",
+            String::from("One credit note item is not part of the source invoice."),
+        );
+    }
+
+    if normalized.contains("credit note item quantity exceeds invoice quantity") {
+        return (
+            "CREDIT_NOTE_QUANTITY_EXCEEDS_INVOICE",
+            "notifications.errors.credit-note-quantity-exceeds-invoice",
+            String::from("A credit note quantity exceeds the invoiced quantity."),
+        );
+    }
+
+    if normalized.contains("credit note item price exceeds invoice price") {
+        return (
+            "CREDIT_NOTE_PRICE_EXCEEDS_INVOICE",
+            "notifications.errors.credit-note-price-exceeds-invoice",
+            String::from("A credit note price exceeds the invoiced price."),
+        );
+    }
+
     if normalized.contains("invalid order status") || normalized.contains("corrupted order status")
     {
         return (

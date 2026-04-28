@@ -1,14 +1,17 @@
 use super::dto::*;
-use chrono::Utc;
+use chrono::{Datelike, NaiveDate, Utc};
 use sea_orm::{
-    DatabaseConnection as DbConn, ActiveValue, TransactionError, DbErr, EntityTrait,
-    TransactionTrait, ActiveModelTrait, PaginatorTrait, QueryFilter, ColumnTrait,
+    ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection as DbConn, DbErr, EntityTrait,
+    PaginatorTrait, QueryFilter, QueryOrder, TransactionError, TransactionTrait,
 };
+use std::collections::HashMap;
 use tenant_entity::{
     credit_note_items::ActiveModel as CreditNoteItemActiveModel,
     credit_notes::ActiveModel as CreditNoteActiveModel,
+    inventory_transactions::ActiveModel as InventoryTransactionActiveModel,
     prelude::*,
 };
+use crate::status::InvoiceStatus;
 
 pub struct CreditNotesService;
 
@@ -24,11 +27,49 @@ impl CreditNotesService {
                     .await?
                     .ok_or_else(|| DbErr::RecordNotFound("invoice not found".to_string()))?;
 
-                let identifier = format!(
-                    "CN-{}-{:03}",
-                    Utc::now().format("%y-%m"),
-                    Utc::now().timestamp() % 1000
-                );
+                let invoice_status = InvoiceStatus::from_str(&invoice.status).ok_or_else(|| {
+                    DbErr::Custom(format!("corrupted invoice status: {}", invoice.status))
+                })?;
+
+                if invoice_status != InvoiceStatus::Finalized {
+                    return Err(DbErr::Custom(
+                        "credit notes can only be created for finalized invoices".to_string(),
+                    ));
+                }
+
+                if credit_note.items.is_empty() {
+                    return Err(DbErr::Custom(
+                        "credit note must contain at least one item".to_string(),
+                    ));
+                }
+                let client = Clients::find_by_id(&invoice.client_id)
+                    .one(txn)
+                    .await?
+                    .ok_or_else(|| {
+                        DbErr::RecordNotFound("client for credit note not found".to_string())
+                    })?;
+
+                let invoice_items = InvoiceItems::find()
+                    .filter(tenant_entity::invoice_items::Column::InvoiceId.eq(invoice.id.clone()))
+                    .all(txn)
+                    .await?;
+                let invoice_items_by_product: HashMap<String, tenant_entity::invoice_items::Model> =
+                    invoice_items
+                        .into_iter()
+                        .map(|item| (item.product_id.clone(), item))
+                        .collect();
+
+                let now = Utc::now().naive_utc();
+                let month_start = NaiveDate::from_ymd_opt(now.year(), now.month(), 1)
+                    .expect("valid first day of month")
+                    .and_hms_opt(0, 0, 0)
+                    .expect("valid start of day");
+                let monthly_count = CreditNotes::find()
+                    .filter(tenant_entity::credit_notes::Column::CreatedAt.gte(month_start))
+                    .filter(tenant_entity::credit_notes::Column::CreatedAt.lt(now))
+                    .count(txn)
+                    .await?;
+                let identifier = format!("CN-{}-{:03}", now.format("%y-%m"), monthly_count + 1);
 
                 let cn = CreditNoteActiveModel {
                     invoice_id: ActiveValue::Set(credit_note.invoice_id),
@@ -44,14 +85,54 @@ impl CreditNotesService {
                 let mut items = Vec::<CreditNoteItemActiveModel>::new();
 
                 for item in credit_note.items {
+                    if item.quantity <= 0.0 {
+                        return Err(DbErr::Custom(
+                            "credit note item quantity must be greater than zero".to_string(),
+                        ));
+                    }
+
+                    if item.price < 0.0 {
+                        return Err(DbErr::Custom(
+                            "credit note item price cannot be negative".to_string(),
+                        ));
+                    }
+
+                    let invoice_item = invoice_items_by_product
+                        .get(&item.product_id)
+                        .ok_or_else(|| {
+                            DbErr::Custom(
+                                "credit note item does not belong to the invoice".to_string(),
+                            )
+                        })?;
+
+                    if item.quantity as f64 > invoice_item.quantity {
+                        return Err(DbErr::Custom(
+                            "credit note item quantity exceeds invoice quantity".to_string(),
+                        ));
+                    }
+
+                    if item.price > invoice_item.price {
+                        return Err(DbErr::Custom(
+                            "credit note item price exceeds invoice price".to_string(),
+                        ));
+                    }
+
                     total += (item.quantity as f64) * item.price;
                     items.push(CreditNoteItemActiveModel {
                         credit_note_id: ActiveValue::Set(cn.id.clone()),
-                        product_id: ActiveValue::Set(item.product_id),
+                        product_id: ActiveValue::Set(item.product_id.clone()),
                         quantity: ActiveValue::Set(item.quantity),
                         price: ActiveValue::Set(item.price),
                         ..Default::default()
                     });
+                    InventoryTransactionActiveModel {
+                        product_id: ActiveValue::Set(item.product_id),
+                        quantity: ActiveValue::Set(item.quantity),
+                        transaction_type: ActiveValue::Set("IN".to_string()),
+                        ..Default::default()
+                    }
+                    .insert(txn)
+                    .await?;
                 }
 
                 if !items.is_empty() {
@@ -61,7 +142,9 @@ impl CreditNotesService {
                 Ok(CreditNoteResponse {
                     id: cn.id,
                     invoice_id: cn.invoice_id,
+                    invoice_identifier: invoice.identifier,
                     client_id: cn.client_id,
+                    full_name: client.full_name,
                     identifier: cn.identifier,
                     reason: cn.reason,
                     created_at: cn.created_at.to_string(),
@@ -76,14 +159,22 @@ impl CreditNotesService {
         db: &DbConn,
         args: ListCreditNotesArgs,
     ) -> Result<CreditNotesListResponse, DbErr> {
-        let total = CreditNotes::find().count(db).await?;
-
         let notes = CreditNotes::find()
+            .filter(tenant_entity::credit_notes::Column::IsDeleted.eq(false))
+            .order_by_desc(tenant_entity::credit_notes::Column::CreatedAt)
             .all(db)
             .await?;
 
         let mut response_notes = Vec::new();
         for note in notes {
+            let invoice = Invoices::find_by_id(&note.invoice_id)
+                .one(db)
+                .await?
+                .ok_or_else(|| DbErr::RecordNotFound("invoice for credit note not found".to_string()))?;
+            let client = Clients::find_by_id(&note.client_id)
+                .one(db)
+                .await?
+                .ok_or_else(|| DbErr::RecordNotFound("client for credit note not found".to_string()))?;
             let items = CreditNoteItems::find()
                 .filter(tenant_entity::credit_note_items::Column::CreditNoteId.eq(note.id.clone()))
                 .all(db)
@@ -96,46 +187,119 @@ impl CreditNotesService {
             response_notes.push(CreditNoteResponse {
                 id: note.id,
                 invoice_id: note.invoice_id,
+                invoice_identifier: invoice.identifier,
                 client_id: note.client_id,
+                full_name: client.full_name,
                 identifier: note.identifier,
                 reason: note.reason,
                 created_at: note.created_at.to_string(),
                 total: item_total,
             });
         }
+        let search = args.search.trim().to_lowercase();
+        if !search.is_empty() {
+            response_notes.retain(|note| {
+                [
+                    note.identifier.as_deref(),
+                    Some(note.full_name.as_str()),
+                    note.invoice_identifier.as_deref(),
+                    note.reason.as_deref(),
+                ]
+                .iter()
+                .flatten()
+                .any(|value| value.to_lowercase().contains(&search))
+            });
+        }
+
+        match args.sort.as_deref() {
+            Some("identifier") => response_notes.sort_by(|a, b| a.identifier.cmp(&b.identifier)),
+            Some("full_name") => response_notes.sort_by(|a, b| a.full_name.cmp(&b.full_name)),
+            Some("invoice_identifier") => {
+                response_notes.sort_by(|a, b| a.invoice_identifier.cmp(&b.invoice_identifier))
+            }
+            Some("reason") => response_notes.sort_by(|a, b| a.reason.cmp(&b.reason)),
+            Some("total") => response_notes.sort_by(|a, b| {
+                a.total
+                    .partial_cmp(&b.total)
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            }),
+            Some("created_at") => response_notes.sort_by(|a, b| a.created_at.cmp(&b.created_at)),
+            _ => {}
+        }
+
+        if matches!(args.direction.as_deref(), Some("desc")) {
+            response_notes.reverse();
+        }
+
+        let total = response_notes.len() as i64;
+        let limit = args.limit.clamp(1, 100) as usize;
+        let offset = args.offset.max(0) as usize;
+        let response_notes = response_notes.into_iter().skip(offset).take(limit).collect();
 
         Ok(CreditNotesListResponse {
-            count: total as i64,
+            count: total,
             notes: response_notes,
         })
     }
 
-    pub async fn get_credit_note(
-        db: &DbConn,
-        id: String,
-    ) -> Result<CreditNoteResponse, DbErr> {
+    pub async fn get_credit_note(db: &DbConn, id: String) -> Result<CreditNoteDetailsResponse, DbErr> {
         let note = CreditNotes::find_by_id(id)
             .one(db)
             .await?
             .ok_or_else(|| DbErr::RecordNotFound("credit note not found".to_string()))?;
+        let invoice = Invoices::find_by_id(&note.invoice_id)
+            .one(db)
+            .await?
+            .ok_or_else(|| DbErr::RecordNotFound("invoice for credit note not found".to_string()))?;
+        let client = Clients::find_by_id(&note.client_id)
+            .one(db)
+            .await?
+            .ok_or_else(|| DbErr::RecordNotFound("client for credit note not found".to_string()))?;
 
         let items = CreditNoteItems::find()
             .filter(tenant_entity::credit_note_items::Column::CreditNoteId.eq(note.id.clone()))
             .all(db)
             .await?;
 
-        let total: f64 = items.iter()
+        let total: f64 = items
+            .iter()
             .map(|item| (item.quantity as f64) * item.price)
             .sum();
+        let mut response_items = Vec::new();
 
-        Ok(CreditNoteResponse {
+        for item in items {
+            let product = Products::find_by_id(&item.product_id)
+                .one(db)
+                .await?
+                .ok_or_else(|| DbErr::RecordNotFound("product for credit note not found".to_string()))?;
+            response_items.push(CreditNoteProductItem {
+                product_id: item.product_id,
+                name: product.name,
+                quantity: item.quantity,
+                price: item.price,
+            });
+        }
+
+        Ok(CreditNoteDetailsResponse {
             id: note.id,
             invoice_id: note.invoice_id,
+            invoice_identifier: invoice.identifier,
             client_id: note.client_id,
             identifier: note.identifier,
             reason: note.reason,
             created_at: note.created_at.to_string(),
             total,
+            client: CreditNoteClientInfo {
+                full_name: client.full_name,
+                email: client.email,
+                address: client.address,
+                phone_number: client.phone_number,
+                ice: client.ice,
+                if_number: client.if_number,
+                rc: client.rc,
+                patente: client.patente,
+            },
+            items: response_items,
         })
     }
 }

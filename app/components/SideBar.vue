@@ -2,6 +2,7 @@
 import {
   ArrowLeftRight,
   BarChart3Icon,
+  FileMinus,
   HomeIcon,
   Languages,
   Package,
@@ -61,6 +62,12 @@ const menuItems = [
     icon: ReceiptText,
     label: "routes.invoices",
     path: "/invoices/",
+    query: { page: 1 },
+  },
+  {
+    icon: FileMinus,
+    label: "routes.credit-notes",
+    path: "/credit-notes/",
     query: { page: 1 },
   },
   {

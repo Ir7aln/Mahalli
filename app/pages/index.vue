@@ -28,6 +28,16 @@ const pages = ref([
     path: "/invoices/",
   },
   {
+    image: "",
+    text: "delivery-notes",
+    path: "/delivery-notes/",
+  },
+  {
+    image: "",
+    text: "credit-notes",
+    path: "/credit-notes/",
+  },
+  {
     image: "/inventory.jpg",
     text: "inventory",
     path: "/inventory",

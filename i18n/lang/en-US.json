@@ -106,6 +106,7 @@
     "credit": "Credit",
     "threshold": "Threshold",
     "item": "Item",
+    "product": "Product",
     "sub-total": "sub-total",
     "vat-rate": "VAT rate",
     "vat-amount": "VAT amount",
@@ -140,6 +141,18 @@
     "payment-description": "Optional payment note",
     "no-payments": "No payments recorded yet",
     "reason": "Enter reason for credit note"
+  },
+  "seller-profile": {
+    "title": "Seller profile",
+    "description": "Company information used on B2B documents and invoices.",
+    "fields": {
+      "legal-name": "Legal name",
+      "commercial-name": "Commercial name",
+      "city": "City",
+      "currency": "Default currency",
+      "payment-terms": "Payment terms in days",
+      "invoice-footer": "Invoice footer"
+    }
   },
   "status": {
     "pending": "Pending",
@@ -282,6 +295,9 @@
     "credit-note": {
       "created": "A credit note has been created"
     },
+    "seller-profile": {
+      "updated": "Seller profile has been updated"
+    },
     "invoice": {
       "created": "An Invoice has been created",
       "updated": "The Invoice has been updated",
@@ -329,6 +345,16 @@
       "invoice-payment-amount-invalid": "The payment amount must be greater than zero.",
       "invoice-payment-deleted": "Payments cannot be added to a deleted invoice.",
       "invoice-payment-exceeds-remaining": "The payment amount exceeds the remaining unpaid amount.",
+      "invoice-finalize-requires-paid": "Only fully paid invoices can be finalized.",
+      "invoice-finalized-edit-blocked": "Finalized invoices cannot be edited.",
+      "invoice-finalized-delete-blocked": "Finalized invoices cannot be deleted.",
+      "credit-note-requires-finalized-invoice": "Credit notes can only be created for finalized invoices.",
+      "credit-note-empty": "A credit note must contain at least one item.",
+      "credit-note-quantity-invalid": "Credit note quantities must be greater than zero.",
+      "credit-note-price-invalid": "Credit note prices cannot be negative.",
+      "credit-note-item-not-on-invoice": "One credit note item is not part of the source invoice.",
+      "credit-note-quantity-exceeds-invoice": "A credit note quantity exceeds the invoiced quantity.",
+      "credit-note-price-exceeds-invoice": "A credit note price exceeds the invoiced price.",
       "order-status-invalid": "The order status is invalid.",
       "invoice-status-invalid": "The invoice status is invalid.",
       "status-transition-invalid": "That status change is not allowed.",

@@ -848,7 +848,18 @@ impl InvoicesService {
 
     pub async fn delete_invoice(db: &DbConn, id: String) -> Result<u64, DbErr> {
         let invoice_model = Invoices::find_by_id(id).one(db).await?;
-        let mut invoice_active: InvoiceActiveModel = invoice_model.unwrap().into();
+        let invoice = invoice_model.ok_or_else(|| DbErr::RecordNotFound("invoice not found".to_string()))?;
+        let current_status = InvoiceStatus::from_str(&invoice.status).ok_or_else(|| {
+            DbErr::Custom(format!("corrupted invoice status: {}", invoice.status))
+        })?;
+
+        if current_status == InvoiceStatus::Finalized {
+            return Err(DbErr::Custom(
+                "finalized invoices cannot be deleted".to_string(),
+            ));
+        }
+
+        let mut invoice_active: InvoiceActiveModel = invoice.into();
         invoice_active.is_deleted = ActiveValue::Set(true);
         match invoice_active.update(db).await {
             Ok(_) => Ok(1),

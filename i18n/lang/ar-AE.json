@@ -106,6 +106,7 @@
     "credit": "الائتمان",
     "threshold": "العتبة",
     "item": "العنصر",
+    "product": "المنتج",
     "sub-total": "المجموع الفرعي",
     "vat-rate": "نسبة ضريبة القيمة المضافة",
     "vat-amount": "مبلغ ضريبة القيمة المضافة",
@@ -140,6 +141,18 @@
     "payment-description": "ملاحظة دفع اختيارية",
     "no-payments": "لا توجد دفعات مسجلة بعد",
     "reason": "أدخل سبب إشعار الخصم"
+  },
+  "seller-profile": {
+    "title": "ملف البائع",
+    "description": "معلومات الشركة المستخدمة في مستندات B2B والفواتير.",
+    "fields": {
+      "legal-name": "الاسم القانوني",
+      "commercial-name": "الاسم التجاري",
+      "city": "المدينة",
+      "currency": "العملة الافتراضية",
+      "payment-terms": "مدة الدفع بالأيام",
+      "invoice-footer": "تذييل الفاتورة"
+    }
   },
   "status": {
     "pending": "قيد الانتظار",
@@ -281,6 +294,9 @@
     "credit-note": {
       "created": "تم إنشاء إشعار الخصم"
     },
+    "seller-profile": {
+      "updated": "تم تحديث ملف البائع"
+    },
     "invoice": {
       "created": "تم إنشاء فاتورة",
       "updated": "تم تحديث الفاتورة",
@@ -328,6 +344,16 @@
       "invoice-payment-amount-invalid": "يجب أن يكون مبلغ الدفعة أكبر من صفر.",
       "invoice-payment-deleted": "لا يمكن إضافة دفعة إلى فاتورة محذوفة.",
       "invoice-payment-exceeds-remaining": "مبلغ الدفعة يتجاوز المبلغ المتبقي غير المدفوع.",
+      "invoice-finalize-requires-paid": "يمكن إنهاء الفواتير المدفوعة بالكامل فقط.",
+      "invoice-finalized-edit-blocked": "لا يمكن تعديل الفواتير النهائية.",
+      "invoice-finalized-delete-blocked": "لا يمكن حذف الفواتير النهائية.",
+      "credit-note-requires-finalized-invoice": "يمكن إنشاء إشعارات الخصم للفواتير النهائية فقط.",
+      "credit-note-empty": "يجب أن يحتوي إشعار الخصم على عنصر واحد على الأقل.",
+      "credit-note-quantity-invalid": "يجب أن تكون كميات إشعار الخصم أكبر من صفر.",
+      "credit-note-price-invalid": "لا يمكن أن تكون أسعار إشعار الخصم سالبة.",
+      "credit-note-item-not-on-invoice": "أحد عناصر إشعار الخصم غير موجود في الفاتورة الأصلية.",
+      "credit-note-quantity-exceeds-invoice": "كمية في إشعار الخصم تتجاوز الكمية المفوترة.",
+      "credit-note-price-exceeds-invoice": "سعر في إشعار الخصم يتجاوز السعر المفوتر.",
       "order-status-invalid": "حالة الطلب غير صالحة.",
       "invoice-status-invalid": "حالة الفاتورة غير صالحة.",
       "status-transition-invalid": "لا يُسمح بهذا التغيير في الحالة.",

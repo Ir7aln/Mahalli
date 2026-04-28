@@ -133,8 +133,10 @@ function toggleSort(key: string) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent class="rtl:ml-6 ltr:mr-6">
                   <DropdownMenuItem>
-                    <Printer :size="20" class="text-slate-800 inline mr-2" />
-                    {{ t("buttons.print") }}
+                    <NuxtLink :to="localePath(`/credit-notes/${creditNote.id}`)">
+                      <Printer :size="20" class="text-slate-800 inline mr-2" />
+                      {{ t("buttons.print") }}
+                    </NuxtLink>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

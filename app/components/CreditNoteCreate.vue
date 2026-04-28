@@ -22,6 +22,7 @@ const { t, n } = useI18n();
 const { showErrorToast } = useCommandError();
 const { close } = useModal();
 const router = useRouter();
+const localePath = useLocalePath();
 const isPosting = ref(false);
 const loading = ref(true);
 const invoiceDetails = ref<InvoiceWithClient | null>(null);
@@ -87,6 +88,10 @@ function addItem() {
   });
 }
 
+function invoiceItemAt(index: number) {
+  return invoiceDetails.value?.items?.[index] ?? null;
+}
+
 const onSubmit = handleSubmit(async (formData) => {
   isPosting.value = true;
 
@@ -105,11 +110,12 @@ const onSubmit = handleSubmit(async (formData) => {
       action: {
         label: t("buttons.view"),
         onClick: () => {
-          router.push(`/credit-notes/${result.data?.id}`);
+          router.push(localePath(`/credit-notes/${result.data.data?.id}`));
         },
       },
     });
   } catch (err: any) {
+    showErrorToast(err);
     Logger.error(`ERROR CREATE CREDIT NOTE: ${err.error ? err.error : err.message}`);
   } finally {
     isPosting.value = false;
@@ -171,7 +177,7 @@ const onSubmit = handleSubmit(async (formData) => {
                       <Input
                         v-bind="componentField"
                         disabled
-                        :value="invoiceDetails?.items?.[idx]?.product_name || ''"
+                        :value="invoiceItemAt(idx)?.name || ''"
                         class="bg-slate-50"
                       />
                     </FormControl>
@@ -184,7 +190,12 @@ const onSubmit = handleSubmit(async (formData) => {
                   <FormItem>
                     <FormLabel class="text-xs">{{ t("fields.quantity") }}</FormLabel>
                     <FormControl>
-                      <Input v-bind="componentField" type="number" min="0" />
+                      <Input
+                        v-bind="componentField"
+                        type="number"
+                        min="1"
+                        :max="invoiceItemAt(idx)?.quantity"
+                      />
                     </FormControl>
                   </FormItem>
                 </FormField>
@@ -195,7 +206,13 @@ const onSubmit = handleSubmit(async (formData) => {
                   <FormItem>
                     <FormLabel class="text-xs">{{ t("fields.price") }}</FormLabel>
                     <FormControl>
-                      <Input v-bind="componentField" type="number" min="0" step="0.01" />
+                      <Input
+                        v-bind="componentField"
+                        type="number"
+                        min="0"
+                        :max="invoiceItemAt(idx)?.price"
+                        step="0.01"
+                      />
                     </FormControl>
                   </FormItem>
                 </FormField>

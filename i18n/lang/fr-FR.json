@@ -106,6 +106,7 @@
     "credit": "Crédit",
     "threshold": "Seuil",
     "item": "Article",
+    "product": "Produit",
     "sub-total": "Sous-total",
     "vat-rate": "Taux de TVA",
     "vat-amount": "Montant de la TVA",
@@ -140,6 +141,18 @@
     "payment-description": "Note de paiement facultative",
     "no-payments": "Aucun paiement enregistré",
     "reason": "Entrez la raison du note de crédit"
+  },
+  "seller-profile": {
+    "title": "Profil vendeur",
+    "description": "Informations de l'entreprise utilisées sur les documents B2B et les factures.",
+    "fields": {
+      "legal-name": "Raison sociale",
+      "commercial-name": "Nom commercial",
+      "city": "Ville",
+      "currency": "Devise par défaut",
+      "payment-terms": "Délai de paiement en jours",
+      "invoice-footer": "Pied de facture"
+    }
   },
   "status": {
     "pending": "En attente",
@@ -281,6 +294,9 @@
     "credit-note": {
       "created": "Un avoir a été créé"
     },
+    "seller-profile": {
+      "updated": "Le profil vendeur a été mis à jour"
+    },
     "invoice": {
       "created": "Une facture a été créée",
       "updated": "La facture a été mise à jour",
@@ -328,6 +344,16 @@
       "invoice-payment-amount-invalid": "Le montant du paiement doit être supérieur à zéro.",
       "invoice-payment-deleted": "Impossible d'ajouter un paiement à une facture supprimée.",
       "invoice-payment-exceeds-remaining": "Le montant du paiement dépasse le reste à payer.",
+      "invoice-finalize-requires-paid": "Seules les factures entièrement payées peuvent être finalisées.",
+      "invoice-finalized-edit-blocked": "Les factures finalisées ne peuvent pas être modifiées.",
+      "invoice-finalized-delete-blocked": "Les factures finalisées ne peuvent pas être supprimées.",
+      "credit-note-requires-finalized-invoice": "Les avoirs ne peuvent être créés que pour des factures finalisées.",
+      "credit-note-empty": "Un avoir doit contenir au moins un article.",
+      "credit-note-quantity-invalid": "Les quantités de l'avoir doivent être supérieures à zéro.",
+      "credit-note-price-invalid": "Les prix de l'avoir ne peuvent pas être négatifs.",
+      "credit-note-item-not-on-invoice": "Un article de l'avoir ne fait pas partie de la facture source.",
+      "credit-note-quantity-exceeds-invoice": "Une quantité de l'avoir dépasse la quantité facturée.",
+      "credit-note-price-exceeds-invoice": "Un prix de l'avoir dépasse le prix facturé.",
       "order-status-invalid": "Le statut de la commande est invalide.",
       "invoice-status-invalid": "Le statut de la facture est invalide.",
       "status-transition-invalid": "Ce changement de statut n'est pas autorisé.",

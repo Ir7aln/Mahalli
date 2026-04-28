@@ -28,6 +28,7 @@ pub fn builder<R: Runtime>() -> Builder<R> {
         commands::clients::delete_client,
         commands::delivery_notes::list_delivery_notes,
         commands::delivery_notes::list_delivery_note_products,
+        commands::delivery_notes::get_delivery_note,
         commands::delivery_notes::create_delivery_note_from_order,
         commands::credit_notes::create_credit_note,
         commands::credit_notes::list_credit_notes,

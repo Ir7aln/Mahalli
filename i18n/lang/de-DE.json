@@ -106,6 +106,7 @@
     "credit": "Kredit",
     "threshold": "Schwellenwert",
     "item": "Artikel",
+    "product": "Produkt",
     "sub-total": "Zwischensumme",
     "vat-rate": "Mehrwertsteuersatz",
     "vat-amount": "Mehrwertsteuerbetrag",
@@ -140,6 +141,18 @@
     "payment-description": "Optionale Zahlungsnotiz",
     "no-payments": "Noch keine Zahlungen erfasst",
     "reason": "Geben Sie den Grund für die Gutschrift ein"
+  },
+  "seller-profile": {
+    "title": "Verkäuferprofil",
+    "description": "Unternehmensdaten für B2B-Dokumente und Rechnungen.",
+    "fields": {
+      "legal-name": "Rechtlicher Name",
+      "commercial-name": "Handelsname",
+      "city": "Stadt",
+      "currency": "Standardwährung",
+      "payment-terms": "Zahlungsziel in Tagen",
+      "invoice-footer": "Rechnungsfußzeile"
+    }
   },
   "status": {
     "pending": "Ausstehend",
@@ -282,6 +295,9 @@
     "credit-note": {
       "created": "Eine Gutschrift wurde erstellt"
     },
+    "seller-profile": {
+      "updated": "Verkäuferprofil wurde aktualisiert"
+    },
     "invoice": {
       "created": "Eine Rechnung wurde erstellt",
       "updated": "Die Rechnung wurde aktualisiert",
@@ -329,6 +345,16 @@
       "invoice-payment-amount-invalid": "Der Zahlungsbetrag muss größer als null sein.",
       "invoice-payment-deleted": "Zu einer gelöschten Rechnung kann keine Zahlung hinzugefügt werden.",
       "invoice-payment-exceeds-remaining": "Der Zahlungsbetrag überschreitet den offenen Restbetrag.",
+      "invoice-finalize-requires-paid": "Nur vollständig bezahlte Rechnungen können finalisiert werden.",
+      "invoice-finalized-edit-blocked": "Finalisierte Rechnungen können nicht bearbeitet werden.",
+      "invoice-finalized-delete-blocked": "Finalisierte Rechnungen können nicht gelöscht werden.",
+      "credit-note-requires-finalized-invoice": "Gutschriften können nur für finalisierte Rechnungen erstellt werden.",
+      "credit-note-empty": "Eine Gutschrift muss mindestens einen Artikel enthalten.",
+      "credit-note-quantity-invalid": "Gutschriftmengen müssen größer als null sein.",
+      "credit-note-price-invalid": "Gutschriftpreise dürfen nicht negativ sein.",
+      "credit-note-item-not-on-invoice": "Ein Gutschriftartikel gehört nicht zur Ausgangsrechnung.",
+      "credit-note-quantity-exceeds-invoice": "Eine Gutschriftmenge überschreitet die fakturierte Menge.",
+      "credit-note-price-exceeds-invoice": "Ein Gutschriftpreis überschreitet den fakturierten Preis.",
       "order-status-invalid": "Der Auftragsstatus ist ungültig.",
       "invoice-status-invalid": "Der Rechnungsstatus ist ungültig.",
       "status-transition-invalid": "Dieser Statuswechsel ist nicht erlaubt.",

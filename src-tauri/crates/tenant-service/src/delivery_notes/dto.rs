@@ -40,8 +40,44 @@ pub struct DeliveryNotesResponse {
     pub delivery_notes: Vec<SelectDeliveryNotes>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Type)]
+pub struct DeliveryNoteDetailsResponse {
+    pub id: String,
+    pub created_at: String,
+    pub client_id: String,
+    pub identifier: Option<String>,
+    pub order_id: String,
+    pub order_identifier: Option<String>,
+    #[specta(type = f32)]
+    pub total: f32,
+    pub client: DeliveryNoteClientInfo,
+    pub items: Vec<DeliveryNoteProductDetailItem>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Type)]
+pub struct DeliveryNoteClientInfo {
+    pub full_name: String,
+    pub email: Option<String>,
+    pub phone_number: Option<String>,
+    pub address: Option<String>,
+    pub ice: Option<String>,
+    pub if_number: Option<String>,
+    pub rc: Option<String>,
+    pub patente: Option<String>,
+}
+
 #[derive(Debug, Serialize, Deserialize, FromQueryResult, Type)]
 pub struct DeliveryNoteProductItem {
+    pub name: String,
+    #[specta(type = f32)]
+    pub price: f32,
+    #[specta(type = f32)]
+    pub quantity: f32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Type)]
+pub struct DeliveryNoteProductDetailItem {
+    pub product_id: String,
     pub name: String,
     #[specta(type = f32)]
     pub price: f32,
