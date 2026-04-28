@@ -143,6 +143,7 @@
     "shipped": "شحنت",
     "delivered": "تم التسليم",
     "cancelled": "ملغى",
+    "completed": "مكتمل",
     "draft": "مسودة",
     "sent": "تم الإرسال",
     "paid": "مدفوع",

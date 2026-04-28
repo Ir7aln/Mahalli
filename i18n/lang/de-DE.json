@@ -143,6 +143,7 @@
     "shipped": "Versandt",
     "delivered": "Geliefert",
     "cancelled": "Storniert",
+    "completed": "Abgeschlossen",
     "draft": "Entwurf",
     "sent": "Gesendet",
     "paid": "Bezahlt",
