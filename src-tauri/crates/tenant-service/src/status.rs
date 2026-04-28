@@ -48,6 +48,8 @@ impl OrderStatus {
 pub enum InvoiceStatus {
     #[serde(rename = "DRAFT")]
     Draft,
+    #[serde(rename = "FINALIZED")]
+    Finalized,
     #[serde(rename = "PAID")]
     Paid,
     #[serde(rename = "PARTIALLY_PAID")]
@@ -60,6 +62,7 @@ impl InvoiceStatus {
     pub fn as_str(&self) -> &'static str {
         match self {
             InvoiceStatus::Draft => "DRAFT",
+            InvoiceStatus::Finalized => "FINALIZED",
             InvoiceStatus::Paid => "PAID",
             InvoiceStatus::PartiallyPaid => "PARTIALLY_PAID",
             InvoiceStatus::Cancelled => "CANCELLED",
@@ -69,6 +72,7 @@ impl InvoiceStatus {
     pub fn from_str(s: &str) -> Option<Self> {
         match s {
             "DRAFT" => Some(InvoiceStatus::Draft),
+            "FINALIZED" => Some(InvoiceStatus::Finalized),
             "PAID" => Some(InvoiceStatus::Paid),
             "PARTIALLY_PAID" => Some(InvoiceStatus::PartiallyPaid),
             "CANCELLED" => Some(InvoiceStatus::Cancelled),
@@ -82,8 +86,11 @@ impl InvoiceStatus {
             (InvoiceStatus::Cancelled, _) => false,
             (InvoiceStatus::Paid, InvoiceStatus::Paid) => true,
             (InvoiceStatus::Paid, _) => false,
+            (InvoiceStatus::Draft, InvoiceStatus::Finalized) => true,
             (InvoiceStatus::Draft, InvoiceStatus::Paid) => true,
             (InvoiceStatus::Draft, InvoiceStatus::PartiallyPaid) => true,
+            (InvoiceStatus::Finalized, InvoiceStatus::PartiallyPaid) => true,
+            (InvoiceStatus::Finalized, InvoiceStatus::Paid) => true,
             (InvoiceStatus::PartiallyPaid, InvoiceStatus::Paid) => true,
             (_, InvoiceStatus::Cancelled) => true,
             _ => false,

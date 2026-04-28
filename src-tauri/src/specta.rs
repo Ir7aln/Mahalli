@@ -58,6 +58,7 @@ pub fn builder<R: Runtime>() -> Builder<R> {
         commands::invoices::list_invoice_products,
         commands::invoices::create_invoice_from_delivery_note,
         commands::invoices::update_invoice_status,
+        commands::invoices::finalize_invoice,
         commands::invoice_items::delete_invoice_item,
         commands::dashboard::list_inventory_stats,
         commands::dashboard::list_top_clients,

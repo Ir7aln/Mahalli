@@ -1,6 +1,6 @@
 use super::dto::*;
 use crate::InvoiceStatus;
-use chrono::{DateTime, NaiveDate, NaiveDateTime};
+use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
 use sea_orm::{
     sea_query::{
         Alias, Cond, Expr, Func, Query, SimpleExpr, SqliteQueryBuilder, SubQueryStatement,
@@ -614,6 +614,18 @@ impl InvoicesService {
         db.transaction::<_, (), DbErr>(|txn| {
             Box::pin(async move {
                 let invoice_model = Invoices::find_by_id(invoice.id.clone()).one(txn).await?;
+                let current_invoice = invoice_model.as_ref().unwrap();
+
+                let current_status = InvoiceStatus::from_str(&current_invoice.status).ok_or_else(|| {
+                    DbErr::Custom(format!("corrupted invoice status: {}", current_invoice.status))
+                })?;
+
+                if current_status == InvoiceStatus::Finalized {
+                    return Err(DbErr::Custom(
+                        "finalized invoices cannot be edited".to_string(),
+                    ));
+                }
+
                 let mut invoice_active: InvoiceActiveModel = invoice_model.unwrap().into();
                 invoice_active.client_id = ActiveValue::Set(invoice.client_id);
                 invoice_active.status = ActiveValue::Set(invoice.status);
@@ -808,6 +820,30 @@ impl InvoicesService {
 
         let mut invoice_active: InvoiceActiveModel = invoice.into();
         invoice_active.status = ActiveValue::Set(next_status.as_str().to_string());
+        match invoice_active.update(db).await {
+            Ok(_) => Ok(()),
+            Err(err) => Err(err),
+        }
+    }
+
+    pub async fn finalize_invoice(db: &DbConn, id: String) -> Result<(), DbErr> {
+        let invoice_model = Invoices::find_by_id(&id).one(db).await?;
+        let invoice =
+            invoice_model.ok_or_else(|| DbErr::RecordNotFound("invoice not found".to_string()))?;
+
+        let current_status = InvoiceStatus::from_str(&invoice.status).ok_or_else(|| {
+            DbErr::Custom(format!("corrupted invoice status: {}", invoice.status))
+        })?;
+
+        if current_status != InvoiceStatus::Draft {
+            return Err(DbErr::Custom(
+                "only draft invoices can be finalized".to_string(),
+            ));
+        }
+
+        let mut invoice_active: InvoiceActiveModel = invoice.into();
+        invoice_active.status = ActiveValue::Set(InvoiceStatus::Finalized.as_str().to_string());
+        invoice_active.finalized_at = ActiveValue::Set(Some(Utc::now().naive_utc()));
         match invoice_active.update(db).await {
             Ok(_) => Ok(()),
             Err(err) => Err(err),

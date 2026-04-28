@@ -125,6 +125,20 @@ pub async fn update_invoice_status(
 
 #[tauri::command]
 #[specta::specta]
+pub async fn finalize_invoice(state: State<'_, AppState>, id: String) -> SResult<()> {
+    let db_conn = tenant_db_or_fail(&state).await?;
+    match InvoicesService::finalize_invoice(&db_conn, id).await {
+        Ok(_) => Ok(Success {
+            error: None,
+            message: Option::Some(String::from("invoice finalized successfully")),
+            data: None,
+        }),
+        Err(err) => Err(err.into()),
+    }
+}
+
+#[tauri::command]
+#[specta::specta]
 pub async fn delete_invoice(state: State<'_, AppState>, id: String) -> SResult<u64> {
     let db_conn = tenant_db_or_fail(&state).await?;
     match InvoicesService::delete_invoice(&db_conn, id).await {
