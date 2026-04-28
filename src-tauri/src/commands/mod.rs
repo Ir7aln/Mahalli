@@ -17,6 +17,7 @@ pub mod products;
 pub mod quote_items;
 pub mod quotes;
 pub mod seed;
+pub mod seller_profile;
 pub mod templates;
 
 #[derive(Deserialize, Serialize, Debug, Clone, Type)]

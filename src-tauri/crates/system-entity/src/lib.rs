@@ -3,3 +3,4 @@
 pub mod prelude;
 
 pub mod databases;
+pub mod seller_profile;

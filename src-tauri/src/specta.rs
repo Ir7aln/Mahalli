@@ -66,6 +66,8 @@ pub fn builder<R: Runtime>() -> Builder<R> {
         commands::dashboard::list_financial_metrics,
         commands::column_preferences::get_column_preferences,
         commands::column_preferences::save_column_preferences,
+        commands::seller_profile::get_seller_profile,
+        commands::seller_profile::update_seller_profile,
         commands::seed::seed_database,
     ])
 }
