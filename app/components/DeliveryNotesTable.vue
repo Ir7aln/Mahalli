@@ -26,14 +26,17 @@ const sortDirection = computed(() =>
   queryString(route.query.direction) === "desc" ? "desc" : "asc",
 );
 
-const visibleCols = computed(() => props.visibleColumns ?? [
-  "identifier",
-  "full_name",
-  "order_identifier",
-  "products",
-  "created_at",
-  "total",
-]);
+const visibleCols = computed(
+  () =>
+    props.visibleColumns ?? [
+      "identifier",
+      "full_name",
+      "order_identifier",
+      "products",
+      "created_at",
+      "total",
+    ],
+);
 
 let previewProductsTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -144,21 +147,28 @@ async function createInvoiceFromDeliveryNote(id: string) {
           <TableCell v-if="visibleCols.includes('full_name')" class="p-2 font-medium">
             <Popover>
               <PopoverTrigger as-child>
-                <Button
-                  variant="link"
-                  class="underline px-0 h-fit text-nowrap"
-                >
+                <Button variant="link" class="underline px-0 h-fit text-nowrap">
                   {{ deliveryNote.full_name }}
                 </Button>
               </PopoverTrigger>
               <PopoverContent class="min-w-[18rem] p-3">
                 <div class="space-y-3">
                   <div>
-                    <p class="text-xs text-muted-foreground">{{ t('fields.full-name') }}</p>
+                    <p class="text-xs text-muted-foreground">{{ t("fields.full-name") }}</p>
                     <p class="text-sm font-medium">{{ deliveryNote.full_name }}</p>
                   </div>
-                  <div v-if="deliveryNote.ice || deliveryNote.if_number || deliveryNote.rc || deliveryNote.patente" class="border-t pt-2">
-                    <p class="text-xs text-muted-foreground mb-2">{{ t('fields.legal-identifiers') }}</p>
+                  <div
+                    v-if="
+                      deliveryNote.ice ||
+                      deliveryNote.if_number ||
+                      deliveryNote.rc ||
+                      deliveryNote.patente
+                    "
+                    class="border-t pt-2"
+                  >
+                    <p class="text-xs text-muted-foreground mb-2">
+                      {{ t("fields.legal-identifiers") }}
+                    </p>
                     <div class="space-y-1 text-sm">
                       <div v-if="deliveryNote.ice">
                         <span class="text-xs text-slate-500">ICE:</span>
@@ -173,24 +183,27 @@ async function createInvoiceFromDeliveryNote(id: string) {
                         <span class="font-mono">{{ deliveryNote.rc }}</span>
                       </div>
                       <div v-if="deliveryNote.patente">
-                        <span class="text-xs text-slate-500">{{ t('fields.patente') }}:</span>
+                        <span class="text-xs text-slate-500">{{ t("fields.patente") }}:</span>
                         <span class="font-mono">{{ deliveryNote.patente }}</span>
                       </div>
                     </div>
                   </div>
-                  <div v-if="deliveryNote.email || deliveryNote.phone_number || deliveryNote.address" class="border-t pt-2">
-                    <p class="text-xs text-muted-foreground mb-2">{{ t('fields.contact') }}</p>
+                  <div
+                    v-if="deliveryNote.email || deliveryNote.phone_number || deliveryNote.address"
+                    class="border-t pt-2"
+                  >
+                    <p class="text-xs text-muted-foreground mb-2">{{ t("fields.contact") }}</p>
                     <div class="space-y-1 text-sm">
                       <div v-if="deliveryNote.email">
-                        <span class="text-xs text-slate-500">{{ t('fields.email') }}:</span>
+                        <span class="text-xs text-slate-500">{{ t("fields.email") }}:</span>
                         <span>{{ deliveryNote.email }}</span>
                       </div>
                       <div v-if="deliveryNote.phone_number">
-                        <span class="text-xs text-slate-500">{{ t('fields.phone') }}:</span>
+                        <span class="text-xs text-slate-500">{{ t("fields.phone") }}:</span>
                         <span>{{ deliveryNote.phone_number }}</span>
                       </div>
                       <div v-if="deliveryNote.address">
-                        <span class="text-xs text-slate-500">{{ t('fields.address') }}:</span>
+                        <span class="text-xs text-slate-500">{{ t("fields.address") }}:</span>
                         <span>{{ deliveryNote.address }}</span>
                       </div>
                     </div>
@@ -201,7 +214,12 @@ async function createInvoiceFromDeliveryNote(id: string) {
           </TableCell>
           <TableCell v-if="visibleCols.includes('order_identifier')" class="p-2">
             <NuxtLink
-              :to="localePath({ path: '/orders/', query: { page: 1, search: deliveryNote.order_identifier } })"
+              :to="
+                localePath({
+                  path: '/orders/',
+                  query: { page: 1, search: deliveryNote.order_identifier },
+                })
+              "
               class="inline-flex items-center gap-2 underline decoration-slate-300 underline-offset-4"
             >
               <FileText class="size-4 text-slate-500" />
@@ -218,7 +236,9 @@ async function createInvoiceFromDeliveryNote(id: string) {
                   @mouseenter.passive="previewProducts(deliveryNote.id)"
                   @mouseleave.passive="cancelPreviewProducts"
                 >
-                  {{ `${deliveryNote.products} ${t("plrz.p", { n: Math.ceil(deliveryNote.products) })}` }}
+                  {{
+                    `${deliveryNote.products} ${t("plrz.p", { n: Math.ceil(deliveryNote.products) })}`
+                  }}
                 </Button>
               </PopoverTrigger>
               <PopoverContent class="min-w-[13rem] p-2">
@@ -241,7 +261,9 @@ async function createInvoiceFromDeliveryNote(id: string) {
               </PopoverContent>
             </Popover>
             <template v-else>
-              {{ `${deliveryNote.products} ${t("plrz.p", { n: Math.ceil(deliveryNote.products ?? 0) })}` }}
+              {{
+                `${deliveryNote.products} ${t("plrz.p", { n: Math.ceil(deliveryNote.products ?? 0) })}`
+              }}
             </template>
           </TableCell>
           <TableCell v-if="visibleCols.includes('created_at')" class="p-2">

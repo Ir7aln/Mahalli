@@ -21,18 +21,21 @@ const modal = useModal();
 const clientInvoiceDebts = ref<ClientInvoiceDebtItem[]>([]);
 const debtCache = reactive<Record<string, ClientInvoiceDebtItem[]>>({});
 
-const visibleCols = computed(() => props.visibleColumns ?? [
-  "avatar",
-  "full_name",
-  "email",
-  "phone_number",
-  "address",
-  "ice",
-  "if_number",
-  "rc",
-  "patente",
-  "credit",
-]);
+const visibleCols = computed(
+  () =>
+    props.visibleColumns ?? [
+      "avatar",
+      "full_name",
+      "email",
+      "phone_number",
+      "address",
+      "ice",
+      "if_number",
+      "rc",
+      "patente",
+      "credit",
+    ],
+);
 const sortKey = computed(() => queryString(route.query.sort));
 const sortDirection = computed(() =>
   queryString(route.query.direction) === "desc" ? "desc" : "asc",
@@ -205,7 +208,10 @@ function toggleThisClient(client: SelectClients, name: "delete" | "update") {
               </AvatarFallback>
             </Avatar>
           </TableCell>
-          <TableCell v-if="visibleCols.includes('full_name')" class="p-2 whitespace-nowrap font-medium">
+          <TableCell
+            v-if="visibleCols.includes('full_name')"
+            class="p-2 whitespace-nowrap font-medium"
+          >
             {{ client?.full_name }}
           </TableCell>
           <TableCell v-if="visibleCols.includes('email')" class="p-2">
@@ -313,5 +319,3 @@ function toggleThisClient(client: SelectClients, name: "delete" | "update") {
     <Pagination />
   </div>
 </template>
-
-

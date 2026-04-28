@@ -35,8 +35,4 @@ export const INVOICE_STATUSES = [
   "FINALIZED",
 ] as const;
 
-export const ORDER_STATUSES = [
-  "PENDING",
-  "COMPLETED",
-  "CANCELLED",
-] as const;
+export const ORDER_STATUSES = ["PENDING", "COMPLETED", "CANCELLED"] as const;

@@ -119,12 +119,16 @@ onMounted(async () => {
   }
 });
 
-watch(visibleColumns, async (newColumns) => {
-  await commands.saveColumnPreferences({
-    page: "products",
-    visible_columns: newColumns,
-  });
-}, { deep: true });
+watch(
+  visibleColumns,
+  async (newColumns) => {
+    await commands.saveColumnPreferences({
+      page: "products",
+      visible_columns: newColumns,
+    });
+  },
+  { deep: true },
+);
 
 function clearFilter(key: string) {
   if (key === "stock_status") stockStatus.value = "";
@@ -201,11 +205,19 @@ const openCreateProductModal = () => modal.open(ProductCreate, {});
                 <div class="space-y-5">
                   <div class="space-y-2">
                     <p class="text-xs text-muted-foreground">{{ t("filters.min") }}</p>
-                    <Input v-model="sellingPriceMin" type="number" :placeholder="t('filters.min')" />
+                    <Input
+                      v-model="sellingPriceMin"
+                      type="number"
+                      :placeholder="t('filters.min')"
+                    />
                   </div>
                   <div class="space-y-2">
                     <p class="text-xs text-muted-foreground">{{ t("filters.max") }}</p>
-                    <Input v-model="sellingPriceMax" type="number" :placeholder="t('filters.max')" />
+                    <Input
+                      v-model="sellingPriceMax"
+                      type="number"
+                      :placeholder="t('filters.max')"
+                    />
                   </div>
                 </div>
               </DropdownMenuSubContent>
@@ -217,5 +229,3 @@ const openCreateProductModal = () => modal.open(ProductCreate, {});
     </div>
   </main>
 </template>
-
-

@@ -73,12 +73,16 @@ onMounted(async () => {
   }
 });
 
-watch(visibleColumns, async (newColumns) => {
-  await commands.saveColumnPreferences({
-    page: "credit-notes",
-    visible_columns: newColumns,
-  });
-}, { deep: true });
+watch(
+  visibleColumns,
+  async (newColumns) => {
+    await commands.saveColumnPreferences({
+      page: "credit-notes",
+      visible_columns: newColumns,
+    });
+  },
+  { deep: true },
+);
 </script>
 
 <template>
@@ -98,10 +102,7 @@ watch(visibleColumns, async (newColumns) => {
         </template>
       </ListFilterBar>
 
-      <CreditNotesTable
-        :credit-notes="creditNotes"
-        :visible-columns="visibleColumns"
-      />
+      <CreditNotesTable :credit-notes="creditNotes" :visible-columns="visibleColumns" />
     </div>
   </main>
 </template>

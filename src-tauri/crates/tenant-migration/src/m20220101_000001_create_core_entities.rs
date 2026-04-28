@@ -118,8 +118,16 @@ impl MigrationTrait for Migration {
                             .not_null()
                             .default("INITIAL"),
                     )
-                    .col(ColumnDef::new(InventoryTransaction::SourceId).string().null())
-                    .col(ColumnDef::new(InventoryTransaction::UnitPrice).float().null())
+                    .col(
+                        ColumnDef::new(InventoryTransaction::SourceId)
+                            .string()
+                            .null(),
+                    )
+                    .col(
+                        ColumnDef::new(InventoryTransaction::UnitPrice)
+                            .float()
+                            .null(),
+                    )
                     .col(ColumnDef::new(InventoryTransaction::Notes).text().null())
                     .col(
                         ColumnDef::new(InventoryTransaction::IsVoid)
@@ -127,8 +135,16 @@ impl MigrationTrait for Migration {
                             .not_null()
                             .default(false),
                     )
-                    .col(ColumnDef::new(InventoryTransaction::VoidedAt).date_time().null())
-                    .col(ColumnDef::new(InventoryTransaction::VoidReason).text().null())
+                    .col(
+                        ColumnDef::new(InventoryTransaction::VoidedAt)
+                            .date_time()
+                            .null(),
+                    )
+                    .col(
+                        ColumnDef::new(InventoryTransaction::VoidReason)
+                            .text()
+                            .null(),
+                    )
                     .col(
                         ColumnDef::new(InventoryTransaction::CreatedAt)
                             .date_time()

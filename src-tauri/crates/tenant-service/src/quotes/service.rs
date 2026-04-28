@@ -4,12 +4,11 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
-    clients,
-    inventory_transactions,
+    clients, inventory_transactions,
+    prelude::*,
     products,
     quote_items::{self, ActiveModel as QuoteItemActiveModel},
     quotes::{self, ActiveModel as QuoteActiveModel},
-    prelude::*,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
@@ -35,7 +34,6 @@ impl QuotesService {
             .join(JoinType::Join, quotes::Relation::Clients.def())
             .filter(
                 Cond::all()
-
                     .add(Expr::col((Quotes, quotes::Column::IsDeleted)).eq(false))
                     .add(quote_search_condition(&args.search)),
             )
@@ -103,7 +101,6 @@ impl QuotesService {
             )
             .cond_where(
                 Cond::all()
-
                     .add(Expr::col((Quotes, quotes::Column::IsDeleted)).eq(false))
                     .add(quote_search_condition(&args.search)),
             )

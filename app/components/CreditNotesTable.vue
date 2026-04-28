@@ -19,14 +19,17 @@ const sortDirection = computed(() =>
   queryString(route.query.direction) === "desc" ? "desc" : "asc",
 );
 
-const visibleCols = computed(() => props.visibleColumns ?? [
-  "identifier",
-  "full_name",
-  "invoice_identifier",
-  "reason",
-  "created_at",
-  "total",
-]);
+const visibleCols = computed(
+  () =>
+    props.visibleColumns ?? [
+      "identifier",
+      "full_name",
+      "invoice_identifier",
+      "reason",
+      "created_at",
+      "total",
+    ],
+);
 
 function toggleSort(key: string) {
   if (sortKey.value !== key) {
@@ -110,7 +113,12 @@ function toggleSort(key: string) {
           </TableCell>
           <TableCell v-if="visibleCols.includes('invoice_identifier')" class="p-2">
             <NuxtLink
-              :to="localePath({ path: '/invoices/', query: { page: 1, search: creditNote.invoice_identifier } })"
+              :to="
+                localePath({
+                  path: '/invoices/',
+                  query: { page: 1, search: creditNote.invoice_identifier },
+                })
+              "
               class="inline-flex items-center gap-2 underline decoration-slate-300 underline-offset-4"
             >
               {{ creditNote.invoice_identifier }}

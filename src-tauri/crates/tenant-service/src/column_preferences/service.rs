@@ -1,11 +1,9 @@
-use sea_orm::{
-    entity::prelude::*, ColumnTrait, EntityTrait, QueryFilter, Set,
-};
+use sea_orm::{entity::prelude::*, ColumnTrait, EntityTrait, QueryFilter, Set};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use tenant_entity::{
-    user_column_preferences::{self},
     prelude::*,
+    user_column_preferences::{self},
 };
 
 #[derive(Debug, Serialize, Deserialize, Type)]
@@ -34,8 +32,7 @@ impl ColumnPreferencesService {
 
         Ok(preference.map(|p| ColumnPreference {
             page: p.page,
-            visible_columns: serde_json::from_str(&p.visible_columns)
-                .unwrap_or_default(),
+            visible_columns: serde_json::from_str(&p.visible_columns).unwrap_or_default(),
         }))
     }
 
@@ -43,8 +40,8 @@ impl ColumnPreferencesService {
         db: &DbConn,
         args: SaveColumnPreferenceArgs,
     ) -> Result<(), DbErr> {
-        let visible_columns_json = serde_json::to_string(&args.visible_columns)
-            .unwrap_or_else(|_| "[]".to_string());
+        let visible_columns_json =
+            serde_json::to_string(&args.visible_columns).unwrap_or_else(|_| "[]".to_string());
 
         // Check if preference already exists
         let existing = UserColumnPreferences::find()

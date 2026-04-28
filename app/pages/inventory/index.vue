@@ -150,12 +150,16 @@ onMounted(async () => {
   }
 });
 
-watch(visibleColumns, async (newColumns) => {
-  await commands.saveColumnPreferences({
-    page: "inventory",
-    visible_columns: newColumns,
-  });
-}, { deep: true });
+watch(
+  visibleColumns,
+  async (newColumns) => {
+    await commands.saveColumnPreferences({
+      page: "inventory",
+      visible_columns: newColumns,
+    });
+  },
+  { deep: true },
+);
 
 function clearFilter(key: string) {
   if (key === "transaction_type") transactionType.value = "";
@@ -277,5 +281,3 @@ function clearAllFilters() {
     </div>
   </main>
 </template>
-
-

@@ -39,12 +39,16 @@ onMounted(async () => {
   }
 });
 
-watch(visibleColumns, async (newColumns) => {
-  await commands.saveColumnPreferences({
-    page: "clients",
-    visible_columns: newColumns,
-  });
-}, { deep: true });
+watch(
+  visibleColumns,
+  async (newColumns) => {
+    await commands.saveColumnPreferences({
+      page: "clients",
+      visible_columns: newColumns,
+    });
+  },
+  { deep: true },
+);
 
 const LIMIT = 50;
 
@@ -171,10 +175,12 @@ const openCreateClientModal = () => modal.open(ClientCreate, {});
                 <DropdownMenuCheckboxItem
                   :checked="!searchField"
                   @select.prevent
-                  @update:checked="() => {
-                    searchField = null;
-                    updateQueryParams({ search_field: null, page: 1 });
-                  }"
+                  @update:checked="
+                    () => {
+                      searchField = null;
+                      updateQueryParams({ search_field: null, page: 1 });
+                    }
+                  "
                 >
                   {{ t("filters.clear-all") }}
                 </DropdownMenuCheckboxItem>
@@ -182,70 +188,84 @@ const openCreateClientModal = () => modal.open(ClientCreate, {});
                 <DropdownMenuCheckboxItem
                   :checked="searchField === 'email'"
                   @select.prevent
-                  @update:checked="() => {
-                    searchField = searchField === 'email' ? null : 'email';
-                    updateQueryParams({ search_field: searchField, page: 1 });
-                  }"
+                  @update:checked="
+                    () => {
+                      searchField = searchField === 'email' ? null : 'email';
+                      updateQueryParams({ search_field: searchField, page: 1 });
+                    }
+                  "
                 >
                   {{ t("fields.email") }}
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
                   :checked="searchField === 'phone_number'"
                   @select.prevent
-                  @update:checked="() => {
-                    searchField = searchField === 'phone_number' ? null : 'phone_number';
-                    updateQueryParams({ search_field: searchField, page: 1 });
-                  }"
+                  @update:checked="
+                    () => {
+                      searchField = searchField === 'phone_number' ? null : 'phone_number';
+                      updateQueryParams({ search_field: searchField, page: 1 });
+                    }
+                  "
                 >
                   {{ t("fields.phone") }}
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
                   :checked="searchField === 'address'"
                   @select.prevent
-                  @update:checked="() => {
-                    searchField = searchField === 'address' ? null : 'address';
-                    updateQueryParams({ search_field: searchField, page: 1 });
-                  }"
+                  @update:checked="
+                    () => {
+                      searchField = searchField === 'address' ? null : 'address';
+                      updateQueryParams({ search_field: searchField, page: 1 });
+                    }
+                  "
                 >
                   {{ t("fields.address") }}
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
                   :checked="searchField === 'ice'"
                   @select.prevent
-                  @update:checked="() => {
-                    searchField = searchField === 'ice' ? null : 'ice';
-                    updateQueryParams({ search_field: searchField, page: 1 });
-                  }"
+                  @update:checked="
+                    () => {
+                      searchField = searchField === 'ice' ? null : 'ice';
+                      updateQueryParams({ search_field: searchField, page: 1 });
+                    }
+                  "
                 >
                   {{ t("fields.ice") }}
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
                   :checked="searchField === 'if_number'"
                   @select.prevent
-                  @update:checked="() => {
-                    searchField = searchField === 'if_number' ? null : 'if_number';
-                    updateQueryParams({ search_field: searchField, page: 1 });
-                  }"
+                  @update:checked="
+                    () => {
+                      searchField = searchField === 'if_number' ? null : 'if_number';
+                      updateQueryParams({ search_field: searchField, page: 1 });
+                    }
+                  "
                 >
                   {{ t("fields.if-number") }}
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
                   :checked="searchField === 'rc'"
                   @select.prevent
-                  @update:checked="() => {
-                    searchField = searchField === 'rc' ? null : 'rc';
-                    updateQueryParams({ search_field: searchField, page: 1 });
-                  }"
+                  @update:checked="
+                    () => {
+                      searchField = searchField === 'rc' ? null : 'rc';
+                      updateQueryParams({ search_field: searchField, page: 1 });
+                    }
+                  "
                 >
                   {{ t("fields.rc") }}
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
                   :checked="searchField === 'patente'"
                   @select.prevent
-                  @update:checked="() => {
-                    searchField = searchField === 'patente' ? null : 'patente';
-                    updateQueryParams({ search_field: searchField, page: 1 });
-                  }"
+                  @update:checked="
+                    () => {
+                      searchField = searchField === 'patente' ? null : 'patente';
+                      updateQueryParams({ search_field: searchField, page: 1 });
+                    }
+                  "
                 >
                   {{ t("fields.patente") }}
                 </DropdownMenuCheckboxItem>
@@ -266,5 +286,3 @@ const openCreateClientModal = () => modal.open(ClientCreate, {});
     </div>
   </main>
 </template>
-
-

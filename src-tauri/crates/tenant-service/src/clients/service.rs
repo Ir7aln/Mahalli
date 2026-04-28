@@ -92,17 +92,24 @@ fn client_credit_expr() -> SimpleExpr {
 fn client_search_condition(search: &str, search_field: Option<&str>) -> Cond {
     let pattern = format!("%{}%", search);
     match search_field {
-        Some("email") => Cond::any().add(Expr::col((Clients, clients::Column::Email)).like(pattern)),
-        Some("phone_number") => Cond::any().add(Expr::col((Clients, clients::Column::PhoneNumber)).like(pattern)),
-        Some("address") => Cond::any().add(Expr::col((Clients, clients::Column::Address)).like(pattern)),
-        Some("ice") => Cond::any().add(Expr::col((Clients, clients::Column::Ice)).like(pattern)),
-        Some("if_number") => Cond::any().add(Expr::col((Clients, clients::Column::IfNumber)).like(pattern)),
-        Some("rc") => Cond::any().add(Expr::col((Clients, clients::Column::Rc)).like(pattern)),
-        Some("patente") => Cond::any().add(Expr::col((Clients, clients::Column::Patente)).like(pattern)),
-        _ => {
-            Cond::any()
-                .add(Expr::col((Clients, clients::Column::FullName)).like(pattern))
+        Some("email") => {
+            Cond::any().add(Expr::col((Clients, clients::Column::Email)).like(pattern))
         }
+        Some("phone_number") => {
+            Cond::any().add(Expr::col((Clients, clients::Column::PhoneNumber)).like(pattern))
+        }
+        Some("address") => {
+            Cond::any().add(Expr::col((Clients, clients::Column::Address)).like(pattern))
+        }
+        Some("ice") => Cond::any().add(Expr::col((Clients, clients::Column::Ice)).like(pattern)),
+        Some("if_number") => {
+            Cond::any().add(Expr::col((Clients, clients::Column::IfNumber)).like(pattern))
+        }
+        Some("rc") => Cond::any().add(Expr::col((Clients, clients::Column::Rc)).like(pattern)),
+        Some("patente") => {
+            Cond::any().add(Expr::col((Clients, clients::Column::Patente)).like(pattern))
+        }
+        _ => Cond::any().add(Expr::col((Clients, clients::Column::FullName)).like(pattern)),
     }
 }
 
@@ -116,9 +123,11 @@ impl ClientsService {
         let count = Clients::find()
             .filter(
                 Cond::all()
-
                     .add(Expr::col((Clients, clients::Column::IsDeleted)).eq(false))
-                    .add(client_search_condition(&args.search, args.search_field.as_deref())),
+                    .add(client_search_condition(
+                        &args.search,
+                        args.search_field.as_deref(),
+                    )),
             )
             .apply_if(args.credit_only, |query, credit_only| {
                 query.filter(client_credit_expr().gt(if credit_only { 0.0 } else { -1.0 }))
@@ -144,9 +153,11 @@ impl ClientsService {
             .expr_as(client_credit_expr(), Alias::new("credit"))
             .cond_where(
                 Cond::all()
-
                     .add(Expr::col((Clients, clients::Column::IsDeleted)).eq(false))
-                    .add(client_search_condition(&args.search, args.search_field.as_deref())),
+                    .add(client_search_condition(
+                        &args.search,
+                        args.search_field.as_deref(),
+                    )),
             )
             .conditions(
                 args.credit_only == Some(true),

@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { commands, type InvoiceProductItem, type SelectInvoices } from "@/bindings";
-import { CircleDollarSign, FilePenLine, GripHorizontal, Printer, Trash2, ReceiptText, CheckCircle2 } from "lucide-vue-next";
+import {
+  CircleDollarSign,
+  FilePenLine,
+  GripHorizontal,
+  Printer,
+  Trash2,
+  ReceiptText,
+  CheckCircle2,
+} from "lucide-vue-next";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
 import { InvoiceAddPayment, InvoiceDelete, InvoiceUpdate, CreditNoteCreate } from "#components";
@@ -26,16 +34,19 @@ const sortDirection = computed(() =>
   queryString(route.query.direction) === "desc" ? "desc" : "asc",
 );
 
-const visibleCols = computed(() => props.visibleColumns ?? [
-  "identifier",
-  "client",
-  "status",
-  "date",
-  "products",
-  "total",
-  "paid",
-  "rest",
-]);
+const visibleCols = computed(
+  () =>
+    props.visibleColumns ?? [
+      "identifier",
+      "client",
+      "status",
+      "date",
+      "products",
+      "total",
+      "paid",
+      "rest",
+    ],
+);
 
 function toggleSort(key: string) {
   if (sortKey.value !== key) {
@@ -190,21 +201,23 @@ function createCreditNote(invoice: SelectInvoices) {
           <TableCell v-if="visibleCols.includes('full_name')" class="p-2 font-medium">
             <Popover>
               <PopoverTrigger as-child>
-                <Button
-                  variant="link"
-                  class="underline px-0 h-fit text-nowrap"
-                >
+                <Button variant="link" class="underline px-0 h-fit text-nowrap">
                   {{ invoice.full_name }}
                 </Button>
               </PopoverTrigger>
               <PopoverContent class="min-w-[18rem] p-3">
                 <div class="space-y-3">
                   <div>
-                    <p class="text-xs text-muted-foreground">{{ t('fields.full-name') }}</p>
+                    <p class="text-xs text-muted-foreground">{{ t("fields.full-name") }}</p>
                     <p class="text-sm font-medium">{{ invoice.full_name }}</p>
                   </div>
-                  <div v-if="invoice.ice || invoice.if_number || invoice.rc || invoice.patente" class="border-t pt-2">
-                    <p class="text-xs text-muted-foreground mb-2">{{ t('fields.legal-identifiers') }}</p>
+                  <div
+                    v-if="invoice.ice || invoice.if_number || invoice.rc || invoice.patente"
+                    class="border-t pt-2"
+                  >
+                    <p class="text-xs text-muted-foreground mb-2">
+                      {{ t("fields.legal-identifiers") }}
+                    </p>
                     <div class="space-y-1 text-sm">
                       <div v-if="invoice.ice">
                         <span class="text-xs text-slate-500">ICE:</span>
@@ -219,24 +232,27 @@ function createCreditNote(invoice: SelectInvoices) {
                         <span class="font-mono">{{ invoice.rc }}</span>
                       </div>
                       <div v-if="invoice.patente">
-                        <span class="text-xs text-slate-500">{{ t('fields.patente') }}:</span>
+                        <span class="text-xs text-slate-500">{{ t("fields.patente") }}:</span>
                         <span class="font-mono">{{ invoice.patente }}</span>
                       </div>
                     </div>
                   </div>
-                  <div v-if="invoice.email || invoice.phone_number || invoice.address" class="border-t pt-2">
-                    <p class="text-xs text-muted-foreground mb-2">{{ t('fields.contact') }}</p>
+                  <div
+                    v-if="invoice.email || invoice.phone_number || invoice.address"
+                    class="border-t pt-2"
+                  >
+                    <p class="text-xs text-muted-foreground mb-2">{{ t("fields.contact") }}</p>
                     <div class="space-y-1 text-sm">
                       <div v-if="invoice.email">
-                        <span class="text-xs text-slate-500">{{ t('fields.email') }}:</span>
+                        <span class="text-xs text-slate-500">{{ t("fields.email") }}:</span>
                         <span>{{ invoice.email }}</span>
                       </div>
                       <div v-if="invoice.phone_number">
-                        <span class="text-xs text-slate-500">{{ t('fields.phone') }}:</span>
+                        <span class="text-xs text-slate-500">{{ t("fields.phone") }}:</span>
                         <span>{{ invoice.phone_number }}</span>
                       </div>
                       <div v-if="invoice.address">
-                        <span class="text-xs text-slate-500">{{ t('fields.address') }}:</span>
+                        <span class="text-xs text-slate-500">{{ t("fields.address") }}:</span>
                         <span>{{ invoice.address }}</span>
                       </div>
                     </div>
@@ -398,5 +414,3 @@ function createCreditNote(invoice: SelectInvoices) {
     <Pagination />
   </div>
 </template>
-
-

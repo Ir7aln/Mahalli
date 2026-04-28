@@ -68,5 +68,3 @@ async function deleteTheClient() {
     </div>
   </Card>
 </template>
-
-

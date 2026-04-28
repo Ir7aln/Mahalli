@@ -109,12 +109,16 @@ onMounted(async () => {
   }
 });
 
-watch(visibleColumns, async (newColumns) => {
-  await commands.saveColumnPreferences({
-    page: "delivery-notes",
-    visible_columns: newColumns,
-  });
-}, { deep: true });
+watch(
+  visibleColumns,
+  async (newColumns) => {
+    await commands.saveColumnPreferences({
+      page: "delivery-notes",
+      visible_columns: newColumns,
+    });
+  },
+  { deep: true },
+);
 
 async function listDeliveryNoteProducts(id?: string) {
   if (!id) {

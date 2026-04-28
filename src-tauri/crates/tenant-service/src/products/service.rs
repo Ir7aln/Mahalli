@@ -6,10 +6,9 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
-    inventory_transactions,
-    order_items, orders,
-    products::{self, ActiveModel as ProductActiveModel},
+    inventory_transactions, order_items, orders,
     prelude::*,
+    products::{self, ActiveModel as ProductActiveModel},
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
@@ -103,7 +102,6 @@ impl ProductsService {
         let count = Products::find()
             .filter(
                 Cond::all()
-
                     .add(Expr::col((Products, products::Column::IsDeleted)).eq(false))
                     .add(product_search_condition(&args.search)),
             )
@@ -149,7 +147,6 @@ impl ProductsService {
             .expr_as(product_inventory_expr(), Alias::new("inventory"))
             .cond_where(
                 Cond::all()
-
                     .add(Expr::col((Products, products::Column::IsDeleted)).eq(false))
                     .add(product_search_condition(&args.search)),
             )

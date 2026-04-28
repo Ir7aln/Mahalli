@@ -1,5 +1,5 @@
+use system_service::{SellerProfileDTO, SellerProfileService, UpdateSellerProfileDTO};
 use tauri::State;
-use system_service::{SellerProfileService, SellerProfileDTO, UpdateSellerProfileDTO};
 
 use crate::AppState;
 

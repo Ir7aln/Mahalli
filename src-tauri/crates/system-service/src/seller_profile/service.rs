@@ -40,7 +40,9 @@ impl SellerProfileService {
         let existing = SellerProfile::find()
             .one(db)
             .await?
-            .ok_or(DbErr::RecordNotFound("Seller profile not found".to_string()))?;
+            .ok_or(DbErr::RecordNotFound(
+                "Seller profile not found".to_string(),
+            ))?;
 
         let mut active_model = existing.into_active_model();
 

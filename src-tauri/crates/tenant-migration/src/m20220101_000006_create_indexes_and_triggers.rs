@@ -321,7 +321,12 @@ impl MigrationTrait for Migration {
             .await?;
 
         manager
-            .drop_index(Index::drop().table(Quote::Table).name("idx_quote_client_id").to_owned())
+            .drop_index(
+                Index::drop()
+                    .table(Quote::Table)
+                    .name("idx_quote_client_id")
+                    .to_owned(),
+            )
             .await?;
         manager
             .drop_index(
@@ -340,10 +345,20 @@ impl MigrationTrait for Migration {
             )
             .await?;
         manager
-            .drop_index(Index::drop().table(Order::Table).name("idx_order_client_id").to_owned())
+            .drop_index(
+                Index::drop()
+                    .table(Order::Table)
+                    .name("idx_order_client_id")
+                    .to_owned(),
+            )
             .await?;
         manager
-            .drop_index(Index::drop().table(Order::Table).name("idx_orders_status").to_owned())
+            .drop_index(
+                Index::drop()
+                    .table(Order::Table)
+                    .name("idx_orders_status")
+                    .to_owned(),
+            )
             .await?;
         manager
             .drop_index(

@@ -8,7 +8,11 @@ import { ORDER_STATUSES, STATUS_COLORS } from "@/consts";
 import type { OrderProductItem, SelectOrders } from "@/bindings";
 import { queryString } from "@/utils/query";
 
-const props = defineProps<{ orders: SelectOrders[]; orderProducts: OrderProductItem[]; visibleColumns?: string[] }>();
+const props = defineProps<{
+  orders: SelectOrders[];
+  orderProducts: OrderProductItem[];
+  visibleColumns?: string[];
+}>();
 const emits = defineEmits<{
   listOrderProducts: [id: string];
 }>();
@@ -23,14 +27,17 @@ const sortDirection = computed(() =>
   queryString(route.query.direction) === "desc" ? "desc" : "asc",
 );
 
-const visibleCols = computed(() => props.visibleColumns ?? [
-  "identifier",
-  "full_name",
-  "products",
-  "status",
-  "created_at",
-  "total",
-]);
+const visibleCols = computed(
+  () =>
+    props.visibleColumns ?? [
+      "identifier",
+      "full_name",
+      "products",
+      "status",
+      "created_at",
+      "total",
+    ],
+);
 
 function toggleSort(key: string) {
   if (sortKey.value !== key) {
@@ -167,21 +174,23 @@ async function createDeliveryNoteFromOrder(id: string) {
           <TableCell v-if="visibleCols.includes('full_name')" class="p-2 font-medium">
             <Popover>
               <PopoverTrigger as-child>
-                <Button
-                  variant="link"
-                  class="underline px-0 h-fit text-nowrap"
-                >
+                <Button variant="link" class="underline px-0 h-fit text-nowrap">
                   {{ order.full_name }}
                 </Button>
               </PopoverTrigger>
               <PopoverContent class="min-w-[18rem] p-3">
                 <div class="space-y-3">
                   <div>
-                    <p class="text-xs text-muted-foreground">{{ t('fields.full-name') }}</p>
+                    <p class="text-xs text-muted-foreground">{{ t("fields.full-name") }}</p>
                     <p class="text-sm font-medium">{{ order.full_name }}</p>
                   </div>
-                  <div v-if="order.ice || order.if_number || order.rc || order.patente" class="border-t pt-2">
-                    <p class="text-xs text-muted-foreground mb-2">{{ t('fields.legal-identifiers') }}</p>
+                  <div
+                    v-if="order.ice || order.if_number || order.rc || order.patente"
+                    class="border-t pt-2"
+                  >
+                    <p class="text-xs text-muted-foreground mb-2">
+                      {{ t("fields.legal-identifiers") }}
+                    </p>
                     <div class="space-y-1 text-sm">
                       <div v-if="order.ice">
                         <span class="text-xs text-slate-500">ICE:</span>
@@ -196,24 +205,27 @@ async function createDeliveryNoteFromOrder(id: string) {
                         <span class="font-mono">{{ order.rc }}</span>
                       </div>
                       <div v-if="order.patente">
-                        <span class="text-xs text-slate-500">{{ t('fields.patente') }}:</span>
+                        <span class="text-xs text-slate-500">{{ t("fields.patente") }}:</span>
                         <span class="font-mono">{{ order.patente }}</span>
                       </div>
                     </div>
                   </div>
-                  <div v-if="order.email || order.phone_number || order.address" class="border-t pt-2">
-                    <p class="text-xs text-muted-foreground mb-2">{{ t('fields.contact') }}</p>
+                  <div
+                    v-if="order.email || order.phone_number || order.address"
+                    class="border-t pt-2"
+                  >
+                    <p class="text-xs text-muted-foreground mb-2">{{ t("fields.contact") }}</p>
                     <div class="space-y-1 text-sm">
                       <div v-if="order.email">
-                        <span class="text-xs text-slate-500">{{ t('fields.email') }}:</span>
+                        <span class="text-xs text-slate-500">{{ t("fields.email") }}:</span>
                         <span>{{ order.email }}</span>
                       </div>
                       <div v-if="order.phone_number">
-                        <span class="text-xs text-slate-500">{{ t('fields.phone') }}:</span>
+                        <span class="text-xs text-slate-500">{{ t("fields.phone") }}:</span>
                         <span>{{ order.phone_number }}</span>
                       </div>
                       <div v-if="order.address">
-                        <span class="text-xs text-slate-500">{{ t('fields.address') }}:</span>
+                        <span class="text-xs text-slate-500">{{ t("fields.address") }}:</span>
                         <span>{{ order.address }}</span>
                       </div>
                     </div>
@@ -357,5 +369,3 @@ async function createDeliveryNoteFromOrder(id: string) {
     <Pagination />
   </div>
 </template>
-
-

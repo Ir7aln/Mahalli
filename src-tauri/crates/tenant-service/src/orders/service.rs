@@ -9,8 +9,8 @@ use tenant_entity::{
     inventory_transactions::{self, ActiveModel as InventoryActiveModel},
     order_items::{self, ActiveModel as OrderItemActiveModel},
     orders::{self, ActiveModel as OrderActiveModel},
-    products, quote_items,
     prelude::*,
+    products, quote_items,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
@@ -36,7 +36,6 @@ impl OrdersService {
             .join(JoinType::Join, orders::Relation::Clients.def())
             .filter(
                 Cond::all()
-
                     .add(Expr::col((Orders, orders::Column::IsDeleted)).eq(false))
                     .add(order_search_condition(&args.search)),
             )
@@ -116,7 +115,6 @@ impl OrdersService {
             )
             .cond_where(
                 Cond::all()
-
                     .add(Expr::col((Orders, orders::Column::IsDeleted)).eq(false))
                     .add(order_search_condition(&args.search)),
             )

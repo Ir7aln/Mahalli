@@ -195,5 +195,3 @@ function cleanImage() {
     </Card>
   </form>
 </template>
-
-

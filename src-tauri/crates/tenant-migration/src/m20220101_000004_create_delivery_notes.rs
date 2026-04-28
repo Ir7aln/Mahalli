@@ -61,7 +61,11 @@ impl MigrationTrait for Migration {
                             .not_null()
                             .primary_key(),
                     )
-                    .col(ColumnDef::new(DeliveryNoteItem::DeliveryNoteId).string().not_null())
+                    .col(
+                        ColumnDef::new(DeliveryNoteItem::DeliveryNoteId)
+                            .string()
+                            .not_null(),
+                    )
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk_delivery_note_item_delivery_note_id")
@@ -69,7 +73,11 @@ impl MigrationTrait for Migration {
                             .to(DeliveryNote::Table, DeliveryNote::Id)
                             .on_delete(ForeignKeyAction::Cascade),
                     )
-                    .col(ColumnDef::new(DeliveryNoteItem::ProductId).string().not_null())
+                    .col(
+                        ColumnDef::new(DeliveryNoteItem::ProductId)
+                            .string()
+                            .not_null(),
+                    )
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk_delivery_note_item_product_id")

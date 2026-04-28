@@ -31,7 +31,7 @@ function toggleColumn(key: string) {
   if (props.visibleColumns.includes(key)) {
     emit(
       "update:visible-columns",
-      props.visibleColumns.filter((col) => col !== key)
+      props.visibleColumns.filter((col) => col !== key),
     );
   } else {
     emit("update:visible-columns", [...props.visibleColumns, key]);
@@ -44,7 +44,7 @@ function toggleAll() {
   } else {
     emit(
       "update:visible-columns",
-      props.columns.map((col) => col.key)
+      props.columns.map((col) => col.key),
     );
   }
 }

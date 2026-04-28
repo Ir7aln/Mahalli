@@ -7,7 +7,11 @@ import { NuxtLink, QuoteDelete, QuoteUpdate } from "#components";
 import type { QuoteProductItem, SelectQuotes } from "@/bindings";
 import { queryString } from "@/utils/query";
 
-const props = defineProps<{ quotes: SelectQuotes[]; quoteProducts: QuoteProductItem[]; visibleColumns?: string[] }>();
+const props = defineProps<{
+  quotes: SelectQuotes[];
+  quoteProducts: QuoteProductItem[];
+  visibleColumns?: string[];
+}>();
 const emits = defineEmits<{
   listQuoteProducts: [id: string];
 }>();
@@ -22,13 +26,9 @@ const sortDirection = computed(() =>
   queryString(route.query.direction) === "desc" ? "desc" : "asc",
 );
 
-const visibleCols = computed(() => props.visibleColumns ?? [
-  "identifier",
-  "full_name",
-  "products",
-  "created_at",
-  "total",
-]);
+const visibleCols = computed(
+  () => props.visibleColumns ?? ["identifier", "full_name", "products", "created_at", "total"],
+);
 
 function toggleSort(key: string) {
   if (sortKey.value !== key) {
@@ -136,21 +136,23 @@ async function createOrderFromQuote(id: string) {
           <TableCell v-if="visibleCols.includes('full_name')" class="p-2 font-medium">
             <Popover>
               <PopoverTrigger as-child>
-                <Button
-                  variant="link"
-                  class="underline px-0 h-fit text-nowrap"
-                >
+                <Button variant="link" class="underline px-0 h-fit text-nowrap">
                   {{ quote.full_name }}
                 </Button>
               </PopoverTrigger>
               <PopoverContent class="min-w-[18rem] p-3">
                 <div class="space-y-3">
                   <div>
-                    <p class="text-xs text-muted-foreground">{{ t('fields.full-name') }}</p>
+                    <p class="text-xs text-muted-foreground">{{ t("fields.full-name") }}</p>
                     <p class="text-sm font-medium">{{ quote.full_name }}</p>
                   </div>
-                  <div v-if="quote.ice || quote.if_number || quote.rc || quote.patente" class="border-t pt-2">
-                    <p class="text-xs text-muted-foreground mb-2">{{ t('fields.legal-identifiers') }}</p>
+                  <div
+                    v-if="quote.ice || quote.if_number || quote.rc || quote.patente"
+                    class="border-t pt-2"
+                  >
+                    <p class="text-xs text-muted-foreground mb-2">
+                      {{ t("fields.legal-identifiers") }}
+                    </p>
                     <div class="space-y-1 text-sm">
                       <div v-if="quote.ice">
                         <span class="text-xs text-slate-500">ICE:</span>
@@ -165,24 +167,27 @@ async function createOrderFromQuote(id: string) {
                         <span class="font-mono">{{ quote.rc }}</span>
                       </div>
                       <div v-if="quote.patente">
-                        <span class="text-xs text-slate-500">{{ t('fields.patente') }}:</span>
+                        <span class="text-xs text-slate-500">{{ t("fields.patente") }}:</span>
                         <span class="font-mono">{{ quote.patente }}</span>
                       </div>
                     </div>
                   </div>
-                  <div v-if="quote.email || quote.phone_number || quote.address" class="border-t pt-2">
-                    <p class="text-xs text-muted-foreground mb-2">{{ t('fields.contact') }}</p>
+                  <div
+                    v-if="quote.email || quote.phone_number || quote.address"
+                    class="border-t pt-2"
+                  >
+                    <p class="text-xs text-muted-foreground mb-2">{{ t("fields.contact") }}</p>
                     <div class="space-y-1 text-sm">
                       <div v-if="quote.email">
-                        <span class="text-xs text-slate-500">{{ t('fields.email') }}:</span>
+                        <span class="text-xs text-slate-500">{{ t("fields.email") }}:</span>
                         <span>{{ quote.email }}</span>
                       </div>
                       <div v-if="quote.phone_number">
-                        <span class="text-xs text-slate-500">{{ t('fields.phone') }}:</span>
+                        <span class="text-xs text-slate-500">{{ t("fields.phone") }}:</span>
                         <span>{{ quote.phone_number }}</span>
                       </div>
                       <div v-if="quote.address">
-                        <span class="text-xs text-slate-500">{{ t('fields.address') }}:</span>
+                        <span class="text-xs text-slate-500">{{ t("fields.address") }}:</span>
                         <span>{{ quote.address }}</span>
                       </div>
                     </div>
@@ -300,5 +305,3 @@ async function createOrderFromQuote(id: string) {
     <Pagination />
   </div>
 </template>
-
-

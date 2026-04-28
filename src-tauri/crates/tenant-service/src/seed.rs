@@ -315,7 +315,12 @@ impl SeedService {
     async fn seed_credit_notes(db: &DatabaseConnection) -> Result<(), DbErr> {
         for _ in 0..20 {
             let id = ulid::Ulid::new();
-            let reasons = vec!["Defective product", "Wrong item shipped", "Quantity mismatch", "Customer request"];
+            let reasons = vec![
+                "Defective product",
+                "Wrong item shipped",
+                "Quantity mismatch",
+                "Customer request",
+            ];
             let reason = get_random_item(&reasons);
             let insert_credit_note = Statement::from_string(
                 sea_orm::DatabaseBackend::Sqlite,

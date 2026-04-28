@@ -29,13 +29,15 @@ const invoiceDetails = ref<InvoiceWithClient | null>(null);
 
 const creditNoteSchema = z.object({
   reason: z.string().optional(),
-  items: z.array(
-    z.object({
-      product_id: z.string().min(1),
-      quantity: z.number().min(1),
-      price: z.number().min(0),
-    })
-  ).min(1),
+  items: z
+    .array(
+      z.object({
+        product_id: z.string().min(1),
+        quantity: z.number().min(1),
+        price: z.number().min(0),
+      }),
+    )
+    .min(1),
 });
 
 type Item = z.infer<typeof creditNoteSchema>["items"][number];
@@ -145,10 +147,7 @@ const onSubmit = handleSubmit(async (formData) => {
           <FormItem>
             <FormLabel>{{ t("fields.reason") }}</FormLabel>
             <FormControl>
-              <Textarea
-                v-bind="componentField"
-                :placeholder="t('placeholders.reason')"
-              />
+              <Textarea v-bind="componentField" :placeholder="t('placeholders.reason')" />
             </FormControl>
           </FormItem>
         </FormField>
@@ -156,12 +155,7 @@ const onSubmit = handleSubmit(async (formData) => {
         <div class="space-y-4">
           <div class="flex items-center justify-between">
             <h3 class="font-semibold text-sm">{{ t("fields.items") }}</h3>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              @click="addItem"
-            >
+            <Button type="button" variant="outline" size="sm" @click="addItem">
               <Plus :size="16" class="mr-2" />
               {{ t("buttons.add-product") }}
             </Button>

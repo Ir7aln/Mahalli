@@ -8,8 +8,8 @@ use tenant_entity::{
     delivery_note_items::{self, ActiveModel as DeliveryNoteItemActiveModel},
     delivery_notes::{self, ActiveModel as DeliveryNoteActiveModel},
     order_items, orders,
-    products,
     prelude::*,
+    products,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
@@ -40,7 +40,6 @@ impl DeliveryNotesService {
             .join(JoinType::Join, delivery_notes::Relation::Orders.def())
             .filter(
                 Cond::all()
-
                     .add(Expr::col((DeliveryNotes, delivery_notes::Column::IsDeleted)).eq(false))
                     .add(delivery_note_search_condition(&args.search)),
             )
@@ -238,11 +237,15 @@ impl DeliveryNotesService {
         let client = Clients::find_by_id(&delivery_note.client_id)
             .one(db)
             .await?
-            .ok_or_else(|| DbErr::RecordNotFound("client for delivery note not found".to_string()))?;
+            .ok_or_else(|| {
+                DbErr::RecordNotFound("client for delivery note not found".to_string())
+            })?;
         let order = Orders::find_by_id(&delivery_note.order_id)
             .one(db)
             .await?
-            .ok_or_else(|| DbErr::RecordNotFound("order for delivery note not found".to_string()))?;
+            .ok_or_else(|| {
+                DbErr::RecordNotFound("order for delivery note not found".to_string())
+            })?;
         let items = DeliveryNoteItems::find()
             .filter(delivery_note_items::Column::DeliveryNoteId.eq(delivery_note.id.clone()))
             .all(db)
@@ -303,12 +306,9 @@ impl DeliveryNotesService {
                     return Ok(delivery_note.id);
                 }
 
-                let order = Orders::find_by_id(&id)
-                    .one(txn)
-                    .await?
-                    .ok_or_else(|| {
-                        DbErr::RecordNotFound("delivery note source order not found".to_string())
-                    })?;
+                let order = Orders::find_by_id(&id).one(txn).await?.ok_or_else(|| {
+                    DbErr::RecordNotFound("delivery note source order not found".to_string())
+                })?;
 
                 let delivery_note = DeliveryNoteActiveModel {
                     order_id: ActiveValue::Set(order.id.clone()),

@@ -21,7 +21,10 @@ fn requested_order(direction: Option<&str>) -> Order {
 
 fn inventory_price_expr() -> sea_orm::sea_query::SimpleExpr {
     Expr::expr(Func::coalesce([
-        Expr::col((InventoryTransactions, inventory_transactions::Column::UnitPrice)),
+        Expr::col((
+            InventoryTransactions,
+            inventory_transactions::Column::UnitPrice,
+        )),
         Expr::col((OrderItems, order_items::Column::Price)),
         Expr::col((Products, products::Column::PurchasePrice)),
     ]))

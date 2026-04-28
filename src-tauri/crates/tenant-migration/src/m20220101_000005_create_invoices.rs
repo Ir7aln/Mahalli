@@ -38,11 +38,7 @@ impl MigrationTrait for Migration {
                             .to(Order::Table, Order::Id)
                             .on_delete(ForeignKeyAction::SetNull),
                     )
-                    .col(
-                        ColumnDef::new(Invoice::DeliveryNoteId)
-                            .string()
-                            .null(),
-                    )
+                    .col(ColumnDef::new(Invoice::DeliveryNoteId).string().null())
                     .foreign_key(
                         ForeignKey::create()
                             .name("fk_invoice_delivery_note_id")

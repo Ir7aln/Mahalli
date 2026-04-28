@@ -15,13 +15,9 @@ const sortDirection = computed(() =>
   queryString(route.query.direction) === "desc" ? "desc" : "asc",
 );
 
-const visibleCols = computed(() => props.visibleColumns ?? [
-  "name",
-  "price",
-  "quantity",
-  "transaction_type",
-  "created_at",
-]);
+const visibleCols = computed(
+  () => props.visibleColumns ?? ["name", "price", "quantity", "transaction_type", "created_at"],
+);
 
 function toggleSort(key: string) {
   if (sortKey.value !== key) {

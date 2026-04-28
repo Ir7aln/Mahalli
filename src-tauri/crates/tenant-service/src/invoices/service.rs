@@ -8,14 +8,14 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
-    clients,
-    delivery_note_items,
+    clients, delivery_note_items,
     inventory_transactions::ActiveModel as InventoryActiveModel,
     invoice_items::{self, ActiveModel as InvoiceItemActiveModel},
     invoice_payments::{self, ActiveModel as InvoicePaymentActiveModel},
-    invoices::{self, ActiveModel as InvoiceActiveModel}, orders::ActiveModel as OrderActiveModel,
-    products,
+    invoices::{self, ActiveModel as InvoiceActiveModel},
+    orders::ActiveModel as OrderActiveModel,
     prelude::*,
+    products,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
@@ -218,7 +218,6 @@ impl InvoicesService {
             .join(JoinType::Join, invoices::Relation::Clients.def())
             .filter(
                 Cond::all()
-
                     .add(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
                     .add(invoice_search_condition(&args.search)),
             )
@@ -269,7 +268,6 @@ impl InvoicesService {
             )
             .cond_where(
                 Cond::all()
-
                     .add(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
                     .add(invoice_search_condition(&args.search)),
             )
@@ -615,9 +613,13 @@ impl InvoicesService {
                 let invoice_model = Invoices::find_by_id(invoice.id.clone()).one(txn).await?;
                 let current_invoice = invoice_model.as_ref().unwrap();
 
-                let current_status = InvoiceStatus::from_str(&current_invoice.status).ok_or_else(|| {
-                    DbErr::Custom(format!("corrupted invoice status: {}", current_invoice.status))
-                })?;
+                let current_status =
+                    InvoiceStatus::from_str(&current_invoice.status).ok_or_else(|| {
+                        DbErr::Custom(format!(
+                            "corrupted invoice status: {}",
+                            current_invoice.status
+                        ))
+                    })?;
 
                 if current_status == InvoiceStatus::Finalized {
                     return Err(DbErr::Custom(
@@ -854,7 +856,8 @@ impl InvoicesService {
 
     pub async fn delete_invoice(db: &DbConn, id: String) -> Result<u64, DbErr> {
         let invoice_model = Invoices::find_by_id(id).one(db).await?;
-        let invoice = invoice_model.ok_or_else(|| DbErr::RecordNotFound("invoice not found".to_string()))?;
+        let invoice =
+            invoice_model.ok_or_else(|| DbErr::RecordNotFound("invoice not found".to_string()))?;
         let current_status = InvoiceStatus::from_str(&invoice.status).ok_or_else(|| {
             DbErr::Custom(format!("corrupted invoice status: {}", invoice.status))
         })?;

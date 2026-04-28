@@ -123,12 +123,16 @@ onMounted(async () => {
   }
 });
 
-watch(visibleColumns, async (newColumns) => {
-  await commands.saveColumnPreferences({
-    page: "orders",
-    visible_columns: newColumns,
-  });
-}, { deep: true });
+watch(
+  visibleColumns,
+  async (newColumns) => {
+    await commands.saveColumnPreferences({
+      page: "orders",
+      visible_columns: newColumns,
+    });
+  },
+  { deep: true },
+);
 
 async function listOrderProducts(id?: string) {
   if (!id) {
@@ -228,5 +232,3 @@ const openCreateOrderModal = () => modal.open(OrderCreate, { sheet: true });
     </div>
   </main>
 </template>
-
-

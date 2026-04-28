@@ -6,8 +6,8 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
-    clients, inventory_transactions, invoice_payments, invoices, order_items, orders, products,
-    prelude::*,
+    clients, inventory_transactions, invoice_payments, invoices, order_items, orders, prelude::*,
+    products,
 };
 
 pub struct DashboardService;
@@ -278,11 +278,7 @@ impl DashboardService {
                 Func::count(Expr::col((Orders, orders::Column::Id))),
                 Alias::new("status_count"),
             )
-            .cond_where(
-                Cond::all()
-                    .add(orders::Column::IsDeleted.eq(false))
-,
-            )
+            .cond_where(Cond::all().add(orders::Column::IsDeleted.eq(false)))
             .group_by_col(orders::Column::Status)
             .to_owned()
             .build(SqliteQueryBuilder);
@@ -294,11 +290,7 @@ impl DashboardService {
                 Func::count(Expr::col((Invoices, invoices::Column::Id))),
                 Alias::new("status_count"),
             )
-            .cond_where(
-                Cond::all()
-                    .add(invoices::Column::IsDeleted.eq(false))
-,
-            )
+            .cond_where(Cond::all().add(invoices::Column::IsDeleted.eq(false)))
             .group_by_col(invoices::Column::Status)
             .to_owned()
             .build(SqliteQueryBuilder);

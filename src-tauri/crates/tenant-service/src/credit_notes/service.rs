@@ -1,4 +1,5 @@
 use super::dto::*;
+use crate::status::InvoiceStatus;
 use sea_orm::{
     ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection as DbConn, DbErr, EntityTrait,
     QueryFilter, QueryOrder, TransactionError, TransactionTrait,
@@ -7,10 +8,8 @@ use std::collections::HashMap;
 use tenant_entity::{
     credit_note_items::ActiveModel as CreditNoteItemActiveModel,
     credit_notes::ActiveModel as CreditNoteActiveModel,
-    inventory_transactions::ActiveModel as InventoryTransactionActiveModel,
-    prelude::*,
+    inventory_transactions::ActiveModel as InventoryTransactionActiveModel, prelude::*,
 };
-use crate::status::InvoiceStatus;
 
 pub struct CreditNotesService;
 
@@ -90,13 +89,14 @@ impl CreditNotesService {
                         ));
                     }
 
-                    let invoice_item = invoice_items_by_product
-                        .get(&item.product_id)
-                        .ok_or_else(|| {
-                            DbErr::Custom(
-                                "credit note item does not belong to the invoice".to_string(),
-                            )
-                        })?;
+                    let invoice_item =
+                        invoice_items_by_product
+                            .get(&item.product_id)
+                            .ok_or_else(|| {
+                                DbErr::Custom(
+                                    "credit note item does not belong to the invoice".to_string(),
+                                )
+                            })?;
 
                     if item.quantity as f64 > invoice_item.quantity {
                         return Err(DbErr::Custom(
@@ -166,17 +166,22 @@ impl CreditNotesService {
             let invoice = Invoices::find_by_id(&note.invoice_id)
                 .one(db)
                 .await?
-                .ok_or_else(|| DbErr::RecordNotFound("invoice for credit note not found".to_string()))?;
+                .ok_or_else(|| {
+                    DbErr::RecordNotFound("invoice for credit note not found".to_string())
+                })?;
             let client = Clients::find_by_id(&note.client_id)
                 .one(db)
                 .await?
-                .ok_or_else(|| DbErr::RecordNotFound("client for credit note not found".to_string()))?;
+                .ok_or_else(|| {
+                    DbErr::RecordNotFound("client for credit note not found".to_string())
+                })?;
             let items = CreditNoteItems::find()
                 .filter(tenant_entity::credit_note_items::Column::CreditNoteId.eq(note.id.clone()))
                 .all(db)
                 .await?;
 
-            let item_total: f64 = items.iter()
+            let item_total: f64 = items
+                .iter()
                 .map(|item| (item.quantity as f64) * item.price)
                 .sum();
 
@@ -230,7 +235,11 @@ impl CreditNotesService {
         let total = response_notes.len() as i64;
         let limit = args.limit.clamp(1, 100) as usize;
         let offset = args.offset.max(0) as usize;
-        let response_notes = response_notes.into_iter().skip(offset).take(limit).collect();
+        let response_notes = response_notes
+            .into_iter()
+            .skip(offset)
+            .take(limit)
+            .collect();
 
         Ok(CreditNotesListResponse {
             count: total,
@@ -238,7 +247,10 @@ impl CreditNotesService {
         })
     }
 
-    pub async fn get_credit_note(db: &DbConn, id: String) -> Result<CreditNoteDetailsResponse, DbErr> {
+    pub async fn get_credit_note(
+        db: &DbConn,
+        id: String,
+    ) -> Result<CreditNoteDetailsResponse, DbErr> {
         let note = CreditNotes::find_by_id(id)
             .one(db)
             .await?
@@ -246,7 +258,9 @@ impl CreditNotesService {
         let invoice = Invoices::find_by_id(&note.invoice_id)
             .one(db)
             .await?
-            .ok_or_else(|| DbErr::RecordNotFound("invoice for credit note not found".to_string()))?;
+            .ok_or_else(|| {
+                DbErr::RecordNotFound("invoice for credit note not found".to_string())
+            })?;
         let client = Clients::find_by_id(&note.client_id)
             .one(db)
             .await?
@@ -267,7 +281,9 @@ impl CreditNotesService {
             let product = Products::find_by_id(&item.product_id)
                 .one(db)
                 .await?
-                .ok_or_else(|| DbErr::RecordNotFound("product for credit note not found".to_string()))?;
+                .ok_or_else(|| {
+                    DbErr::RecordNotFound("product for credit note not found".to_string())
+                })?;
             response_items.push(CreditNoteProductItem {
                 product_id: item.product_id,
                 name: product.name,

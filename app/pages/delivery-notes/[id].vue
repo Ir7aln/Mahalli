@@ -42,8 +42,13 @@ function formatMoney(value: number) {
       <div class="h-8 w-8 animate-spin rounded-full border-b-2 border-slate-900" />
     </div>
 
-    <section v-else class="mx-auto max-w-5xl space-y-6 rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-      <div class="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-start sm:justify-between">
+    <section
+      v-else
+      class="mx-auto max-w-5xl space-y-6 rounded-xl border border-slate-200 bg-white p-8 shadow-sm"
+    >
+      <div
+        class="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-start sm:justify-between"
+      >
         <div>
           <p class="text-sm font-medium uppercase tracking-wide text-slate-500">
             {{ t("routes.delivery-notes") }}

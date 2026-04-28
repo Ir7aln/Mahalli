@@ -124,12 +124,16 @@ onMounted(async () => {
   }
 });
 
-watch(visibleColumns, async (newColumns) => {
-  await commands.saveColumnPreferences({
-    page: "invoices",
-    visible_columns: newColumns,
-  });
-}, { deep: true });
+watch(
+  visibleColumns,
+  async (newColumns) => {
+    await commands.saveColumnPreferences({
+      page: "invoices",
+      visible_columns: newColumns,
+    });
+  },
+  { deep: true },
+);
 
 async function listInvoiceProducts(id?: string) {
   if (!id) {
@@ -229,5 +233,3 @@ const openCreateInvoiceModal = () => modal.open(InvoiceCreate, { sheet: true });
     </div>
   </main>
 </template>
-
-

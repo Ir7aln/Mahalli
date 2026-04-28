@@ -68,5 +68,3 @@ async function deleteTheProduct() {
     </div>
   </Card>
 </template>
-
-

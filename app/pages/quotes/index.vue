@@ -110,12 +110,16 @@ onMounted(async () => {
   }
 });
 
-watch(visibleColumns, async (newColumns) => {
-  await commands.saveColumnPreferences({
-    page: "quotes",
-    visible_columns: newColumns,
-  });
-}, { deep: true });
+watch(
+  visibleColumns,
+  async (newColumns) => {
+    await commands.saveColumnPreferences({
+      page: "quotes",
+      visible_columns: newColumns,
+    });
+  },
+  { deep: true },
+);
 
 async function listQuoteProducts(id?: string) {
   if (!id) {
@@ -196,5 +200,3 @@ const openCreateQuoteModal = () => modal.open(QuoteCreate, { sheet: true });
     </div>
   </main>
 </template>
-
-

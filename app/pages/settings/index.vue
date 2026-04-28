@@ -73,23 +73,27 @@ const { data: sellerProfileData, refresh: refreshSellerProfile } = await useAsyn
   },
 );
 
-watch(sellerProfileData, (profile) => {
-  if (!profile) return;
-  sellerProfileForm.legal_name = profile.legal_name;
-  sellerProfileForm.commercial_name = profile.commercial_name;
-  sellerProfileForm.address = profile.address;
-  sellerProfileForm.city = profile.city;
-  sellerProfileForm.phone_number = profile.phone_number;
-  sellerProfileForm.email = profile.email;
-  sellerProfileForm.ice = profile.ice;
-  sellerProfileForm.if_number = profile.if_number;
-  sellerProfileForm.rc = profile.rc;
-  sellerProfileForm.patente = profile.patente;
-  sellerProfileForm.logo = profile.logo;
-  sellerProfileForm.default_currency = profile.default_currency;
-  sellerProfileForm.default_payment_terms_days = profile.default_payment_terms_days;
-  sellerProfileForm.invoice_footer = profile.invoice_footer;
-}, { immediate: true });
+watch(
+  sellerProfileData,
+  (profile) => {
+    if (!profile) return;
+    sellerProfileForm.legal_name = profile.legal_name;
+    sellerProfileForm.commercial_name = profile.commercial_name;
+    sellerProfileForm.address = profile.address;
+    sellerProfileForm.city = profile.city;
+    sellerProfileForm.phone_number = profile.phone_number;
+    sellerProfileForm.email = profile.email;
+    sellerProfileForm.ice = profile.ice;
+    sellerProfileForm.if_number = profile.if_number;
+    sellerProfileForm.rc = profile.rc;
+    sellerProfileForm.patente = profile.patente;
+    sellerProfileForm.logo = profile.logo;
+    sellerProfileForm.default_currency = profile.default_currency;
+    sellerProfileForm.default_payment_terms_days = profile.default_payment_terms_days;
+    sellerProfileForm.invoice_footer = profile.invoice_footer;
+  },
+  { immediate: true },
+);
 
 function emptyToNull(value: string | number | null) {
   if (typeof value === "number") return value;
@@ -286,7 +290,11 @@ async function seedDatabase() {
           </div>
           <div class="space-y-2">
             <Label>{{ t("seller-profile.fields.payment-terms") }}</Label>
-            <Input v-model.number="sellerProfileForm.default_payment_terms_days" type="number" min="0" />
+            <Input
+              v-model.number="sellerProfileForm.default_payment_terms_days"
+              type="number"
+              min="0"
+            />
           </div>
           <div class="space-y-2 md:col-span-2 xl:col-span-3">
             <Label>{{ t("seller-profile.fields.invoice-footer") }}</Label>
@@ -295,7 +303,11 @@ async function seedDatabase() {
         </div>
 
         <div class="mt-5 flex justify-end">
-          <Button :disabled="savingSellerProfile" :loading="savingSellerProfile" @click="saveSellerProfile">
+          <Button
+            :disabled="savingSellerProfile"
+            :loading="savingSellerProfile"
+            @click="saveSellerProfile"
+          >
             {{ t("buttons.save") }}
           </Button>
         </div>

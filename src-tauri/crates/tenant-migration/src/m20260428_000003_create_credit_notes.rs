@@ -17,27 +17,15 @@ impl MigrationTrait for Migration {
                             .not_null()
                             .primary_key(),
                     )
-                    .col(
-                        ColumnDef::new(CreditNotes::InvoiceId)
-                            .string()
-                            .not_null(),
-                    )
-                    .col(
-                        ColumnDef::new(CreditNotes::ClientId)
-                            .string()
-                            .not_null(),
-                    )
+                    .col(ColumnDef::new(CreditNotes::InvoiceId).string().not_null())
+                    .col(ColumnDef::new(CreditNotes::ClientId).string().not_null())
                     .col(
                         ColumnDef::new(CreditNotes::Identifier)
                             .string()
                             .unique_key()
                             .null(),
                     )
-                    .col(
-                        ColumnDef::new(CreditNotes::Reason)
-                            .text()
-                            .null(),
-                    )
+                    .col(ColumnDef::new(CreditNotes::Reason).text().null())
                     .col(
                         ColumnDef::new(CreditNotes::IsDeleted)
                             .boolean()
@@ -89,16 +77,8 @@ impl MigrationTrait for Migration {
                             .string()
                             .not_null(),
                     )
-                    .col(
-                        ColumnDef::new(CreditNoteItems::Quantity)
-                            .float()
-                            .not_null(),
-                    )
-                    .col(
-                        ColumnDef::new(CreditNoteItems::Price)
-                            .double()
-                            .not_null(),
-                    )
+                    .col(ColumnDef::new(CreditNoteItems::Quantity).float().not_null())
+                    .col(ColumnDef::new(CreditNoteItems::Price).double().not_null())
                     .col(
                         ColumnDef::new(CreditNoteItems::CreatedAt)
                             .date_time()

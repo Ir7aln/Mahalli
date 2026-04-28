@@ -68,5 +68,3 @@ async function deleteTheQuotes() {
     </div>
   </Card>
 </template>
-
-
