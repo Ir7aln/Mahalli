@@ -1,5 +1,5 @@
 use super::dto::*;
-use crate::InvoiceStatus;
+use crate::{DeliveryNoteStatus, InvoiceStatus};
 use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
 use sea_orm::{
     sea_query::{
@@ -9,6 +9,7 @@ use sea_orm::{
 };
 use tenant_entity::{
     clients, delivery_note_items,
+    delivery_notes::ActiveModel as DeliveryNoteActiveModel,
     inventory_transactions::ActiveModel as InventoryActiveModel,
     invoice_items::{self, ActiveModel as InvoiceItemActiveModel},
     invoice_payments::{self, ActiveModel as InvoicePaymentActiveModel},
@@ -759,9 +760,9 @@ impl InvoicesService {
                     None => match DeliveryNotes::find_by_id(&id).one(txn).await? {
                         Some(delivery_note) => {
                             let invoice = InvoiceActiveModel {
-                                client_id: ActiveValue::Set(delivery_note.client_id),
+                                client_id: ActiveValue::Set(delivery_note.client_id.clone()),
                                 status: ActiveValue::Set("DRAFT".to_string()),
-                                order_id: ActiveValue::Set(delivery_note.order_id),
+                                order_id: ActiveValue::Set(delivery_note.order_id.clone()),
                                 delivery_note_id: ActiveValue::Set(Some(delivery_note.id.clone())),
                                 ..Default::default()
                             }
@@ -780,7 +781,7 @@ impl InvoicesService {
                                     product_id: ActiveValue::Set(item.product_id),
                                     price: ActiveValue::Set(item.price as f64),
                                     quantity: ActiveValue::Set(item.quantity as f64),
-                                    inventory_id: ActiveValue::Set(None),
+                                    inventory_id: ActiveValue::Set(item.inventory_id),
                                     ..Default::default()
                                 });
                             }
@@ -788,6 +789,10 @@ impl InvoicesService {
                             if !invoice_items.is_empty() {
                                 InvoiceItems::insert_many(invoice_items).exec(txn).await?;
                             }
+
+                            let mut dn_active: DeliveryNoteActiveModel = delivery_note.into();
+                            dn_active.status = ActiveValue::Set(DeliveryNoteStatus::Invoiced.as_str().to_string());
+                            dn_active.update(txn).await?;
 
                             Ok(invoice.id)
                         }

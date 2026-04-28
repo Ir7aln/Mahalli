@@ -47,6 +47,8 @@
     "generate-invoice": "Generate invoice",
     "generate-order": "Generate order",
     "generate-quote": "Generate quote",
+    "generate-delivery-note": "Generate delivery note",
+    "generate-credit-note": "Generate credit note",
     "create": "Create",
     "creating": "Creating...",
     "view": "View"
@@ -156,6 +158,8 @@
   },
   "status": {
     "pending": "Pending",
+    "accepted": "Accepted",
+    "invoiced": "Invoiced",
     "processing": "Processing",
     "shipped": "Shipped",
     "delivered": "Delivered",

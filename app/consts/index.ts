@@ -36,3 +36,5 @@ export const INVOICE_STATUSES = [
 ] as const;
 
 export const ORDER_STATUSES = ["PENDING", "COMPLETED", "CANCELLED"] as const;
+export const QUOTE_STATUSES = ["PENDING", "ACCEPTED", "CANCELLED"] as const;
+export const DELIVERY_NOTE_STATUSES = ["PENDING", "INVOICED", "CANCELLED"] as const;

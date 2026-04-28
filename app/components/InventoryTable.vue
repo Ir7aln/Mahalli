@@ -85,7 +85,7 @@ function toggleSort(key: string) {
             <div class="flex items-center justify-between gap-3">
               <span class="min-w-0 truncate">{{ tx?.name }}</span>
               <div
-                v-if="tx.order_identifier || tx.invoice_identifier || tx.quote_identifier"
+                v-if="tx.order_identifier || tx.invoice_identifier || tx.quote_identifier || tx.credit_note_identifier"
                 class="flex shrink-0 flex-wrap justify-end gap-2 text-xs font-normal"
               >
                 <NuxtLink
@@ -124,6 +124,18 @@ function toggleSort(key: string) {
                 >
                   {{ tx.quote_identifier }}
                 </NuxtLink>
+                <NuxtLink
+                  v-if="tx.credit_note_identifier"
+                  :to="
+                    localePath({
+                      path: '/credit-notes/',
+                      query: { page: 1, search: tx.credit_note_identifier },
+                    })
+                  "
+                  class="text-slate-700 underline decoration-slate-300 underline-offset-4 hover:text-slate-950"
+                >
+                  {{ tx.credit_note_identifier }}
+                </NuxtLink>
               </div>
             </div>
           </TableCell>
@@ -134,19 +146,28 @@ function toggleSort(key: string) {
             {{ `${tx.quantity} ${t("plrz.i", { n: Math.ceil(tx.quantity) })}` }}
           </TableCell>
           <TableCell v-if="visibleCols.includes('transaction_type')" class="p-2">
-            <Badge
-              variant="outline"
-              :class="
-                cn(
-                  'cursor-pointer whitespace-nowrap',
-                  tx?.transaction_type === 'OUT'
-                    ? 'bg-green-100 border-green-500 text-green-900'
-                    : 'bg-sky-100 border-sky-500 text-sky-900',
-                )
-              "
-            >
-              {{ t(`status.${tx?.transaction_type.toLowerCase()}`) }}
-            </Badge>
+            <div class="flex items-center gap-2">
+              <Badge
+                variant="outline"
+                :class="
+                  cn(
+                    'cursor-pointer whitespace-nowrap',
+                    tx?.transaction_type === 'OUT'
+                      ? 'bg-green-100 border-green-500 text-green-900'
+                      : 'bg-sky-100 border-sky-500 text-sky-900',
+                  )
+                "
+              >
+                {{ t(`status.${tx?.transaction_type.toLowerCase()}`) }}
+              </Badge>
+              <Badge
+                v-if="tx.source_type === 'CREDIT_NOTE'"
+                variant="outline"
+                class="bg-purple-100 border-purple-500 text-purple-900 whitespace-nowrap"
+              >
+                {{ t("routes.credit-notes") }}
+              </Badge>
+            </div>
           </TableCell>
           <TableCell v-if="visibleCols.includes('created_at')" class="p-2">
             {{ d(new Date(tx.created_at), "long") }}

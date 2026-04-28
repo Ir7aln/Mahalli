@@ -27,7 +27,8 @@ const sortDirection = computed(() =>
 );
 
 const visibleCols = computed(
-  () => props.visibleColumns ?? ["identifier", "full_name", "products", "created_at", "total"],
+  () =>
+    props.visibleColumns ?? ["identifier", "full_name", "status", "products", "created_at", "total"],
 );
 
 function toggleSort(key: string) {
@@ -74,6 +75,9 @@ async function createOrderFromQuote(id: string) {
     return;
   }
   Logger.info(`CREATE ORDER FROM QUOTE: ${id}`);
+  updateQueryParams({
+    refresh: `refresh-update-${Math.random() * 9999}`,
+  });
   toast.success(t("notifications.order.created"), {
     closeButton: true,
     description: h(NuxtLink, {
@@ -97,6 +101,14 @@ async function createOrderFromQuote(id: string) {
               :active="sortKey === 'full_name'"
               :direction="sortDirection"
               @click="toggleSort('full_name')"
+            />
+          </TableHead>
+          <TableHead v-if="visibleCols.includes('status')">
+            <TableSortHeader
+              :label="t('fields.status')"
+              :active="sortKey === 'status'"
+              :direction="sortDirection"
+              @click="toggleSort('status')"
             />
           </TableHead>
           <TableHead v-if="visibleCols.includes('products')">
@@ -195,6 +207,23 @@ async function createOrderFromQuote(id: string) {
                 </div>
               </PopoverContent>
             </Popover>
+          </TableCell>
+          <TableCell v-if="visibleCols.includes('status')" class="p-2">
+            <Badge
+              variant="outline"
+              :class="
+                cn(
+                  'whitespace-nowrap',
+                  quote.status === 'ACCEPTED'
+                    ? 'bg-green-100 border-green-500 text-green-900'
+                    : quote.status === 'CANCELLED'
+                      ? 'bg-red-100 border-red-500 text-red-900'
+                      : 'bg-blue-100 border-blue-500 text-blue-900',
+                )
+              "
+            >
+              {{ t(`status.${quote.status.toLowerCase()}`) }}
+            </Badge>
           </TableCell>
           <TableCell v-if="visibleCols.includes('products')" class="p-2">
             <Popover v-if="quote.products && quote.products > 0">

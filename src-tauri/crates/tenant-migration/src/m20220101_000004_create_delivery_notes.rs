@@ -46,6 +46,12 @@ impl MigrationTrait for Migration {
                             .default(Expr::current_timestamp()),
                     )
                     .col(ColumnDef::new(DeliveryNote::Identifier).string())
+                    .col(
+                        ColumnDef::new(DeliveryNote::Status)
+                            .string()
+                            .not_null()
+                            .default("PENDING"),
+                    )
                     .to_owned(),
             )
             .await?;
@@ -97,6 +103,14 @@ impl MigrationTrait for Migration {
                             .not_null()
                             .default(0.0f32),
                     )
+                    .col(ColumnDef::new(DeliveryNoteItem::InventoryId).string())
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_delivery_note_item_inventory_id")
+                            .from(DeliveryNoteItem::Table, DeliveryNoteItem::InventoryId)
+                            .to(InventoryTransactions::Table, InventoryTransactions::Id)
+                            .on_delete(ForeignKeyAction::SetNull),
+                    )
                     .col(
                         ColumnDef::new(DeliveryNoteItem::CreatedAt)
                             .date_time()
@@ -138,6 +152,8 @@ enum DeliveryNote {
     IsDeleted,
     #[sea_orm(iden = "identifier")]
     Identifier,
+    #[sea_orm(iden = "status")]
+    Status,
 }
 
 #[derive(DeriveIden)]
@@ -154,8 +170,18 @@ enum DeliveryNoteItem {
     Price,
     #[sea_orm(iden = "quantity")]
     Quantity,
+    #[sea_orm(iden = "inventory_id")]
+    InventoryId,
     #[sea_orm(iden = "created_at")]
     CreatedAt,
+}
+
+#[derive(DeriveIden)]
+enum InventoryTransactions {
+    #[sea_orm(iden = "inventory_transactions")]
+    Table,
+    #[sea_orm(iden = "id")]
+    Id,
 }
 
 #[derive(DeriveIden)]

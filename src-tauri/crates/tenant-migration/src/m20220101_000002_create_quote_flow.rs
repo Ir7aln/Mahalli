@@ -33,6 +33,12 @@ impl MigrationTrait for Migration {
                             .default(Expr::current_timestamp()),
                     )
                     .col(ColumnDef::new(Quote::Identifier).string())
+                    .col(
+                        ColumnDef::new(Quote::Status)
+                            .string()
+                            .not_null()
+                            .default("PENDING"),
+                    )
                     .to_owned(),
             )
             .await?;
@@ -115,6 +121,8 @@ enum Quote {
     IsDeleted,
     #[sea_orm(iden = "identifier")]
     Identifier,
+    #[sea_orm(iden = "status")]
+    Status,
 }
 
 #[derive(DeriveIden)]

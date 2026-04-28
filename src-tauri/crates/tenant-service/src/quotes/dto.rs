@@ -7,6 +7,7 @@ pub struct ListQuotesArgs {
     pub page: u64,
     pub limit: u64,
     pub search: String,
+    pub status: Option<String>,
     pub created_from: Option<String>,
     pub created_to: Option<String>,
     pub sort: Option<String>,
@@ -26,6 +27,7 @@ pub struct SelectQuotes {
     pub if_number: Option<String>,
     pub rc: Option<String>,
     pub patente: Option<String>,
+    pub status: String,
     pub products: i64,
     pub identifier: String,
     #[specta(type = f32)]

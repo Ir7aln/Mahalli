@@ -2,11 +2,21 @@
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
 import { z } from "zod";
-import { CLIENT_FIELDS, INVOICE_STATUSES, ORDER_STATUSES } from "~/consts";
+import {
+  CLIENT_FIELDS,
+  DELIVERY_NOTE_STATUSES,
+  INVOICE_STATUSES,
+  ORDER_STATUSES,
+  QUOTE_STATUSES,
+} from "~/consts";
 
 const props = defineProps<{
-  statues?: typeof INVOICE_STATUSES | typeof ORDER_STATUSES;
-  documentType: "invoice" | "order" | "quote";
+  statues?:
+    | typeof INVOICE_STATUSES
+    | typeof ORDER_STATUSES
+    | typeof QUOTE_STATUSES
+    | typeof DELIVERY_NOTE_STATUSES;
+  documentType: "invoice" | "order" | "quote" | "delivery-note" | "credit-note";
   config: any;
   document: any;
 }>();
@@ -29,7 +39,14 @@ const ConfigSchema = z.object({
     vat: z.boolean(),
   }),
   documentValues: z.object({
-    status: z.enum([...INVOICE_STATUSES, ...ORDER_STATUSES]).optional(),
+    status: z
+      .enum([
+        ...INVOICE_STATUSES,
+        ...ORDER_STATUSES,
+        ...QUOTE_STATUSES,
+        ...DELIVERY_NOTE_STATUSES,
+      ])
+      .optional(),
     client: z.object({
       full_name: z.string().optional(),
       email: z.string().email().optional(),
@@ -111,7 +128,7 @@ const onSubmit = handleSubmit(async (values) => {
 
         <Separator />
 
-        <div v-if="documentType !== 'quote'" class="space-y-2">
+        <div v-if="documentType !== 'quote' && documentType !== 'credit-note'" class="space-y-2">
           <FormField v-slot="{ value, handleChange }" name="fields.status">
             <FormItem class="flex justify-between items-end space-y-0">
               <FormLabel>{{ t("fields.status") }}</FormLabel>

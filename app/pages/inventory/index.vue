@@ -24,6 +24,7 @@ const visibleColumns = ref<string[]>(inventoryTableColumns.map((col) => col.key)
 
 const searchQuery = ref(queryString(route.query.search));
 const transactionType = ref(queryString(route.query.transaction_type));
+const sourceType = ref(queryString(route.query.source_type));
 const createdFrom = ref(queryString(route.query.created_from));
 const createdTo = ref(queryString(route.query.created_to));
 const quantityMin = ref(queryString(route.query.quantity_min));
@@ -38,6 +39,7 @@ const queryParams = computed(() => ({
   page: queryNumber(route.query.page, 1),
   limit: route.query.limit ? queryNumber(route.query.limit, LIMIT) : LIMIT,
   transaction_type: queryString(route.query.transaction_type) || null,
+  source_type: queryString(route.query.source_type) || null,
   created_from: queryString(route.query.created_from) || null,
   created_to: queryString(route.query.created_to) || null,
   quantity_min: queryString(route.query.quantity_min)
@@ -59,6 +61,7 @@ async function fetchInventory() {
     page: queryParams.value.page,
     limit: queryParams.value.limit,
     transaction_type: queryParams.value.transaction_type,
+    source_type: queryParams.value.source_type,
     created_from: queryParams.value.created_from,
     created_to: queryParams.value.created_to,
     quantity_min: queryParams.value.quantity_min,
@@ -90,6 +93,13 @@ const activeFilters = computed(
             key: "transaction_type",
             label: t("fields.status"),
             value: t(`status.${transactionType.value.toLowerCase()}`),
+          }
+        : null,
+      sourceType.value
+        ? {
+            key: "source_type",
+            label: t("fields.order"),
+            value: t(`routes.${sourceType.value.toLowerCase().replace('_', '-')}`),
           }
         : null,
       createdFrom.value
@@ -127,6 +137,7 @@ const debouncedSearch = useDebounceFn(() => {
 const debouncedFilters = useDebounceFn(() => {
   updateQueryParams({
     transaction_type: transactionType.value || null,
+    source_type: sourceType.value || null,
     created_from: createdFrom.value || null,
     created_to: createdTo.value || null,
     quantity_min: quantityMin.value || null,
@@ -139,7 +150,7 @@ const debouncedFilters = useDebounceFn(() => {
 
 watch(searchQuery, debouncedSearch);
 watch(
-  [transactionType, createdFrom, createdTo, quantityMin, quantityMax, priceMin, priceMax],
+  [transactionType, sourceType, createdFrom, createdTo, quantityMin, quantityMax, priceMin, priceMax],
   debouncedFilters,
 );
 
@@ -163,6 +174,7 @@ watch(
 
 function clearFilter(key: string) {
   if (key === "transaction_type") transactionType.value = "";
+  if (key === "source_type") sourceType.value = "";
   if (key === "created_from") createdFrom.value = "";
   if (key === "created_to") createdTo.value = "";
   if (key === "quantity_min") quantityMin.value = "";
@@ -173,6 +185,7 @@ function clearFilter(key: string) {
 
 function clearAllFilters() {
   transactionType.value = "";
+  sourceType.value = "";
   createdFrom.value = "";
   createdTo.value = "";
   quantityMin.value = "";
@@ -217,6 +230,21 @@ function clearAllFilters() {
                   @update:checked="transactionType = transactionType === 'OUT' ? '' : 'OUT'"
                 >
                   {{ t("status.out") }}
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>{{ t("fields.order") }}</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuCheckboxItem
+                  :checked="sourceType === 'CREDIT_NOTE'"
+                  @select.prevent
+                  @update:checked="sourceType = sourceType === 'CREDIT_NOTE' ? '' : 'CREDIT_NOTE'"
+                >
+                  {{ t("routes.credit-notes") }}
                 </DropdownMenuCheckboxItem>
               </DropdownMenuSubContent>
             </DropdownMenuSub>

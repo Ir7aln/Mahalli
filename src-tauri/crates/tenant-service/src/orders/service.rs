@@ -1,5 +1,5 @@
 use super::dto::*;
-use crate::OrderStatus;
+use crate::{OrderStatus, QuoteStatus};
 use sea_orm::{
     sea_query::{Alias, Cond, Expr, Func, Query, SqliteQueryBuilder},
     DatabaseConnection as DbConn, *,
@@ -11,6 +11,7 @@ use tenant_entity::{
     orders::{self, ActiveModel as OrderActiveModel},
     prelude::*,
     products, quote_items,
+    quotes::ActiveModel as QuoteActiveModel,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
@@ -533,9 +534,9 @@ impl OrdersService {
                     None => match Quotes::find_by_id(&id).one(txn).await? {
                         Some(quote) => {
                             let order = OrderActiveModel {
-                                client_id: ActiveValue::Set(quote.client_id),
+                                client_id: ActiveValue::Set(quote.client_id.clone()),
                                 status: ActiveValue::Set("PENDING".to_string()),
-                                quote_id: ActiveValue::Set(Some(quote.id)),
+                                quote_id: ActiveValue::Set(Some(quote.id.clone())),
                                 ..Default::default()
                             }
                             .insert(txn)
@@ -571,6 +572,11 @@ impl OrdersService {
                             if !items.is_empty() {
                                 OrderItems::insert_many(items).exec(txn).await?;
                             }
+
+                            let mut quote_active: QuoteActiveModel = quote.into();
+                            quote_active.status = ActiveValue::Set(QuoteStatus::Accepted.as_str().to_string());
+                            quote_active.update(txn).await?;
+
                             Ok(order.id)
                         }
                         None => Err(DbErr::RecordNotFound("no quote".to_string())),
@@ -625,7 +631,7 @@ impl OrdersService {
                 let res = item_model.delete(db).await?;
                 Ok(res.rows_affected)
             }
-            None => Ok(0),
+     None => Ok(0),
         }
     }
 }

@@ -47,6 +47,8 @@
     "generate-invoice": "إنشاء الفاتورة",
     "generate-order": "إنشاء الطلب",
     "generate-quote": "إنشاء عرض السعر",
+    "generate-delivery-note": "إنشاء سند التسليم",
+    "generate-credit-note": "إنشاء إشعار الخصم",
     "create": "إنشاء",
     "creating": "جاري الإنشاء...",
     "view": "عرض"
@@ -156,6 +158,8 @@
   },
   "status": {
     "pending": "قيد الانتظار",
+    "accepted": "مقبول",
+    "invoiced": "تمت الفوترة",
     "processing": "قيد المعالجة",
     "shipped": "شحنت",
     "delivered": "تم التسليم",

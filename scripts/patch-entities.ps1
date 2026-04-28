@@ -66,6 +66,20 @@ impl ActiveModelBehavior for ActiveModel {
 }
 "@
         }
+        "quotes.rs", "delivery_notes.rs" {
+@"
+impl ActiveModelBehavior for ActiveModel {
+    fn new() -> Self {
+        Self {
+            id: Set(ulid::Ulid::new().to_string()),
+            created_at: Set(Utc::now().naive_utc()),
+            status: Set("PENDING".to_string()),
+            ..ActiveModelTrait::default()
+        }
+    }
+}
+"@
+        }
         "seller_profile.rs" {
 @"
 impl ActiveModelBehavior for ActiveModel {

@@ -45,6 +45,8 @@ pub struct SelectInventory {
     pub invoice_identifier: Option<String>,
     pub quote_id: Option<String>,
     pub quote_identifier: Option<String>,
+    pub credit_note_id: Option<String>,
+    pub credit_note_identifier: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]

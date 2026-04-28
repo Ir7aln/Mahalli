@@ -1,4 +1,5 @@
 use super::dto::*;
+use crate::{DeliveryNoteStatus, OrderStatus};
 use sea_orm::{
     sea_query::{Alias, Cond, Expr, Func, Query, SqliteQueryBuilder},
     DatabaseConnection as DbConn, *,
@@ -7,7 +8,7 @@ use tenant_entity::{
     clients,
     delivery_note_items::{self, ActiveModel as DeliveryNoteItemActiveModel},
     delivery_notes::{self, ActiveModel as DeliveryNoteActiveModel},
-    order_items, orders,
+    order_items, orders::{self, ActiveModel as OrderActiveModel},
     prelude::*,
     products,
 };
@@ -43,6 +44,9 @@ impl DeliveryNotesService {
                     .add(Expr::col((DeliveryNotes, delivery_notes::Column::IsDeleted)).eq(false))
                     .add(delivery_note_search_condition(&args.search)),
             )
+            .apply_if(args.status.clone(), |query, v| {
+                query.filter(Expr::col((DeliveryNotes, delivery_notes::Column::Status)).eq(v))
+            })
             .apply_if(args.created_from.clone(), |query, v| {
                 query.filter(Expr::cust_with_values(
                     "strftime('%Y-%m-%d', delivery_notes.created_at) >= strftime('%Y-%m-%d', ?)",
@@ -75,6 +79,7 @@ impl DeliveryNotesService {
                 Expr::col((Clients, clients::Column::IfNumber)),
                 Expr::col((Clients, clients::Column::Rc)),
                 Expr::col((Clients, clients::Column::Patente)),
+                Expr::col((DeliveryNotes, delivery_notes::Column::Status)),
             ])
             .expr_as(
                 Expr::col((Orders, orders::Column::Identifier)),
@@ -128,6 +133,13 @@ impl DeliveryNotesService {
                     .add(delivery_note_search_condition(&args.search)),
             )
             .conditions(
+                args.status.clone().is_some(),
+                |x| {
+                    x.and_where(Expr::col((DeliveryNotes, delivery_notes::Column::Status)).eq(args.status.clone()));
+                },
+                |_| {},
+            )
+            .conditions(
                 args.created_from.clone().is_some(),
                 |x| {
                     x.and_where(Expr::cust_with_values(
@@ -158,6 +170,10 @@ impl DeliveryNotesService {
             ),
             Some("full_name") => query.order_by(
                 (Clients, clients::Column::FullName),
+                requested_order(args.direction.as_deref()),
+            ),
+            Some("status") => query.order_by(
+                (DeliveryNotes, delivery_notes::Column::Status),
                 requested_order(args.direction.as_deref()),
             ),
             Some("order_identifier") => query.order_by(
@@ -312,7 +328,7 @@ impl DeliveryNotesService {
 
                 let delivery_note = DeliveryNoteActiveModel {
                     order_id: ActiveValue::Set(order.id.clone()),
-                    client_id: ActiveValue::Set(order.client_id),
+                    client_id: ActiveValue::Set(order.client_id.clone()),
                     ..Default::default()
                 }
                 .insert(txn)
@@ -323,7 +339,7 @@ impl DeliveryNotesService {
                         JoinType::Join,
                         order_items::Relation::InventoryTransactions.def(),
                     )
-                    .filter(order_items::Column::OrderId.eq(order.id))
+                    .filter(order_items::Column::OrderId.eq(order.id.clone()))
                     .all(txn)
                     .await?;
 
@@ -343,6 +359,7 @@ impl DeliveryNotesService {
                         product_id: ActiveValue::Set(inventory.product_id),
                         price: ActiveValue::Set(item.price),
                         quantity: ActiveValue::Set(inventory.quantity),
+                        inventory_id: ActiveValue::Set(Some(inventory.id)),
                         ..Default::default()
                     });
                 }
@@ -350,6 +367,10 @@ impl DeliveryNotesService {
                 if !items.is_empty() {
                     DeliveryNoteItems::insert_many(items).exec(txn).await?;
                 }
+
+                let mut order_active: OrderActiveModel = order.into();
+                order_active.status = ActiveValue::Set(OrderStatus::Completed.as_str().to_string());
+                order_active.update(txn).await?;
 
                 Ok(delivery_note.id)
             })

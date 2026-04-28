@@ -96,6 +96,9 @@ async function createDeliveryNoteFromOrder(id: string) {
     return;
   }
   Logger.info(`CREATE DELIVERY NOTE FROM ORDER: ${id}`);
+  updateQueryParams({
+    refresh: `refresh-update-${Math.random() * 9999}`,
+  });
   toast.success(t("notifications.delivery-note.created"), {
     closeButton: true,
     description: h(NuxtLink, {

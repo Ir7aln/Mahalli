@@ -17,6 +17,7 @@ const { updateQueryParams } = useUpdateRouteQueryParams();
 const quoteTableColumns = [
   { key: "identifier", label: t("fields.identifier") },
   { key: "full_name", label: t("fields.full-name") },
+  { key: "status", label: t("fields.status") },
   { key: "products", label: t("fields.items") },
   { key: "created_at", label: t("fields.date") },
   { key: "total", label: t("fields.total") },
@@ -25,6 +26,7 @@ const quoteTableColumns = [
 const visibleColumns = ref<string[]>(quoteTableColumns.map((col) => col.key));
 
 const searchQuery = ref(queryString(route.query.search));
+const status = ref(queryString(route.query.status));
 const createdFrom = ref(queryString(route.query.created_from));
 const createdTo = ref(queryString(route.query.created_to));
 const quoteProducts = ref<QuoteProductItem[]>([]);
@@ -33,6 +35,7 @@ const LIMIT = 50;
 
 const queryParams = computed(() => ({
   search: queryString(route.query.search),
+  status: queryString(route.query.status) || null,
   page: queryNumber(route.query.page, 1),
   limit: route.query.limit ? queryNumber(route.query.limit, LIMIT) : LIMIT,
   created_from: queryString(route.query.created_from) || null,
@@ -45,6 +48,7 @@ const queryParams = computed(() => ({
 async function fetchQuotes() {
   const result = await commands.listQuotes({
     search: queryParams.value.search,
+    status: queryParams.value.status,
     page: queryParams.value.page,
     limit: queryParams.value.limit,
     created_from: queryParams.value.created_from,
@@ -69,6 +73,13 @@ const totalRows = computed<number>(() => quotesData.value?.count ?? 0);
 const activeFilters = computed(
   () =>
     [
+      status.value
+        ? {
+            key: "status",
+            label: t("fields.status"),
+            value: t(`status.${status.value.toLowerCase()}`),
+          }
+        : null,
       createdFrom.value
         ? {
             key: "created_from",
@@ -95,8 +106,9 @@ const debouncedSearch = useDebounceFn(() => {
 
 watch(searchQuery, debouncedSearch);
 
-watch([createdFrom, createdTo], () => {
+watch([status, createdFrom, createdTo], () => {
   updateQueryParams({
+    status: status.value || null,
     created_from: createdFrom.value || null,
     created_to: createdTo.value || null,
     page: 1,
@@ -136,11 +148,13 @@ async function listQuoteProducts(id?: string) {
 }
 
 function clearFilter(key: string) {
+  if (key === "status") status.value = "";
   if (key === "created_from") createdFrom.value = "";
   if (key === "created_to") createdTo.value = "";
 }
 
 function clearAllFilters() {
+  status.value = "";
   createdFrom.value = "";
   createdTo.value = "";
 }
@@ -172,6 +186,35 @@ const openCreateQuoteModal = () => modal.open(QuoteCreate, { sheet: true });
           />
         </template>
         <template #advanced>
+          <DropdownMenuGroup>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>{{ t("fields.status") }}</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuCheckboxItem
+                  :checked="status === 'PENDING'"
+                  @select.prevent
+                  @update:checked="status = status === 'PENDING' ? '' : 'PENDING'"
+                >
+                  {{ t("status.pending") }}
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  :checked="status === 'ACCEPTED'"
+                  @select.prevent
+                  @update:checked="status = status === 'ACCEPTED' ? '' : 'ACCEPTED'"
+                >
+                  {{ t("status.accepted") }}
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  :checked="status === 'CANCELLED'"
+                  @select.prevent
+                  @update:checked="status = status === 'CANCELLED' ? '' : 'CANCELLED'"
+                >
+                  {{ t("status.cancelled") }}
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>{{ t("fields.date") }}</DropdownMenuSubTrigger>

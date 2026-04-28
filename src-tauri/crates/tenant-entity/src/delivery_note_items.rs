@@ -14,6 +14,7 @@ pub struct Model {
     pub price: f32,
     #[sea_orm(column_type = "Float")]
     pub quantity: f32,
+    pub inventory_id: Option<String>,
     pub created_at: DateTime,
 }
 
@@ -28,6 +29,14 @@ pub enum Relation {
     )]
     DeliveryNotes,
     #[sea_orm(
+        belongs_to = "super::inventory_transactions::Entity",
+        from = "Column::InventoryId",
+        to = "super::inventory_transactions::Column::Id",
+        on_update = "NoAction",
+        on_delete = "SetNull"
+    )]
+    InventoryTransactions,
+    #[sea_orm(
         belongs_to = "super::products::Entity",
         from = "Column::ProductId",
         to = "super::products::Column::Id",
@@ -40,6 +49,12 @@ pub enum Relation {
 impl Related<super::delivery_notes::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::DeliveryNotes.def()
+    }
+}
+
+impl Related<super::inventory_transactions::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::InventoryTransactions.def()
     }
 }
 

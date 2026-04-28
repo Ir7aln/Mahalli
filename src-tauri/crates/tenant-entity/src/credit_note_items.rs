@@ -10,7 +10,9 @@ pub struct Model {
     pub id: String,
     pub credit_note_id: String,
     pub product_id: String,
+    #[sea_orm(column_type = "Float")]
     pub quantity: f32,
+    #[sea_orm(column_type = "Double")]
     pub price: f64,
     pub created_at: DateTime,
 }

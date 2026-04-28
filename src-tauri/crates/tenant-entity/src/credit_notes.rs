@@ -10,7 +10,9 @@ pub struct Model {
     pub id: String,
     pub invoice_id: String,
     pub client_id: String,
+    #[sea_orm(unique)]
     pub identifier: Option<String>,
+    #[sea_orm(column_type = "Text", nullable)]
     pub reason: Option<String>,
     pub is_deleted: bool,
     pub created_at: DateTime,

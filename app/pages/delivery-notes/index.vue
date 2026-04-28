@@ -12,13 +12,10 @@ const { showErrorToast } = useCommandError();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const deliveryNoteProducts = ref<DeliveryNoteProductItem[]>([]);
 
-const searchQuery = ref(queryString(route.query.search));
-const createdFrom = ref(queryString(route.query.created_from));
-const createdTo = ref(queryString(route.query.created_to));
-
 const deliveryNoteTableColumns = [
   { key: "identifier", label: t("fields.identifier") },
   { key: "full_name", label: t("fields.full-name") },
+  { key: "status", label: t("fields.status") },
   { key: "order_identifier", label: t("fields.order") },
   { key: "products", label: t("fields.items") },
   { key: "created_at", label: t("fields.date") },
@@ -28,8 +25,14 @@ const deliveryNoteTableColumns = [
 const visibleColumns = ref<string[]>(deliveryNoteTableColumns.map((col) => col.key));
 const LIMIT = 50;
 
+const searchQuery = ref(queryString(route.query.search));
+const status = ref(queryString(route.query.status));
+const createdFrom = ref(queryString(route.query.created_from));
+const createdTo = ref(queryString(route.query.created_to));
+
 const queryParams = computed(() => ({
   search: queryString(route.query.search),
+  status: queryString(route.query.status) || null,
   page: queryNumber(route.query.page, 1),
   limit: route.query.limit ? queryNumber(route.query.limit, LIMIT) : LIMIT,
   created_from: queryString(route.query.created_from) || null,
@@ -42,6 +45,7 @@ const queryParams = computed(() => ({
 async function fetchDeliveryNotes() {
   const result = await commands.listDeliveryNotes({
     search: queryParams.value.search,
+    status: queryParams.value.status,
     page: queryParams.value.page,
     limit: queryParams.value.limit,
     created_from: queryParams.value.created_from,
@@ -68,6 +72,13 @@ const totalRows = computed<number>(() => deliveryNotesData.value?.count ?? 0);
 const activeFilters = computed(
   () =>
     [
+      status.value
+        ? {
+            key: "status",
+            label: t("fields.status"),
+            value: t(`status.${status.value.toLowerCase()}`),
+          }
+        : null,
       createdFrom.value
         ? {
             key: "created_from",
@@ -94,8 +105,9 @@ const debouncedSearch = useDebounceFn(() => {
 
 watch(searchQuery, debouncedSearch);
 
-watch([createdFrom, createdTo], () => {
+watch([status, createdFrom, createdTo], () => {
   updateQueryParams({
+    status: status.value || null,
     created_from: createdFrom.value || null,
     created_to: createdTo.value || null,
     page: 1,
@@ -135,11 +147,13 @@ async function listDeliveryNoteProducts(id?: string) {
 }
 
 function clearFilter(key: string) {
+  if (key === "status") status.value = "";
   if (key === "created_from") createdFrom.value = "";
   if (key === "created_to") createdTo.value = "";
 }
 
 function clearAllFilters() {
+  status.value = "";
   createdFrom.value = "";
   createdTo.value = "";
 }
@@ -163,6 +177,35 @@ function clearAllFilters() {
           />
         </template>
         <template #advanced>
+          <DropdownMenuGroup>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>{{ t("fields.status") }}</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuCheckboxItem
+                  :checked="status === 'PENDING'"
+                  @select.prevent
+                  @update:checked="status = status === 'PENDING' ? '' : 'PENDING'"
+                >
+                  {{ t("status.pending") }}
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  :checked="status === 'INVOICED'"
+                  @select.prevent
+                  @update:checked="status = status === 'INVOICED' ? '' : 'INVOICED'"
+                >
+                  {{ t("status.invoiced") }}
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  :checked="status === 'CANCELLED'"
+                  @select.prevent
+                  @update:checked="status = status === 'CANCELLED' ? '' : 'CANCELLED'"
+                >
+                  {{ t("status.cancelled") }}
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>{{ t("fields.date") }}</DropdownMenuSubTrigger>

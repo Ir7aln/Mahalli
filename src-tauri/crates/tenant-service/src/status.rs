@@ -45,6 +45,66 @@ impl OrderStatus {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[serde(rename_all = "UPPERCASE")]
+pub enum QuoteStatus {
+    #[serde(rename = "PENDING")]
+    Pending,
+    #[serde(rename = "ACCEPTED")]
+    Accepted,
+    #[serde(rename = "CANCELLED")]
+    Cancelled,
+}
+
+impl QuoteStatus {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            QuoteStatus::Pending => "PENDING",
+            QuoteStatus::Accepted => "ACCEPTED",
+            QuoteStatus::Cancelled => "CANCELLED",
+        }
+    }
+
+    pub fn from_str(s: &str) -> Option<Self> {
+        match s {
+            "PENDING" => Some(QuoteStatus::Pending),
+            "ACCEPTED" => Some(QuoteStatus::Accepted),
+            "CANCELLED" => Some(QuoteStatus::Cancelled),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[serde(rename_all = "UPPERCASE")]
+pub enum DeliveryNoteStatus {
+    #[serde(rename = "PENDING")]
+    Pending,
+    #[serde(rename = "INVOICED")]
+    Invoiced,
+    #[serde(rename = "CANCELLED")]
+    Cancelled,
+}
+
+impl DeliveryNoteStatus {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            DeliveryNoteStatus::Pending => "PENDING",
+            DeliveryNoteStatus::Invoiced => "INVOICED",
+            DeliveryNoteStatus::Cancelled => "CANCELLED",
+        }
+    }
+
+    pub fn from_str(s: &str) -> Option<Self> {
+        match s {
+            "PENDING" => Some(DeliveryNoteStatus::Pending),
+            "INVOICED" => Some(DeliveryNoteStatus::Invoiced),
+            "CANCELLED" => Some(DeliveryNoteStatus::Cancelled),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
+#[serde(rename_all = "UPPERCASE")]
 pub enum InvoiceStatus {
     #[serde(rename = "DRAFT")]
     Draft,

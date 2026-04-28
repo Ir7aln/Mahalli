@@ -13,6 +13,7 @@ pub struct Model {
     pub is_deleted: bool,
     pub created_at: DateTime,
     pub identifier: Option<String>,
+    pub status: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
@@ -27,6 +28,8 @@ pub enum Relation {
     Clients,
     #[sea_orm(has_many = "super::delivery_note_items::Entity")]
     DeliveryNoteItems,
+    #[sea_orm(has_many = "super::invoices::Entity")]
+    Invoices,
     #[sea_orm(
         belongs_to = "super::orders::Entity",
         from = "Column::OrderId",
@@ -49,6 +52,12 @@ impl Related<super::delivery_note_items::Entity> for Entity {
     }
 }
 
+impl Related<super::invoices::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Invoices.def()
+    }
+}
+
 impl Related<super::orders::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Orders.def()
@@ -60,6 +69,7 @@ impl ActiveModelBehavior for ActiveModel {
         Self {
             id: Set(ulid::Ulid::new().to_string()),
             created_at: Set(Utc::now().naive_utc()),
+            status: Set("PENDING".to_string()),
             ..ActiveModelTrait::default()
         }
     }

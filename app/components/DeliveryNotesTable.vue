@@ -31,6 +31,7 @@ const visibleCols = computed(
     props.visibleColumns ?? [
       "identifier",
       "full_name",
+      "status",
       "order_identifier",
       "products",
       "created_at",
@@ -69,6 +70,9 @@ async function createInvoiceFromDeliveryNote(id: string) {
     return;
   }
   Logger.info(`CREATE INVOICE FROM DELIVERY NOTE: ${id}`);
+  updateQueryParams({
+    refresh: `refresh-update-${Math.random() * 9999}`,
+  });
   toast.success(t("notifications.invoice.created"), {
     closeButton: true,
     description: h(NuxtLink, {
@@ -92,6 +96,14 @@ async function createInvoiceFromDeliveryNote(id: string) {
               :active="sortKey === 'full_name'"
               :direction="sortDirection"
               @click="toggleSort('full_name')"
+            />
+          </TableHead>
+          <TableHead v-if="visibleCols.includes('status')">
+            <TableSortHeader
+              :label="t('fields.status')"
+              :active="sortKey === 'status'"
+              :direction="sortDirection"
+              @click="toggleSort('status')"
             />
           </TableHead>
           <TableHead v-if="visibleCols.includes('order_identifier')">
@@ -211,6 +223,23 @@ async function createInvoiceFromDeliveryNote(id: string) {
                 </div>
               </PopoverContent>
             </Popover>
+          </TableCell>
+          <TableCell v-if="visibleCols.includes('status')" class="p-2">
+            <Badge
+              variant="outline"
+              :class="
+                cn(
+                  'whitespace-nowrap',
+                  deliveryNote.status === 'INVOICED'
+                    ? 'bg-green-100 border-green-500 text-green-900'
+                    : deliveryNote.status === 'CANCELLED'
+                      ? 'bg-red-100 border-red-500 text-red-900'
+                      : 'bg-blue-100 border-blue-500 text-blue-900',
+                )
+              "
+            >
+              {{ t(`status.${deliveryNote.status.toLowerCase()}`) }}
+            </Badge>
           </TableCell>
           <TableCell v-if="visibleCols.includes('order_identifier')" class="p-2">
             <NuxtLink

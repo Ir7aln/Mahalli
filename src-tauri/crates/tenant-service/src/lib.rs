@@ -17,6 +17,6 @@ pub use column_preferences::{
 };
 pub use credit_notes::CreditNotesService;
 pub use seed::*;
-pub use status::{InvoiceStatus, OrderStatus};
+pub use status::{DeliveryNoteStatus, InvoiceStatus, OrderStatus, QuoteStatus};
 
 pub use sea_orm;

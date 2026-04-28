@@ -8,7 +8,7 @@ use tenant_entity::{
     inventory_transactions::{self, ActiveModel as InventoryActiveModel},
     invoice_items, invoices, order_items, orders,
     prelude::*,
-    products, quotes,
+    products, quotes, credit_notes,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
@@ -169,10 +169,19 @@ impl InventoryService {
                 Alias::new("quote_identifier"),
             )
             .expr_as(
+                Expr::col((CreditNotes, credit_notes::Column::Id)),
+                Alias::new("credit_note_id"),
+            )
+            .expr_as(
+                Expr::col((CreditNotes, credit_notes::Column::Identifier)),
+                Alias::new("credit_note_identifier"),
+            )
+            .expr_as(
                 Func::coalesce([
                     Expr::col((Invoices, invoices::Column::Identifier)),
                     Expr::col((Orders, orders::Column::Identifier)),
                     Expr::col((Quotes, quotes::Column::Identifier)),
+                    Expr::col((CreditNotes, credit_notes::Column::Identifier)),
                 ]),
                 Alias::new("source_identifier"),
             )
@@ -218,6 +227,16 @@ impl InventoryService {
                 Quotes,
                 Expr::col((Quotes, quotes::Column::Id))
                     .equals((Orders, orders::Column::QuoteId)),
+            )
+            .join(
+                JoinType::LeftJoin,
+                CreditNotes,
+                Expr::col((CreditNotes, credit_notes::Column::Id))
+                    .equals((InventoryTransactions, inventory_transactions::Column::SourceId))
+                    .and(
+                        Expr::col((InventoryTransactions, inventory_transactions::Column::SourceType))
+                            .eq("CREDIT_NOTE"),
+                    ),
             )
             .cond_where(
                 Cond::all()

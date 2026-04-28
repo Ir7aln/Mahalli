@@ -47,6 +47,8 @@
     "generate-invoice": "Générer la facture",
     "generate-order": "Générer la commande",
     "generate-quote": "Générer le devis",
+    "generate-delivery-note": "Générer le bon de livraison",
+    "generate-credit-note": "Générer l'avoir",
     "create": "Créer",
     "creating": "Création...",
     "view": "Afficher"
@@ -156,6 +158,8 @@
   },
   "status": {
     "pending": "En attente",
+    "accepted": "Accepté",
+    "invoiced": "Facturé",
     "processing": "En cours de traitement",
     "shipped": "Expédié",
     "delivered": "Livré",
