@@ -25,3 +25,15 @@ pub struct CreditNoteResponse {
     pub created_at: String,
     pub total: f64,
 }
+
+#[derive(Debug, Serialize, Deserialize, Type)]
+pub struct ListCreditNotesArgs {
+    pub limit: i64,
+    pub offset: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Type)]
+pub struct CreditNotesListResponse {
+    pub count: i64,
+    pub notes: Vec<CreditNoteResponse>,
+}

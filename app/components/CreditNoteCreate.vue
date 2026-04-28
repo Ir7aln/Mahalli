@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { commands } from "@/bindings";
+import type { InvoiceWithClient } from "@/bindings";
 import { Plus, Trash2, X } from "lucide-vue-next";
 import { useFieldArray, useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
@@ -23,7 +24,7 @@ const { close } = useModal();
 const router = useRouter();
 const isPosting = ref(false);
 const loading = ref(true);
-const invoiceDetails = ref<any>(null);
+const invoiceDetails = ref<InvoiceWithClient | null>(null);
 
 const creditNoteSchema = z.object({
   reason: z.string().optional(),
@@ -59,14 +60,16 @@ function formatMoney(value: number | string) {
 }
 
 const getResult = await commands.getInvoice(props.invoiceId);
-if (getResult.status === "ok" && getResult.data?.data) {
-  const invoice = getResult.data.data;
+if (getResult.status === "error") {
+  Logger.error(`ERROR GET INVOICE: ${JSON.stringify(getResult.error)}`);
+} else if (getResult.data.data) {
+  const invoice = getResult.data.data as InvoiceWithClient;
   invoiceDetails.value = invoice;
 
   resetForm({
     values: {
       reason: "",
-      items: (invoice?.items ?? []).map((item: any) => ({
+      items: (invoice.items ?? []).map((item) => ({
         product_id: item.product_id,
         quantity: item.quantity,
         price: item.price,
@@ -86,29 +89,32 @@ function addItem() {
 
 const onSubmit = handleSubmit(async (formData) => {
   isPosting.value = true;
-  const result = await commands.createCreditNote({
-    invoice_id: props.invoiceId,
-    reason: formData.reason || null,
-    items: formData.items,
-  });
 
-  if (result.status === "error") {
-    showErrorToast(result.error);
-    Logger.error(`ERROR CREATE CREDIT NOTE: ${JSON.stringify(result.error)}`);
-    isPosting.value = false;
-    return;
-  }
+  try {
+    const result = await commands.createCreditNote({
+      invoice_id: props.invoiceId,
+      reason: formData.reason || null,
+      items: formData.items,
+    });
 
-  Logger.info(`CREATE CREDIT NOTE: ${JSON.stringify(result.data)}`);
-  close();
-  toast.success(t("notifications.credit-note.created"), {
-    action: {
-      label: t("buttons.view"),
-      onClick: () => {
-        router.push(`/credit-notes/${result.data?.id}`);
+    if (result.status === "error") throw result.error;
+
+    Logger.info(`CREATE CREDIT NOTE: ${JSON.stringify(result.data)}`);
+
+    toast.success(t("notifications.credit-note.created"), {
+      action: {
+        label: t("buttons.view"),
+        onClick: () => {
+          router.push(`/credit-notes/${result.data?.id}`);
+        },
       },
-    },
-  });
+    });
+  } catch (err: any) {
+    Logger.error(`ERROR CREATE CREDIT NOTE: ${err.error ? err.error : err.message}`);
+  } finally {
+    isPosting.value = false;
+    close();
+  }
 });
 </script>
 

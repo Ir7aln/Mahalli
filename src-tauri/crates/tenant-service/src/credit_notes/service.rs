@@ -2,7 +2,7 @@ use super::dto::*;
 use chrono::Utc;
 use sea_orm::{
     DatabaseConnection as DbConn, ActiveValue, TransactionError, DbErr, EntityTrait,
-    TransactionTrait, ActiveModelTrait,
+    TransactionTrait, ActiveModelTrait, PaginatorTrait, QueryFilter, ColumnTrait,
 };
 use tenant_entity::{
     credit_note_items::ActiveModel as CreditNoteItemActiveModel,
@@ -70,5 +70,72 @@ impl CreditNotesService {
             })
         })
         .await
+    }
+
+    pub async fn list_credit_notes(
+        db: &DbConn,
+        args: ListCreditNotesArgs,
+    ) -> Result<CreditNotesListResponse, DbErr> {
+        let total = CreditNotes::find().count(db).await?;
+
+        let notes = CreditNotes::find()
+            .all(db)
+            .await?;
+
+        let mut response_notes = Vec::new();
+        for note in notes {
+            let items = CreditNoteItems::find()
+                .filter(tenant_entity::credit_note_items::Column::CreditNoteId.eq(note.id.clone()))
+                .all(db)
+                .await?;
+
+            let item_total: f64 = items.iter()
+                .map(|item| (item.quantity as f64) * item.price)
+                .sum();
+
+            response_notes.push(CreditNoteResponse {
+                id: note.id,
+                invoice_id: note.invoice_id,
+                client_id: note.client_id,
+                identifier: note.identifier,
+                reason: note.reason,
+                created_at: note.created_at.to_string(),
+                total: item_total,
+            });
+        }
+
+        Ok(CreditNotesListResponse {
+            count: total as i64,
+            notes: response_notes,
+        })
+    }
+
+    pub async fn get_credit_note(
+        db: &DbConn,
+        id: String,
+    ) -> Result<CreditNoteResponse, DbErr> {
+        let note = CreditNotes::find_by_id(id)
+            .one(db)
+            .await?
+            .ok_or_else(|| DbErr::RecordNotFound("credit note not found".to_string()))?;
+
+        let items = CreditNoteItems::find()
+            .filter(tenant_entity::credit_note_items::Column::CreditNoteId.eq(note.id.clone()))
+            .all(db)
+            .await?;
+
+        let total: f64 = items.iter()
+            .map(|item| (item.quantity as f64) * item.price)
+            .sum();
+
+        Ok(CreditNoteResponse {
+            id: note.id,
+            invoice_id: note.invoice_id,
+            client_id: note.client_id,
+            identifier: note.identifier,
+            reason: note.reason,
+            created_at: note.created_at.to_string(),
+            total,
+        })
     }
 }
