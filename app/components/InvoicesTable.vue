@@ -3,7 +3,7 @@ import { commands, type InvoiceProductItem, type SelectInvoices } from "@/bindin
 import { CircleDollarSign, FilePenLine, GripHorizontal, Printer, Trash2, ReceiptText, CheckCircle2 } from "lucide-vue-next";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
-import { InvoiceAddPayment, InvoiceDelete, InvoiceUpdate } from "#components";
+import { InvoiceAddPayment, InvoiceDelete, InvoiceUpdate, CreditNoteCreate } from "#components";
 import { INVOICE_STATUSES, STATUS_COLORS } from "@/consts";
 import { queryString } from "@/utils/query";
 
@@ -104,6 +104,15 @@ async function finalizeInvoice(id: string) {
   Logger.info(`FINALIZE INVOICE: ${id}`);
   updateQueryParams({
     refresh: `refresh-update-${Math.random() * 9999}`,
+  });
+}
+
+function createCreditNote(invoice: SelectInvoices) {
+  modal.open(CreditNoteCreate, {
+    invoice,
+    invoiceItems: props.invoiceProducts.filter(
+      (item) => item.invoice_id === invoice.id
+    ),
   });
 }
 </script>
@@ -362,7 +371,10 @@ async function finalizeInvoice(id: string) {
                     </NuxtLink>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem :disabled="invoice.status !== 'FINALIZED'">
+                  <DropdownMenuItem
+                    :disabled="invoice.status !== 'FINALIZED'"
+                    @click="createCreditNote(invoice)"
+                  >
                     <ReceiptText :size="20" class="text-slate-800 inline mr-2" />
                     {{ t("buttons.create-credit-note") }}
                   </DropdownMenuItem>
