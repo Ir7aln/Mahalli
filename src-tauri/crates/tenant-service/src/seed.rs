@@ -93,7 +93,7 @@ impl SeedService {
             let inventory_quantity: u8 = Faker.fake();
             let insert_stock = Statement::from_sql_and_values(
                 sea_orm::DatabaseBackend::Sqlite,
-                r#"INSERT INTO inventory_transactions (id, product_id, quantity, transaction_type) VALUES ($1, $2, $3)"#,
+                r#"INSERT INTO inventory_transactions (id, product_id, quantity, transaction_type) VALUES ($1, $2, $3, $4)"#,
                 [
                     inventory_id.to_string().into(),
                     id.to_string().into(),
