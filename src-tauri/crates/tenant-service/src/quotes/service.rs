@@ -4,11 +4,12 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
-    clients::{self, Entity as Clients},
+    clients,
     inventory_transactions,
-    products::{self, Entity as Products},
-    quote_items::{self, ActiveModel as QuoteItemActiveModel, Entity as QuoteItems},
-    quotes::{self, ActiveModel as QuoteActiveModel, Entity as Quotes},
+    products,
+    quote_items::{self, ActiveModel as QuoteItemActiveModel},
+    quotes::{self, ActiveModel as QuoteActiveModel},
+    prelude::*,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {

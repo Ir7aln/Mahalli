@@ -8,18 +8,15 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
-    clients::{self, Entity as Clients},
-    delivery_note_items::{self, Entity as DeliveryNoteItems},
-    delivery_notes::{self, Entity as DeliveryNotes},
-    inventory_transactions::{
-        ActiveModel as InventoryActiveModel, Entity as InventoryTransactions,
-    },
-    invoice_items::{self, ActiveModel as InvoiceItemActiveModel, Entity as InvoiceItems},
-    invoice_payments::{self, ActiveModel as InvoicePaymentActiveModel, Entity as InvoicePayments},
-    invoices::{self, ActiveModel as InvoiceActiveModel, Entity as Invoices},
-    order_items::{self, Entity as OrderItems},
-    orders::{ActiveModel as OrderActiveModel, Entity as Orders},
-    products::{self, Entity as Products},
+    clients,
+    delivery_note_items, delivery_notes,
+    inventory_transactions::{self, ActiveModel as InventoryActiveModel},
+    invoice_items::{self, ActiveModel as InvoiceItemActiveModel},
+    invoice_payments::{self, ActiveModel as InvoicePaymentActiveModel},
+    invoices::{self, ActiveModel as InvoiceActiveModel},
+    order_items, orders::{self, ActiveModel as OrderActiveModel},
+    products,
+    prelude::*,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {

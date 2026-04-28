@@ -5,9 +5,10 @@ use sea_orm::{
     TransactionTrait, ActiveModelTrait,
 };
 use tenant_entity::{
-    credit_note_items::{ActiveModel as CreditNoteItemActiveModel, Entity as CreditNoteItems},
-    credit_notes::ActiveModel as CreditNoteActiveModel,
-    invoices::Entity as Invoices,
+    credit_note_items::{self, ActiveModel as CreditNoteItemActiveModel},
+    credit_notes::{self, ActiveModel as CreditNoteActiveModel},
+    invoices,
+    prelude::*,
 };
 
 pub struct CreditNotesService;

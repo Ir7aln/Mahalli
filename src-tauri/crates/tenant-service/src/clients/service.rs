@@ -6,10 +6,9 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
-    clients::{self, ActiveModel as ClientActiveModel, Entity as Clients},
-    invoice_items::{self, Entity as InvoiceItems},
-    invoice_payments::{self, Entity as InvoicePayments},
-    invoices::{self, Entity as Invoices},
+    clients::{self, ActiveModel as ClientActiveModel},
+    invoice_items, invoice_payments, invoices,
+    prelude::*,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {

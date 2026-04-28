@@ -6,13 +6,8 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
-    clients::{self, Entity as Clients},
-    inventory_transactions::{self, Entity as InventoryTransactions},
-    invoice_payments::{self, Entity as InvoicePayments},
-    invoices::{self, Entity as Invoices},
-    order_items::{self, Entity as OrderItems},
-    orders::{self, Entity as Orders},
-    products::{self, Entity as Products},
+    clients, inventory_transactions, invoice_payments, invoices, order_items, orders, products,
+    prelude::*,
 };
 
 pub struct DashboardService;

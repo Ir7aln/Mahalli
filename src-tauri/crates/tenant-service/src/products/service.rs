@@ -6,10 +6,10 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
-    inventory_transactions::{self, Entity as InventoryTransactions},
-    order_items::{self, Entity as OrderItems},
-    orders::{self, Entity as Orders},
-    products::{self, ActiveModel as ProductActiveModel, Entity as Products},
+    inventory_transactions,
+    order_items, orders,
+    products::{self, ActiveModel as ProductActiveModel},
+    prelude::*,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {

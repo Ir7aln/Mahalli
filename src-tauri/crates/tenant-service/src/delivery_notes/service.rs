@@ -4,15 +4,13 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
-    clients::{self, Entity as Clients},
-    delivery_note_items::{
-        self, ActiveModel as DeliveryNoteItemActiveModel, Entity as DeliveryNoteItems,
-    },
-    delivery_notes::{self, ActiveModel as DeliveryNoteActiveModel, Entity as DeliveryNotes},
-    inventory_transactions::Entity as InventoryTransactions,
-    order_items::{self, Entity as OrderItems},
-    orders::{self, Entity as Orders},
-    products::{self, Entity as Products},
+    clients,
+    delivery_note_items::{self, ActiveModel as DeliveryNoteItemActiveModel},
+    delivery_notes::{self, ActiveModel as DeliveryNoteActiveModel},
+    inventory_transactions,
+    order_items, orders,
+    products,
+    prelude::*,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {

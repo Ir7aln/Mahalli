@@ -4,15 +4,12 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
-    inventory_transactions::{
-        self, ActiveModel as InventoryActiveModel, Entity as InventoryTransactions,
-    },
-    invoice_items::{self, Entity as InvoiceItems},
-    invoices::{self, Entity as Invoices},
-    order_items::{self, Entity as OrderItems},
-    orders::{self, Entity as Orders},
-    products::{self, Entity as Products},
-    quotes::{self, Entity as Quotes},
+    inventory_transactions::{self, ActiveModel as InventoryActiveModel},
+    invoice_items, invoices, orders,
+    order_items,
+    products,
+    quotes,
+    prelude::*,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
