@@ -335,7 +335,7 @@ async function finalizeInvoice(id: string) {
                     {{ t("buttons.edit") }}
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    :disabled="invoice.status !== 'DRAFT'"
+                    :disabled="invoice.status !== 'PAID'"
                     @click="finalizeInvoice(invoice.id as string)"
                   >
                     <CheckCircle2 :size="20" class="text-slate-800 inline mr-2" />

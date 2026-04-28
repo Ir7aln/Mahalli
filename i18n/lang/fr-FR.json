@@ -147,6 +147,7 @@
     "sent": "Envoyé",
     "paid": "Payé",
     "partially_paid": "Partiellement payé",
+    "finalized": "Finalisé",
     "overdue": "En retard",
     "in": "Acheté",
     "out": "Vendu"

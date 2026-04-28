@@ -147,6 +147,7 @@
     "sent": "Sent",
     "paid": "Paid",
     "partially_paid": "Partially Paid",
+    "finalized": "Finalized",
     "overdue": "Overdue",
     "in": "Bought",
     "out": "Sold"

@@ -147,6 +147,7 @@
     "sent": "Gesendet",
     "paid": "Bezahlt",
     "partially_paid": "Teilweise bezahlt",
+    "finalized": "Abgeschlossen",
     "overdue": "Überfällig",
     "in": "Gekauft",
     "out": "Verkauft"

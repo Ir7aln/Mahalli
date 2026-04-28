@@ -831,9 +831,9 @@ impl InvoicesService {
             DbErr::Custom(format!("corrupted invoice status: {}", invoice.status))
         })?;
 
-        if current_status != InvoiceStatus::Draft {
+        if current_status != InvoiceStatus::Paid {
             return Err(DbErr::Custom(
-                "only draft invoices can be finalized".to_string(),
+                "only paid invoices can be finalized".to_string(),
             ));
         }
 
