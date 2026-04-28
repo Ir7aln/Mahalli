@@ -220,7 +220,7 @@ impl InvoicesService {
             .join(JoinType::Join, invoices::Relation::Clients.def())
             .filter(
                 Cond::all()
-                    .add(Expr::col((Invoices, invoices::Column::IsArchived)).eq(false))
+
                     .add(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
                     .add(invoice_search_condition(&args.search)),
             )
@@ -264,7 +264,7 @@ impl InvoicesService {
             )
             .cond_where(
                 Cond::all()
-                    .add(Expr::col((Invoices, invoices::Column::IsArchived)).eq(false))
+
                     .add(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
                     .add(invoice_search_condition(&args.search)),
             )

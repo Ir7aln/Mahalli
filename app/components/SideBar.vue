@@ -5,6 +5,7 @@ import {
   HomeIcon,
   Languages,
   Package,
+  ClipboardCheck,
   Quote,
   ReceiptText,
   Settings,
@@ -48,6 +49,12 @@ const menuItems = [
     icon: Truck,
     label: "routes.orders",
     path: "/orders/",
+    query: { page: 1 },
+  },
+  {
+    icon: ClipboardCheck,
+    label: "routes.delivery-notes",
+    path: "/delivery-notes/",
     query: { page: 1 },
   },
   {

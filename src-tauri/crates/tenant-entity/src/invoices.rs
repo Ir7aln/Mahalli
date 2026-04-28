@@ -12,7 +12,6 @@ pub struct Model {
     #[sea_orm(unique)]
     pub order_id: String,
     pub is_deleted: bool,
-    pub is_archived: bool,
     pub status: String,
     pub identifier: Option<String>,
     pub created_at: DateTime,

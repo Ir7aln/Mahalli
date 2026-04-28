@@ -11,6 +11,7 @@
     "clients": "Clients",
     "products": "Products",
     "orders": "Orders",
+    "delivery-notes": "Delivery notes",
     "invoices": "Invoices",
     "inventory": "Inventory",
     "dashboard": "Dashboard",
@@ -36,6 +37,7 @@
     "delete": "Delete",
     "print": "Print",
     "to-order": "Create order",
+    "to-delivery-note": "Create delivery note",
     "to-invoice": "Create invoice",
     "inventory-update": "Update inventory",
     "generate-invoice": "Generate invoice",
@@ -261,6 +263,9 @@
       "updated": "The Order has been updated",
       "deleted": "The Order has been deleted"
     },
+    "delivery-note": {
+      "created": "A delivery note has been created"
+    },
     "invoice": {
       "created": "An Invoice has been created",
       "updated": "The Invoice has been updated",
@@ -298,6 +303,9 @@
       "client-not-found": "The client could not be found.",
       "quote-not-found": "The quote could not be found.",
       "order-not-found": "The order could not be found.",
+      "delivery-note-not-found": "The delivery note could not be found.",
+      "delivery-note-order-not-found": "The source order for this delivery note could not be found.",
+      "delivery-note-inventory-missing": "A linked stock movement for this delivery note could not be found.",
       "invoice-not-found": "The invoice could not be found.",
       "invoice-payment-date-invalid": "The payment date is invalid.",
       "invoice-payment-amount-invalid": "The payment amount must be greater than zero.",

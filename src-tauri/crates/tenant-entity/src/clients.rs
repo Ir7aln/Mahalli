@@ -11,7 +11,6 @@ pub struct Model {
     pub full_name: String,
     pub created_at: DateTime,
     pub is_deleted: bool,
-    pub is_archived: bool,
     pub phone_number: Option<String>,
     pub email: Option<String>,
     pub address: Option<String>,
@@ -24,12 +23,20 @@ pub struct Model {
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+    #[sea_orm(has_many = "super::delivery_notes::Entity")]
+    DeliveryNotes,
     #[sea_orm(has_many = "super::invoices::Entity")]
     Invoices,
     #[sea_orm(has_many = "super::orders::Entity")]
     Orders,
     #[sea_orm(has_many = "super::quotes::Entity")]
     Quotes,
+}
+
+impl Related<super::delivery_notes::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::DeliveryNotes.def()
+    }
 }
 
 impl Related<super::invoices::Entity> for Entity {

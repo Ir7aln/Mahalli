@@ -11,6 +11,7 @@
     "clients": "Kunden",
     "products": "Produkte",
     "orders": "Bestellungen",
+    "delivery-notes": "Lieferscheine",
     "invoices": "Rechnungen",
     "inventory": "Lagerbestand",
     "dashboard": "Dashboard",
@@ -36,6 +37,7 @@
     "delete": "Löschen",
     "print": "Drucken",
     "to-order": "Bestellung erstellen",
+    "to-delivery-note": "Lieferschein erstellen",
     "to-invoice": "Rechnung erstellen",
     "inventory-update": "Lagerbestand aktualisieren",
     "generate-invoice": "Rechnung erstellen",
@@ -261,6 +263,9 @@
       "updated": "Die Bestellung wurde aktualisiert",
       "deleted": "Die Bestellung wurde gelöscht"
     },
+    "delivery-note": {
+      "created": "Ein Lieferschein wurde erstellt"
+    },
     "invoice": {
       "created": "Eine Rechnung wurde erstellt",
       "updated": "Die Rechnung wurde aktualisiert",
@@ -298,6 +303,9 @@
       "client-not-found": "Der Kunde wurde nicht gefunden.",
       "quote-not-found": "Das Angebot wurde nicht gefunden.",
       "order-not-found": "Der Auftrag wurde nicht gefunden.",
+      "delivery-note-not-found": "Der Lieferschein wurde nicht gefunden.",
+      "delivery-note-order-not-found": "Die Ausgangsbestellung für diesen Lieferschein wurde nicht gefunden.",
+      "delivery-note-inventory-missing": "Eine verknüpfte Lagerbewegung für diesen Lieferschein wurde nicht gefunden.",
       "invoice-not-found": "Die Rechnung wurde nicht gefunden.",
       "invoice-payment-date-invalid": "Das Zahlungsdatum ist ungültig.",
       "invoice-payment-amount-invalid": "Der Zahlungsbetrag muss größer als null sein.",

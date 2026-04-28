@@ -4,21 +4,29 @@ use chrono::Utc;
 use sea_orm::{entity::prelude::*, Set};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
-#[sea_orm(table_name = "quote_items")]
+#[sea_orm(table_name = "delivery_note_items")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: String,
+    pub delivery_note_id: String,
+    pub product_id: String,
     #[sea_orm(column_type = "Float")]
     pub price: f32,
     #[sea_orm(column_type = "Float")]
     pub quantity: f32,
-    pub product_id: String,
-    pub quote_id: String,
     pub created_at: DateTime,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+    #[sea_orm(
+        belongs_to = "super::delivery_notes::Entity",
+        from = "Column::DeliveryNoteId",
+        to = "super::delivery_notes::Column::Id",
+        on_update = "NoAction",
+        on_delete = "Cascade"
+    )]
+    DeliveryNotes,
     #[sea_orm(
         belongs_to = "super::products::Entity",
         from = "Column::ProductId",
@@ -27,25 +35,17 @@ pub enum Relation {
         on_delete = "Cascade"
     )]
     Products,
-    #[sea_orm(
-        belongs_to = "super::quotes::Entity",
-        from = "Column::QuoteId",
-        to = "super::quotes::Column::Id",
-        on_update = "NoAction",
-        on_delete = "Cascade"
-    )]
-    Quotes,
+}
+
+impl Related<super::delivery_notes::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::DeliveryNotes.def()
+    }
 }
 
 impl Related<super::products::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Products.def()
-    }
-}
-
-impl Related<super::quotes::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Quotes.def()
     }
 }
 

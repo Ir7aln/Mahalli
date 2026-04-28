@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { commands } from "@/bindings";
 import * as Logger from "@tauri-apps/plugin-log";
-import { FilePenLine, GripHorizontal, NotepadText, Printer, Trash2 } from "lucide-vue-next";
+import { FilePenLine, GripHorizontal, NotepadText, Printer, ReceiptText, Trash2 } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import { NuxtLink, OrderDelete, OrderUpdate } from "#components";
 import { ORDER_STATUSES, STATUS_COLORS } from "@/consts";
@@ -95,6 +95,24 @@ async function createInvoiceFromOrder(id: string) {
       to: localePath(`/invoices/?page=1&highlight=true&id=${result.data.data}`),
       class: "underline",
       innerHTML: "go to invoice",
+    }),
+  });
+}
+
+async function createDeliveryNoteFromOrder(id: string) {
+  const result = await commands.createDeliveryNoteFromOrder(id);
+  if (result.status === "error") {
+    Logger.error(`CREATE DELIVERY NOTE FROM ORDER: ${JSON.stringify(result.error)}`);
+    showErrorToast(result.error);
+    return;
+  }
+  Logger.info(`CREATE DELIVERY NOTE FROM ORDER: ${id}`);
+  toast.success(t("notifications.delivery-note.created"), {
+    closeButton: true,
+    description: h(NuxtLink, {
+      to: localePath(`/delivery-notes/?page=1&highlight=true&id=${result.data.data}`),
+      class: "underline",
+      innerHTML: "go to delivery note",
     }),
   });
 }
@@ -272,6 +290,12 @@ async function createInvoiceFromOrder(id: string) {
                         t("buttons.print")
                       }}
                     </NuxtLink>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem @click="createDeliveryNoteFromOrder(order.id!)">
+                    <ReceiptText :size="20" class="text-slate-800 inline mr-2" />{{
+                      t("buttons.to-delivery-note")
+                    }}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem @click="createInvoiceFromOrder(order.id!)">

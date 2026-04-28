@@ -34,7 +34,7 @@ impl QuotesService {
             .join(JoinType::Join, quotes::Relation::Clients.def())
             .filter(
                 Cond::all()
-                    .add(Expr::col((Quotes, quotes::Column::IsArchived)).eq(false))
+
                     .add(Expr::col((Quotes, quotes::Column::IsDeleted)).eq(false))
                     .add(quote_search_condition(&args.search)),
             )
@@ -95,7 +95,7 @@ impl QuotesService {
             )
             .cond_where(
                 Cond::all()
-                    .add(Expr::col((Quotes, quotes::Column::IsArchived)).eq(false))
+
                     .add(Expr::col((Quotes, quotes::Column::IsDeleted)).eq(false))
                     .add(quote_search_condition(&args.search)),
             )

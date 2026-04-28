@@ -1,6 +1,8 @@
 use tauri::State;
 
-use tenant_service::column_preferences::{ColumnPreference, ColumnPreferencesService, SaveColumnPreferenceArgs};
+use tenant_service::column_preferences::{
+    ColumnPreference, ColumnPreferencesService, SaveColumnPreferenceArgs,
+};
 
 use crate::AppState;
 

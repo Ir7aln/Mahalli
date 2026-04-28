@@ -286,7 +286,7 @@ impl DashboardService {
             .cond_where(
                 Cond::all()
                     .add(orders::Column::IsDeleted.eq(false))
-                    .add(orders::Column::IsArchived.eq(false)),
+,
             )
             .group_by_col(orders::Column::Status)
             .to_owned()
@@ -302,7 +302,7 @@ impl DashboardService {
             .cond_where(
                 Cond::all()
                     .add(invoices::Column::IsDeleted.eq(false))
-                    .add(invoices::Column::IsArchived.eq(false)),
+,
             )
             .group_by_col(invoices::Column::Status)
             .to_owned()

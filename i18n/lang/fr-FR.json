@@ -11,6 +11,7 @@
     "clients": "Clients",
     "products": "Produits",
     "orders": "Commandes",
+    "delivery-notes": "Bons de livraison",
     "invoices": "Factures",
     "inventory": "Inventaire",
     "dashboard": "Tableau de bord",
@@ -36,6 +37,7 @@
     "delete": "Supprimer",
     "print": "Imprimer",
     "to-order": "Créer une commande",
+    "to-delivery-note": "Créer un bon de livraison",
     "to-invoice": "Créer une facture",
     "inventory-update": "Mettre à jour l'inventaire",
     "generate-invoice": "Générer la facture",
@@ -260,6 +262,9 @@
       "updated": "La commande a été mise à jour",
       "deleted": "La commande a été supprimée"
     },
+    "delivery-note": {
+      "created": "Un bon de livraison a été créé"
+    },
     "invoice": {
       "created": "Une facture a été créée",
       "updated": "La facture a été mise à jour",
@@ -297,6 +302,9 @@
       "client-not-found": "Le client est introuvable.",
       "quote-not-found": "Le devis est introuvable.",
       "order-not-found": "La commande est introuvable.",
+      "delivery-note-not-found": "Le bon de livraison est introuvable.",
+      "delivery-note-order-not-found": "La commande source de ce bon de livraison est introuvable.",
+      "delivery-note-inventory-missing": "Un mouvement de stock lié à ce bon de livraison est introuvable.",
       "invoice-not-found": "La facture est introuvable.",
       "invoice-payment-date-invalid": "La date du paiement est invalide.",
       "invoice-payment-amount-invalid": "Le montant du paiement doit être supérieur à zéro.",

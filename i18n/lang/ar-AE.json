@@ -11,6 +11,7 @@
     "clients": "العملاء",
     "products": "المنتجات",
     "orders": "الطلبات",
+    "delivery-notes": "سندات التسليم",
     "invoices": "الفواتير",
     "inventory": "المخزون",
     "dashboard": "لوحة التحكم",
@@ -36,6 +37,7 @@
     "delete": "حذف",
     "print": "طباعة",
     "to-order": "إنشاء طلب",
+    "to-delivery-note": "إنشاء سند تسليم",
     "to-invoice": "إنشاء فاتورة",
     "inventory-update": "تحديث المخزون",
     "generate-invoice": "إنشاء الفاتورة",
@@ -260,6 +262,9 @@
       "updated": "تم تحديث الطلب",
       "deleted": "تم حذف الطلب"
     },
+    "delivery-note": {
+      "created": "تم إنشاء سند التسليم"
+    },
     "invoice": {
       "created": "تم إنشاء فاتورة",
       "updated": "تم تحديث الفاتورة",
@@ -297,6 +302,9 @@
       "client-not-found": "تعذر العثور على العميل.",
       "quote-not-found": "تعذر العثور على عرض السعر.",
       "order-not-found": "تعذر العثور على الطلب.",
+      "delivery-note-not-found": "تعذر العثور على سند التسليم.",
+      "delivery-note-order-not-found": "تعذر العثور على الطلب المرتبط بسند التسليم هذا.",
+      "delivery-note-inventory-missing": "تعذر العثور على حركة المخزون المرتبطة بسند التسليم هذا.",
       "invoice-not-found": "تعذر العثور على الفاتورة.",
       "invoice-payment-date-invalid": "تاريخ الدفعة غير صالح.",
       "invoice-payment-amount-invalid": "يجب أن يكون مبلغ الدفعة أكبر من صفر.",

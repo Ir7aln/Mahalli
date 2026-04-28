@@ -39,7 +39,7 @@ impl OrdersService {
             .join(JoinType::Join, orders::Relation::Clients.def())
             .filter(
                 Cond::all()
-                    .add(Expr::col((Orders, orders::Column::IsArchived)).eq(false))
+
                     .add(Expr::col((Orders, orders::Column::IsDeleted)).eq(false))
                     .add(order_search_condition(&args.search)),
             )
@@ -112,7 +112,7 @@ impl OrdersService {
             )
             .cond_where(
                 Cond::all()
-                    .add(Expr::col((Orders, orders::Column::IsArchived)).eq(false))
+
                     .add(Expr::col((Orders, orders::Column::IsDeleted)).eq(false))
                     .add(order_search_condition(&args.search)),
             )

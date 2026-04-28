@@ -32,12 +32,6 @@ impl MigrationTrait for Migration {
                             .not_null()
                             .default(false),
                     )
-                    .col(
-                        ColumnDef::new(Client::IsArchived)
-                            .boolean()
-                            .not_null()
-                            .default(false),
-                    )
                     .col(ColumnDef::new(Client::Phone).string())
                     .col(ColumnDef::new(Client::Email).string())
                     .col(ColumnDef::new(Client::Address).string())
@@ -46,6 +40,99 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Client::IfNumber).string())
                     .col(ColumnDef::new(Client::Rc).string())
                     .col(ColumnDef::new(Client::Patente).string())
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_table(
+                Table::create()
+                    .table(DeliveryNote::Table)
+                    .if_not_exists()
+                    .col(
+                        ColumnDef::new(DeliveryNote::Id)
+                            .string()
+                            .not_null()
+                            .primary_key(),
+                    )
+                    .col(ColumnDef::new(DeliveryNote::OrderId).string().not_null())
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_delivery_note_order_id")
+                            .from(DeliveryNote::Table, DeliveryNote::OrderId)
+                            .to(Order::Table, Order::Id)
+                            .on_delete(ForeignKeyAction::Cascade),
+                    )
+                    .col(ColumnDef::new(DeliveryNote::ClientId).string().not_null())
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_delivery_note_client_id")
+                            .from(DeliveryNote::Table, DeliveryNote::ClientId)
+                            .to(Client::Table, Client::Id)
+                            .on_delete(ForeignKeyAction::Cascade),
+                    )
+                    .col(
+                        ColumnDef::new(DeliveryNote::IsDeleted)
+                            .boolean()
+                            .not_null()
+                            .default(false),
+                    )
+                    .col(
+                        ColumnDef::new(DeliveryNote::CreatedAt)
+                            .date_time()
+                            .not_null()
+                            .default(Expr::current_timestamp()),
+                    )
+                    .col(ColumnDef::new(DeliveryNote::Identifier).string())
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_table(
+                Table::create()
+                    .table(DeliveryNoteItem::Table)
+                    .if_not_exists()
+                    .col(
+                        ColumnDef::new(DeliveryNoteItem::Id)
+                            .string()
+                            .not_null()
+                            .primary_key(),
+                    )
+                    .col(ColumnDef::new(DeliveryNoteItem::DeliveryNoteId).string().not_null())
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_delivery_note_item_delivery_note_id")
+                            .from(DeliveryNoteItem::Table, DeliveryNoteItem::DeliveryNoteId)
+                            .to(DeliveryNote::Table, DeliveryNote::Id)
+                            .on_delete(ForeignKeyAction::Cascade),
+                    )
+                    .col(ColumnDef::new(DeliveryNoteItem::ProductId).string().not_null())
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_delivery_note_item_product_id")
+                            .from(DeliveryNoteItem::Table, DeliveryNoteItem::ProductId)
+                            .to(Product::Table, Product::Id)
+                            .on_delete(ForeignKeyAction::Cascade),
+                    )
+                    .col(
+                        ColumnDef::new(DeliveryNoteItem::Price)
+                            .float()
+                            .not_null()
+                            .default(0.0f32),
+                    )
+                    .col(
+                        ColumnDef::new(DeliveryNoteItem::Quantity)
+                            .float()
+                            .not_null()
+                            .default(0.0f32),
+                    )
+                    .col(
+                        ColumnDef::new(DeliveryNoteItem::CreatedAt)
+                            .date_time()
+                            .not_null()
+                            .default(Expr::current_timestamp()),
+                    )
                     .to_owned(),
             )
             .await?;
@@ -70,12 +157,6 @@ impl MigrationTrait for Migration {
                     )
                     .col(
                         ColumnDef::new(Product::IsDeleted)
-                            .boolean()
-                            .not_null()
-                            .default(false),
-                    )
-                    .col(
-                        ColumnDef::new(Product::IsArchived)
                             .boolean()
                             .not_null()
                             .default(false),
@@ -169,12 +250,6 @@ impl MigrationTrait for Migration {
                             .default(false),
                     )
                     .col(
-                        ColumnDef::new(Quote::IsArchived)
-                            .boolean()
-                            .not_null()
-                            .default(false),
-                    )
-                    .col(
                         ColumnDef::new(Quote::CreatedAt)
                             .date_time()
                             .not_null()
@@ -224,6 +299,12 @@ impl MigrationTrait for Migration {
                             .to(Quote::Table, Quote::Id)
                             .on_delete(ForeignKeyAction::Cascade),
                     )
+                    .col(
+                        ColumnDef::new(QuoteItem::CreatedAt)
+                            .date_time()
+                            .not_null()
+                            .default(Expr::current_timestamp()),
+                    )
                     .to_owned(),
             )
             .await?;
@@ -252,12 +333,6 @@ impl MigrationTrait for Migration {
                     )
                     .col(
                         ColumnDef::new(Order::IsDeleted)
-                            .boolean()
-                            .not_null()
-                            .default(false),
-                    )
-                    .col(
-                        ColumnDef::new(Order::IsArchived)
                             .boolean()
                             .not_null()
                             .default(false),
@@ -312,6 +387,12 @@ impl MigrationTrait for Migration {
                             .to(InventoryTransaction::Table, InventoryTransaction::Id)
                             .on_delete(ForeignKeyAction::Cascade),
                     )
+                    .col(
+                        ColumnDef::new(OrderItem::CreatedAt)
+                            .date_time()
+                            .not_null()
+                            .default(Expr::current_timestamp()),
+                    )
                     .to_owned(),
             )
             .await?;
@@ -350,12 +431,6 @@ impl MigrationTrait for Migration {
                     )
                     .col(
                         ColumnDef::new(Invoice::IsDeleted)
-                            .boolean()
-                            .not_null()
-                            .default(false),
-                    )
-                    .col(
-                        ColumnDef::new(Invoice::IsArchived)
                             .boolean()
                             .not_null()
                             .default(false),
@@ -596,6 +671,36 @@ impl MigrationTrait for Migration {
 
         manager
             .create_index(
+                Index::create()
+                    .table(DeliveryNote::Table)
+                    .col(DeliveryNote::OrderId)
+                    .name("idx_delivery_notes_order_id")
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .table(DeliveryNote::Table)
+                    .col(DeliveryNote::ClientId)
+                    .name("idx_delivery_notes_client_id")
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .table(DeliveryNoteItem::Table)
+                    .col(DeliveryNoteItem::DeliveryNoteId)
+                    .name("idx_delivery_note_items_delivery_note_id")
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
                 sea_query::Index::create()
                     .table(Client::Table)
                     .col(Client::Fullname)
@@ -697,6 +802,33 @@ impl MigrationTrait for Migration {
         );
         db.execute_raw(q_identifier_generator).await?;
 
+        let dn_identifier_generator = Statement::from_string(
+            sea_orm::DatabaseBackend::Sqlite,
+            r#"
+                CREATE TRIGGER IF NOT EXISTS delivery_note_identifier_generator
+                AFTER INSERT ON delivery_notes 
+                BEGIN
+                    UPDATE delivery_notes 
+                    SET identifier = (
+                        WITH current_month_delivery_notes AS (
+                            SELECT COUNT(*) as delivery_note_count
+                            FROM delivery_notes
+                            WHERE strftime('%Y-%m', created_at) = strftime('%Y-%m', NEW.created_at)
+                            AND id <= NEW.id
+                        )
+                        SELECT format(
+                            'BL-%s-%03d',
+                            SUBSTRING(strftime('%Y-%m', NEW.created_at), 3),
+                            delivery_note_count
+                        )
+                        FROM current_month_delivery_notes
+                    )
+                    WHERE id = NEW.id;
+                END;
+            "#,
+        );
+        db.execute_raw(dn_identifier_generator).await?;
+
         Ok(())
     }
 
@@ -707,6 +839,8 @@ impl MigrationTrait for Migration {
         db.execute_unprepared("DROP TRIGGER IF EXISTS order_identifier_generator")
             .await?;
         db.execute_unprepared("DROP TRIGGER IF EXISTS quote_identifier_generator")
+            .await?;
+        db.execute_unprepared("DROP TRIGGER IF EXISTS delivery_note_identifier_generator")
             .await?;
 
         manager
@@ -823,6 +957,30 @@ impl MigrationTrait for Migration {
             )
             .await?;
         manager
+            .drop_index(
+                Index::drop()
+                    .table(DeliveryNote::Table)
+                    .name("idx_delivery_notes_order_id")
+                    .to_owned(),
+            )
+            .await?;
+        manager
+            .drop_index(
+                Index::drop()
+                    .table(DeliveryNote::Table)
+                    .name("idx_delivery_notes_client_id")
+                    .to_owned(),
+            )
+            .await?;
+        manager
+            .drop_index(
+                Index::drop()
+                    .table(DeliveryNoteItem::Table)
+                    .name("idx_delivery_note_items_delivery_note_id")
+                    .to_owned(),
+            )
+            .await?;
+        manager
             .drop_table(Table::drop().table(InvoiceItem::Table).to_owned())
             .await?;
         manager
@@ -830,6 +988,12 @@ impl MigrationTrait for Migration {
             .await?;
         manager
             .drop_table(Table::drop().table(Invoice::Table).to_owned())
+            .await?;
+        manager
+            .drop_table(Table::drop().table(DeliveryNoteItem::Table).to_owned())
+            .await?;
+        manager
+            .drop_table(Table::drop().table(DeliveryNote::Table).to_owned())
             .await?;
         manager
             .drop_table(Table::drop().table(Order::Table).to_owned())
@@ -876,8 +1040,6 @@ pub enum Client {
     Address,
     #[sea_orm(iden = "is_deleted")]
     IsDeleted,
-    #[sea_orm(iden = "is_archived")]
-    IsArchived,
     #[sea_orm(iden = "ice")]
     Ice,
     #[sea_orm(iden = "if_number")]
@@ -909,8 +1071,6 @@ pub enum Product {
     MinQuantity,
     #[sea_orm(iden = "is_deleted")]
     IsDeleted,
-    #[sea_orm(iden = "is_archived")]
-    IsArchived,
 }
 
 #[derive(DeriveIden)]
@@ -939,8 +1099,6 @@ pub enum Quote {
     CreatedAt,
     #[sea_orm(iden = "is_deleted")]
     IsDeleted,
-    #[sea_orm(iden = "is_archived")]
-    IsArchived,
     #[sea_orm(iden = "identifier")]
     Identifier,
 }
@@ -958,6 +1116,8 @@ pub enum QuoteItem {
     Price,
     #[sea_orm(iden = "quantity")]
     Quantity,
+    #[sea_orm(iden = "created_at")]
+    CreatedAt,
 }
 
 #[derive(DeriveIden)]
@@ -976,8 +1136,6 @@ pub enum Order {
     CreatedAt,
     #[sea_orm(iden = "is_deleted")]
     IsDeleted,
-    #[sea_orm(iden = "is_archived")]
-    IsArchived,
     #[sea_orm(iden = "identifier")]
     Identifier,
 }
@@ -993,6 +1151,42 @@ pub enum OrderItem {
     InventoryId,
     #[sea_orm(iden = "price")]
     Price,
+    #[sea_orm(iden = "created_at")]
+    CreatedAt,
+}
+
+#[derive(DeriveIden)]
+pub enum DeliveryNote {
+    #[sea_orm(iden = "delivery_notes")]
+    Table,
+    Id,
+    #[sea_orm(iden = "order_id")]
+    OrderId,
+    #[sea_orm(iden = "client_id")]
+    ClientId,
+    #[sea_orm(iden = "created_at")]
+    CreatedAt,
+    #[sea_orm(iden = "is_deleted")]
+    IsDeleted,
+    #[sea_orm(iden = "identifier")]
+    Identifier,
+}
+
+#[derive(DeriveIden)]
+pub enum DeliveryNoteItem {
+    #[sea_orm(iden = "delivery_note_items")]
+    Table,
+    Id,
+    #[sea_orm(iden = "delivery_note_id")]
+    DeliveryNoteId,
+    #[sea_orm(iden = "product_id")]
+    ProductId,
+    #[sea_orm(iden = "price")]
+    Price,
+    #[sea_orm(iden = "quantity")]
+    Quantity,
+    #[sea_orm(iden = "created_at")]
+    CreatedAt,
 }
 
 #[derive(DeriveIden)]
@@ -1011,8 +1205,6 @@ pub enum Invoice {
     CreatedAt,
     #[sea_orm(iden = "is_deleted")]
     IsDeleted,
-    #[sea_orm(iden = "is_archived")]
-    IsArchived,
     #[sea_orm(iden = "identifier")]
     Identifier,
 }

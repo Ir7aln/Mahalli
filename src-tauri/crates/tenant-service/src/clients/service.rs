@@ -117,7 +117,7 @@ impl ClientsService {
         let count = Clients::find()
             .filter(
                 Cond::all()
-                    .add(Expr::col((Clients, clients::Column::IsArchived)).eq(false))
+
                     .add(Expr::col((Clients, clients::Column::IsDeleted)).eq(false))
                     .add(client_search_condition(&args.search, args.search_field.as_deref())),
             )
@@ -145,7 +145,7 @@ impl ClientsService {
             .expr_as(client_credit_expr(), Alias::new("credit"))
             .cond_where(
                 Cond::all()
-                    .add(Expr::col((Clients, clients::Column::IsArchived)).eq(false))
+
                     .add(Expr::col((Clients, clients::Column::IsDeleted)).eq(false))
                     .add(client_search_condition(&args.search, args.search_field.as_deref())),
             )

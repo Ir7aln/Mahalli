@@ -26,6 +26,9 @@ export const commands = {
 	createClient: (client: NewClient) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_client", { client })),
 	updateClient: (client: Client) => typedError<Success<string>, Fail>(__TAURI_INVOKE("update_client", { client })),
 	deleteClient: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_client", { id })),
+	listDeliveryNotes: (args: ListDeliveryNotesArgs) => typedError<Success<DeliveryNotesResponse>, Fail>(__TAURI_INVOKE("list_delivery_notes", { args })),
+	listDeliveryNoteProducts: (id: string) => typedError<Success<DeliveryNoteProductItem[]>, Fail>(__TAURI_INVOKE("list_delivery_note_products", { id })),
+	createDeliveryNoteFromOrder: (id: string) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_delivery_note_from_order", { id })),
 	listOrders: (args: ListOrdersArgs) => typedError<Success<OrdersResponse>, Fail>(__TAURI_INVOKE("list_orders", { args })),
 	getOrder: (id: string) => typedError<Success<OrderWithClient>, Fail>(__TAURI_INVOKE("get_order", { id })),
 	getOrderDetails: (id: string) => typedError<Success<OrderDetailsResponse>, Fail>(__TAURI_INVOKE("get_order_details", { id })),
@@ -148,6 +151,17 @@ export type DatabaseRecord = {
 	last_opened_at: string | null,
 };
 
+export type DeliveryNoteProductItem = {
+	name: string,
+	price: number,
+	quantity: number,
+};
+
+export type DeliveryNotesResponse = {
+	count: number,
+	delivery_notes: SelectDeliveryNotes[],
+};
+
 export type Fail = {
 	code: string | null,
 	i18n_key: string | null,
@@ -224,6 +238,16 @@ export type ListClientsArgs = {
 	search: string,
 	search_field: string | null,
 	credit_only: boolean | null,
+	sort: string | null,
+	direction: string | null,
+};
+
+export type ListDeliveryNotesArgs = {
+	page: number,
+	limit: number,
+	search: string,
+	created_from: string | null,
+	created_to: string | null,
 	sort: string | null,
 	direction: string | null,
 };
@@ -465,6 +489,18 @@ export type SelectClients = {
 	rc: string | null,
 	patente: string | null,
 	credit: number,
+};
+
+export type SelectDeliveryNotes = {
+	id: string,
+	created_at: string,
+	client_id: string,
+	full_name: string,
+	identifier: string,
+	order_id: string,
+	order_identifier: string,
+	products: number,
+	total: number,
 };
 
 export type SelectInventory = {

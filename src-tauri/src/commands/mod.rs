@@ -7,6 +7,7 @@ pub mod clients;
 pub mod column_preferences;
 pub mod dashboard;
 pub mod databases;
+pub mod delivery_notes;
 pub mod inventory;
 pub mod invoice_items;
 pub mod invoices;
@@ -146,11 +147,35 @@ fn map_error_details(raw: &str) -> (&'static str, &'static str, String) {
         );
     }
 
+    if normalized.contains("delivery note source order not found") {
+        return (
+            "DELIVERY_NOTE_ORDER_NOT_FOUND",
+            "notifications.errors.delivery-note-order-not-found",
+            String::from("The source order for this delivery note could not be found."),
+        );
+    }
+
     if normalized.contains("no order") || normalized.contains("order not found") {
         return (
             "ORDER_NOT_FOUND",
             "notifications.errors.order-not-found",
             String::from("The order could not be found."),
+        );
+    }
+
+    if normalized.contains("delivery note not found") {
+        return (
+            "DELIVERY_NOTE_NOT_FOUND",
+            "notifications.errors.delivery-note-not-found",
+            String::from("The delivery note could not be found."),
+        );
+    }
+
+    if normalized.contains("delivery note inventory transaction missing") {
+        return (
+            "DELIVERY_NOTE_INVENTORY_MISSING",
+            "notifications.errors.delivery-note-inventory-missing",
+            String::from("A linked stock movement for this delivery note could not be found."),
         );
     }
 

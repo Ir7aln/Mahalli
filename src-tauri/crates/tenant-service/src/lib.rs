@@ -1,6 +1,7 @@
 pub mod clients;
 pub mod column_preferences;
 pub mod dashboard;
+pub mod delivery_notes;
 pub mod inventory;
 pub mod invoices;
 pub mod orders;
