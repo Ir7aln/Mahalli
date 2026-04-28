@@ -82,6 +82,21 @@ impl ActiveModelBehavior for ActiveModel {
 }
 "@
         }
+        "inventory_transactions.rs" {
+@"
+impl ActiveModelBehavior for ActiveModel {
+    fn new() -> Self {
+        Self {
+            id: Set(ulid::Ulid::new().to_string()),
+            created_at: Set(Utc::now().naive_utc()),
+            source_type: Set("INITIAL".to_string()),
+            is_void: Set(false),
+            ..ActiveModelTrait::default()
+        }
+    }
+}
+"@
+        }
         default {
             if ($hasCreatedAt) {
 @"

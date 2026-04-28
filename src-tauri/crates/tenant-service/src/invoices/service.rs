@@ -578,6 +578,9 @@ impl InvoicesService {
                         product_id: ActiveValue::Set(item.product_id.clone()),
                         quantity: ActiveValue::Set(item.quantity as f32),
                         transaction_type: ActiveValue::Set("OUT".to_string()),
+                        source_type: ActiveValue::Set("INVOICE".to_string()),
+                        source_id: ActiveValue::Set(Some(created_invoice.id.clone())),
+                        unit_price: ActiveValue::Set(Some(item.price as f32)),
                         ..Default::default()
                     }
                     .insert(txn)
@@ -648,6 +651,9 @@ impl InvoicesService {
                                 product_id: ActiveValue::Set(item.product_id.clone()),
                                 quantity: ActiveValue::Set(item.quantity as f32),
                                 transaction_type: ActiveValue::Set("OUT".to_string()),
+                                source_type: ActiveValue::Set("INVOICE".to_string()),
+                                source_id: ActiveValue::Set(Some(invoice.id.clone())),
+                                unit_price: ActiveValue::Set(Some(item.price as f32)),
                                 ..Default::default()
                             }
                             .insert(txn)

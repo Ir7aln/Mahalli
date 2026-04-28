@@ -33,6 +33,10 @@ async function updateTheProduct({ quantity }: z.infer<typeof inventory>) {
       transaction_type: "IN",
       product_id: id,
       quantity: Number(quantity),
+      source_type: "ADJUSTMENT",
+      source_id: null,
+      unit_price: null,
+      notes: null,
     };
     const result = await commands.createInventory(payload);
     if (result.status === "error") throw result.error;

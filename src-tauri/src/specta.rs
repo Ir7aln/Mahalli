@@ -18,7 +18,7 @@ pub fn builder<R: Runtime>() -> Builder<R> {
         commands::databases::switch_database,
         commands::inventory::list_inventory,
         commands::inventory::create_inventory,
-        commands::inventory::delete_inventory,
+        commands::inventory::void_inventory_transaction,
         commands::clients::list_clients,
         commands::clients::list_client_invoice_debts,
         commands::clients::search_clients,

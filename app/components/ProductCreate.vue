@@ -49,6 +49,10 @@ async function createNewProduct(product: NewProduct) {
       transaction_type: "IN",
       product_id: createResult.data.data as string,
       quantity: Number(quantity.value),
+      source_type: "INITIAL",
+      source_id: null,
+      unit_price: null,
+      notes: null,
     };
     const invResult = await commands.createInventory(invPayload);
     if (invResult.status === "error") throw invResult.error;

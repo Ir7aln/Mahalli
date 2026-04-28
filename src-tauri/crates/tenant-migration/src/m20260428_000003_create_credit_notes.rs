@@ -1,4 +1,4 @@
-use sea_orm_migration::prelude::*;
+use sea_orm_migration::{prelude::*, sea_orm::Statement};
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -123,10 +123,42 @@ impl MigrationTrait for Migration {
             )
             .await?;
 
+        let db = manager.get_connection();
+        let credit_note_trigger = Statement::from_string(
+            sea_orm::DatabaseBackend::Sqlite,
+            r#"
+                CREATE TRIGGER IF NOT EXISTS credit_note_identifier_generator
+                AFTER INSERT ON credit_notes
+                BEGIN
+                    UPDATE credit_notes
+                    SET identifier = (
+                        WITH current_month_credit_notes AS (
+                            SELECT COUNT(*) as credit_note_count
+                            FROM credit_notes
+                            WHERE strftime('%Y-%m', created_at) = strftime('%Y-%m', NEW.created_at)
+                            AND id <= NEW.id
+                        )
+                        SELECT format(
+                            'AV-%s-%03d',
+                            SUBSTRING(strftime('%Y-%m', NEW.created_at), 3),
+                            credit_note_count
+                        )
+                        FROM current_month_credit_notes
+                    )
+                    WHERE id = NEW.id;
+                END;
+            "#,
+        );
+        db.execute_raw(credit_note_trigger).await?;
+
         Ok(())
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        let db = manager.get_connection();
+        db.execute_unprepared("DROP TRIGGER IF EXISTS credit_note_identifier_generator")
+            .await?;
+
         manager
             .drop_table(Table::drop().table(CreditNoteItems::Table).to_owned())
             .await?;

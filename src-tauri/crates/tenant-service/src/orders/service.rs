@@ -432,6 +432,9 @@ impl OrdersService {
                         product_id: ActiveValue::Set(item.product_id),
                         quantity: ActiveValue::Set(item.quantity),
                         transaction_type: ActiveValue::Set("OUT".to_string()),
+                        source_type: ActiveValue::Set("ORDER".to_string()),
+                        source_id: ActiveValue::Set(Some(created_order.id.clone())),
+                        unit_price: ActiveValue::Set(Some(item.price as f32)),
                         ..Default::default()
                     }
                     .insert(txn)
@@ -491,6 +494,9 @@ impl OrdersService {
                                 product_id: ActiveValue::Set(item.product_id),
                                 quantity: ActiveValue::Set(item.quantity),
                                 transaction_type: ActiveValue::Set("OUT".to_string()),
+                                source_type: ActiveValue::Set("ORDER".to_string()),
+                                source_id: ActiveValue::Set(Some(order.id.clone())),
+                                unit_price: ActiveValue::Set(Some(item.price as f32)),
                                 ..Default::default()
                             }
                             .insert(txn)
@@ -549,6 +555,9 @@ impl OrdersService {
                                     product_id: ActiveValue::Set(item.product_id),
                                     quantity: ActiveValue::Set(item.quantity),
                                     transaction_type: ActiveValue::Set("OUT".to_string()),
+                                    source_type: ActiveValue::Set("ORDER".to_string()),
+                                    source_id: ActiveValue::Set(Some(order.id.clone())),
+                                    unit_price: ActiveValue::Set(Some(item.price as f32)),
                                     ..Default::default()
                                 }
                                 .insert(txn)

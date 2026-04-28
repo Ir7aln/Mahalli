@@ -1,8 +1,7 @@
 use super::dto::*;
-use chrono::{Datelike, NaiveDate, Utc};
 use sea_orm::{
     ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection as DbConn, DbErr, EntityTrait,
-    PaginatorTrait, QueryFilter, QueryOrder, TransactionError, TransactionTrait,
+    QueryFilter, QueryOrder, TransactionError, TransactionTrait,
 };
 use std::collections::HashMap;
 use tenant_entity::{
@@ -59,27 +58,21 @@ impl CreditNotesService {
                         .map(|item| (item.product_id.clone(), item))
                         .collect();
 
-                let now = Utc::now().naive_utc();
-                let month_start = NaiveDate::from_ymd_opt(now.year(), now.month(), 1)
-                    .expect("valid first day of month")
-                    .and_hms_opt(0, 0, 0)
-                    .expect("valid start of day");
-                let monthly_count = CreditNotes::find()
-                    .filter(tenant_entity::credit_notes::Column::CreatedAt.gte(month_start))
-                    .filter(tenant_entity::credit_notes::Column::CreatedAt.lt(now))
-                    .count(txn)
-                    .await?;
-                let identifier = format!("CN-{}-{:03}", now.format("%y-%m"), monthly_count + 1);
-
                 let cn = CreditNoteActiveModel {
                     invoice_id: ActiveValue::Set(credit_note.invoice_id),
                     client_id: ActiveValue::Set(invoice.client_id),
-                    identifier: ActiveValue::Set(Some(identifier.clone())),
                     reason: ActiveValue::Set(credit_note.reason),
                     ..Default::default()
                 }
                 .insert(txn)
                 .await?;
+
+                let cn = CreditNotes::find_by_id(&cn.id)
+                    .one(txn)
+                    .await?
+                    .ok_or_else(|| {
+                        DbErr::RecordNotFound("credit note not found after insert".to_string())
+                    })?;
 
                 let mut total = 0.0f64;
                 let mut items = Vec::<CreditNoteItemActiveModel>::new();
@@ -129,6 +122,9 @@ impl CreditNotesService {
                         product_id: ActiveValue::Set(item.product_id),
                         quantity: ActiveValue::Set(item.quantity),
                         transaction_type: ActiveValue::Set("IN".to_string()),
+                        source_type: ActiveValue::Set("CREDIT_NOTE".to_string()),
+                        source_id: ActiveValue::Set(Some(cn.id.clone())),
+                        unit_price: ActiveValue::Set(Some(item.price as f32)),
                         ..Default::default()
                     }
                     .insert(txn)

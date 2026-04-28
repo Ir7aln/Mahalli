@@ -38,7 +38,7 @@ impl SeedService {
     }
 
     async fn seed_clients(db: &DatabaseConnection) -> Result<(), DbErr> {
-        for _ in 0..200 {
+        for _ in 0..50 {
             let id = ulid::Ulid::new();
             let full_name: String = Name().fake();
             let phone_number: String = PhoneNumber().fake();
@@ -64,7 +64,7 @@ impl SeedService {
     }
 
     async fn seed_products(db: &DatabaseConnection) -> Result<(), DbErr> {
-        for _ in 0..400 {
+        for _ in 0..200 {
             let id = ulid::Ulid::new();
             let name: String = Word().fake();
             let rand: u8 = Faker.fake();
@@ -93,12 +93,14 @@ impl SeedService {
             let inventory_quantity: u8 = Faker.fake();
             let insert_stock = Statement::from_sql_and_values(
                 sea_orm::DatabaseBackend::Sqlite,
-                r#"INSERT INTO inventory_transactions (id, product_id, quantity, transaction_type) VALUES ($1, $2, $3, $4)"#,
+                r#"INSERT INTO inventory_transactions (id, product_id, quantity, transaction_type, source_type, unit_price) VALUES ($1, $2, $3, $4, $5, $6)"#,
                 [
                     inventory_id.to_string().into(),
                     id.to_string().into(),
                     (inventory_quantity as f32).into(),
                     String::from("IN").into(),
+                    String::from("INITIAL").into(),
+                    (purchase_price as f32).into(),
                 ],
             );
 
@@ -110,7 +112,7 @@ impl SeedService {
     async fn seed_orders(db: &DatabaseConnection) -> Result<(), DbErr> {
         let statuses = vec!["PENDING", "COMPLETED", "CANCELLED"];
 
-        for _ in 0..100 {
+        for _ in 0..50 {
             let id = ulid::Ulid::new();
             let status = get_random_item(&statuses);
             let insert_order = Statement::from_sql_and_values(
@@ -124,32 +126,46 @@ impl SeedService {
     }
 
     async fn seed_order_items(db: &DatabaseConnection) -> Result<(), DbErr> {
-        for _ in 0..1000 {
-            let _id = ulid::Ulid::new();
+        for _ in 0..500 {
+            let pick_order = Statement::from_string(
+                sea_orm::DatabaseBackend::Sqlite,
+                "SELECT id FROM orders ORDER BY RANDOM() LIMIT 1".to_string(),
+            );
+            let Some(order_row) = db.query_one_raw(pick_order).await? else {
+                continue;
+            };
+            let order_id: String = order_row.try_get("", "id")?;
+
+            let inv_id = ulid::Ulid::new();
             let quantity: u8 = Faker.fake();
+            let price: u8 = Faker.fake();
+
             let insert_inventory = Statement::from_sql_and_values(
                 sea_orm::DatabaseBackend::Sqlite,
-                r#"INSERT INTO inventory_transactions (id, transaction_type, quantity, product_id) VALUES ($1, $2, $3, (SELECT id FROM products ORDER BY RANDOM() LIMIT 1))"#,
+                r#"INSERT INTO inventory_transactions (id, transaction_type, quantity, product_id, source_type, source_id, unit_price) VALUES ($1, $2, $3, (SELECT id FROM products ORDER BY RANDOM() LIMIT 1), $4, $5, $6)"#,
                 [
-                    _id.to_string().into(),
+                    inv_id.to_string().into(),
                     String::from("OUT").into(),
                     (quantity as f32).into(),
+                    String::from("ORDER").into(),
+                    order_id.clone().into(),
+                    (price as f32).into(),
                 ],
             );
             db.execute_raw(insert_inventory).await?;
 
             let id = ulid::Ulid::new();
-            let price: u8 = Faker.fake();
-            let insert_order = Statement::from_sql_and_values(
+            let insert_order_item = Statement::from_sql_and_values(
                 sea_orm::DatabaseBackend::Sqlite,
-                r#"INSERT INTO order_items (id, price, order_id, inventory_id) VALUES ($1, $2, (SELECT id FROM orders ORDER BY RANDOM() LIMIT 1), $3)"#,
+                r#"INSERT INTO order_items (id, price, order_id, inventory_id) VALUES ($1, $2, $3, $4)"#,
                 [
                     id.to_string().into(),
                     (price as f32).into(),
-                    _id.to_string().into(),
+                    order_id.into(),
+                    inv_id.to_string().into(),
                 ],
             );
-            db.execute_raw(insert_order).await?;
+            db.execute_raw(insert_order_item).await?;
         }
         Ok(())
     }
@@ -157,7 +173,7 @@ impl SeedService {
     async fn seed_invoices(db: &DatabaseConnection) -> Result<(), DbErr> {
         let statuses = vec!["DRAFT", "PAID", "PARTIALLY_PAID", "CANCELLED"];
 
-        for _ in 0..100 {
+        for _ in 0..50 {
             let id = ulid::Ulid::new();
             let status = get_random_item(&statuses);
             let insert_invoice = Statement::from_sql_and_values(
@@ -180,7 +196,7 @@ impl SeedService {
     }
 
     async fn seed_invoice_items(db: &DatabaseConnection) -> Result<(), DbErr> {
-        for _ in 0..300 {
+        for _ in 0..150 {
             let id = ulid::Ulid::new();
             let price: u8 = Faker.fake();
             let quantity: u8 = Faker.fake();
@@ -199,7 +215,7 @@ impl SeedService {
     }
 
     async fn seed_invoice_payments(db: &DatabaseConnection) -> Result<(), DbErr> {
-        for _ in 0..150 {
+        for _ in 0..75 {
             let id = ulid::Ulid::new();
             let amount: u8 = (10..100).fake();
             let insert_payment = Statement::from_sql_and_values(
@@ -233,7 +249,7 @@ impl SeedService {
     }
 
     async fn seed_quotes(db: &DatabaseConnection) -> Result<(), DbErr> {
-        for _ in 0..150 {
+        for _ in 0..75 {
             let id = ulid::Ulid::new();
             let insert_quote = Statement::from_sql_and_values(
                 sea_orm::DatabaseBackend::Sqlite,
@@ -246,7 +262,7 @@ impl SeedService {
     }
 
     async fn seed_quote_items(db: &DatabaseConnection) -> Result<(), DbErr> {
-        for _ in 0..1000 {
+        for _ in 0..500 {
             let id = ulid::Ulid::new();
             let price: u8 = Faker.fake();
             let quantity: u8 = Faker.fake();
@@ -265,7 +281,7 @@ impl SeedService {
     }
 
     async fn seed_delivery_notes(db: &DatabaseConnection) -> Result<(), DbErr> {
-        for _ in 0..80 {
+        for _ in 0..40 {
             let id = ulid::Ulid::new();
             let insert_delivery_note = Statement::from_string(
                 sea_orm::DatabaseBackend::Sqlite,
@@ -280,7 +296,7 @@ impl SeedService {
     }
 
     async fn seed_delivery_note_items(db: &DatabaseConnection) -> Result<(), DbErr> {
-        for _ in 0..250 {
+        for _ in 0..125 {
             let id = ulid::Ulid::new();
             let price: u8 = Faker.fake();
             let quantity: u8 = Faker.fake();
@@ -297,7 +313,7 @@ impl SeedService {
     }
 
     async fn seed_credit_notes(db: &DatabaseConnection) -> Result<(), DbErr> {
-        for _ in 0..40 {
+        for _ in 0..20 {
             let id = ulid::Ulid::new();
             let reasons = vec!["Defective product", "Wrong item shipped", "Quantity mismatch", "Customer request"];
             let reason = get_random_item(&reasons);
@@ -314,7 +330,7 @@ impl SeedService {
     }
 
     async fn seed_credit_note_items(db: &DatabaseConnection) -> Result<(), DbErr> {
-        for _ in 0..120 {
+        for _ in 0..60 {
             let id = ulid::Ulid::new();
             let price: u8 = Faker.fake();
             let quantity: u8 = Faker.fake();

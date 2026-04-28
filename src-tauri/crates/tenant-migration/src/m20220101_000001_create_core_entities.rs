@@ -113,6 +113,23 @@ impl MigrationTrait for Migration {
                             .not_null(),
                     )
                     .col(
+                        ColumnDef::new(InventoryTransaction::SourceType)
+                            .string()
+                            .not_null()
+                            .default("INITIAL"),
+                    )
+                    .col(ColumnDef::new(InventoryTransaction::SourceId).string().null())
+                    .col(ColumnDef::new(InventoryTransaction::UnitPrice).float().null())
+                    .col(ColumnDef::new(InventoryTransaction::Notes).text().null())
+                    .col(
+                        ColumnDef::new(InventoryTransaction::IsVoid)
+                            .boolean()
+                            .not_null()
+                            .default(false),
+                    )
+                    .col(ColumnDef::new(InventoryTransaction::VoidedAt).date_time().null())
+                    .col(ColumnDef::new(InventoryTransaction::VoidReason).text().null())
+                    .col(
                         ColumnDef::new(InventoryTransaction::CreatedAt)
                             .date_time()
                             .not_null()
@@ -213,6 +230,20 @@ enum InventoryTransaction {
     Quantity,
     #[sea_orm(iden = "product_id")]
     ProductId,
+    #[sea_orm(iden = "source_type")]
+    SourceType,
+    #[sea_orm(iden = "source_id")]
+    SourceId,
+    #[sea_orm(iden = "unit_price")]
+    UnitPrice,
+    #[sea_orm(iden = "notes")]
+    Notes,
+    #[sea_orm(iden = "is_void")]
+    IsVoid,
+    #[sea_orm(iden = "voided_at")]
+    VoidedAt,
+    #[sea_orm(iden = "void_reason")]
+    VoidReason,
     #[sea_orm(iden = "created_at")]
     CreatedAt,
 }

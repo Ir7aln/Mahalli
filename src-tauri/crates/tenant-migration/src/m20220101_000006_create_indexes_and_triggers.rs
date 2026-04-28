@@ -139,6 +139,17 @@ impl MigrationTrait for Migration {
         manager
             .create_index(
                 Index::create()
+                    .table(InventoryTransaction::Table)
+                    .col(InventoryTransaction::SourceType)
+                    .col(InventoryTransaction::SourceId)
+                    .name("idx_inventory_transactions_source")
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
                     .table(DeliveryNote::Table)
                     .col(DeliveryNote::OrderId)
                     .name("idx_delivery_notes_order_id")
@@ -393,6 +404,14 @@ impl MigrationTrait for Migration {
         manager
             .drop_index(
                 Index::drop()
+                    .table(InventoryTransaction::Table)
+                    .name("idx_inventory_transactions_source")
+                    .to_owned(),
+            )
+            .await?;
+        manager
+            .drop_index(
+                Index::drop()
                     .table(DeliveryNote::Table)
                     .name("idx_delivery_notes_order_id")
                     .to_owned(),
@@ -505,6 +524,10 @@ enum InventoryTransaction {
     ProductId,
     #[sea_orm(iden = "transaction_type")]
     TransactionType,
+    #[sea_orm(iden = "source_type")]
+    SourceType,
+    #[sea_orm(iden = "source_id")]
+    SourceId,
 }
 
 #[derive(DeriveIden)]

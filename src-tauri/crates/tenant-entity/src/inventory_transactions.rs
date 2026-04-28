@@ -12,6 +12,14 @@ pub struct Model {
     #[sea_orm(column_type = "Float")]
     pub quantity: f32,
     pub product_id: String,
+    pub source_type: String,
+    pub source_id: Option<String>,
+    #[sea_orm(column_type = "Float", nullable)]
+    pub unit_price: Option<f32>,
+    pub notes: Option<String>,
+    pub is_void: bool,
+    pub voided_at: Option<DateTime>,
+    pub void_reason: Option<String>,
     pub created_at: DateTime,
 }
 
@@ -54,6 +62,8 @@ impl ActiveModelBehavior for ActiveModel {
         Self {
             id: Set(ulid::Ulid::new().to_string()),
             created_at: Set(Utc::now().naive_utc()),
+            source_type: Set("INITIAL".to_string()),
+            is_void: Set(false),
             ..ActiveModelTrait::default()
         }
     }

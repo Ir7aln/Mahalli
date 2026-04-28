@@ -18,7 +18,7 @@ export const commands = {
 	switchDatabase: (id: string) => typedError<Success<DatabaseRecord>, Fail>(__TAURI_INVOKE("switch_database", { id })),
 	listInventory: (args: ListInventoryArgs) => typedError<Success<InventoryResponse>, Fail>(__TAURI_INVOKE("list_inventory", { args })),
 	createInventory: (transaction: NewInventory) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_inventory", { transaction })),
-	deleteInventory: (id: string) => typedError<Success<string>, Fail>(__TAURI_INVOKE("delete_inventory", { id })),
+	voidInventoryTransaction: (args: VoidInventoryArgs) => typedError<Success<string>, Fail>(__TAURI_INVOKE("void_inventory_transaction", { args })),
 	listClients: (args: ListClientsArgs) => typedError<Success<ClientsResponse>, Fail>(__TAURI_INVOKE("list_clients", { args })),
 	listClientInvoiceDebts: (clientId: string) => typedError<Success<ClientInvoiceDebtItem[]>, Fail>(__TAURI_INVOKE("list_client_invoice_debts", { clientId })),
 	searchClients: (search: string) => typedError<Success<ClientSearch[]>, Fail>(__TAURI_INVOKE("search_clients", { search })),
@@ -362,6 +362,7 @@ export type ListInventoryArgs = {
 	limit: number,
 	search: string,
 	transaction_type: string | null,
+	source_type: string | null,
 	created_from: string | null,
 	created_to: string | null,
 	quantity_min: number | null,
@@ -370,6 +371,7 @@ export type ListInventoryArgs = {
 	price_max: number | null,
 	sort: string | null,
 	direction: string | null,
+	include_voided: boolean | null,
 };
 
 export type ListInvoicesArgs = {
@@ -431,6 +433,10 @@ export type NewInventory = {
 	transaction_type: string,
 	product_id: string,
 	quantity: number,
+	source_type: string | null,
+	source_id: string | null,
+	unit_price: number | null,
+	notes: string | null,
 };
 
 export type NewInvoice = {
@@ -622,6 +628,11 @@ export type SelectInventory = {
 	price: number,
 	quantity: number,
 	transaction_type: string,
+	source_type: string,
+	source_id: string | null,
+	source_identifier: string | null,
+	notes: string | null,
+	is_void: boolean,
 	order_id: string | null,
 	order_identifier: string | null,
 	invoice_id: string | null,
@@ -869,6 +880,11 @@ export type UpdateSellerProfileDTO = {
 	default_currency: string | null,
 	default_payment_terms_days: number | null,
 	invoice_footer: string | null,
+};
+
+export type VoidInventoryArgs = {
+	id: string,
+	reason: string,
 };
 
 /* Tauri Specta runtime */

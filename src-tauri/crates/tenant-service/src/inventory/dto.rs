@@ -8,6 +8,7 @@ pub struct ListInventoryArgs {
     pub limit: u64,
     pub search: String,
     pub transaction_type: Option<String>,
+    pub source_type: Option<String>,
     pub created_from: Option<String>,
     pub created_to: Option<String>,
     #[specta(type = Option<f32>)]
@@ -20,6 +21,7 @@ pub struct ListInventoryArgs {
     pub price_max: Option<f32>,
     pub sort: Option<String>,
     pub direction: Option<String>,
+    pub include_voided: Option<bool>,
 }
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, FromQueryResult, Type)]
@@ -32,6 +34,11 @@ pub struct SelectInventory {
     #[specta(type = f32)]
     pub quantity: f32,
     pub transaction_type: String,
+    pub source_type: String,
+    pub source_id: Option<String>,
+    pub source_identifier: Option<String>,
+    pub notes: Option<String>,
+    pub is_void: bool,
     pub order_id: Option<String>,
     pub order_identifier: Option<String>,
     pub invoice_id: Option<String>,
@@ -46,15 +53,17 @@ pub struct NewInventory {
     pub product_id: String,
     #[specta(type = f32)]
     pub quantity: f32,
+    pub source_type: Option<String>,
+    pub source_id: Option<String>,
+    #[specta(type = Option<f32>)]
+    pub unit_price: Option<f32>,
+    pub notes: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]
-pub struct Inventory {
+pub struct VoidInventoryArgs {
     pub id: String,
-    pub transaction_type: String,
-    pub product_id: String,
-    #[specta(type = f32)]
-    pub quantity: f32,
+    pub reason: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type)]
