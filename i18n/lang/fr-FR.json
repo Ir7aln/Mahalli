@@ -46,7 +46,10 @@
     "inventory-update": "Mettre à jour l'inventaire",
     "generate-invoice": "Générer la facture",
     "generate-order": "Générer la commande",
-    "generate-quote": "Générer le devis"
+    "generate-quote": "Générer le devis",
+    "create": "Créer",
+    "creating": "Création...",
+    "view": "Afficher"
   },
   "translationTitle": "Changer de langue",
   "translationDescription": "Choisissez la langue à utiliser dans Mahalli.",
@@ -135,7 +138,8 @@
     "no-address": "Pas d'adresse",
     "no-phone": "Pas de téléphone",
     "payment-description": "Note de paiement facultative",
-    "no-payments": "Aucun paiement enregistré"
+    "no-payments": "Aucun paiement enregistré",
+    "reason": "Entrez la raison du note de crédit"
   },
   "status": {
     "pending": "En attente",

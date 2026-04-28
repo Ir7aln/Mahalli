@@ -77,7 +77,7 @@ const onSubmit = handleSubmit(async (formData) => {
 
   Logger.info(`CREATE CREDIT NOTE: ${JSON.stringify(result.data)}`);
   close();
-  toast.success(t("messages.success.credit-note-created"), {
+  toast.success(t("notifications.credit-note.created"), {
     action: {
       label: t("buttons.view"),
       onClick: () => {

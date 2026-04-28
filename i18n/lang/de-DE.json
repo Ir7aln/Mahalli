@@ -46,7 +46,10 @@
     "inventory-update": "Lagerbestand aktualisieren",
     "generate-invoice": "Rechnung erstellen",
     "generate-order": "Bestellung erstellen",
-    "generate-quote": "Angebot erstellen"
+    "generate-quote": "Angebot erstellen",
+    "create": "Erstellen",
+    "creating": "Wird erstellt...",
+    "view": "Ansicht"
   },
   "translationTitle": "Sprache ändern",
   "translationDescription": "Wählen Sie die Sprache, die Sie in Mahalli verwenden möchten.",
@@ -135,7 +138,8 @@
     "no-address": "Keine Adresse",
     "no-phone": "Kein Telefon",
     "payment-description": "Optionale Zahlungsnotiz",
-    "no-payments": "Noch keine Zahlungen erfasst"
+    "no-payments": "Noch keine Zahlungen erfasst",
+    "reason": "Geben Sie den Grund für die Gutschrift ein"
   },
   "status": {
     "pending": "Ausstehend",

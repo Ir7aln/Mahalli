@@ -46,7 +46,10 @@
     "inventory-update": "تحديث المخزون",
     "generate-invoice": "إنشاء الفاتورة",
     "generate-order": "إنشاء الطلب",
-    "generate-quote": "إنشاء عرض السعر"
+    "generate-quote": "إنشاء عرض السعر",
+    "create": "إنشاء",
+    "creating": "جاري الإنشاء...",
+    "view": "عرض"
   },
   "translationTitle": "تغيير اللغة",
   "translationDescription": "اختر اللغة التي تريد استخدامها في Mahalli.",
@@ -135,7 +138,8 @@
     "no-address": "لا يوجد عنوان",
     "no-phone": "لا يوجد هاتف",
     "payment-description": "ملاحظة دفع اختيارية",
-    "no-payments": "لا توجد دفعات مسجلة بعد"
+    "no-payments": "لا توجد دفعات مسجلة بعد",
+    "reason": "أدخل سبب إشعار الخصم"
   },
   "status": {
     "pending": "قيد الانتظار",

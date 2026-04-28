@@ -46,7 +46,10 @@
     "inventory-update": "Update inventory",
     "generate-invoice": "Generate invoice",
     "generate-order": "Generate order",
-    "generate-quote": "Generate quote"
+    "generate-quote": "Generate quote",
+    "create": "Create",
+    "creating": "Creating...",
+    "view": "View"
   },
   "translationTitle": "Change Language",
   "translationDescription": "Choose the language you want to use across Mahalli.",
@@ -135,7 +138,8 @@
     "no-address": "No address",
     "no-phone": "No phone",
     "payment-description": "Optional payment note",
-    "no-payments": "No payments recorded yet"
+    "no-payments": "No payments recorded yet",
+    "reason": "Enter reason for credit note"
   },
   "status": {
     "pending": "Pending",
