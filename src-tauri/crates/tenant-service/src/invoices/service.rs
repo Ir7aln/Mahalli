@@ -9,6 +9,8 @@ use sea_orm::{
 };
 use tenant_entity::{
     clients::{self, Entity as Clients},
+    delivery_note_items::{self, Entity as DeliveryNoteItems},
+    delivery_notes::{self, Entity as DeliveryNotes},
     inventory_transactions::{
         ActiveModel as InventoryActiveModel, Entity as InventoryTransactions,
     },
@@ -783,6 +785,61 @@ impl InvoicesService {
                             Ok(invoice.id)
                         }
                         None => Err(DbErr::RecordNotFound("no order".to_string())),
+                    },
+                }
+            })
+        })
+        .await
+    }
+
+    pub async fn create_invoice_from_delivery_note(
+        db: &DbConn,
+        id: String,
+    ) -> Result<String, TransactionError<DbErr>> {
+        db.transaction::<_, String, DbErr>(|txn| {
+            Box::pin(async move {
+                match Invoices::find()
+                    .filter(invoices::Column::DeliveryNoteId.eq(&id))
+                    .one(txn)
+                    .await?
+                {
+                    Some(invoice) => Ok(invoice.id),
+                    None => match DeliveryNotes::find_by_id(&id).one(txn).await? {
+                        Some(delivery_note) => {
+                            let invoice = InvoiceActiveModel {
+                                client_id: ActiveValue::Set(delivery_note.client_id),
+                                status: ActiveValue::Set("DRAFT".to_string()),
+                                order_id: ActiveValue::Set(delivery_note.order_id),
+                                delivery_note_id: ActiveValue::Set(Some(delivery_note.id.clone())),
+                                ..Default::default()
+                            }
+                            .insert(txn)
+                            .await?;
+
+                            let delivery_note_items = DeliveryNoteItems::find()
+                                .filter(delivery_note_items::Column::DeliveryNoteId.eq(&id))
+                                .all(txn)
+                                .await?;
+
+                            let mut invoice_items = Vec::<InvoiceItemActiveModel>::new();
+                            for item in delivery_note_items {
+                                invoice_items.push(InvoiceItemActiveModel {
+                                    invoice_id: ActiveValue::Set(invoice.id.clone()),
+                                    product_id: ActiveValue::Set(item.product_id),
+                                    price: ActiveValue::Set(item.price as f64),
+                                    quantity: ActiveValue::Set(item.quantity as f64),
+                                    inventory_id: ActiveValue::Set(None),
+                                    ..Default::default()
+                                });
+                            }
+
+                            if !invoice_items.is_empty() {
+                                InvoiceItems::insert_many(invoice_items).exec(txn).await?;
+                            }
+
+                            Ok(invoice.id)
+                        }
+                        None => Err(DbErr::RecordNotFound("delivery note not found".to_string())),
                     },
                 }
             })

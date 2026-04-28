@@ -26,6 +26,23 @@ pub async fn create_invoice_from_order(state: State<'_, AppState>, id: String) -
 
 #[tauri::command]
 #[specta::specta]
+pub async fn create_invoice_from_delivery_note(
+    state: State<'_, AppState>,
+    id: String,
+) -> SResult<String> {
+    let db_conn = tenant_db_or_fail(&state).await?;
+    match InvoicesService::create_invoice_from_delivery_note(&db_conn, id).await {
+        Ok(res) => Ok(Success {
+            error: None,
+            message: None,
+            data: Some(res),
+        }),
+        Err(err) => Err(err.into()),
+    }
+}
+
+#[tauri::command]
+#[specta::specta]
 pub async fn list_invoices(
     state: State<'_, AppState>,
     args: ListInvoicesArgs,
