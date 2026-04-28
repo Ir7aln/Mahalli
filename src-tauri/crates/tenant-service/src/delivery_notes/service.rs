@@ -8,7 +8,8 @@ use tenant_entity::{
     clients,
     delivery_note_items::{self, ActiveModel as DeliveryNoteItemActiveModel},
     delivery_notes::{self, ActiveModel as DeliveryNoteActiveModel},
-    order_items, orders::{self, ActiveModel as OrderActiveModel},
+    order_items,
+    orders::{self, ActiveModel as OrderActiveModel},
     prelude::*,
     products,
 };

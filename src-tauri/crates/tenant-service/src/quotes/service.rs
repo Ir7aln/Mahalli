@@ -111,7 +111,9 @@ impl QuotesService {
             .conditions(
                 args.status.clone().is_some(),
                 |x| {
-                    x.and_where(Expr::col((Quotes, quotes::Column::Status)).eq(args.status.clone()));
+                    x.and_where(
+                        Expr::col((Quotes, quotes::Column::Status)).eq(args.status.clone()),
+                    );
                 },
                 |_| {},
             )

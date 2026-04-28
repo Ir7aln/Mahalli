@@ -78,7 +78,7 @@ async function createInvoiceFromDeliveryNote(id: string) {
     description: h(NuxtLink, {
       to: localePath(`/invoices/?page=1&highlight=true&id=${result.data.data}`),
       class: "underline",
-      innerHTML: "go to invoice",
+      innerHTML: t("buttons.go-to-invoice"),
     }),
   });
 }

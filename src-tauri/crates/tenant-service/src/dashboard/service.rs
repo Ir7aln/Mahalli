@@ -1,13 +1,10 @@
 use super::dto::*;
 use sea_orm::{
-    sea_query::{
-        Alias, Cond, Expr, Func, Query, SimpleExpr, SqliteQueryBuilder, SubQueryStatement,
-    },
+    sea_query::{Alias, Expr, Func, Query, SimpleExpr, SqliteQueryBuilder, SubQueryStatement},
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
-    clients, inventory_transactions, invoice_payments, invoices, order_items, orders, prelude::*,
-    products,
+    inventory_transactions, invoice_payments, invoices, order_items, orders, prelude::*, products,
 };
 
 pub struct DashboardService;
@@ -34,519 +31,156 @@ fn invoice_paid_amount_expr() -> SimpleExpr {
     )
 }
 
-impl DashboardService {
-    pub async fn list_inventory_stats(db: &DbConn) -> Result<Vec<SelectTransaction>, DbErr> {
-        let (sql, values) = Query::select()
-            .from(InventoryTransactions)
-            .columns([(
+fn revenue_expr(start: &'static str, end: Option<&'static str>) -> SimpleExpr {
+    let mut condition = Expr::cust(start)
+        .and(Expr::col((Invoices, invoices::Column::Status)).is_in(vec!["PAID", "PARTIALLY_PAID"]))
+        .and(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
+        .and(
+            Expr::col((Orders, orders::Column::Status))
+                .eq("CANCELLED")
+                .not(),
+        );
+
+    if let Some(end) = end {
+        condition = condition.and(Expr::cust(end));
+    }
+
+    Expr::expr(SimpleExpr::SubQuery(
+        None,
+        Box::new(SubQueryStatement::SelectStatement(
+            Query::select()
+                .expr(Func::coalesce([
+                    Expr::expr(Func::sum(
+                        Expr::case(
+                            Expr::col((Invoices, invoices::Column::Status)).eq("PAID"),
+                            Expr::col((
+                                InventoryTransactions,
+                                inventory_transactions::Column::Quantity,
+                            ))
+                            .mul(Expr::col((OrderItems, order_items::Column::Price))),
+                        )
+                        .case(
+                            Expr::col((Invoices, invoices::Column::Status)).eq("PARTIALLY_PAID"),
+                            invoice_paid_amount_expr(),
+                        )
+                        .finally(Expr::val(0)),
+                    )),
+                    Expr::val(0.0),
+                ]))
+                .from(InventoryTransactions)
+                .join(
+                    JoinType::InnerJoin,
+                    OrderItems,
+                    Expr::col((OrderItems, order_items::Column::InventoryId))
+                        .equals((InventoryTransactions, inventory_transactions::Column::Id)),
+                )
+                .join(
+                    JoinType::InnerJoin,
+                    Orders,
+                    Expr::col((Orders, orders::Column::Id))
+                        .equals((OrderItems, order_items::Column::OrderId)),
+                )
+                .join(
+                    JoinType::InnerJoin,
+                    Invoices,
+                    Expr::col((Invoices, invoices::Column::OrderId))
+                        .equals((Orders, orders::Column::Id)),
+                )
+                .cond_where(condition)
+                .to_owned(),
+        )),
+    ))
+}
+
+fn expense_expr(start: &'static str, end: Option<&'static str>) -> SimpleExpr {
+    let mut condition = Expr::cust(start)
+        .and(
+            Expr::col((
                 InventoryTransactions,
                 inventory_transactions::Column::TransactionType,
-            )])
-            .expr_as(
-                Expr::cust("strftime('%Y-%m', inventory_transactions.created_at)"),
-                Alias::new("created_at"),
-            )
-            .expr_as(
-                Expr::col((
-                    InventoryTransactions,
-                    inventory_transactions::Column::Quantity,
-                ))
-                .sum(),
-                Alias::new("quantity"),
-            )
-            .expr_as(
-                Func::sum(
-                    Expr::expr(Func::coalesce([
-                        Expr::col((OrderItems, order_items::Column::Price)),
-                        Expr::col((Products, products::Column::PurchasePrice)),
-                    ]))
-                    .mul(Expr::col((
-                        InventoryTransactions,
-                        inventory_transactions::Column::Quantity,
-                    ))),
-                ),
-                Alias::new("price"),
-            )
-            .join(
-                JoinType::Join,
-                Products,
-                Expr::col((Products, products::Column::Id)).equals((
-                    InventoryTransactions,
-                    inventory_transactions::Column::ProductId,
-                )),
-            )
-            .join(
-                JoinType::LeftJoin,
-                OrderItems,
-                Expr::col((OrderItems, order_items::Column::InventoryId))
-                    .equals((InventoryTransactions, inventory_transactions::Column::Id)),
-            )
-            .join(
-                JoinType::LeftJoin,
-                Orders,
-                Expr::col((Orders, orders::Column::Id))
-                    .equals((OrderItems, order_items::Column::OrderId)),
-            )
-            .cond_where(
-                Cond::all()
-                    .add(
+            ))
+            .eq("IN"),
+        )
+        .and(
+            Expr::col((
+                InventoryTransactions,
+                inventory_transactions::Column::IsVoid,
+            ))
+            .eq(false),
+        );
+
+    if let Some(end) = end {
+        condition = condition.and(Expr::cust(end));
+    }
+
+    Expr::expr(SimpleExpr::SubQuery(
+        None,
+        Box::new(SubQueryStatement::SelectStatement(
+            Query::select()
+                .expr(Func::coalesce([
+                    Expr::expr(Func::sum(
                         Expr::expr(Func::coalesce([
-                            Expr::col((Orders, orders::Column::Status)),
-                            Expr::expr("PENDING"),
-                        ]))
-                        .eq("CANCELLED")
-                        .not(),
-                    )
-                    .add(Expr::cust(
-                        "inventory_transactions.created_at >= DATETIME('now', '-3 month')",
-                    )),
-            )
-            .add_group_by([
-                Expr::cust("strftime('%Y-%m', inventory_transactions.created_at)"),
-                Expr::col((
-                    InventoryTransactions,
-                    inventory_transactions::Column::TransactionType,
-                ))
-                .into(),
-            ])
-            .to_owned()
-            .build(SqliteQueryBuilder);
-
-        let res = SelectTransaction::find_by_statement(Statement::from_sql_and_values(
-            DbBackend::Sqlite,
-            sql,
-            values,
-        ))
-        .all(db)
-        .await?;
-
-        Ok(res)
-    }
-
-    pub async fn list_top_products(db: &DbConn) -> Result<Vec<SelectTopProducts>, DbErr> {
-        let (sql, values) = Query::select()
-            .from(Products)
-            .column((Products, products::Column::Name))
-            .expr_as(
-                Func::sum(Expr::col((
-                    InventoryTransactions,
-                    inventory_transactions::Column::Quantity,
-                ))),
-                Alias::new("quantity"),
-            )
-            .join(
-                JoinType::Join,
-                InventoryTransactions,
-                Expr::col((
-                    InventoryTransactions,
-                    inventory_transactions::Column::ProductId,
-                ))
-                .equals((Products, products::Column::Id)),
-            )
-            .join(
-                JoinType::LeftJoin,
-                OrderItems,
-                Expr::col((OrderItems, order_items::Column::InventoryId))
-                    .equals((InventoryTransactions, inventory_transactions::Column::Id)),
-            )
-            .join(
-                JoinType::LeftJoin,
-                Orders,
-                Expr::col((Orders, orders::Column::Id))
-                    .equals((OrderItems, order_items::Column::OrderId)),
-            )
-            .cond_where(
-                Cond::all()
-                    .add(
-                        Expr::col((
-                            InventoryTransactions,
-                            inventory_transactions::Column::TransactionType,
-                        ))
-                        .eq("OUT"),
-                    )
-                    .add(
-                        Expr::col((Orders, orders::Column::Status))
-                            .eq("CANCELLED")
-                            .not(),
-                    ),
-            )
-            .add_group_by([Expr::col((Products, products::Column::Id)).into()])
-            .order_by_expr(
-                Func::sum(Expr::col((
-                    InventoryTransactions,
-                    inventory_transactions::Column::Quantity,
-                )))
-                .into(),
-                Order::Desc,
-            )
-            .limit(10)
-            .to_owned()
-            .build(SqliteQueryBuilder);
-
-        let res = SelectTopProducts::find_by_statement(Statement::from_sql_and_values(
-            DbBackend::Sqlite,
-            sql,
-            values,
-        ))
-        .all(db)
-        .await?;
-
-        Ok(res)
-    }
-
-    pub async fn list_top_clients(db: &DbConn) -> Result<Vec<SelectTops>, DbErr> {
-        let (sql, values) = Query::select()
-            .from(Clients)
-            .column((Clients, clients::Column::FullName))
-            .expr_as(
-                Func::sum(Expr::col((
-                    InventoryTransactions,
-                    inventory_transactions::Column::Quantity,
-                ))),
-                Alias::new("quantity"),
-            )
-            .expr_as(
-                Func::sum(
-                    Expr::col((OrderItems, order_items::Column::Price)).mul(Expr::col((
-                        InventoryTransactions,
-                        inventory_transactions::Column::Quantity,
-                    ))),
-                ),
-                Alias::new("price"),
-            )
-            .join(
-                JoinType::Join,
-                Invoices,
-                Expr::col((Invoices, invoices::Column::ClientId))
-                    .equals((Clients, clients::Column::Id)),
-            )
-            .join(
-                JoinType::Join,
-                OrderItems,
-                Expr::col((OrderItems, order_items::Column::OrderId))
-                    .equals((Invoices, invoices::Column::OrderId)),
-            )
-            .join(
-                JoinType::Join,
-                InventoryTransactions,
-                Expr::col((InventoryTransactions, inventory_transactions::Column::Id))
-                    .equals((OrderItems, order_items::Column::InventoryId)),
-            )
-            .cond_where(
-                Cond::all()
-                    .add(
-                        Expr::expr(Expr::col((Orders, orders::Column::Status)))
-                            .eq("CANCELLED")
-                            .not(),
-                    )
-                    .add(
-                        Expr::expr(Expr::col((Invoices, invoices::Column::Status)))
-                            .is_not_in(["CANCELLED", "DRAFT"]),
-                    ),
-            )
-            .add_group_by([Expr::col((Clients, clients::Column::Id)).into()])
-            .order_by_expr(
-                Func::sum(
-                    Expr::col((OrderItems, order_items::Column::Price)).mul(Expr::col((
-                        InventoryTransactions,
-                        inventory_transactions::Column::Quantity,
-                    ))),
-                )
-                .into(),
-                Order::Desc,
-            )
-            .limit(5)
-            .to_owned()
-            .build(SqliteQueryBuilder);
-
-        let res = SelectTops::find_by_statement(Statement::from_sql_and_values(
-            DbBackend::Sqlite,
-            sql,
-            values,
-        ))
-        .all(db)
-        .await?;
-
-        Ok(res)
-    }
-
-    pub async fn list_status_count(db: &DbConn) -> Result<StatusCountResponse, DbErr> {
-        let (order_sql, order_values) = Query::select()
-            .from(Orders)
-            .column(orders::Column::Status)
-            .expr_as(
-                Func::count(Expr::col((Orders, orders::Column::Id))),
-                Alias::new("status_count"),
-            )
-            .cond_where(Cond::all().add(orders::Column::IsDeleted.eq(false)))
-            .group_by_col(orders::Column::Status)
-            .to_owned()
-            .build(SqliteQueryBuilder);
-
-        let (invoice_sql, invoice_values) = Query::select()
-            .from(Invoices)
-            .column(invoices::Column::Status)
-            .expr_as(
-                Func::count(Expr::col((Invoices, invoices::Column::Id))),
-                Alias::new("status_count"),
-            )
-            .cond_where(Cond::all().add(invoices::Column::IsDeleted.eq(false)))
-            .group_by_col(invoices::Column::Status)
-            .to_owned()
-            .build(SqliteQueryBuilder);
-
-        let order_res = SelectStatusCount::find_by_statement(Statement::from_sql_and_values(
-            DbBackend::Sqlite,
-            order_sql,
-            order_values,
-        ))
-        .all(db)
-        .await?;
-
-        let invoice_res = SelectStatusCount::find_by_statement(Statement::from_sql_and_values(
-            DbBackend::Sqlite,
-            invoice_sql,
-            invoice_values,
-        ))
-        .all(db)
-        .await?;
-
-        Ok(StatusCountResponse {
-            orders: order_res,
-            invoices: invoice_res,
-        })
-    }
-
-    pub async fn list_financial_metrics(db: &DbConn) -> Result<FinancialMetricsResponse, DbErr> {
-        let (sql, values) = Query::select()
-            .expr_as(
-                Expr::expr(SimpleExpr::SubQuery(
-                    None,
-                    Box::new(SubQueryStatement::SelectStatement(
-                        Query::select().expr(Func::coalesce([
-                            Expr::expr(Func::sum(
-                                Expr::case(
-                                    Expr::col((Invoices, invoices::Column::Status)).eq("PAID"),
-                                    Expr::col((
-                                        InventoryTransactions,
-                                        inventory_transactions::Column::Quantity,
-                                    ))
-                                    .mul(Expr::col((OrderItems, order_items::Column::Price))),
-                                )
-                                .case(
-                                    Expr::col((Invoices, invoices::Column::Status))
-                                        .eq("PARTIALLY_PAID"),
-                                    invoice_paid_amount_expr(),
-                                )
-                                .finally(Expr::val(0)),
+                            Expr::col((
+                                InventoryTransactions,
+                                inventory_transactions::Column::UnitPrice,
                             )),
+                            Expr::col((Products, products::Column::PurchasePrice)),
                             Expr::val(0.0),
                         ]))
-                        .from(InventoryTransactions)
-                        .join(
-                            JoinType::InnerJoin,
-                            OrderItems,
-                            Expr::col((OrderItems, order_items::Column::InventoryId))
-                                .equals((InventoryTransactions, inventory_transactions::Column::Id)),
-                        )
-                        .join(
-                            JoinType::InnerJoin,
-                            Orders,
-                            Expr::col((Orders, orders::Column::Id))
-                                .equals((OrderItems, order_items::Column::OrderId)),
-                        )
-                        .join(
-                            JoinType::InnerJoin,
-                            Invoices,
-                            Expr::col((Invoices, invoices::Column::OrderId))
-                                .equals((Orders, orders::Column::Id)),
-                        )
-                        .cond_where(Expr::cust(
-                            "invoices.created_at >= strftime('%Y-%m-01', CURRENT_DATE)",
-                        )
-                        .and(Expr::col((Invoices, invoices::Column::Status)).is_in(vec![
-                            "PAID",
-                            "PARTIALLY_PAID",
-                        ]))
-                        .and(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
-                        .and(Expr::col((Orders, orders::Column::Status)).eq("CANCELLED").not()))
-                        .to_owned(),
+                        .mul(Expr::col((
+                            InventoryTransactions,
+                            inventory_transactions::Column::Quantity,
+                        ))),
                     )),
-                )),
+                    Expr::val(0.0),
+                ]))
+                .from(InventoryTransactions)
+                .join(
+                    JoinType::InnerJoin,
+                    Products,
+                    Expr::col((Products, products::Column::Id)).equals((
+                        InventoryTransactions,
+                        inventory_transactions::Column::ProductId,
+                    )),
+                )
+                .cond_where(condition)
+                .to_owned(),
+        )),
+    ))
+}
+
+impl DashboardService {
+    pub async fn list_financial_metrics(db: &DbConn) -> Result<FinancialMetricsResponse, DbErr> {
+        let current_month_start = "invoices.created_at >= strftime('%Y-%m-01', CURRENT_DATE)";
+        let last_month_start = "invoices.created_at >= date('now', '-1 month', 'start of month')";
+        let last_month_end = "invoices.created_at < date('now', 'start of month')";
+        let current_expense_start =
+            "inventory_transactions.created_at >= strftime('%Y-%m-01', CURRENT_DATE)";
+        let last_expense_start =
+            "inventory_transactions.created_at >= date('now', '-1 month', 'start of month')";
+        let last_expense_end = "inventory_transactions.created_at < date('now', 'start of month')";
+
+        let (sql, values) = Query::select()
+            .expr_as(
+                revenue_expr(current_month_start, None),
                 Alias::new("current_revenue"),
             )
             .expr_as(
-                Expr::expr(SimpleExpr::SubQuery(
-                    None,
-                    Box::new(SubQueryStatement::SelectStatement(
-                        Query::select().expr(Func::coalesce([
-                            Expr::expr(Func::sum(
-                                Expr::case(
-                                    Expr::col((Invoices, invoices::Column::Status)).eq("PAID"),
-                                    Expr::col((
-                                        InventoryTransactions,
-                                        inventory_transactions::Column::Quantity,
-                                    ))
-                                    .mul(Expr::col((OrderItems, order_items::Column::Price))),
-                                )
-                                .case(
-                                    Expr::col((Invoices, invoices::Column::Status))
-                                        .eq("PARTIALLY_PAID"),
-                                    invoice_paid_amount_expr(),
-                                )
-                                .finally(Expr::val(0)),
-                            )),
-                            Expr::val(0.0),
-                        ]))
-                        .from(InventoryTransactions)
-                        .join(
-                            JoinType::InnerJoin,
-                            OrderItems,
-                            Expr::col((OrderItems, order_items::Column::InventoryId))
-                                .equals((InventoryTransactions, inventory_transactions::Column::Id)),
-                        )
-                        .join(
-                            JoinType::InnerJoin,
-                            Orders,
-                            Expr::col((Orders, orders::Column::Id))
-                                .equals((OrderItems, order_items::Column::OrderId)),
-                        )
-                        .join(
-                            JoinType::InnerJoin,
-                            Invoices,
-                            Expr::col((Invoices, invoices::Column::OrderId))
-                                .equals((Orders, orders::Column::Id)),
-                        )
-                        .cond_where(Expr::cust(
-                            "invoices.created_at >= date('now', '-1 month', 'start of month') AND invoices.created_at < date('now', 'start of month')",
-                        )
-                        .and(Expr::col((Invoices, invoices::Column::Status)).is_in(vec![
-                            "PAID",
-                            "PARTIALLY_PAID",
-                        ]))
-                        .and(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
-                        .and(Expr::col((Orders, orders::Column::Status)).eq("CANCELLED").not()))
-                        .to_owned(),
-                    )),
-                )),
+                revenue_expr(last_month_start, Some(last_month_end)),
                 Alias::new("last_month_revenue"),
             )
             .expr_as(
-                Expr::expr(SimpleExpr::SubQuery(
-                    None,
-                    Box::new(SubQueryStatement::SelectStatement(
-                        Query::select().expr(Func::coalesce([
-                            Expr::expr(Func::sum(
-                                Expr::case(
-                                    Expr::col((Invoices, invoices::Column::Status)).eq("PAID"),
-                                    Expr::col((
-                                        InventoryTransactions,
-                                        inventory_transactions::Column::Quantity,
-                                    ))
-                                    .mul(Expr::col((OrderItems, order_items::Column::Price))),
-                                )
-                                .case(
-                                    Expr::col((Invoices, invoices::Column::Status))
-                                        .eq("PARTIALLY_PAID"),
-                                    invoice_paid_amount_expr(),
-                                )
-                                .finally(Expr::val(0)),
-                            )),
-                            Expr::val(0.0),
-                        ]))
-                        .from(InventoryTransactions)
-                        .join(
-                            JoinType::InnerJoin,
-                            OrderItems,
-                            Expr::col((OrderItems, order_items::Column::InventoryId))
-                                .equals((InventoryTransactions, inventory_transactions::Column::Id)),
-                        )
-                        .join(
-                            JoinType::InnerJoin,
-                            Orders,
-                            Expr::col((Orders, orders::Column::Id))
-                                .equals((OrderItems, order_items::Column::OrderId)),
-                        )
-                        .join(
-                            JoinType::InnerJoin,
-                            Invoices,
-                            Expr::col((Invoices, invoices::Column::OrderId))
-                                .equals((Orders, orders::Column::Id)),
-                        )
-                        .cond_where(Expr::cust(
-                            "invoices.created_at >= strftime('%Y-%m-01', date('now', '-1 month')) AND invoices.created_at < strftime('%Y-%m-01', CURRENT_DATE)",
-                        )
-                        .and(Expr::col((Invoices, invoices::Column::Status)).is_in(vec![
-                            "PAID",
-                            "PARTIALLY_PAID",
-                        ]))
-                        .and(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
-                        .and(Expr::col((Orders, orders::Column::Status)).eq("CANCELLED").not()))
-                        .to_owned(),
-                    )),
-                )),
+                expense_expr(current_expense_start, None),
                 Alias::new("current_expenses"),
             )
             .expr_as(
-                Expr::expr(SimpleExpr::SubQuery(
-                    None,
-                    Box::new(SubQueryStatement::SelectStatement(
-                        Query::select().expr(Func::coalesce([
-                            Expr::expr(Func::sum(
-                                Expr::case(
-                                    Expr::col((Invoices, invoices::Column::Status)).eq("PAID"),
-                                    Expr::col((
-                                        InventoryTransactions,
-                                        inventory_transactions::Column::Quantity,
-                                    ))
-                                    .mul(Expr::col((OrderItems, order_items::Column::Price))),
-                                )
-                                .case(
-                                    Expr::col((Invoices, invoices::Column::Status))
-                                        .eq("PARTIALLY_PAID"),
-                                    invoice_paid_amount_expr(),
-                                )
-                                .finally(Expr::val(0)),
-                            )),
-                            Expr::val(0.0),
-                        ]))
-                        .from(InventoryTransactions)
-                        .join(
-                            JoinType::InnerJoin,
-                            OrderItems,
-                            Expr::col((OrderItems, order_items::Column::InventoryId))
-                                .equals((InventoryTransactions, inventory_transactions::Column::Id)),
-                        )
-                        .join(
-                            JoinType::InnerJoin,
-                            Orders,
-                            Expr::col((Orders, orders::Column::Id))
-                                .equals((OrderItems, order_items::Column::OrderId)),
-                        )
-                        .join(
-                            JoinType::InnerJoin,
-                            Invoices,
-                            Expr::col((Invoices, invoices::Column::OrderId))
-                                .equals((Orders, orders::Column::Id)),
-                        )
-                        .cond_where(Expr::cust(
-                            "invoices.created_at >= date('now', '-1 month', 'start of month') AND invoices.created_at < date('now', 'start of month')",
-                        )
-                        .and(Expr::col((Invoices, invoices::Column::Status)).is_in(vec![
-                            "PAID",
-                            "PARTIALLY_PAID",
-                        ]))
-                        .and(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
-                        .and(Expr::col((Orders, orders::Column::Status)).eq("CANCELLED").not()))
-                        .to_owned(),
-                    )),
-                )),
+                expense_expr(last_expense_start, Some(last_expense_end)),
                 Alias::new("last_month_expenses"),
             )
             .to_owned()
             .build(SqliteQueryBuilder);
 
-        let res: Finiacialmetrics = Finiacialmetrics::find_by_statement(
+        let res: FinancialMetricsQueryResult = FinancialMetricsQueryResult::find_by_statement(
             Statement::from_sql_and_values(DbBackend::Sqlite, sql, values),
         )
         .one(db)
@@ -570,6 +204,7 @@ impl DashboardService {
         } else {
             0.0
         } * 100.0;
+
         Ok(FinancialMetricsResponse {
             current_revenue: res.current_revenue,
             last_month_revenue: res.last_month_revenue,

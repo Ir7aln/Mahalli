@@ -5,10 +5,11 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
+    credit_notes,
     inventory_transactions::{self, ActiveModel as InventoryActiveModel},
     invoice_items, invoices, order_items, orders,
     prelude::*,
-    products, quotes, credit_notes,
+    products, quotes,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {

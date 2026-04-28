@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {
   ArrowLeftRight,
-  BarChart3Icon,
   FileMinus,
   HomeIcon,
   Languages,
@@ -23,7 +22,6 @@ const LOCALE_TEXT = {
   en: "English",
   fr: "Francais",
   ar: "العربية",
-  de: "Deutsch",
 } as const;
 const openTranslationModal = () => modal.open(TranslationModal, {});
 const menuItems = [
@@ -76,7 +74,6 @@ const menuItems = [
     path: "/inventory/",
     query: { page: 1 },
   },
-  { icon: BarChart3Icon, label: "routes.dashboard", path: "/dashboard" },
   { icon: Settings, label: "routes.settings", path: "/settings" },
 ];
 </script>

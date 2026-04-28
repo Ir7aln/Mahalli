@@ -83,7 +83,7 @@ async function createOrderFromQuote(id: string) {
     description: h(NuxtLink, {
       to: localePath(`/orders/?page=1&highlight=true&id=${result.data.data}`),
       class: "underline",
-      innerHTML: "go to order",
+      innerHTML: t("buttons.go-to-order"),
     }),
   });
 }

@@ -791,7 +791,8 @@ impl InvoicesService {
                             }
 
                             let mut dn_active: DeliveryNoteActiveModel = delivery_note.into();
-                            dn_active.status = ActiveValue::Set(DeliveryNoteStatus::Invoiced.as_str().to_string());
+                            dn_active.status =
+                                ActiveValue::Set(DeliveryNoteStatus::Invoiced.as_str().to_string());
                             dn_active.update(txn).await?;
 
                             Ok(invoice.id)

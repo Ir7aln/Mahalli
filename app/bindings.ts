@@ -64,10 +64,6 @@ export const commands = {
 	updateInvoiceStatus: (invoice: UpdateInvoiceStatus) => typedError<Success<null>, Fail>(__TAURI_INVOKE("update_invoice_status", { invoice })),
 	finalizeInvoice: (id: string) => typedError<Success<null>, Fail>(__TAURI_INVOKE("finalize_invoice", { id })),
 	deleteInvoiceItem: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_invoice_item", { id })),
-	listInventoryStats: () => typedError<Success<SelectTransaction[]>, Fail>(__TAURI_INVOKE("list_inventory_stats")),
-	listTopClients: () => typedError<Success<SelectTops[]>, Fail>(__TAURI_INVOKE("list_top_clients")),
-	listTopProducts: () => typedError<Success<SelectTopProducts[]>, Fail>(__TAURI_INVOKE("list_top_products")),
-	listStatusCount: () => typedError<Success<StatusCountResponse>, Fail>(__TAURI_INVOKE("list_status_count")),
 	listFinancialMetrics: () => typedError<Success<FinancialMetricsResponse>, Fail>(__TAURI_INVOKE("list_financial_metrics")),
 	getColumnPreferences: (page: string) => typedError<Success<ColumnPreference | null>, Fail>(__TAURI_INVOKE("get_column_preferences", { page })),
 	saveColumnPreferences: (args: SaveColumnPreferenceArgs) => typedError<Success<null>, Fail>(__TAURI_INVOKE("save_column_preferences", { args })),
@@ -764,29 +760,6 @@ export type SelectQuotesItemsForUpdate = {
 	product_id: string,
 };
 
-export type SelectStatusCount = {
-	status: string,
-	status_count: number,
-};
-
-export type SelectTopProducts = {
-	name: string,
-	quantity: number,
-};
-
-export type SelectTops = {
-	full_name: string,
-	price: number,
-	quantity: number,
-};
-
-export type SelectTransaction = {
-	created_at: string,
-	price: number,
-	quantity: number,
-	transaction_type: string,
-};
-
 export type SellerProfileDTO = {
 	id: string,
 	legal_name: string,
@@ -803,11 +776,6 @@ export type SellerProfileDTO = {
 	default_currency: string,
 	default_payment_terms_days: number,
 	invoice_footer: string | null,
-};
-
-export type StatusCountResponse = {
-	orders: SelectStatusCount[],
-	invoices: SelectStatusCount[],
 };
 
 export type Success<T> = {

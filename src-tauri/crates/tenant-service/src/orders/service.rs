@@ -574,7 +574,8 @@ impl OrdersService {
                             }
 
                             let mut quote_active: QuoteActiveModel = quote.into();
-                            quote_active.status = ActiveValue::Set(QuoteStatus::Accepted.as_str().to_string());
+                            quote_active.status =
+                                ActiveValue::Set(QuoteStatus::Accepted.as_str().to_string());
                             quote_active.update(txn).await?;
 
                             Ok(order.id)
@@ -631,7 +632,7 @@ impl OrdersService {
                 let res = item_model.delete(db).await?;
                 Ok(res.rows_affected)
             }
-     None => Ok(0),
+            None => Ok(0),
         }
     }
 }

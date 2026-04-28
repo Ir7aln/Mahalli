@@ -104,7 +104,7 @@ async function createDeliveryNoteFromOrder(id: string) {
     description: h(NuxtLink, {
       to: localePath(`/delivery-notes/?page=1&highlight=true&id=${result.data.data}`),
       class: "underline",
-      innerHTML: "go to delivery note",
+      innerHTML: t("buttons.go-to-delivery-note"),
     }),
   });
 }
