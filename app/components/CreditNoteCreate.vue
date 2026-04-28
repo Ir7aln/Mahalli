@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { commands, type InvoiceProductItem, type SelectInvoices } from "@/bindings";
+import { commands } from "@/bindings";
 import { Plus, Trash2, X } from "lucide-vue-next";
 import { useFieldArray, useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
@@ -13,8 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 const props = defineProps<{
-  invoice: SelectInvoices;
-  invoiceItems: InvoiceProductItem[];
+  invoiceId: string;
+  invoiceIdentifier: string;
 }>();
 
 const { t, n } = useI18n();
@@ -22,6 +22,8 @@ const { showErrorToast } = useCommandError();
 const { close } = useModal();
 const router = useRouter();
 const isPosting = ref(false);
+const loading = ref(true);
+const invoiceDetails = ref<any>(null);
 
 const creditNoteSchema = z.object({
   reason: z.string().optional(),
@@ -40,11 +42,7 @@ const { handleSubmit, setFieldValue, values } = useForm({
   validationSchema: toTypedSchema(creditNoteSchema),
   initialValues: {
     reason: "",
-    items: props.invoiceItems.map((item) => ({
-      product_id: item.product_id,
-      quantity: item.quantity,
-      price: item.price,
-    })),
+    items: [],
   },
 });
 
@@ -60,10 +58,42 @@ function formatMoney(value: number | string) {
   return n(toNumber(value), "currency");
 }
 
+async function fetchInvoiceDetails() {
+  try {
+    const result = await commands.getInvoiceDetails(props.invoiceId);
+    if (result.status === "error") {
+      showErrorToast(result.error);
+      return;
+    }
+
+    invoiceDetails.value = result.data;
+
+    // Set initial items from invoice details
+    const items = result.data?.items?.map((item: any) => ({
+      product_id: item.product_id,
+      quantity: item.quantity,
+      price: item.price,
+    })) || [];
+
+    items.forEach((item: Item) => {
+      push(item);
+    });
+  } catch (error) {
+    Logger.error(`ERROR FETCH INVOICE DETAILS: ${error}`);
+    showErrorToast({ message: "Failed to fetch invoice details" });
+  } finally {
+    loading.value = false;
+  }
+}
+
+onMounted(() => {
+  fetchInvoiceDetails();
+});
+
 const onSubmit = handleSubmit(async (formData) => {
   isPosting.value = true;
   const result = await commands.createCreditNote({
-    invoice_id: props.invoice.id as string,
+    invoice_id: props.invoiceId,
     reason: formData.reason || null,
     items: formData.items,
   });
@@ -104,7 +134,7 @@ function addItem() {
           <div class="space-y-1">
             <p class="card-modal-eyebrow">{{ t("routes.invoices") }}</p>
             <h2 class="card-modal-title">{{ t("buttons.create-credit-note") }}</h2>
-            <p class="card-modal-description">{{ t("fields.invoice") }}: {{ invoice.identifier }}</p>
+            <p class="card-modal-description">{{ t("fields.invoice") }}: {{ invoiceIdentifier }}</p>
           </div>
           <Button type="button" variant="ghost" size="icon" class="rounded-full" @click="close">
             <X class="size-5" />
@@ -112,7 +142,11 @@ function addItem() {
         </div>
       </div>
 
-      <CardContent class="card-modal-body space-y-4">
+      <CardContent v-if="loading" class="card-modal-body flex items-center justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </CardContent>
+
+      <CardContent v-else class="card-modal-body space-y-4">
         <FormField v-slot="{ componentField }" name="reason">
           <FormItem>
             <FormLabel>{{ t("fields.reason") }}</FormLabel>
@@ -149,7 +183,7 @@ function addItem() {
                       <Input
                         v-bind="componentField"
                         disabled
-                        :value="invoiceItems[idx]?.product_name || ''"
+                        :value="invoiceDetails?.items[idx]?.product_name || ''"
                         class="bg-slate-50"
                       />
                     </FormControl>

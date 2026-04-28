@@ -109,10 +109,8 @@ async function finalizeInvoice(id: string) {
 
 function createCreditNote(invoice: SelectInvoices) {
   modal.open(CreditNoteCreate, {
-    invoice,
-    invoiceItems: props.invoiceProducts.filter(
-      (item) => item.invoice_id === invoice.id
-    ),
+    invoiceId: invoice.id,
+    invoiceIdentifier: invoice.identifier,
   });
 }
 </script>
