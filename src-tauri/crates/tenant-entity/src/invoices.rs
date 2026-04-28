@@ -70,6 +70,7 @@ impl ActiveModelBehavior for ActiveModel {
         Self {
             id: Set(ulid::Ulid::new().to_string()),
             created_at: Set(Utc::now().naive_utc()),
+            status: Set("DRAFT".to_string()),
             ..ActiveModelTrait::default()
         }
     }
