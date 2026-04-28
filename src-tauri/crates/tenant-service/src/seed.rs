@@ -267,10 +267,12 @@ impl SeedService {
     async fn seed_delivery_notes(db: &DatabaseConnection) -> Result<(), DbErr> {
         for _ in 0..80 {
             let id = ulid::Ulid::new();
-            let insert_delivery_note = Statement::from_sql_and_values(
+            let insert_delivery_note = Statement::from_string(
                 sea_orm::DatabaseBackend::Sqlite,
-                r#"INSERT INTO delivery_notes (id, order_id, client_id, is_deleted) VALUES ($1, (SELECT id FROM orders ORDER BY RANDOM() LIMIT 1), (SELECT id FROM clients ORDER BY RANDOM() LIMIT 1), $2)"#,
-                [id.to_string().into(), false.into()],
+                format!(
+                    "INSERT INTO delivery_notes (id, order_id, client_id, is_deleted) SELECT '{}', id, client_id, 0 FROM orders ORDER BY RANDOM() LIMIT 1",
+                    id
+                ),
             );
             db.execute_raw(insert_delivery_note).await?;
         }
@@ -282,14 +284,12 @@ impl SeedService {
             let id = ulid::Ulid::new();
             let price: u8 = Faker.fake();
             let quantity: u8 = Faker.fake();
-            let insert_item = Statement::from_sql_and_values(
+            let insert_item = Statement::from_string(
                 sea_orm::DatabaseBackend::Sqlite,
-                r#"INSERT INTO delivery_note_items (id, delivery_note_id, product_id, price, quantity) VALUES ($1, (SELECT id FROM delivery_notes ORDER BY RANDOM() LIMIT 1), (SELECT id FROM products ORDER BY RANDOM() LIMIT 1), $2, $3)"#,
-                [
-                    id.to_string().into(),
-                    (price as f32).into(),
-                    (quantity as f32).into(),
-                ],
+                format!(
+                    "INSERT INTO delivery_note_items (id, delivery_note_id, product_id, price, quantity) SELECT '{}', dn.id, p.id, {}, {} FROM delivery_notes dn, products p ORDER BY RANDOM() LIMIT 1",
+                    id, price as f32, quantity as f32
+                ),
             );
             db.execute_raw(insert_item).await?;
         }
@@ -301,14 +301,12 @@ impl SeedService {
             let id = ulid::Ulid::new();
             let reasons = vec!["Defective product", "Wrong item shipped", "Quantity mismatch", "Customer request"];
             let reason = get_random_item(&reasons);
-            let insert_credit_note = Statement::from_sql_and_values(
+            let insert_credit_note = Statement::from_string(
                 sea_orm::DatabaseBackend::Sqlite,
-                r#"INSERT INTO credit_notes (id, invoice_id, client_id, is_deleted, reason) VALUES ($1, (SELECT id FROM invoices ORDER BY RANDOM() LIMIT 1), (SELECT client_id FROM invoices ORDER BY RANDOM() LIMIT 1), $2, $3)"#,
-                [
-                    id.to_string().into(),
-                    false.into(),
-                    reason.to_string().into(),
-                ],
+                format!(
+                    "INSERT INTO credit_notes (id, invoice_id, client_id, is_deleted, reason) SELECT '{}', id, client_id, 0, '{}' FROM invoices ORDER BY RANDOM() LIMIT 1",
+                    id, reason
+                ),
             );
             db.execute_raw(insert_credit_note).await?;
         }
@@ -320,14 +318,12 @@ impl SeedService {
             let id = ulid::Ulid::new();
             let price: u8 = Faker.fake();
             let quantity: u8 = Faker.fake();
-            let insert_item = Statement::from_sql_and_values(
+            let insert_item = Statement::from_string(
                 sea_orm::DatabaseBackend::Sqlite,
-                r#"INSERT INTO credit_note_items (id, credit_note_id, product_id, price, quantity) VALUES ($1, (SELECT id FROM credit_notes ORDER BY RANDOM() LIMIT 1), (SELECT id FROM products ORDER BY RANDOM() LIMIT 1), $2, $3)"#,
-                [
-                    id.to_string().into(),
-                    (price as f32).into(),
-                    (quantity as f32).into(),
-                ],
+                format!(
+                    "INSERT INTO credit_note_items (id, credit_note_id, product_id, price, quantity) SELECT '{}', cn.id, p.id, {}, {} FROM credit_notes cn, products p ORDER BY RANDOM() LIMIT 1",
+                    id, price as f32, quantity as f32
+                ),
             );
             db.execute_raw(insert_item).await?;
         }
