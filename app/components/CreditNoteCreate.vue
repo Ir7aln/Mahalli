@@ -6,6 +6,9 @@ import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
+import { FormField, FormItem, FormControl, FormLabel } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 const props = defineProps<{
   invoice: SelectInvoices;
@@ -112,15 +115,17 @@ function addItem() {
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-2">{{ t("fields.reason") }}</label>
-          <Field v-slot="{ field }" name="reason">
-            <textarea
-              v-bind="field"
-              class="w-full px-3 py-2 border rounded-lg"
-              rows="2"
-              :placeholder="t('placeholders.reason')"
-            />
-          </Field>
+          <FormField v-slot="{ componentField }" name="reason">
+            <FormItem>
+              <FormLabel>{{ t("fields.reason") }}</FormLabel>
+              <FormControl>
+                <Textarea
+                  v-bind="componentField"
+                  :placeholder="t('placeholders.reason')"
+                />
+              </FormControl>
+            </FormItem>
+          </FormField>
         </div>
 
         <div>
@@ -139,40 +144,41 @@ function addItem() {
           <div class="space-y-3">
             <div v-for="(field, idx) in fields" :key="field.key" class="grid grid-cols-12 gap-3 p-3 bg-gray-50 rounded-lg">
               <div class="col-span-5">
-                <label class="text-xs font-medium text-gray-600">{{ t("fields.product") }}</label>
-                <Field v-slot="{ field: f }" :name="`items.${idx}.product_id`">
-                  <input
-                    v-bind="f"
-                    disabled
-                    class="w-full px-2 py-1 border rounded text-sm bg-gray-100"
-                    :value="invoiceItems[idx]?.product_name || ''"
-                  />
-                </Field>
+                <FormField v-slot="{ componentField }" :name="`items[${idx}].product_id`">
+                  <FormItem>
+                    <FormLabel class="text-xs">{{ t("fields.product") }}</FormLabel>
+                    <FormControl>
+                      <Input
+                        v-bind="componentField"
+                        disabled
+                        :value="invoiceItems[idx]?.product_name || ''"
+                        class="bg-gray-100"
+                      />
+                    </FormControl>
+                  </FormItem>
+                </FormField>
               </div>
 
               <div class="col-span-2">
-                <label class="text-xs font-medium text-gray-600">{{ t("fields.quantity") }}</label>
-                <Field v-slot="{ field: f }" :name="`items.${idx}.quantity`" type="number">
-                  <input
-                    v-bind="f"
-                    type="number"
-                    min="0"
-                    class="w-full px-2 py-1 border rounded text-sm"
-                  />
-                </Field>
+                <FormField v-slot="{ componentField }" :name="`items[${idx}].quantity`">
+                  <FormItem>
+                    <FormLabel class="text-xs">{{ t("fields.quantity") }}</FormLabel>
+                    <FormControl>
+                      <Input v-bind="componentField" type="number" min="0" />
+                    </FormControl>
+                  </FormItem>
+                </FormField>
               </div>
 
               <div class="col-span-3">
-                <label class="text-xs font-medium text-gray-600">{{ t("fields.price") }}</label>
-                <Field v-slot="{ field: f }" :name="`items.${idx}.price`" type="number">
-                  <input
-                    v-bind="f"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    class="w-full px-2 py-1 border rounded text-sm"
-                  />
-                </Field>
+                <FormField v-slot="{ componentField }" :name="`items[${idx}].price`">
+                  <FormItem>
+                    <FormLabel class="text-xs">{{ t("fields.price") }}</FormLabel>
+                    <FormControl>
+                      <Input v-bind="componentField" type="number" min="0" step="0.01" />
+                    </FormControl>
+                  </FormItem>
+                </FormField>
               </div>
 
               <div class="col-span-2 flex items-end">
