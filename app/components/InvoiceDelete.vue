@@ -68,5 +68,3 @@ async function deleteTheInvoice() {
     </div>
   </Card>
 </template>
-
-

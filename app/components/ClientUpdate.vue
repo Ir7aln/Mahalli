@@ -14,6 +14,10 @@ const props = defineProps<{
   email?: string;
   phoneNumber?: string;
   address?: string;
+  ice?: string;
+  ifNumber?: string;
+  rc?: string;
+  patente?: string;
 }>();
 const { t } = useI18n();
 const { showErrorToast } = useCommandError();
@@ -29,6 +33,10 @@ const clientSchema = toTypedSchema(
     email: z.string().default((props.email as string) ?? ""),
     phone_number: z.string().default((props.phoneNumber as string) ?? ""),
     address: z.string().default((props.address as string) ?? ""),
+    ice: z.string().default((props.ice as string) ?? ""),
+    if_number: z.string().default((props.ifNumber as string) ?? ""),
+    rc: z.string().default((props.rc as string) ?? ""),
+    patente: z.string().default((props.patente as string) ?? ""),
   }),
 );
 
@@ -41,6 +49,10 @@ async function updateTheClient(client: {
   email?: string;
   phone_number?: string;
   address?: string;
+  ice?: string;
+  if_number?: string;
+  rc?: string;
+  patente?: string;
 }) {
   try {
     const payload: Client = {
@@ -50,6 +62,10 @@ async function updateTheClient(client: {
       phone_number: client.phone_number ?? null,
       address: client.address ?? null,
       image: null,
+      ice: client.ice ?? null,
+      if_number: client.if_number ?? null,
+      rc: client.rc ?? null,
+      patente: client.patente ?? null,
     };
     const result = await commands.updateClient(payload);
     if (result.status === "error") throw result.error;
@@ -61,6 +77,10 @@ async function updateTheClient(client: {
         email: client.email,
         phone_number: client.phone_number,
         address: client.address,
+        ice: client.ice,
+        if_number: client.if_number,
+        rc: client.rc,
+        patente: client.patente,
       })}`,
     );
     //
@@ -132,6 +152,40 @@ const onSubmit = form.handleSubmit((values) => {
             </FormControl>
           </FormItem>
         </FormField>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <FormField v-slot="{ componentField }" name="ice">
+            <FormItem>
+              <FormLabel>{{ t("fields.ice") }}</FormLabel>
+              <FormControl>
+                <Input :placeholder="t('fields.ice')" v-bind="componentField" />
+              </FormControl>
+            </FormItem>
+          </FormField>
+          <FormField v-slot="{ componentField }" name="if_number">
+            <FormItem>
+              <FormLabel>{{ t("fields.if-number") }}</FormLabel>
+              <FormControl>
+                <Input :placeholder="t('fields.if-number')" v-bind="componentField" />
+              </FormControl>
+            </FormItem>
+          </FormField>
+          <FormField v-slot="{ componentField }" name="rc">
+            <FormItem>
+              <FormLabel>{{ t("fields.rc") }}</FormLabel>
+              <FormControl>
+                <Input :placeholder="t('fields.rc')" v-bind="componentField" />
+              </FormControl>
+            </FormItem>
+          </FormField>
+          <FormField v-slot="{ componentField }" name="patente">
+            <FormItem>
+              <FormLabel>{{ t("fields.patente") }}</FormLabel>
+              <FormControl>
+                <Input :placeholder="t('fields.patente')" v-bind="componentField" />
+              </FormControl>
+            </FormItem>
+          </FormField>
+        </div>
       </CardContent>
       <div class="card-modal-footer">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
@@ -146,5 +200,3 @@ const onSubmit = form.handleSubmit((values) => {
     </Card>
   </form>
 </template>
-
-

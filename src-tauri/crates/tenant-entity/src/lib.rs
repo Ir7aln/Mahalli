@@ -3,6 +3,10 @@
 pub mod prelude;
 
 pub mod clients;
+pub mod credit_note_items;
+pub mod credit_notes;
+pub mod delivery_note_items;
+pub mod delivery_notes;
 pub mod inventory_transactions;
 pub mod invoice_items;
 pub mod invoice_payments;
@@ -12,5 +16,5 @@ pub mod orders;
 pub mod products;
 pub mod quote_items;
 pub mod quotes;
-pub mod suppliers;
 pub mod templates;
+pub mod user_column_preferences;

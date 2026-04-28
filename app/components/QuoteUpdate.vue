@@ -433,5 +433,3 @@ function deleteQuoteItem(index: number) {
     </div>
   </form>
 </template>
-
-

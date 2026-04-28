@@ -1,6 +1,6 @@
 use super::dto::*;
-use crate::InvoiceStatus;
-use chrono::{DateTime, NaiveDate, NaiveDateTime};
+use crate::{DeliveryNoteStatus, InvoiceStatus};
+use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
 use sea_orm::{
     sea_query::{
         Alias, Cond, Expr, Func, Query, SimpleExpr, SqliteQueryBuilder, SubQueryStatement,
@@ -8,16 +8,15 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
-    clients::{self, Entity as Clients},
-    inventory_transactions::{
-        ActiveModel as InventoryActiveModel, Entity as InventoryTransactions,
-    },
-    invoice_items::{self, ActiveModel as InvoiceItemActiveModel, Entity as InvoiceItems},
-    invoice_payments::{self, ActiveModel as InvoicePaymentActiveModel, Entity as InvoicePayments},
-    invoices::{self, ActiveModel as InvoiceActiveModel, Entity as Invoices},
-    order_items::{self, Entity as OrderItems},
-    orders::{ActiveModel as OrderActiveModel, Entity as Orders},
-    products::{self, Entity as Products},
+    clients, delivery_note_items,
+    delivery_notes::ActiveModel as DeliveryNoteActiveModel,
+    inventory_transactions::ActiveModel as InventoryActiveModel,
+    invoice_items::{self, ActiveModel as InvoiceItemActiveModel},
+    invoice_payments::{self, ActiveModel as InvoicePaymentActiveModel},
+    invoices::{self, ActiveModel as InvoiceActiveModel},
+    orders::ActiveModel as OrderActiveModel,
+    prelude::*,
+    products,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
@@ -220,7 +219,6 @@ impl InvoicesService {
             .join(JoinType::Join, invoices::Relation::Clients.def())
             .filter(
                 Cond::all()
-                    .add(Expr::col((Invoices, invoices::Column::IsArchived)).eq(false))
                     .add(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
                     .add(invoice_search_condition(&args.search)),
             )
@@ -252,6 +250,13 @@ impl InvoicesService {
                 Expr::col((Invoices, invoices::Column::CreatedAt)),
                 Expr::col((Invoices, invoices::Column::ClientId)),
                 Expr::col((Clients, clients::Column::FullName)),
+                Expr::col((Clients, clients::Column::Email)),
+                Expr::col((Clients, clients::Column::PhoneNumber)),
+                Expr::col((Clients, clients::Column::Address)),
+                Expr::col((Clients, clients::Column::Ice)),
+                Expr::col((Clients, clients::Column::IfNumber)),
+                Expr::col((Clients, clients::Column::Rc)),
+                Expr::col((Clients, clients::Column::Patente)),
             ])
             .expr_as(invoice_products_count_expr(), Alias::new("products"))
             .expr_as(invoice_total_expr(), Alias::new("total"))
@@ -264,7 +269,6 @@ impl InvoicesService {
             )
             .cond_where(
                 Cond::all()
-                    .add(Expr::col((Invoices, invoices::Column::IsArchived)).eq(false))
                     .add(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
                     .add(invoice_search_condition(&args.search)),
             )
@@ -573,6 +577,9 @@ impl InvoicesService {
                         product_id: ActiveValue::Set(item.product_id.clone()),
                         quantity: ActiveValue::Set(item.quantity as f32),
                         transaction_type: ActiveValue::Set("OUT".to_string()),
+                        source_type: ActiveValue::Set("INVOICE".to_string()),
+                        source_id: ActiveValue::Set(Some(created_invoice.id.clone())),
+                        unit_price: ActiveValue::Set(Some(item.price as f32)),
                         ..Default::default()
                     }
                     .insert(txn)
@@ -605,6 +612,22 @@ impl InvoicesService {
         db.transaction::<_, (), DbErr>(|txn| {
             Box::pin(async move {
                 let invoice_model = Invoices::find_by_id(invoice.id.clone()).one(txn).await?;
+                let current_invoice = invoice_model.as_ref().unwrap();
+
+                let current_status =
+                    InvoiceStatus::from_str(&current_invoice.status).ok_or_else(|| {
+                        DbErr::Custom(format!(
+                            "corrupted invoice status: {}",
+                            current_invoice.status
+                        ))
+                    })?;
+
+                if current_status == InvoiceStatus::Finalized {
+                    return Err(DbErr::Custom(
+                        "finalized invoices cannot be edited".to_string(),
+                    ));
+                }
+
                 let mut invoice_active: InvoiceActiveModel = invoice_model.unwrap().into();
                 invoice_active.client_id = ActiveValue::Set(invoice.client_id);
                 invoice_active.status = ActiveValue::Set(invoice.status);
@@ -631,6 +654,9 @@ impl InvoicesService {
                                 product_id: ActiveValue::Set(item.product_id.clone()),
                                 quantity: ActiveValue::Set(item.quantity as f32),
                                 transaction_type: ActiveValue::Set("OUT".to_string()),
+                                source_type: ActiveValue::Set("INVOICE".to_string()),
+                                source_id: ActiveValue::Set(Some(invoice.id.clone())),
+                                unit_price: ActiveValue::Set(Some(item.price as f32)),
                                 ..Default::default()
                             }
                             .insert(txn)
@@ -719,52 +745,43 @@ impl InvoicesService {
         .await
     }
 
-    pub async fn create_invoice_from_order(
+    pub async fn create_invoice_from_delivery_note(
         db: &DbConn,
         id: String,
     ) -> Result<String, TransactionError<DbErr>> {
         db.transaction::<_, String, DbErr>(|txn| {
             Box::pin(async move {
                 match Invoices::find()
-                    .filter(invoices::Column::OrderId.eq(&id))
+                    .filter(invoices::Column::DeliveryNoteId.eq(&id))
                     .one(txn)
                     .await?
                 {
                     Some(invoice) => Ok(invoice.id),
-                    None => match Orders::find_by_id(&id).one(txn).await? {
-                        Some(order) => {
+                    None => match DeliveryNotes::find_by_id(&id).one(txn).await? {
+                        Some(delivery_note) => {
                             let invoice = InvoiceActiveModel {
-                                client_id: ActiveValue::Set(order.client_id),
+                                client_id: ActiveValue::Set(delivery_note.client_id.clone()),
                                 status: ActiveValue::Set("DRAFT".to_string()),
-                                order_id: ActiveValue::Set(order.id),
+                                order_id: ActiveValue::Set(delivery_note.order_id.clone()),
+                                delivery_note_id: ActiveValue::Set(Some(delivery_note.id.clone())),
                                 ..Default::default()
                             }
                             .insert(txn)
                             .await?;
 
-                            let order_items = OrderItems::find()
-                                .filter(order_items::Column::OrderId.eq(id))
+                            let delivery_note_items = DeliveryNoteItems::find()
+                                .filter(delivery_note_items::Column::DeliveryNoteId.eq(&id))
                                 .all(txn)
                                 .await?;
 
                             let mut invoice_items = Vec::<InvoiceItemActiveModel>::new();
-                            for item in order_items {
-                                let inv_txn = InventoryTransactions::find_by_id(&item.inventory_id)
-                                    .one(txn)
-                                    .await?
-                                    .ok_or_else(|| {
-                                        DbErr::RecordNotFound(format!(
-                                            "missing inventory_transaction {}",
-                                            item.inventory_id
-                                        ))
-                                    })?;
-
+                            for item in delivery_note_items {
                                 invoice_items.push(InvoiceItemActiveModel {
                                     invoice_id: ActiveValue::Set(invoice.id.clone()),
-                                    product_id: ActiveValue::Set(inv_txn.product_id),
+                                    product_id: ActiveValue::Set(item.product_id),
                                     price: ActiveValue::Set(item.price as f64),
-                                    quantity: ActiveValue::Set(inv_txn.quantity as f64),
-                                    inventory_id: ActiveValue::Set(Some(item.inventory_id)),
+                                    quantity: ActiveValue::Set(item.quantity as f64),
+                                    inventory_id: ActiveValue::Set(item.inventory_id),
                                     ..Default::default()
                                 });
                             }
@@ -773,9 +790,14 @@ impl InvoicesService {
                                 InvoiceItems::insert_many(invoice_items).exec(txn).await?;
                             }
 
+                            let mut dn_active: DeliveryNoteActiveModel = delivery_note.into();
+                            dn_active.status =
+                                ActiveValue::Set(DeliveryNoteStatus::Invoiced.as_str().to_string());
+                            dn_active.update(txn).await?;
+
                             Ok(invoice.id)
                         }
-                        None => Err(DbErr::RecordNotFound("no order".to_string())),
+                        None => Err(DbErr::RecordNotFound("delivery note not found".to_string())),
                     },
                 }
             })
@@ -814,9 +836,45 @@ impl InvoicesService {
         }
     }
 
+    pub async fn finalize_invoice(db: &DbConn, id: String) -> Result<(), DbErr> {
+        let invoice_model = Invoices::find_by_id(&id).one(db).await?;
+        let invoice =
+            invoice_model.ok_or_else(|| DbErr::RecordNotFound("invoice not found".to_string()))?;
+
+        let current_status = InvoiceStatus::from_str(&invoice.status).ok_or_else(|| {
+            DbErr::Custom(format!("corrupted invoice status: {}", invoice.status))
+        })?;
+
+        if current_status != InvoiceStatus::Paid {
+            return Err(DbErr::Custom(
+                "only paid invoices can be finalized".to_string(),
+            ));
+        }
+
+        let mut invoice_active: InvoiceActiveModel = invoice.into();
+        invoice_active.status = ActiveValue::Set(InvoiceStatus::Finalized.as_str().to_string());
+        invoice_active.finalized_at = ActiveValue::Set(Some(Utc::now().naive_utc()));
+        match invoice_active.update(db).await {
+            Ok(_) => Ok(()),
+            Err(err) => Err(err),
+        }
+    }
+
     pub async fn delete_invoice(db: &DbConn, id: String) -> Result<u64, DbErr> {
         let invoice_model = Invoices::find_by_id(id).one(db).await?;
-        let mut invoice_active: InvoiceActiveModel = invoice_model.unwrap().into();
+        let invoice =
+            invoice_model.ok_or_else(|| DbErr::RecordNotFound("invoice not found".to_string()))?;
+        let current_status = InvoiceStatus::from_str(&invoice.status).ok_or_else(|| {
+            DbErr::Custom(format!("corrupted invoice status: {}", invoice.status))
+        })?;
+
+        if current_status == InvoiceStatus::Finalized {
+            return Err(DbErr::Custom(
+                "finalized invoices cannot be deleted".to_string(),
+            ));
+        }
+
+        let mut invoice_active: InvoiceActiveModel = invoice.into();
         invoice_active.is_deleted = ActiveValue::Set(true);
         match invoice_active.update(db).await {
             Ok(_) => Ok(1),

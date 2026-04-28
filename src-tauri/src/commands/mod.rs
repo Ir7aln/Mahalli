@@ -4,8 +4,11 @@ use tenant_service::sea_orm::DatabaseConnection as TenantDatabaseConnection;
 use tenant_service::sea_orm::{DbErr, TransactionError};
 
 pub mod clients;
+pub mod column_preferences;
+pub mod credit_notes;
 pub mod dashboard;
 pub mod databases;
+pub mod delivery_notes;
 pub mod inventory;
 pub mod invoice_items;
 pub mod invoices;
@@ -15,7 +18,7 @@ pub mod products;
 pub mod quote_items;
 pub mod quotes;
 pub mod seed;
-pub mod suppliers;
+pub mod seller_profile;
 pub mod templates;
 
 #[derive(Deserialize, Serialize, Debug, Clone, Type)]
@@ -146,6 +149,14 @@ fn map_error_details(raw: &str) -> (&'static str, &'static str, String) {
         );
     }
 
+    if normalized.contains("delivery note source order not found") {
+        return (
+            "DELIVERY_NOTE_ORDER_NOT_FOUND",
+            "notifications.errors.delivery-note-order-not-found",
+            String::from("The source order for this delivery note could not be found."),
+        );
+    }
+
     if normalized.contains("no order") || normalized.contains("order not found") {
         return (
             "ORDER_NOT_FOUND",
@@ -154,7 +165,38 @@ fn map_error_details(raw: &str) -> (&'static str, &'static str, String) {
         );
     }
 
+    if normalized.contains("delivery note not found") {
+        return (
+            "DELIVERY_NOTE_NOT_FOUND",
+            "notifications.errors.delivery-note-not-found",
+            String::from("The delivery note could not be found."),
+        );
+    }
+
+    if normalized.contains("credit note") && normalized.contains("not found") {
+        return (
+            "CREDIT_NOTE_NOT_FOUND",
+            "notifications.errors.credit-note-not-found",
+            String::from("The credit note could not be found."),
+        );
+    }
+
+    if normalized.contains("delivery note inventory transaction missing") {
+        return (
+            "DELIVERY_NOTE_INVENTORY_MISSING",
+            "notifications.errors.delivery-note-inventory-missing",
+            String::from("A linked stock movement for this delivery note could not be found."),
+        );
+    }
+
     if normalized.contains("no invoice") || normalized.contains("invoice not found") {
+        if normalized.contains("credit note") {
+            return (
+                "CREDIT_NOTE_INVOICE_NOT_FOUND",
+                "notifications.errors.credit-note-invoice-not-found",
+                String::from("The invoice for this credit note could not be found."),
+            );
+        }
         return (
             "INVOICE_NOT_FOUND",
             "notifications.errors.invoice-not-found",
@@ -191,6 +233,86 @@ fn map_error_details(raw: &str) -> (&'static str, &'static str, String) {
             "INVOICE_PAYMENT_EXCEEDS_REMAINING",
             "notifications.errors.invoice-payment-exceeds-remaining",
             String::from("The payment amount exceeds the remaining unpaid amount."),
+        );
+    }
+
+    if normalized.contains("only paid invoices can be finalized") {
+        return (
+            "INVOICE_FINALIZE_REQUIRES_PAID",
+            "notifications.errors.invoice-finalize-requires-paid",
+            String::from("Only fully paid invoices can be finalized."),
+        );
+    }
+
+    if normalized.contains("finalized invoices cannot be edited") {
+        return (
+            "INVOICE_FINALIZED_EDIT_BLOCKED",
+            "notifications.errors.invoice-finalized-edit-blocked",
+            String::from("Finalized invoices cannot be edited."),
+        );
+    }
+
+    if normalized.contains("finalized invoices cannot be deleted") {
+        return (
+            "INVOICE_FINALIZED_DELETE_BLOCKED",
+            "notifications.errors.invoice-finalized-delete-blocked",
+            String::from("Finalized invoices cannot be deleted."),
+        );
+    }
+
+    if normalized.contains("credit notes can only be created for finalized invoices") {
+        return (
+            "CREDIT_NOTE_REQUIRES_FINALIZED_INVOICE",
+            "notifications.errors.credit-note-requires-finalized-invoice",
+            String::from("Credit notes can only be created for finalized invoices."),
+        );
+    }
+
+    if normalized.contains("credit note must contain at least one item") {
+        return (
+            "CREDIT_NOTE_EMPTY",
+            "notifications.errors.credit-note-empty",
+            String::from("A credit note must contain at least one item."),
+        );
+    }
+
+    if normalized.contains("credit note item quantity must be greater than zero") {
+        return (
+            "CREDIT_NOTE_QUANTITY_INVALID",
+            "notifications.errors.credit-note-quantity-invalid",
+            String::from("Credit note quantities must be greater than zero."),
+        );
+    }
+
+    if normalized.contains("credit note item price cannot be negative") {
+        return (
+            "CREDIT_NOTE_PRICE_INVALID",
+            "notifications.errors.credit-note-price-invalid",
+            String::from("Credit note prices cannot be negative."),
+        );
+    }
+
+    if normalized.contains("credit note item does not belong to the invoice") {
+        return (
+            "CREDIT_NOTE_ITEM_NOT_ON_INVOICE",
+            "notifications.errors.credit-note-item-not-on-invoice",
+            String::from("One credit note item is not part of the source invoice."),
+        );
+    }
+
+    if normalized.contains("credit note item quantity exceeds invoice quantity") {
+        return (
+            "CREDIT_NOTE_QUANTITY_EXCEEDS_INVOICE",
+            "notifications.errors.credit-note-quantity-exceeds-invoice",
+            String::from("A credit note quantity exceeds the invoiced quantity."),
+        );
+    }
+
+    if normalized.contains("credit note item price exceeds invoice price") {
+        return (
+            "CREDIT_NOTE_PRICE_EXCEEDS_INVOICE",
+            "notifications.errors.credit-note-price-exceeds-invoice",
+            String::from("A credit note price exceeds the invoiced price."),
         );
     }
 

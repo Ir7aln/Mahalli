@@ -11,7 +11,6 @@ pub struct Model {
     pub name: String,
     pub created_at: DateTime,
     pub is_deleted: bool,
-    pub is_archived: bool,
     pub description: Option<String>,
     #[sea_orm(column_type = "Float")]
     pub purchase_price: f32,
@@ -24,12 +23,28 @@ pub struct Model {
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+    #[sea_orm(has_many = "super::credit_note_items::Entity")]
+    CreditNoteItems,
+    #[sea_orm(has_many = "super::delivery_note_items::Entity")]
+    DeliveryNoteItems,
     #[sea_orm(has_many = "super::inventory_transactions::Entity")]
     InventoryTransactions,
     #[sea_orm(has_many = "super::invoice_items::Entity")]
     InvoiceItems,
     #[sea_orm(has_many = "super::quote_items::Entity")]
     QuoteItems,
+}
+
+impl Related<super::credit_note_items::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::CreditNoteItems.def()
+    }
+}
+
+impl Related<super::delivery_note_items::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::DeliveryNoteItems.def()
+    }
 }
 
 impl Related<super::inventory_transactions::Entity> for Entity {

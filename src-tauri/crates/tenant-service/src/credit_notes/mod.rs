@@ -2,4 +2,4 @@ pub mod dto;
 pub mod service;
 
 pub use dto::*;
-pub use service::*;
+pub use service::CreditNotesService;

@@ -1,7 +1,7 @@
 use tauri::State;
 
 use tenant_service::inventory::{
-    InventoryResponse, InventoryService, ListInventoryArgs, NewInventory,
+    InventoryResponse, InventoryService, ListInventoryArgs, NewInventory, VoidInventoryArgs,
 };
 
 use crate::AppState;
@@ -44,12 +44,15 @@ pub async fn create_inventory(
 
 #[tauri::command]
 #[specta::specta]
-pub async fn delete_inventory(state: State<'_, AppState>, id: String) -> SResult<String> {
+pub async fn void_inventory_transaction(
+    state: State<'_, AppState>,
+    args: VoidInventoryArgs,
+) -> SResult<String> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match InventoryService::delete_inventory(&db_conn, id).await {
+    match InventoryService::void_inventory_transaction(&db_conn, args).await {
         Ok(_) => Ok(Success::<String> {
             error: None,
-            message: Option::Some(String::from("inventory deleted successfully")),
+            message: Option::Some(String::from("inventory transaction voided")),
             data: None,
         }),
         Err(err) => Err(err.into()),

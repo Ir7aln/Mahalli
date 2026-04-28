@@ -11,11 +11,12 @@ pub struct Model {
     pub client_id: String,
     #[sea_orm(unique)]
     pub order_id: String,
+    pub delivery_note_id: Option<String>,
     pub is_deleted: bool,
-    pub is_archived: bool,
     pub status: String,
     pub identifier: Option<String>,
     pub created_at: DateTime,
+    pub finalized_at: Option<DateTime>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
@@ -28,6 +29,16 @@ pub enum Relation {
         on_delete = "Cascade"
     )]
     Clients,
+    #[sea_orm(has_many = "super::credit_notes::Entity")]
+    CreditNotes,
+    #[sea_orm(
+        belongs_to = "super::delivery_notes::Entity",
+        from = "Column::DeliveryNoteId",
+        to = "super::delivery_notes::Column::Id",
+        on_update = "NoAction",
+        on_delete = "SetNull"
+    )]
+    DeliveryNotes,
     #[sea_orm(has_many = "super::invoice_items::Entity")]
     InvoiceItems,
     #[sea_orm(has_many = "super::invoice_payments::Entity")]
@@ -45,6 +56,18 @@ pub enum Relation {
 impl Related<super::clients::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Clients.def()
+    }
+}
+
+impl Related<super::credit_notes::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::CreditNotes.def()
+    }
+}
+
+impl Related<super::delivery_notes::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::DeliveryNotes.def()
     }
 }
 
@@ -71,6 +94,7 @@ impl ActiveModelBehavior for ActiveModel {
         Self {
             id: Set(ulid::Ulid::new().to_string()),
             created_at: Set(Utc::now().naive_utc()),
+            status: Set("DRAFT".to_string()),
             ..ActiveModelTrait::default()
         }
     }

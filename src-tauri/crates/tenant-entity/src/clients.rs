@@ -11,21 +11,40 @@ pub struct Model {
     pub full_name: String,
     pub created_at: DateTime,
     pub is_deleted: bool,
-    pub is_archived: bool,
     pub phone_number: Option<String>,
     pub email: Option<String>,
     pub address: Option<String>,
     pub image: Option<String>,
+    pub ice: Option<String>,
+    pub if_number: Option<String>,
+    pub rc: Option<String>,
+    pub patente: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+    #[sea_orm(has_many = "super::credit_notes::Entity")]
+    CreditNotes,
+    #[sea_orm(has_many = "super::delivery_notes::Entity")]
+    DeliveryNotes,
     #[sea_orm(has_many = "super::invoices::Entity")]
     Invoices,
     #[sea_orm(has_many = "super::orders::Entity")]
     Orders,
     #[sea_orm(has_many = "super::quotes::Entity")]
     Quotes,
+}
+
+impl Related<super::credit_notes::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::CreditNotes.def()
+    }
+}
+
+impl Related<super::delivery_notes::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::DeliveryNotes.def()
+    }
 }
 
 impl Related<super::invoices::Entity> for Entity {

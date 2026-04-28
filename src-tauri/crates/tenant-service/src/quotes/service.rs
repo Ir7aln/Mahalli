@@ -4,11 +4,11 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
-    clients::{self, Entity as Clients},
-    inventory_transactions,
-    products::{self, Entity as Products},
-    quote_items::{self, ActiveModel as QuoteItemActiveModel, Entity as QuoteItems},
-    quotes::{self, ActiveModel as QuoteActiveModel, Entity as Quotes},
+    clients, inventory_transactions,
+    prelude::*,
+    products,
+    quote_items::{self, ActiveModel as QuoteItemActiveModel},
+    quotes::{self, ActiveModel as QuoteActiveModel},
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
@@ -34,10 +34,12 @@ impl QuotesService {
             .join(JoinType::Join, quotes::Relation::Clients.def())
             .filter(
                 Cond::all()
-                    .add(Expr::col((Quotes, quotes::Column::IsArchived)).eq(false))
                     .add(Expr::col((Quotes, quotes::Column::IsDeleted)).eq(false))
                     .add(quote_search_condition(&args.search)),
             )
+            .apply_if(args.status.clone(), |query, v| {
+                query.filter(Expr::col((Quotes, quotes::Column::Status)).eq(v))
+            })
             .apply_if(args.created_from.clone(), |query, v| {
                 query.filter(Expr::cust_with_values(
                     "strftime('%Y-%m-%d', quotes.created_at) >= strftime('%Y-%m-%d', ?)",
@@ -62,6 +64,14 @@ impl QuotesService {
                 Expr::col((Quotes, quotes::Column::ClientId)),
                 Expr::col((Quotes, quotes::Column::Identifier)),
                 Expr::col((Clients, clients::Column::FullName)),
+                Expr::col((Clients, clients::Column::Email)),
+                Expr::col((Clients, clients::Column::PhoneNumber)),
+                Expr::col((Clients, clients::Column::Address)),
+                Expr::col((Clients, clients::Column::Ice)),
+                Expr::col((Clients, clients::Column::IfNumber)),
+                Expr::col((Clients, clients::Column::Rc)),
+                Expr::col((Clients, clients::Column::Patente)),
+                Expr::col((Quotes, quotes::Column::Status)),
             ])
             .expr_as(
                 Func::coalesce([
@@ -95,9 +105,17 @@ impl QuotesService {
             )
             .cond_where(
                 Cond::all()
-                    .add(Expr::col((Quotes, quotes::Column::IsArchived)).eq(false))
                     .add(Expr::col((Quotes, quotes::Column::IsDeleted)).eq(false))
                     .add(quote_search_condition(&args.search)),
+            )
+            .conditions(
+                args.status.clone().is_some(),
+                |x| {
+                    x.and_where(
+                        Expr::col((Quotes, quotes::Column::Status)).eq(args.status.clone()),
+                    );
+                },
+                |_| {},
             )
             .conditions(
                 args.created_from.clone().is_some(),
@@ -131,6 +149,12 @@ impl QuotesService {
             Some("full_name") => {
                 query.order_by(
                     (Clients, clients::Column::FullName),
+                    requested_order(args.direction.as_deref()),
+                );
+            }
+            Some("status") => {
+                query.order_by(
+                    (Quotes, quotes::Column::Status),
                     requested_order(args.direction.as_deref()),
                 );
             }

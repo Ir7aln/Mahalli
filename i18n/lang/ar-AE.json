@@ -9,10 +9,11 @@
   "routes": {
     "home": "الصفحة الرئيسية",
     "clients": "العملاء",
-    "suppliers": "الموردين",
     "products": "المنتجات",
     "orders": "الطلبات",
+    "delivery-notes": "سندات التسليم",
     "invoices": "الفواتير",
+    "credit-notes": "إشعارات الخصم",
     "inventory": "المخزون",
     "dashboard": "لوحة التحكم",
     "settings": "الإعدادات",
@@ -27,22 +28,33 @@
     "update": "تحديث {name}",
     "add-product": "إضافة منتج",
     "toggle-create-client": "إضافة عميل جديد",
-    "toggle-create-supplier": "إضافة مورد جديد",
     "toggle-create-product": "إضافة منتج جديد",
     "toggle-create-order": "إضافة طلب جديد",
     "toggle-create-quote": "إضافة عرض جديد",
     "toggle-create-invoice": "إضافة فاتورة جديدة",
     "toggle-create-org": "إنشاء منظمة",
     "edit": "تحرير",
+    "finalize": "إنهاء",
     "add-payment": "إضافة دفعة",
     "delete": "حذف",
     "print": "طباعة",
     "to-order": "إنشاء طلب",
+    "to-delivery-note": "إنشاء سند تسليم",
     "to-invoice": "إنشاء فاتورة",
+    "go-to-order": "الانتقال إلى الطلب",
+    "go-to-delivery-note": "الانتقال إلى سند التسليم",
+    "go-to-invoice": "الانتقال إلى الفاتورة",
+    "create-invoice": "إنشاء فاتورة",
+    "create-credit-note": "إنشاء إشعار خصم",
     "inventory-update": "تحديث المخزون",
     "generate-invoice": "إنشاء الفاتورة",
     "generate-order": "إنشاء الطلب",
-    "generate-quote": "إنشاء عرض السعر"
+    "generate-quote": "إنشاء عرض السعر",
+    "generate-delivery-note": "إنشاء سند التسليم",
+    "generate-credit-note": "إنشاء إشعار الخصم",
+    "create": "إنشاء",
+    "creating": "جاري الإنشاء...",
+    "view": "عرض"
   },
   "translationTitle": "تغيير اللغة",
   "translationDescription": "اختر اللغة التي تريد استخدامها في Mahalli.",
@@ -60,7 +72,12 @@
     "stock-status": "حالة المخزون",
     "out-of-stock": "نفد المخزون",
     "low-stock": "مخزون منخفض",
-    "healthy-stock": "مخزون جيد"
+    "healthy-stock": "مخزون جيد",
+    "search-by-field": "البحث حسب الحقل"
+  },
+  "columns": {
+    "show-hide": "إظهار/إخفاء الأعمدة",
+    "all": "الكل"
   },
   "dropZone": "اسحب وأفلت أو اختر",
   "plrz": {
@@ -74,6 +91,8 @@
     "phone": "رقم الهاتف",
     "address": "العنوان",
     "actions": "الإجراءات",
+    "identifier": "المعرف",
+    "columns": "الأعمدة",
     "description": "الوصف",
     "amount": "المبلغ",
     "status": "الحالة",
@@ -92,6 +111,7 @@
     "credit": "الائتمان",
     "threshold": "العتبة",
     "item": "العنصر",
+    "product": "المنتج",
     "sub-total": "المجموع الفرعي",
     "vat-rate": "نسبة ضريبة القيمة المضافة",
     "vat-amount": "مبلغ ضريبة القيمة المضافة",
@@ -108,7 +128,14 @@
     "subtotal": "المجموع الفرعي",
     "balance": "الرصيد",
     "payments": "الدفعات",
-    "currency": "درهم"
+    "currency": "درهم",
+    "ice": "ICE",
+    "if-number": "IF",
+    "rc": "RC",
+    "patente": "Patente / TP",
+    "reason": "السبب",
+    "contact": "جهات الاتصال",
+    "legal-identifiers": "المعرفات القانونية"
   },
   "placeholders": {
     "select-client": "اختر عميلاً",
@@ -117,18 +144,35 @@
     "no-address": "لا يوجد عنوان",
     "no-phone": "لا يوجد هاتف",
     "payment-description": "ملاحظة دفع اختيارية",
-    "no-payments": "لا توجد دفعات مسجلة بعد"
+    "no-payments": "لا توجد دفعات مسجلة بعد",
+    "reason": "أدخل سبب إشعار الخصم"
+  },
+  "seller-profile": {
+    "title": "ملف البائع",
+    "description": "معلومات الشركة المستخدمة في مستندات B2B والفواتير.",
+    "fields": {
+      "legal-name": "الاسم القانوني",
+      "commercial-name": "الاسم التجاري",
+      "city": "المدينة",
+      "currency": "العملة الافتراضية",
+      "payment-terms": "مدة الدفع بالأيام",
+      "invoice-footer": "تذييل الفاتورة"
+    }
   },
   "status": {
     "pending": "قيد الانتظار",
+    "accepted": "مقبول",
+    "invoiced": "تمت الفوترة",
     "processing": "قيد المعالجة",
     "shipped": "شحنت",
     "delivered": "تم التسليم",
     "cancelled": "ملغى",
+    "completed": "مكتمل",
     "draft": "مسودة",
     "sent": "تم الإرسال",
     "paid": "مدفوع",
     "partially_paid": "مدفوع جزئيًا",
+    "finalized": "نهائي",
     "overdue": "متأخر",
     "in": "مشتراة",
     "out": "مبيعة"
@@ -140,8 +184,7 @@
     "expenses": "المصاريف الإجمالية",
     "growth": " {n} من الشهر الماضي",
     "b3c": "أفضل العملاء بناءً على النفقات",
-    "bp": "أفضل المنتجات مبيعًا (الكمية)",
-    "b3s": "أفضل الموردين بناءً على النفقات"
+    "bp": "أفضل المنتجات مبيعًا (الكمية)"
   },
   "tables": {
     "empty": {
@@ -195,7 +238,7 @@
       "empty-state": "لا توجد قواعد بيانات مسجلة بعد.",
       "seed-title": "إضافة بيانات تجريبية",
       "seed-description": "املأ قاعدة البيانات ببيانات نموذجية للاختبار والتطوير.",
-      "seed-card-note": "سيؤدي هذا إلى إضافة 200 عميل و200 مورد و400 منتج و100 طلب و100 فاتورة و150 عرض سعر مع بيانات نموذجية."
+      "seed-card-note": "سيؤدي هذا إلى إضافة 200 عميل و400 منتج و100 طلب و100 فاتورة و150 عرض سعر مع بيانات نموذجية."
     },
     "create": {
       "title": "إنشاء قاعدة بيانات",
@@ -247,15 +290,19 @@
       "updated": "تم تحديث العميل {name}",
       "deleted": "تم حذف العميل {name}"
     },
-    "supplier": {
-      "created": "تم إضافة المورد {name}",
-      "updated": "تم تحديث المورد {name}",
-      "deleted": "تم حذف المورد {name}"
-    },
     "order": {
       "created": "تم إنشاء طلب",
       "updated": "تم تحديث الطلب",
       "deleted": "تم حذف الطلب"
+    },
+    "delivery-note": {
+      "created": "تم إنشاء سند التسليم"
+    },
+    "credit-note": {
+      "created": "تم إنشاء إشعار الخصم"
+    },
+    "seller-profile": {
+      "updated": "تم تحديث ملف البائع"
     },
     "invoice": {
       "created": "تم إنشاء فاتورة",
@@ -294,11 +341,26 @@
       "client-not-found": "تعذر العثور على العميل.",
       "quote-not-found": "تعذر العثور على عرض السعر.",
       "order-not-found": "تعذر العثور على الطلب.",
+      "delivery-note-not-found": "تعذر العثور على سند التسليم.",
+      "delivery-note-order-not-found": "تعذر العثور على الطلب المرتبط بسند التسليم هذا.",
+      "delivery-note-inventory-missing": "تعذر العثور على حركة المخزون المرتبطة بسند التسليم هذا.",
+      "credit-note-not-found": "تعذر العثور على إشعار الخصم.",
+      "credit-note-invoice-not-found": "تعذر العثور على الفاتورة المرتبطة بإشعار الخصم هذا.",
       "invoice-not-found": "تعذر العثور على الفاتورة.",
       "invoice-payment-date-invalid": "تاريخ الدفعة غير صالح.",
       "invoice-payment-amount-invalid": "يجب أن يكون مبلغ الدفعة أكبر من صفر.",
       "invoice-payment-deleted": "لا يمكن إضافة دفعة إلى فاتورة محذوفة.",
       "invoice-payment-exceeds-remaining": "مبلغ الدفعة يتجاوز المبلغ المتبقي غير المدفوع.",
+      "invoice-finalize-requires-paid": "يمكن إنهاء الفواتير المدفوعة بالكامل فقط.",
+      "invoice-finalized-edit-blocked": "لا يمكن تعديل الفواتير النهائية.",
+      "invoice-finalized-delete-blocked": "لا يمكن حذف الفواتير النهائية.",
+      "credit-note-requires-finalized-invoice": "يمكن إنشاء إشعارات الخصم للفواتير النهائية فقط.",
+      "credit-note-empty": "يجب أن يحتوي إشعار الخصم على عنصر واحد على الأقل.",
+      "credit-note-quantity-invalid": "يجب أن تكون كميات إشعار الخصم أكبر من صفر.",
+      "credit-note-price-invalid": "لا يمكن أن تكون أسعار إشعار الخصم سالبة.",
+      "credit-note-item-not-on-invoice": "أحد عناصر إشعار الخصم غير موجود في الفاتورة الأصلية.",
+      "credit-note-quantity-exceeds-invoice": "كمية في إشعار الخصم تتجاوز الكمية المفوترة.",
+      "credit-note-price-exceeds-invoice": "سعر في إشعار الخصم يتجاوز السعر المفوتر.",
       "order-status-invalid": "حالة الطلب غير صالحة.",
       "invoice-status-invalid": "حالة الفاتورة غير صالحة.",
       "status-transition-invalid": "لا يُسمح بهذا التغيير في الحالة.",
@@ -312,11 +374,6 @@
       "create": "إضافة عميل",
       "update": "تحديث العميل",
       "delete": "حذف العميل"
-    },
-    "suppliers": {
-      "create": "إضافة مورد",
-      "update": "تحديث المورد",
-      "delete": "حذف المورد"
     },
     "products": {
       "create": "إضافة منتج",
@@ -351,11 +408,6 @@
       "create": "أضف بيانات التواصل ومعلومات الفوترة لعميل جديد.",
       "update": "راجع ملف العميل واحفظ أي تغييرات على بيانات التواصل.",
       "delete": "سيؤدي هذا الإجراء إلى حذف العميل نهائيًا من مساحة العمل."
-    },
-    "suppliers": {
-      "create": "أضف بيانات المورد حتى تتمكن من متابعة عمليات الشراء بسهولة.",
-      "update": "حدّث بيانات المورد قبل حفظ التغييرات الأخيرة.",
-      "delete": "سيؤدي هذا الإجراء إلى حذف المورد نهائيًا من مساحة العمل."
     },
     "products": {
       "create": "حدّد الأسعار وحدود المخزون والكمية الافتتاحية لهذا المنتج.",

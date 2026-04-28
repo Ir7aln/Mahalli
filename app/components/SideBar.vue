@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import {
   ArrowLeftRight,
-  BarChart3Icon,
+  FileMinus,
   HomeIcon,
   Languages,
   Package,
+  ClipboardCheck,
   Quote,
   ReceiptText,
   Settings,
@@ -21,7 +22,6 @@ const LOCALE_TEXT = {
   en: "English",
   fr: "Francais",
   ar: "العربية",
-  de: "Deutsch",
 } as const;
 const openTranslationModal = () => modal.open(TranslationModal, {});
 const menuItems = [
@@ -51,9 +51,21 @@ const menuItems = [
     query: { page: 1 },
   },
   {
+    icon: ClipboardCheck,
+    label: "routes.delivery-notes",
+    path: "/delivery-notes/",
+    query: { page: 1 },
+  },
+  {
     icon: ReceiptText,
     label: "routes.invoices",
     path: "/invoices/",
+    query: { page: 1 },
+  },
+  {
+    icon: FileMinus,
+    label: "routes.credit-notes",
+    path: "/credit-notes/",
     query: { page: 1 },
   },
   {
@@ -62,7 +74,6 @@ const menuItems = [
     path: "/inventory/",
     query: { page: 1 },
   },
-  { icon: BarChart3Icon, label: "routes.dashboard", path: "/dashboard" },
   { icon: Settings, label: "routes.settings", path: "/settings" },
 ];
 </script>

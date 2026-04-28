@@ -12,7 +12,7 @@ import { InventoryUpdate, ProductDelete, ProductUpdate } from "#components";
 import type { SelectProducts } from "@/bindings";
 import { queryString } from "@/utils/query";
 
-const props = defineProps<{ products: SelectProducts[] }>();
+const props = defineProps<{ products: SelectProducts[]; visibleColumns?: string[] }>();
 const route = useRoute();
 const { updateQueryParams } = useUpdateRouteQueryParams();
 const { t, d, locale, n } = useI18n();
@@ -20,6 +20,18 @@ const modal = useModal();
 const sortKey = computed(() => queryString(route.query.sort));
 const sortDirection = computed(() =>
   queryString(route.query.direction) === "desc" ? "desc" : "asc",
+);
+
+const visibleCols = computed(
+  () =>
+    props.visibleColumns ?? [
+      "image",
+      "name",
+      "inventory",
+      "threshold",
+      "purchase_price",
+      "selling_price",
+    ],
 );
 
 function toggleSort(key: string) {
@@ -65,8 +77,8 @@ function updateProductInventory(id: string, name: string) {
     <Table :dir="locale === 'ar' ? 'rtl' : 'ltr'">
       <TableHeader>
         <TableRow>
-          <TableHead class="w-14" />
-          <TableHead class="w-20">
+          <TableHead v-if="visibleCols.includes('image')" class="w-14" />
+          <TableHead v-if="visibleCols.includes('name')" class="w-20">
             <TableSortHeader
               :label="t('fields.name')"
               :active="sortKey === 'name'"
@@ -74,7 +86,7 @@ function updateProductInventory(id: string, name: string) {
               @click="toggleSort('name')"
             />
           </TableHead>
-          <TableHead class="w-fit">
+          <TableHead v-if="visibleCols.includes('inventory')" class="w-fit">
             <TableSortHeader
               :label="t('fields.inventory')"
               :active="sortKey === 'inventory'"
@@ -82,7 +94,7 @@ function updateProductInventory(id: string, name: string) {
               @click="toggleSort('inventory')"
             />
           </TableHead>
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('threshold')">
             <TableSortHeader
               :label="t('fields.threshold')"
               :active="sortKey === 'min_quantity'"
@@ -90,7 +102,7 @@ function updateProductInventory(id: string, name: string) {
               @click="toggleSort('min_quantity')"
             />
           </TableHead>
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('purchase_price')">
             <TableSortHeader
               :label="t('fields.purchase-price')"
               :active="sortKey === 'purchase_price'"
@@ -98,7 +110,7 @@ function updateProductInventory(id: string, name: string) {
               @click="toggleSort('purchase_price')"
             />
           </TableHead>
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('selling_price')">
             <TableSortHeader
               :label="t('fields.selling-price')"
               :active="sortKey === 'selling_price'"
@@ -113,7 +125,7 @@ function updateProductInventory(id: string, name: string) {
       </TableHeader>
       <TableBody>
         <TableRow v-for="(product, index) in props.products" :key="product.id" v-fade="index">
-          <TableCell class="p-2 flex justify-center">
+          <TableCell v-if="visibleCols.includes('image')" class="p-2 flex justify-center">
             <Avatar>
               <AvatarImage v-if="product.image" :src="convertFileSrc(product.image)" />
               <AvatarFallback class="text-xs">
@@ -121,7 +133,7 @@ function updateProductInventory(id: string, name: string) {
               </AvatarFallback>
             </Avatar>
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('name')" class="p-2">
             <span class="whitespace-nowrap flex justify-between gap-3">
               {{ product.name }}
               <HoverCard>
@@ -149,7 +161,7 @@ function updateProductInventory(id: string, name: string) {
               </HoverCard>
             </span>
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('inventory')" class="p-2">
             <Badge
               variant="outline"
               :class="
@@ -174,17 +186,17 @@ function updateProductInventory(id: string, name: string) {
               }}
             </Badge>
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('threshold')" class="p-2">
             {{
               `${product.min_quantity ?? 0} ${t("plrz.i", {
                 n: Math.ceil(product.min_quantity ?? 0),
               })}`
             }}
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('purchase_price')" class="p-2">
             {{ n(toNumber(product.purchase_price), "currency") }}
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('selling_price')" class="p-2">
             {{ n(toNumber(product.selling_price), "currency") }}
           </TableCell>
           <TableCell class="p-2 sticky ltr:right-0 rtl:left-0 bg-background z-10">
@@ -217,7 +229,7 @@ function updateProductInventory(id: string, name: string) {
             </div>
           </TableCell>
         </TableRow>
-        <TableEmpty v-if="!props.products.length" :colspan="7">
+        <TableEmpty v-if="!props.products.length" :colspan="visibleCols.length + 1">
           <div class="space-y-1 text-center">
             <p class="font-medium text-slate-900">{{ t("tables.empty.title") }}</p>
             <p class="text-sm text-slate-500">{{ t("tables.empty.description") }}</p>

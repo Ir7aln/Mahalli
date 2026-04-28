@@ -527,5 +527,3 @@ function deleteInvoiceItem(index: number) {
     </div>
   </form>
 </template>
-
-

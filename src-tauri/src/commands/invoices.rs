@@ -12,9 +12,12 @@ use super::{tenant_db_or_fail, SResult, Success};
 
 #[tauri::command]
 #[specta::specta]
-pub async fn create_invoice_from_order(state: State<'_, AppState>, id: String) -> SResult<String> {
+pub async fn create_invoice_from_delivery_note(
+    state: State<'_, AppState>,
+    id: String,
+) -> SResult<String> {
     let db_conn = tenant_db_or_fail(&state).await?;
-    match InvoicesService::create_invoice_from_order(&db_conn, id).await {
+    match InvoicesService::create_invoice_from_delivery_note(&db_conn, id).await {
         Ok(res) => Ok(Success {
             error: None,
             message: None,
@@ -114,6 +117,20 @@ pub async fn update_invoice_status(
         Ok(_) => Ok(Success {
             error: None,
             message: Option::Some(String::from("update invoices success")),
+            data: None,
+        }),
+        Err(err) => Err(err.into()),
+    }
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn finalize_invoice(state: State<'_, AppState>, id: String) -> SResult<()> {
+    let db_conn = tenant_db_or_fail(&state).await?;
+    match InvoicesService::finalize_invoice(&db_conn, id).await {
+        Ok(_) => Ok(Success {
+            error: None,
+            message: Option::Some(String::from("invoice finalized successfully")),
             data: None,
         }),
         Err(err) => Err(err.into()),

@@ -24,6 +24,7 @@ export const STATUS_COLORS = {
   CANCELLED: "bg-red-100 border-red-500 text-red-900",
   PENDING: "bg-yellow-100 border-yellow-500 text-yellow-900",
   COMPLETED: "bg-blue-100 border-blue-500 text-blue-900",
+  FINALIZED: "bg-purple-100 border-purple-500 text-purple-900",
 } as const;
 
 export const INVOICE_STATUSES = [
@@ -31,10 +32,9 @@ export const INVOICE_STATUSES = [
   "PAID",
   "PARTIALLY_PAID",
   "CANCELLED",
+  "FINALIZED",
 ] as const;
 
-export const ORDER_STATUSES = [
-  "PENDING",
-  "COMPLETED",
-  "CANCELLED",
-] as const;
+export const ORDER_STATUSES = ["PENDING", "COMPLETED", "CANCELLED"] as const;
+export const QUOTE_STATUSES = ["PENDING", "ACCEPTED", "CANCELLED"] as const;
+export const DELIVERY_NOTE_STATUSES = ["PENDING", "INVOICED", "CANCELLED"] as const;

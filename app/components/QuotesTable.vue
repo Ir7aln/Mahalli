@@ -7,7 +7,11 @@ import { NuxtLink, QuoteDelete, QuoteUpdate } from "#components";
 import type { QuoteProductItem, SelectQuotes } from "@/bindings";
 import { queryString } from "@/utils/query";
 
-const props = defineProps<{ quotes: SelectQuotes[]; quoteProducts: QuoteProductItem[] }>();
+const props = defineProps<{
+  quotes: SelectQuotes[];
+  quoteProducts: QuoteProductItem[];
+  visibleColumns?: string[];
+}>();
 const emits = defineEmits<{
   listQuoteProducts: [id: string];
 }>();
@@ -20,6 +24,11 @@ const localePath = useLocalePath();
 const sortKey = computed(() => queryString(route.query.sort));
 const sortDirection = computed(() =>
   queryString(route.query.direction) === "desc" ? "desc" : "asc",
+);
+
+const visibleCols = computed(
+  () =>
+    props.visibleColumns ?? ["identifier", "full_name", "status", "products", "created_at", "total"],
 );
 
 function toggleSort(key: string) {
@@ -66,12 +75,15 @@ async function createOrderFromQuote(id: string) {
     return;
   }
   Logger.info(`CREATE ORDER FROM QUOTE: ${id}`);
+  updateQueryParams({
+    refresh: `refresh-update-${Math.random() * 9999}`,
+  });
   toast.success(t("notifications.order.created"), {
     closeButton: true,
     description: h(NuxtLink, {
       to: localePath(`/orders/?page=1&highlight=true&id=${result.data.data}`),
       class: "underline",
-      innerHTML: "go to order",
+      innerHTML: t("buttons.go-to-order"),
     }),
   });
 }
@@ -82,8 +94,8 @@ async function createOrderFromQuote(id: string) {
     <Table :dir="locale === 'ar' ? 'rtl' : 'ltr'">
       <TableHeader>
         <TableRow>
-          <TableHead class="w-24" />
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('identifier')" class="w-24" />
+          <TableHead v-if="visibleCols.includes('full_name')">
             <TableSortHeader
               :label="t('fields.full-name')"
               :active="sortKey === 'full_name'"
@@ -91,7 +103,15 @@ async function createOrderFromQuote(id: string) {
               @click="toggleSort('full_name')"
             />
           </TableHead>
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('status')">
+            <TableSortHeader
+              :label="t('fields.status')"
+              :active="sortKey === 'status'"
+              :direction="sortDirection"
+              @click="toggleSort('status')"
+            />
+          </TableHead>
+          <TableHead v-if="visibleCols.includes('products')">
             <TableSortHeader
               :label="t('fields.items')"
               :active="sortKey === 'products'"
@@ -99,7 +119,7 @@ async function createOrderFromQuote(id: string) {
               @click="toggleSort('products')"
             />
           </TableHead>
-          <TableHead class="w-56">
+          <TableHead v-if="visibleCols.includes('created_at')" class="w-56">
             <TableSortHeader
               :label="t('fields.date')"
               :active="sortKey === 'created_at'"
@@ -107,7 +127,7 @@ async function createOrderFromQuote(id: string) {
               @click="toggleSort('created_at')"
             />
           </TableHead>
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('total')">
             <TableSortHeader
               :label="t('fields.total')"
               :active="sortKey === 'total'"
@@ -122,13 +142,90 @@ async function createOrderFromQuote(id: string) {
       </TableHeader>
       <TableBody>
         <TableRow v-for="(quote, index) in props.quotes" :key="quote.id" v-fade="index">
-          <TableCell class="p-2 text-nowrap font-medium">
+          <TableCell v-if="visibleCols.includes('identifier')" class="p-2 text-nowrap font-medium">
             {{ quote.identifier }}
           </TableCell>
-          <TableCell class="p-2 font-medium">
-            {{ quote.full_name }}
+          <TableCell v-if="visibleCols.includes('full_name')" class="p-2 font-medium">
+            <Popover>
+              <PopoverTrigger as-child>
+                <Button variant="link" class="underline px-0 h-fit text-nowrap">
+                  {{ quote.full_name }}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent class="min-w-[18rem] p-3">
+                <div class="space-y-3">
+                  <div>
+                    <p class="text-xs text-muted-foreground">{{ t("fields.full-name") }}</p>
+                    <p class="text-sm font-medium">{{ quote.full_name }}</p>
+                  </div>
+                  <div
+                    v-if="quote.ice || quote.if_number || quote.rc || quote.patente"
+                    class="border-t pt-2"
+                  >
+                    <p class="text-xs text-muted-foreground mb-2">
+                      {{ t("fields.legal-identifiers") }}
+                    </p>
+                    <div class="space-y-1 text-sm">
+                      <div v-if="quote.ice">
+                        <span class="text-xs text-slate-500">ICE:</span>
+                        <span class="font-mono">{{ quote.ice }}</span>
+                      </div>
+                      <div v-if="quote.if_number">
+                        <span class="text-xs text-slate-500">IF:</span>
+                        <span class="font-mono">{{ quote.if_number }}</span>
+                      </div>
+                      <div v-if="quote.rc">
+                        <span class="text-xs text-slate-500">RC:</span>
+                        <span class="font-mono">{{ quote.rc }}</span>
+                      </div>
+                      <div v-if="quote.patente">
+                        <span class="text-xs text-slate-500">{{ t("fields.patente") }}:</span>
+                        <span class="font-mono">{{ quote.patente }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    v-if="quote.email || quote.phone_number || quote.address"
+                    class="border-t pt-2"
+                  >
+                    <p class="text-xs text-muted-foreground mb-2">{{ t("fields.contact") }}</p>
+                    <div class="space-y-1 text-sm">
+                      <div v-if="quote.email">
+                        <span class="text-xs text-slate-500">{{ t("fields.email") }}:</span>
+                        <span>{{ quote.email }}</span>
+                      </div>
+                      <div v-if="quote.phone_number">
+                        <span class="text-xs text-slate-500">{{ t("fields.phone") }}:</span>
+                        <span>{{ quote.phone_number }}</span>
+                      </div>
+                      <div v-if="quote.address">
+                        <span class="text-xs text-slate-500">{{ t("fields.address") }}:</span>
+                        <span>{{ quote.address }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('status')" class="p-2">
+            <Badge
+              variant="outline"
+              :class="
+                cn(
+                  'whitespace-nowrap',
+                  quote.status === 'ACCEPTED'
+                    ? 'bg-green-100 border-green-500 text-green-900'
+                    : quote.status === 'CANCELLED'
+                      ? 'bg-red-100 border-red-500 text-red-900'
+                      : 'bg-blue-100 border-blue-500 text-blue-900',
+                )
+              "
+            >
+              {{ t(`status.${quote.status.toLowerCase()}`) }}
+            </Badge>
+          </TableCell>
+          <TableCell v-if="visibleCols.includes('products')" class="p-2">
             <Popover v-if="quote.products && quote.products > 0">
               <PopoverTrigger as-child>
                 <Button
@@ -179,10 +276,10 @@ async function createOrderFromQuote(id: string) {
               }}
             </template>
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('created_at')" class="p-2">
             {{ d(new Date(quote.created_at!), "long") }}
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('total')" class="p-2">
             {{ n(toNumber(quote.total), "currency") }}
           </TableCell>
           <TableCell class="p-2 sticky ltr:right-0 rtl:left-0 bg-background z-10">
@@ -226,7 +323,7 @@ async function createOrderFromQuote(id: string) {
             </div>
           </TableCell>
         </TableRow>
-        <TableEmpty v-if="!props.quotes.length" :colspan="6">
+        <TableEmpty v-if="!props.quotes.length" :colspan="visibleCols.length + 1">
           <div class="space-y-1 text-center">
             <p class="font-medium text-slate-900">{{ t("tables.empty.title") }}</p>
             <p class="text-sm text-slate-500">{{ t("tables.empty.description") }}</p>
@@ -237,5 +334,3 @@ async function createOrderFromQuote(id: string) {
     <Pagination />
   </div>
 </template>
-
-

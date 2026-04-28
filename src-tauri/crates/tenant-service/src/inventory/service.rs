@@ -1,18 +1,15 @@
 use super::dto::*;
+use chrono::Utc;
 use sea_orm::{
     sea_query::{Alias, Cond, Expr, Func, Query, SqliteQueryBuilder},
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
-    inventory_transactions::{
-        self, ActiveModel as InventoryActiveModel, Entity as InventoryTransactions,
-    },
-    invoice_items::{self, Entity as InvoiceItems},
-    invoices::{self, Entity as Invoices},
-    order_items::{self, Entity as OrderItems},
-    orders::{self, Entity as Orders},
-    products::{self, Entity as Products},
-    quotes::{self, Entity as Quotes},
+    credit_notes,
+    inventory_transactions::{self, ActiveModel as InventoryActiveModel},
+    invoice_items, invoices, order_items, orders,
+    prelude::*,
+    products, quotes,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
@@ -25,6 +22,10 @@ fn requested_order(direction: Option<&str>) -> Order {
 
 fn inventory_price_expr() -> sea_orm::sea_query::SimpleExpr {
     Expr::expr(Func::coalesce([
+        Expr::col((
+            InventoryTransactions,
+            inventory_transactions::Column::UnitPrice,
+        )),
         Expr::col((OrderItems, order_items::Column::Price)),
         Expr::col((Products, products::Column::PurchasePrice)),
     ]))
@@ -37,6 +38,8 @@ impl InventoryService {
         db: &DbConn,
         args: ListInventoryArgs,
     ) -> Result<InventoryResponse, DbErr> {
+        let include_voided = args.include_voided.unwrap_or(false);
+
         let count = InventoryTransactions::find()
             .join(JoinType::Join, inventory_transactions::Relation::Products.def())
             .join(JoinType::LeftJoin, inventory_transactions::Relation::OrderItems.def())
@@ -69,6 +72,15 @@ impl InventoryService {
                         .eq(false),
                     ),
             )
+            .apply_if(
+                if include_voided { None } else { Some(()) },
+                |query, _| {
+                    query.filter(
+                        Expr::col((InventoryTransactions, inventory_transactions::Column::IsVoid))
+                            .eq(false),
+                    )
+                },
+            )
             .apply_if(Some(args.search.clone()), |query, v| {
                 query.filter(Expr::col((Products, products::Column::Name)).like(format!("%{}%", v)))
             })
@@ -77,6 +89,15 @@ impl InventoryService {
                     Expr::col((
                         InventoryTransactions,
                         inventory_transactions::Column::TransactionType,
+                    ))
+                    .eq(v),
+                )
+            })
+            .apply_if(args.source_type.clone(), |query, v| {
+                query.filter(
+                    Expr::col((
+                        InventoryTransactions,
+                        inventory_transactions::Column::SourceType,
                     ))
                     .eq(v),
                 )
@@ -118,6 +139,10 @@ impl InventoryService {
                 Expr::col((InventoryTransactions, inventory_transactions::Column::Quantity)),
                 Expr::col((Products, products::Column::Name)),
                 Expr::col((InventoryTransactions, inventory_transactions::Column::TransactionType)),
+                Expr::col((InventoryTransactions, inventory_transactions::Column::SourceType)),
+                Expr::col((InventoryTransactions, inventory_transactions::Column::SourceId)),
+                Expr::col((InventoryTransactions, inventory_transactions::Column::Notes)),
+                Expr::col((InventoryTransactions, inventory_transactions::Column::IsVoid)),
                 Expr::col((InventoryTransactions, inventory_transactions::Column::CreatedAt)),
             ])
             .expr_as(
@@ -143,6 +168,23 @@ impl InventoryService {
             .expr_as(
                 Expr::col((Quotes, quotes::Column::Identifier)),
                 Alias::new("quote_identifier"),
+            )
+            .expr_as(
+                Expr::col((CreditNotes, credit_notes::Column::Id)),
+                Alias::new("credit_note_id"),
+            )
+            .expr_as(
+                Expr::col((CreditNotes, credit_notes::Column::Identifier)),
+                Alias::new("credit_note_identifier"),
+            )
+            .expr_as(
+                Func::coalesce([
+                    Expr::col((Invoices, invoices::Column::Identifier)),
+                    Expr::col((Orders, orders::Column::Identifier)),
+                    Expr::col((Quotes, quotes::Column::Identifier)),
+                    Expr::col((CreditNotes, credit_notes::Column::Identifier)),
+                ]),
+                Alias::new("source_identifier"),
             )
             .expr_as(inventory_price_expr(), Alias::new("price"))
             .join(
@@ -187,30 +229,51 @@ impl InventoryService {
                 Expr::col((Quotes, quotes::Column::Id))
                     .equals((Orders, orders::Column::QuoteId)),
             )
+            .join(
+                JoinType::LeftJoin,
+                CreditNotes,
+                Expr::col((CreditNotes, credit_notes::Column::Id))
+                    .equals((InventoryTransactions, inventory_transactions::Column::SourceId))
+                    .and(
+                        Expr::col((InventoryTransactions, inventory_transactions::Column::SourceType))
+                            .eq("CREDIT_NOTE"),
+                    ),
+            )
             .cond_where(
-                Cond::all().add(
-                    Expr::expr(Func::coalesce([
-                        Expr::col((Orders, orders::Column::Status)),
-                        Expr::expr("PENDING"),
-                    ]))
-                    .eq("CANCELLED")
-                    .not(),
-                )
-                .add(
-                    Expr::expr(Func::coalesce([
-                        Expr::col((Invoices, invoices::Column::Status)),
-                        Expr::expr("PENDING"),
-                    ]))
-                    .eq("CANCELLED")
-                    .not(),
-                )
-                .add(
-                    Expr::expr(Func::coalesce([
-                        Expr::col((Orders, orders::Column::IsDeleted)),
-                        Expr::expr(false),
-                    ]))
-                    .eq(false),
-                ),
+                Cond::all()
+                    .add(
+                        Expr::expr(Func::coalesce([
+                            Expr::col((Orders, orders::Column::Status)),
+                            Expr::expr("PENDING"),
+                        ]))
+                        .eq("CANCELLED")
+                        .not(),
+                    )
+                    .add(
+                        Expr::expr(Func::coalesce([
+                            Expr::col((Invoices, invoices::Column::Status)),
+                            Expr::expr("PENDING"),
+                        ]))
+                        .eq("CANCELLED")
+                        .not(),
+                    )
+                    .add(
+                        Expr::expr(Func::coalesce([
+                            Expr::col((Orders, orders::Column::IsDeleted)),
+                            Expr::expr(false),
+                        ]))
+                        .eq(false),
+                    ),
+            )
+            .conditions(
+                !include_voided,
+                |x| {
+                    x.and_where(
+                        Expr::col((InventoryTransactions, inventory_transactions::Column::IsVoid))
+                            .eq(false),
+                    );
+                },
+                |_| {},
             )
             .and_where(Expr::col((Products, products::Column::Name)).like(format!("%{}%", args.search)))
             .conditions(
@@ -222,6 +285,19 @@ impl InventoryService {
                             inventory_transactions::Column::TransactionType,
                         ))
                         .eq(args.transaction_type),
+                    );
+                },
+                |_| {},
+            )
+            .conditions(
+                args.source_type.clone().is_some(),
+                |x| {
+                    x.and_where(
+                        Expr::col((
+                            InventoryTransactions,
+                            inventory_transactions::Column::SourceType,
+                        ))
+                        .eq(args.source_type),
                     );
                 },
                 |_| {},
@@ -305,6 +381,13 @@ impl InventoryService {
                 ),
                 requested_order(args.direction.as_deref()),
             ),
+            Some("source_type") => query.order_by(
+                (
+                    InventoryTransactions,
+                    inventory_transactions::Column::SourceType,
+                ),
+                requested_order(args.direction.as_deref()),
+            ),
             Some("created_at") => query.order_by(
                 (
                     InventoryTransactions,
@@ -337,10 +420,25 @@ impl InventoryService {
     }
 
     pub async fn create_inventory(db: &DbConn, transaction: NewInventory) -> Result<String, DbErr> {
+        if transaction.quantity <= 0.0 {
+            return Err(DbErr::Custom(
+                "inventory quantity must be greater than zero".to_string(),
+            ));
+        }
+
+        let source_type = transaction
+            .source_type
+            .filter(|s| !s.is_empty())
+            .unwrap_or_else(|| "ADJUSTMENT".to_string());
+
         let in_transaction = InventoryActiveModel {
             transaction_type: ActiveValue::Set(transaction.transaction_type),
             quantity: ActiveValue::Set(transaction.quantity),
             product_id: ActiveValue::Set(transaction.product_id),
+            source_type: ActiveValue::Set(source_type),
+            source_id: ActiveValue::Set(transaction.source_id),
+            unit_price: ActiveValue::Set(transaction.unit_price),
+            notes: ActiveValue::Set(transaction.notes),
             ..Default::default()
         };
         match in_transaction.insert(db).await {
@@ -349,14 +447,33 @@ impl InventoryService {
         }
     }
 
-    pub async fn delete_inventory(db: &DbConn, id: String) -> Result<u64, DbErr> {
-        let inventory = InventoryTransactions::find_by_id(id).one(db).await?;
+    pub async fn void_inventory_transaction(
+        db: &DbConn,
+        args: VoidInventoryArgs,
+    ) -> Result<u64, DbErr> {
+        let reason = args.reason.trim();
+        if reason.is_empty() {
+            return Err(DbErr::Custom(
+                "voiding an inventory transaction requires a reason".to_string(),
+            ));
+        }
+
+        let inventory = InventoryTransactions::find_by_id(&args.id).one(db).await?;
         match inventory {
-            Some(inventory) => {
-                let transaction = inventory.delete(db).await?;
-                Ok(transaction.rows_affected)
+            Some(model) => {
+                if model.is_void {
+                    return Ok(0);
+                }
+                let mut active: InventoryActiveModel = model.into();
+                active.is_void = ActiveValue::Set(true);
+                active.voided_at = ActiveValue::Set(Some(Utc::now().naive_utc()));
+                active.void_reason = ActiveValue::Set(Some(reason.to_string()));
+                active.update(db).await?;
+                Ok(1)
             }
-            None => Ok(0),
+            None => Err(DbErr::RecordNotFound(
+                "inventory transaction not found".to_string(),
+            )),
         }
     }
 }

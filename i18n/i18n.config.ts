@@ -42,19 +42,17 @@ const datetimeFormats = {
   en: DEFAULT_DATE_TIME_FORMAT,
   fr: DEFAULT_DATE_TIME_FORMAT,
   ar: DEFAULT_DATE_TIME_FORMAT,
-  de: DEFAULT_DATE_TIME_FORMAT,
 } as const;
 
 const numberFormats = {
   en: DEFAULT_NUMBER_FORMATS.AR,
   fr: DEFAULT_NUMBER_FORMATS.AR,
   ar: DEFAULT_NUMBER_FORMATS.AR,
-  de: DEFAULT_NUMBER_FORMATS.AR,
 } as const;
 
 export default defineI18nConfig(() => ({
   legacy: false,
-  availableLocales: ["en", "fr", "ar", "de"],
+  availableLocales: ["en", "fr", "ar"],
   datetimeFormats,
   numberFormats,
 }));

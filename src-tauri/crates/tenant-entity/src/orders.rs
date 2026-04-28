@@ -12,7 +12,6 @@ pub struct Model {
     #[sea_orm(unique)]
     pub quote_id: Option<String>,
     pub is_deleted: bool,
-    pub is_archived: bool,
     pub created_at: DateTime,
     pub status: String,
     pub identifier: Option<String>,
@@ -28,6 +27,8 @@ pub enum Relation {
         on_delete = "Cascade"
     )]
     Clients,
+    #[sea_orm(has_many = "super::delivery_notes::Entity")]
+    DeliveryNotes,
     #[sea_orm(has_one = "super::invoices::Entity")]
     Invoices,
     #[sea_orm(has_many = "super::order_items::Entity")]
@@ -45,6 +46,12 @@ pub enum Relation {
 impl Related<super::clients::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Clients.def()
+    }
+}
+
+impl Related<super::delivery_notes::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::DeliveryNotes.def()
     }
 }
 
@@ -71,6 +78,7 @@ impl ActiveModelBehavior for ActiveModel {
         Self {
             id: Set(ulid::Ulid::new().to_string()),
             created_at: Set(Utc::now().naive_utc()),
+            status: Set("PENDING".to_string()),
             ..ActiveModelTrait::default()
         }
     }

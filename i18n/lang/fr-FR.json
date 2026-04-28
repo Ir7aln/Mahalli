@@ -9,10 +9,11 @@
   "routes": {
     "home": "Accueil",
     "clients": "Clients",
-    "suppliers": "Fournisseurs",
     "products": "Produits",
     "orders": "Commandes",
+    "delivery-notes": "Bons de livraison",
     "invoices": "Factures",
+    "credit-notes": "Avoirs",
     "inventory": "Inventaire",
     "dashboard": "Tableau de bord",
     "settings": "Paramètres",
@@ -27,22 +28,33 @@
     "update": "Mettre à jour {name}",
     "add-product": "Ajouter un produit",
     "toggle-create-client": "Ajouter un nouveau client",
-    "toggle-create-supplier": "Ajouter un nouveau fournisseur",
     "toggle-create-product": "Ajouter un nouveau produit",
     "toggle-create-order": "Ajouter une nouvelle commande",
     "toggle-create-quote": "Ajouter un nouveau devis",
     "toggle-create-invoice": "Ajouter une nouvelle facture",
     "toggle-create-org": "Créer une organisation",
     "edit": "Modifier",
+    "finalize": "Finaliser",
     "add-payment": "Ajouter un paiement",
     "delete": "Supprimer",
     "print": "Imprimer",
     "to-order": "Créer une commande",
+    "to-delivery-note": "Créer un bon de livraison",
     "to-invoice": "Créer une facture",
+    "go-to-order": "Aller à la commande",
+    "go-to-delivery-note": "Aller au bon de livraison",
+    "go-to-invoice": "Aller à la facture",
+    "create-invoice": "Créer une facture",
+    "create-credit-note": "Créer un avoir",
     "inventory-update": "Mettre à jour l'inventaire",
     "generate-invoice": "Générer la facture",
     "generate-order": "Générer la commande",
-    "generate-quote": "Générer le devis"
+    "generate-quote": "Générer le devis",
+    "generate-delivery-note": "Générer le bon de livraison",
+    "generate-credit-note": "Générer l'avoir",
+    "create": "Créer",
+    "creating": "Création...",
+    "view": "Afficher"
   },
   "translationTitle": "Changer de langue",
   "translationDescription": "Choisissez la langue à utiliser dans Mahalli.",
@@ -60,7 +72,12 @@
     "stock-status": "État du stock",
     "out-of-stock": "Rupture de stock",
     "low-stock": "Stock faible",
-    "healthy-stock": "Stock sain"
+    "healthy-stock": "Stock sain",
+    "search-by-field": "Rechercher par champ"
+  },
+  "columns": {
+    "show-hide": "Afficher/Masquer les colonnes",
+    "all": "Tous"
   },
   "dropZone": "Glissez-déposez ou sélectionnez",
   "plrz": {
@@ -74,6 +91,8 @@
     "phone": "Numéro de téléphone",
     "address": "Adresse",
     "actions": "Actions",
+    "identifier": "Identifiant",
+    "columns": "Colonnes",
     "description": "Description",
     "amount": "Montant",
     "status": "Statut",
@@ -92,6 +111,7 @@
     "credit": "Crédit",
     "threshold": "Seuil",
     "item": "Article",
+    "product": "Produit",
     "sub-total": "Sous-total",
     "vat-rate": "Taux de TVA",
     "vat-amount": "Montant de la TVA",
@@ -108,7 +128,14 @@
     "subtotal": "Sous-total",
     "balance": "Solde",
     "payments": "Paiements",
-    "currency": "MAD"
+    "currency": "MAD",
+    "ice": "ICE",
+    "if-number": "IF",
+    "rc": "RC",
+    "patente": "Patente / TP",
+    "reason": "Motif",
+    "contact": "Contact",
+    "legal-identifiers": "Identifiants légaux"
   },
   "placeholders": {
     "select-client": "Sélectionnez un client",
@@ -117,18 +144,35 @@
     "no-address": "Pas d'adresse",
     "no-phone": "Pas de téléphone",
     "payment-description": "Note de paiement facultative",
-    "no-payments": "Aucun paiement enregistré"
+    "no-payments": "Aucun paiement enregistré",
+    "reason": "Entrez la raison du note de crédit"
+  },
+  "seller-profile": {
+    "title": "Profil vendeur",
+    "description": "Informations de l'entreprise utilisées sur les documents B2B et les factures.",
+    "fields": {
+      "legal-name": "Raison sociale",
+      "commercial-name": "Nom commercial",
+      "city": "Ville",
+      "currency": "Devise par défaut",
+      "payment-terms": "Délai de paiement en jours",
+      "invoice-footer": "Pied de facture"
+    }
   },
   "status": {
     "pending": "En attente",
+    "accepted": "Accepté",
+    "invoiced": "Facturé",
     "processing": "En cours de traitement",
     "shipped": "Expédié",
     "delivered": "Livré",
     "cancelled": "Annulé",
+    "completed": "Complété",
     "draft": "Brouillon",
     "sent": "Envoyé",
     "paid": "Payé",
     "partially_paid": "Partiellement payé",
+    "finalized": "Finalisé",
     "overdue": "En retard",
     "in": "Acheté",
     "out": "Vendu"
@@ -140,8 +184,7 @@
     "expenses": "Dépenses totales",
     "growth": " {n} par rapport au mois dernier",
     "b3c": "Meilleurs clients en fonction des dépenses",
-    "bp": "Meilleurs produits vendus (quantité)",
-    "b3s": "Meilleurs fournisseurs en fonction des dépenses"
+    "bp": "Meilleurs produits vendus (quantité)"
   },
   "tables": {
     "empty": {
@@ -195,7 +238,7 @@
       "empty-state": "Aucune base n'est encore enregistrée.",
       "seed-title": "Remplir la base avec des données d'exemple",
       "seed-description": "Remplissez la base avec des données d'exemple pour tester et développer.",
-      "seed-card-note": "Cela ajoutera 200 clients, 200 fournisseurs, 400 produits, 100 commandes, 100 factures et 150 devis avec des données d'exemple."
+      "seed-card-note": "Cela ajoutera 200 clients, 400 produits, 100 commandes, 100 factures et 150 devis avec des données d'exemple."
     },
     "create": {
       "title": "Créer une base",
@@ -247,15 +290,19 @@
       "updated": "Le client {name} a été mis à jour",
       "deleted": "Le client {name} a été supprimé"
     },
-    "supplier": {
-      "created": "Le fournisseur {name} a été ajouté",
-      "updated": "Le fournisseur {name} a été mis à jour",
-      "deleted": "Le fournisseur {name} a été supprimé"
-    },
     "order": {
       "created": "Une commande a été créée",
       "updated": "La commande a été mise à jour",
       "deleted": "La commande a été supprimée"
+    },
+    "delivery-note": {
+      "created": "Un bon de livraison a été créé"
+    },
+    "credit-note": {
+      "created": "Un avoir a été créé"
+    },
+    "seller-profile": {
+      "updated": "Le profil vendeur a été mis à jour"
     },
     "invoice": {
       "created": "Une facture a été créée",
@@ -294,11 +341,26 @@
       "client-not-found": "Le client est introuvable.",
       "quote-not-found": "Le devis est introuvable.",
       "order-not-found": "La commande est introuvable.",
+      "delivery-note-not-found": "Le bon de livraison est introuvable.",
+      "delivery-note-order-not-found": "La commande source de ce bon de livraison est introuvable.",
+      "delivery-note-inventory-missing": "Un mouvement de stock lié à ce bon de livraison est introuvable.",
+      "credit-note-not-found": "L'avoir est introuvable.",
+      "credit-note-invoice-not-found": "La facture de cet avoir est introuvable.",
       "invoice-not-found": "La facture est introuvable.",
       "invoice-payment-date-invalid": "La date du paiement est invalide.",
       "invoice-payment-amount-invalid": "Le montant du paiement doit être supérieur à zéro.",
       "invoice-payment-deleted": "Impossible d'ajouter un paiement à une facture supprimée.",
       "invoice-payment-exceeds-remaining": "Le montant du paiement dépasse le reste à payer.",
+      "invoice-finalize-requires-paid": "Seules les factures entièrement payées peuvent être finalisées.",
+      "invoice-finalized-edit-blocked": "Les factures finalisées ne peuvent pas être modifiées.",
+      "invoice-finalized-delete-blocked": "Les factures finalisées ne peuvent pas être supprimées.",
+      "credit-note-requires-finalized-invoice": "Les avoirs ne peuvent être créés que pour des factures finalisées.",
+      "credit-note-empty": "Un avoir doit contenir au moins un article.",
+      "credit-note-quantity-invalid": "Les quantités de l'avoir doivent être supérieures à zéro.",
+      "credit-note-price-invalid": "Les prix de l'avoir ne peuvent pas être négatifs.",
+      "credit-note-item-not-on-invoice": "Un article de l'avoir ne fait pas partie de la facture source.",
+      "credit-note-quantity-exceeds-invoice": "Une quantité de l'avoir dépasse la quantité facturée.",
+      "credit-note-price-exceeds-invoice": "Un prix de l'avoir dépasse le prix facturé.",
       "order-status-invalid": "Le statut de la commande est invalide.",
       "invoice-status-invalid": "Le statut de la facture est invalide.",
       "status-transition-invalid": "Ce changement de statut n'est pas autorisé.",
@@ -312,11 +374,6 @@
       "create": "Ajouter un client",
       "update": "Mettre à jour le client",
       "delete": "Supprimer le client"
-    },
-    "suppliers": {
-      "create": "Ajouter un fournisseur",
-      "update": "Mettre à jour le fournisseur",
-      "delete": "Supprimer le fournisseur"
     },
     "products": {
       "create": "Ajouter un produit",
@@ -351,11 +408,6 @@
       "create": "Ajoutez les coordonnées et les informations de facturation d’un nouveau client.",
       "update": "Vérifiez la fiche client et enregistrez les dernières modifications.",
       "delete": "Cette action supprimera définitivement le client de votre espace de travail."
-    },
-    "suppliers": {
-      "create": "Ajoutez les coordonnées du fournisseur pour suivre facilement vos achats.",
-      "update": "Mettez à jour les informations du fournisseur avant d’enregistrer.",
-      "delete": "Cette action supprimera définitivement le fournisseur de votre espace de travail."
     },
     "products": {
       "create": "Définissez les prix, le seuil de stock et la quantité initiale du produit.",

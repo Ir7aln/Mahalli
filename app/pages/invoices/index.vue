@@ -4,7 +4,7 @@ import { Plus } from "lucide-vue-next";
 import { useDebounceFn } from "@vueuse/core";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
-import { InvoiceCreate } from "#components";
+import { InvoiceCreate, ColumnVisibilityDropdown } from "#components";
 import { INVOICE_STATUSES } from "@/consts";
 import type { InvoiceProductItem, SelectInvoices } from "@/bindings";
 import { queryNumber, queryString } from "@/utils/query";
@@ -20,6 +20,18 @@ const searchQuery = ref(queryString(route.query.search));
 const status = ref(queryString(route.query.status));
 const createdFrom = ref(queryString(route.query.created_from));
 const createdTo = ref(queryString(route.query.created_to));
+
+const invoiceTableColumns = [
+  { key: "identifier", label: t("fields.identifier") },
+  { key: "full_name", label: t("fields.full-name") },
+  { key: "products", label: t("fields.items") },
+  { key: "status", label: t("fields.status") },
+  { key: "created_at", label: t("fields.date") },
+  { key: "total", label: t("fields.total") },
+  { key: "paid_amount", label: t("fields.paid") },
+];
+
+const visibleColumns = ref<string[]>(invoiceTableColumns.map((col) => col.key));
 
 const LIMIT = 50;
 
@@ -105,6 +117,24 @@ watch([status, createdFrom, createdTo], () => {
   });
 });
 
+onMounted(async () => {
+  const preferences = await commands.getColumnPreferences("invoices");
+  if (preferences.status === "ok" && preferences.data?.data?.visible_columns) {
+    visibleColumns.value = preferences.data.data.visible_columns;
+  }
+});
+
+watch(
+  visibleColumns,
+  async (newColumns) => {
+    await commands.saveColumnPreferences({
+      page: "invoices",
+      visible_columns: newColumns,
+    });
+  },
+  { deep: true },
+);
+
 async function listInvoiceProducts(id?: string) {
   if (!id) {
     invoiceProducts.value = [];
@@ -144,6 +174,19 @@ const openCreateInvoiceModal = () => modal.open(InvoiceCreate, { sheet: true });
         @clear-filter="clearFilter"
         @clear-all="clearAllFilters"
       >
+        <template #actions>
+          <Button class="gap-2 text-nowrap" @click="openCreateInvoiceModal()">
+            <Plus :size="20" />
+            {{ t("buttons.toggle-create-invoice") }}
+          </Button>
+        </template>
+        <template #columns>
+          <ColumnVisibilityDropdown
+            :columns="invoiceTableColumns"
+            :visible-columns="visibleColumns"
+            @update:visible-columns="(cols) => (visibleColumns = cols)"
+          />
+        </template>
         <template #advanced>
           <DropdownMenuGroup>
             <DropdownMenuSub>
@@ -180,20 +223,13 @@ const openCreateInvoiceModal = () => modal.open(InvoiceCreate, { sheet: true });
             </DropdownMenuSub>
           </DropdownMenuGroup>
         </template>
-        <template #actions>
-          <Button class="gap-2 text-nowrap" @click="openCreateInvoiceModal()">
-            <Plus :size="20" />
-            {{ t("buttons.toggle-create-invoice") }}
-          </Button>
-        </template>
       </ListFilterBar>
       <InvoicesTable
         :invoices="invoices"
         :invoice-products="invoiceProducts"
+        :visible-columns="visibleColumns"
         @list-invoice-products="listInvoiceProducts"
       />
     </div>
   </main>
 </template>
-
-

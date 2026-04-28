@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { commands } from "@/bindings";
 import * as Logger from "@tauri-apps/plugin-log";
-import { FilePenLine, GripHorizontal, NotepadText, Printer, Trash2 } from "lucide-vue-next";
+import { FilePenLine, GripHorizontal, Printer, ReceiptText, Trash2 } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import { NuxtLink, OrderDelete, OrderUpdate } from "#components";
 import { ORDER_STATUSES, STATUS_COLORS } from "@/consts";
 import type { OrderProductItem, SelectOrders } from "@/bindings";
 import { queryString } from "@/utils/query";
 
-const props = defineProps<{ orders: SelectOrders[]; orderProducts: OrderProductItem[] }>();
+const props = defineProps<{
+  orders: SelectOrders[];
+  orderProducts: OrderProductItem[];
+  visibleColumns?: string[];
+}>();
 const emits = defineEmits<{
   listOrderProducts: [id: string];
 }>();
@@ -21,6 +25,18 @@ const localePath = useLocalePath();
 const sortKey = computed(() => queryString(route.query.sort));
 const sortDirection = computed(() =>
   queryString(route.query.direction) === "desc" ? "desc" : "asc",
+);
+
+const visibleCols = computed(
+  () =>
+    props.visibleColumns ?? [
+      "identifier",
+      "full_name",
+      "products",
+      "status",
+      "created_at",
+      "total",
+    ],
 );
 
 function toggleSort(key: string) {
@@ -72,20 +88,23 @@ async function updateOrderStatus(id: string, status: string) {
   });
 }
 
-async function createInvoiceFromOrder(id: string) {
-  const result = await commands.createInvoiceFromOrder(id);
+async function createDeliveryNoteFromOrder(id: string) {
+  const result = await commands.createDeliveryNoteFromOrder(id);
   if (result.status === "error") {
-    Logger.error(`GET ORDER FOR INVOICE: ${JSON.stringify(result.error)}`);
+    Logger.error(`CREATE DELIVERY NOTE FROM ORDER: ${JSON.stringify(result.error)}`);
     showErrorToast(result.error);
     return;
   }
-  Logger.info(`CREATE INVOICE FROM ORDER: ${id}`);
-  toast.success(t("notifications.invoice.created"), {
+  Logger.info(`CREATE DELIVERY NOTE FROM ORDER: ${id}`);
+  updateQueryParams({
+    refresh: `refresh-update-${Math.random() * 9999}`,
+  });
+  toast.success(t("notifications.delivery-note.created"), {
     closeButton: true,
     description: h(NuxtLink, {
-      to: localePath(`/invoices/?page=1&highlight=true&id=${result.data.data}`),
+      to: localePath(`/delivery-notes/?page=1&highlight=true&id=${result.data.data}`),
       class: "underline",
-      innerHTML: "go to invoice",
+      innerHTML: t("buttons.go-to-delivery-note"),
     }),
   });
 }
@@ -96,8 +115,8 @@ async function createInvoiceFromOrder(id: string) {
     <Table :dir="locale === 'ar' ? 'rtl' : 'ltr'">
       <TableHeader>
         <TableRow>
-          <TableHead class="w-24" />
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('identifier')" class="w-24" />
+          <TableHead v-if="visibleCols.includes('full_name')">
             <TableSortHeader
               :label="t('fields.full-name')"
               :active="sortKey === 'full_name'"
@@ -105,7 +124,7 @@ async function createInvoiceFromOrder(id: string) {
               @click="toggleSort('full_name')"
             />
           </TableHead>
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('products')">
             <TableSortHeader
               :label="t('fields.items')"
               :active="sortKey === 'products'"
@@ -113,7 +132,7 @@ async function createInvoiceFromOrder(id: string) {
               @click="toggleSort('products')"
             />
           </TableHead>
-          <TableHead class="w-fit">
+          <TableHead v-if="visibleCols.includes('status')" class="w-fit">
             <TableSortHeader
               :label="t('fields.status')"
               :active="sortKey === 'status'"
@@ -121,7 +140,7 @@ async function createInvoiceFromOrder(id: string) {
               @click="toggleSort('status')"
             />
           </TableHead>
-          <TableHead class="w-56">
+          <TableHead v-if="visibleCols.includes('created_at')" class="w-56">
             <TableSortHeader
               :label="t('fields.date')"
               :active="sortKey === 'created_at'"
@@ -129,7 +148,7 @@ async function createInvoiceFromOrder(id: string) {
               @click="toggleSort('created_at')"
             />
           </TableHead>
-          <TableHead>
+          <TableHead v-if="visibleCols.includes('total')">
             <TableSortHeader
               :label="t('fields.total')"
               :active="sortKey === 'total'"
@@ -152,13 +171,73 @@ async function createInvoiceFromOrder(id: string) {
               order.id === $route.query.id && $route.query.highlight === 'true',
           }"
         >
-          <TableCell class="p-2 text-nowrap font-medium">
+          <TableCell v-if="visibleCols.includes('identifier')" class="p-2 text-nowrap font-medium">
             {{ order.identifier }}
           </TableCell>
-          <TableCell class="p-2 font-medium">
-            {{ order.full_name }}
+          <TableCell v-if="visibleCols.includes('full_name')" class="p-2 font-medium">
+            <Popover>
+              <PopoverTrigger as-child>
+                <Button variant="link" class="underline px-0 h-fit text-nowrap">
+                  {{ order.full_name }}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent class="min-w-[18rem] p-3">
+                <div class="space-y-3">
+                  <div>
+                    <p class="text-xs text-muted-foreground">{{ t("fields.full-name") }}</p>
+                    <p class="text-sm font-medium">{{ order.full_name }}</p>
+                  </div>
+                  <div
+                    v-if="order.ice || order.if_number || order.rc || order.patente"
+                    class="border-t pt-2"
+                  >
+                    <p class="text-xs text-muted-foreground mb-2">
+                      {{ t("fields.legal-identifiers") }}
+                    </p>
+                    <div class="space-y-1 text-sm">
+                      <div v-if="order.ice">
+                        <span class="text-xs text-slate-500">ICE:</span>
+                        <span class="font-mono">{{ order.ice }}</span>
+                      </div>
+                      <div v-if="order.if_number">
+                        <span class="text-xs text-slate-500">IF:</span>
+                        <span class="font-mono">{{ order.if_number }}</span>
+                      </div>
+                      <div v-if="order.rc">
+                        <span class="text-xs text-slate-500">RC:</span>
+                        <span class="font-mono">{{ order.rc }}</span>
+                      </div>
+                      <div v-if="order.patente">
+                        <span class="text-xs text-slate-500">{{ t("fields.patente") }}:</span>
+                        <span class="font-mono">{{ order.patente }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    v-if="order.email || order.phone_number || order.address"
+                    class="border-t pt-2"
+                  >
+                    <p class="text-xs text-muted-foreground mb-2">{{ t("fields.contact") }}</p>
+                    <div class="space-y-1 text-sm">
+                      <div v-if="order.email">
+                        <span class="text-xs text-slate-500">{{ t("fields.email") }}:</span>
+                        <span>{{ order.email }}</span>
+                      </div>
+                      <div v-if="order.phone_number">
+                        <span class="text-xs text-slate-500">{{ t("fields.phone") }}:</span>
+                        <span>{{ order.phone_number }}</span>
+                      </div>
+                      <div v-if="order.address">
+                        <span class="text-xs text-slate-500">{{ t("fields.address") }}:</span>
+                        <span>{{ order.address }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('products')" class="p-2">
             <Popover v-if="order.products && order.products > 0">
               <PopoverTrigger as-child>
                 <Button
@@ -209,7 +288,7 @@ async function createInvoiceFromOrder(id: string) {
               }}
             </template>
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('status')" class="p-2">
             <Popover>
               <PopoverTrigger as-child>
                 <Badge
@@ -234,10 +313,10 @@ async function createInvoiceFromOrder(id: string) {
               </PopoverContent>
             </Popover>
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('created_at')" class="p-2">
             {{ d(new Date(order.created_at!), "long") }}
           </TableCell>
-          <TableCell class="p-2">
+          <TableCell v-if="visibleCols.includes('total')" class="p-2">
             {{ n(toNumber(order.total), "currency") }}
           </TableCell>
           <TableCell class="p-2 sticky ltr:right-0 rtl:left-0 bg-background z-10">
@@ -265,9 +344,9 @@ async function createInvoiceFromOrder(id: string) {
                     </NuxtLink>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem @click="createInvoiceFromOrder(order.id!)">
-                    <NotepadText :size="20" class="text-slate-800 inline mr-2" />{{
-                      t("buttons.to-invoice")
+                  <DropdownMenuItem @click="createDeliveryNoteFromOrder(order.id!)">
+                    <ReceiptText :size="20" class="text-slate-800 inline mr-2" />{{
+                      t("buttons.to-delivery-note")
                     }}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -282,7 +361,7 @@ async function createInvoiceFromOrder(id: string) {
             </div>
           </TableCell>
         </TableRow>
-        <TableEmpty v-if="!props.orders.length" :colspan="7">
+        <TableEmpty v-if="!props.orders.length" :colspan="visibleCols.length + 1">
           <div class="space-y-1 text-center">
             <p class="font-medium text-slate-900">{{ t("tables.empty.title") }}</p>
             <p class="text-sm text-slate-500">{{ t("tables.empty.description") }}</p>
@@ -293,5 +372,3 @@ async function createInvoiceFromOrder(id: string) {
     <Pagination />
   </div>
 </template>
-
-

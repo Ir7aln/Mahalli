@@ -12,11 +12,23 @@ pub struct Model {
     #[sea_orm(column_type = "Float")]
     pub quantity: f32,
     pub product_id: String,
+    pub source_type: String,
+    pub source_id: Option<String>,
+    #[sea_orm(column_type = "Float", nullable)]
+    pub unit_price: Option<f32>,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub notes: Option<String>,
+    pub is_void: bool,
+    pub voided_at: Option<DateTime>,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub void_reason: Option<String>,
     pub created_at: DateTime,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+    #[sea_orm(has_many = "super::delivery_note_items::Entity")]
+    DeliveryNoteItems,
     #[sea_orm(has_many = "super::invoice_items::Entity")]
     InvoiceItems,
     #[sea_orm(has_one = "super::order_items::Entity")]
@@ -29,6 +41,12 @@ pub enum Relation {
         on_delete = "Cascade"
     )]
     Products,
+}
+
+impl Related<super::delivery_note_items::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::DeliveryNoteItems.def()
+    }
 }
 
 impl Related<super::invoice_items::Entity> for Entity {
@@ -54,6 +72,8 @@ impl ActiveModelBehavior for ActiveModel {
         Self {
             id: Set(ulid::Ulid::new().to_string()),
             created_at: Set(Utc::now().naive_utc()),
+            source_type: Set("INITIAL".to_string()),
+            is_void: Set(false),
             ..ActiveModelTrait::default()
         }
     }

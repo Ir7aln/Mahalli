@@ -4,7 +4,7 @@
 
 @layer components {
   .card-modal-shell {
-    @apply w-full overflow-hidden border border-slate-200 bg-white text-slate-900 shadow-2xl;
+    @apply w-full max-h-[90vh] overflow-hidden border border-slate-200 bg-white text-slate-900 shadow-2xl flex flex-col;
   }
 
   .card-modal-header {
@@ -28,7 +28,7 @@
   }
 
   .card-modal-body {
-    @apply flex-1 px-5 py-6 sm:px-6;
+    @apply flex-1 px-5 py-6 sm:px-6 overflow-y-auto;
   }
 
   .card-modal-footer {

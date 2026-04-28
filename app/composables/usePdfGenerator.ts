@@ -1,21 +1,10 @@
-import { PDFDocument, PDFName, PDFPage, PageSizes, rgb } from "pdf-lib";
-import type { PDFFont } from "pdf-lib";
-import fontkit from "@pdf-lib/fontkit";
+import { computed, h, reactive } from "vue";
+import { Document, Image, Page, Text, View, usePdf } from "@ceereals/vue-pdf";
 import * as Logger from "@tauri-apps/plugin-log";
-import CairoRegular from "@/assets/fonts/Cairo-Regular.ttf";
 
 export function usePdfGenerator() {
-  const { t, locale, n, d } = useI18n();
+  const { t, n, d } = useI18n();
   const { showErrorToast } = useCommandError();
-  const { numberToText } = useNumberToText();
-
-  const Width = ref(0);
-  const Height = ref(0);
-
-  let pdfDoc: PDFDocument;
-  let font: PDFFont;
-  let page: PDFPage;
-  let template: PDFPage | undefined;
 
   const config = reactive({
     marginTop: 40,
@@ -26,8 +15,6 @@ export function usePdfGenerator() {
       bytes: null as Uint8Array | null,
       name: null as string | null,
     },
-    mainColor: rgb(0, 0, 0),
-    secondaryColor: rgb(0.25, 0.25, 0.25),
     fields: {
       full_name: true,
       email: true,
@@ -38,426 +25,267 @@ export function usePdfGenerator() {
     },
   });
 
-  async function initPdfDoc() {
-    try {
-      pdfDoc = await PDFDocument.create();
-      pdfDoc.registerFontkit(fontkit);
-      const res: any = await $fetch(CairoRegular);
-      const fontBytes = await res.arrayBuffer();
-      font = await pdfDoc.embedFont(fontBytes);
-    } catch (err: any) {
-      handleError(err);
-    }
+  type DocType = "order" | "invoice" | "quote" | "delivery-note" | "credit-note";
+
+  function toDataUri(bytes: Uint8Array, name?: string | null): string | null {
+    const file = (name ?? "").toLowerCase();
+    const isPng = file.endsWith(".png");
+    const isJpg = file.endsWith(".jpg") || file.endsWith(".jpeg");
+    if (!isPng && !isJpg) return null;
+    const mime = isPng ? "image/png" : "image/jpeg";
+    const binary = Array.from(bytes, (b) => String.fromCharCode(b)).join("");
+    const base64 = btoa(binary);
+    return `data:${mime};base64,${base64}`;
   }
 
-  type DocType = "order" | "invoice" | "quote";
+  const styles = {
+    page: (cfg: typeof config) => ({
+      paddingTop: cfg.marginTop,
+      paddingBottom: cfg.marginBottom,
+      paddingHorizontal: cfg.marginX,
+      fontSize: 10,
+      color: "#0f172a",
+    }),
+    section: {
+      marginBottom: 14,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: 700,
+      marginBottom: 2,
+    },
+    muted: {
+      fontSize: 8.5,
+      color: "#475569",
+    },
+    label: {
+      fontSize: 8,
+      color: "#64748b",
+      textTransform: "uppercase",
+      letterSpacing: 0.6,
+    },
+    value: {
+      fontSize: 9.5,
+      color: "#0f172a",
+      fontWeight: 500,
+    },
+    divider: {
+      borderBottomWidth: 1,
+      borderBottomColor: "#cbd5e1",
+      marginTop: 8,
+      marginBottom: 10,
+    },
+    cols: {
+      flexDirection: "row",
+      gap: 12,
+      marginBottom: 10,
+    },
+    col: {
+      width: "50%",
+    },
+    block: {
+      borderWidth: 1,
+      borderColor: "#e2e8f0",
+      paddingTop: 8,
+      paddingBottom: 6,
+      paddingHorizontal: 8,
+      borderRadius: 0,
+      marginBottom: 10,
+      backgroundColor: "#f8fafc",
+      minHeight: 96,
+    },
+    sectionTitle: {
+      fontSize: 8,
+      color: "#64748b",
+      textTransform: "uppercase",
+      letterSpacing: 0.6,
+      marginBottom: 6,
+    },
+    row: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 4,
+    },
+    tableHeader: {
+      flexDirection: "row",
+      borderBottomWidth: 1,
+      borderBottomColor: "#94a3b8",
+      borderTopWidth: 1,
+      borderTopColor: "#94a3b8",
+      paddingTop: 5,
+      paddingBottom: 5,
+      marginBottom: 2,
+      fontSize: 8.5,
+      fontWeight: 600,
+      color: "#1e293b",
+    },
+    tableRow: {
+      flexDirection: "row",
+      borderBottomWidth: 1,
+      borderBottomColor: "#e2e8f0",
+      paddingVertical: 5,
+      fontSize: 9,
+    },
+    cellName: {
+      width: "42%",
+    },
+    cellQty: {
+      width: "18%",
+      textAlign: "right",
+    },
+    cellPrice: {
+      width: "20%",
+      textAlign: "right",
+    },
+    cellTotal: {
+      width: "20%",
+      textAlign: "right",
+    },
+    totals: {
+      marginTop: 10,
+      alignSelf: "flex-end",
+      width: "50%",
+      borderTopWidth: 1,
+      borderTopColor: "#94a3b8",
+      paddingTop: 7,
+    },
+    bgTemplate: {
+      position: "absolute",
+      left: 0,
+      top: 0,
+      width: "100%",
+      height: "100%",
+      zIndex: -1,
+    },
+  } as const;
 
   async function generatePdf(data: any, type: DocType) {
-    await initPdfDoc();
-    if (!pdfDoc || !font) return;
-
-    setPdfMetadata(pdfDoc, data, type);
-
+    if (!data) return "";
     try {
-      await setupPage();
-      drawContent(data, type);
-      return await pdfDoc.saveAsBase64({ dataUri: true });
-    } catch (err) {
-      handleError(err);
-    }
-  }
+      const templateImage = config.template.bytes
+        ? toDataUri(config.template.bytes, config.template.name)
+        : null;
+      const items = Array.isArray(data.items) ? data.items : [];
+      const vatMultiplier = 1 + (Number(config.vat) || 0) / 100;
+      const subtotal = Number(data.total ?? 0);
+      const totalWithVat = config.fields.vat ? subtotal * vatMultiplier : subtotal;
+      const statusLabel = data.status ? t(`status.${String(data.status).toLowerCase()}`) : "-";
+      const createdAtLabel = data.created_at ? d(new Date(data.created_at), "long") : "-";
 
-  function setPdfMetadata(pdfDoc: PDFDocument, data: any, type: DocType) {
-    pdfDoc.setTitle(data.identifier);
-    pdfDoc.setAuthor("trymahalli.com");
-    pdfDoc.setSubject(type);
-    pdfDoc.setProducer("trymahalli.com");
-    pdfDoc.setCreator("trymahalli.com");
-  }
-
-  async function setupPage() {
-    if (!pdfDoc) return;
-
-    if (config.template.bytes) {
-      const fileName = config.template.name?.toLowerCase() || "";
-      if (fileName.endsWith(".pdf")) {
-        const sourcePdfDoc = await PDFDocument.load(config.template.bytes);
-        const [templatePage] = await pdfDoc.copyPages(sourcePdfDoc, [0]);
-        if (!templatePage) {
-          handleError(new Error("Template PDF has no pages"));
-          return;
-        }
-        template = templatePage;
-        page = pdfDoc.addPage(copyPage(templatePage));
-      } else {
-        // Add empty page first
-        page = pdfDoc.addPage();
-        page.setSize(...PageSizes.A4);
-
-        let image;
-
-        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
-          image = await pdfDoc.embedJpg(config.template.bytes);
-        } else if (fileName.endsWith(".png")) {
-          image = await pdfDoc.embedPng(config.template.bytes);
-        } else {
-          // Default to PNG if can't determine
-          try {
-            image = await pdfDoc.embedPng(config.template.bytes);
-          } catch {
-            try {
-              image = await pdfDoc.embedJpg(config.template.bytes);
-            } catch {
-              handleError(new Error("Unsupported image format"));
-              return;
-            }
-          }
-        }
-
-        // Draw the image as background
-        const { width, height } = page.getSize();
-        const dims = image.scale(1);
-
-        // Scale to fit page while maintaining aspect ratio
-        const scale = Math.min(width / dims.width, height / dims.height);
-
-        // Center the image on the page
-        const x = (width - dims.width * scale) / 2;
-        const y = (height - dims.height * scale) / 2;
-
-        page.drawImage(image, {
-          x,
-          y,
-          width: dims.width * scale,
-          height: dims.height * scale,
-        });
-      }
-    } else {
-      page = pdfDoc.addPage();
-    }
-
-    if (!page) {
-      page = pdfDoc.addPage();
-    }
-
-    page.setSize(...PageSizes.A4);
-    const { width, height } = page.getSize();
-    Width.value = width;
-    Height.value = height;
-  }
-
-  function drawContent(data: any, type: DocType) {
-    if (!page || !font) return;
-    const vat = config.fields.vat ? config.vat : 0;
-    const vatTotal = data.total * (vat / 100);
-    Height.value -= config.marginTop;
-    drawHeader(data, type);
-    drawSenderAndReceiver(data.client);
-    drawTableHeaders();
-    drawItems(data.items);
-    drawSummary(getSummaryItems(data.total, vatTotal));
-    drawTotalAsText(toNumber(data.total) + vatTotal);
-  }
-
-  function drawHeader(data: any, type: DocType) {
-    if (!page || !font) return;
-
-    const headerText = capitalizeFirstLetter(t(`fields.${type}`));
-    const totalText = n(
-      toNumber(data.total) + toNumber(data.total) * (config.vat / 100),
-      "currency",
-    );
-
-    page.drawText(headerText, {
-      x: config.marginX - 1,
-      y: Height.value,
-      font,
-      size: 30,
-      color: config.mainColor,
-    });
-
-    page.drawText(reverseText(totalText), {
-      x: Width.value - config.marginX - getTextWidth(totalText, 20),
-      y: Height.value,
-      font,
-      size: 20,
-      color: config.mainColor,
-    });
-
-    page.drawText(data.identifier, {
-      x: config.marginX,
-      y: Height.value - 20,
-      font,
-      size: 13,
-      color: config.secondaryColor,
-    });
-
-    if (type !== "quote" && config.fields.status) {
-      const statusText = t(`status.${data.status.toLowerCase()}`);
-      page.drawText(statusText, {
-        x: getMiddleX(statusText, Width.value, 13),
-        y: Height.value - 20,
-        font,
-        size: 13,
-        color: config.secondaryColor,
-      });
-    }
-
-    const dateText = d(new Date(data.created_at));
-    page.drawText(dateText, {
-      x: Width.value - config.marginX - getTextWidth(dateText, 13),
-      y: Height.value - 20,
-      font,
-      size: 13,
-      color: config.secondaryColor,
-    });
-
-    Height.value -= 50;
-  }
-
-  function drawSenderAndReceiver(client: any) {
-    if (!page || !font) return;
-
-    page.drawText(t("fields.bill-to").toUpperCase(), {
-      x: config.marginX,
-      y: Height.value,
-      font,
-      size: 14,
-      color: config.mainColor,
-    });
-
-    const fields = getClientFields(client);
-    let index = 0;
-    for (const field of fields) {
-      page.drawText(field, {
-        x: config.marginX,
-        y: Height.value - 20 * (index + 1),
-        font,
-        size: 13,
-        color: config.secondaryColor,
-      });
-      index++;
-    }
-
-    Height.value -= 20 * fields.length + 20;
-  }
-
-  function getClientFields(client: any): string[] {
-    return ["full_name", "email", "address", "phone_number"]
-      .filter((value) => config.fields[value])
-      .map((key) => client[key])
-      .filter((value) => value !== null);
-  }
-
-  function drawTableHeaders() {
-    if (!page || !font) return;
-
-    drawHorizontalLine(Height.value);
-
-    const headers = ["name", "quantity", "price", "total"];
-    let index = 0;
-    for (const header of headers) {
-      page.drawText(t(`fields.${header}`), {
-        x: config.marginX + 5 + (Width.value * index) / 4,
-        y: Height.value - 20,
-        font,
-        size: 14,
-        color: config.mainColor,
-      });
-      index++;
-    }
-
-    drawHorizontalLine(Height.value - 30);
-
-    Height.value -= 40;
-  }
-
-  function drawItems(items: Record<string, string | number>[]) {
-    for (const item of items) {
-      if (Height.value < config.marginBottom) {
-        addNewPage();
-      }
-
-      if (!page || !font) return;
-
-      const name = String(item.name ?? "");
-      const quantity = Number(item.quantity ?? 0);
-      const price = Number(item.price ?? 0);
-
-      page.drawText(name, {
-        x: config.marginX + 5,
-        y: Height.value - 10,
-        font,
-        size: 12,
-        color: config.secondaryColor,
-      });
-
-      page.drawText(n(quantity, "decimal"), {
-        x: config.marginX + 5 + Width.value / 4,
-        y: Height.value - 10,
-        font,
-        size: 12,
-        color: config.secondaryColor,
-      });
-
-      page.drawText(reverseText(n(toNumber(price), "currency")), {
-        x: config.marginX + 5 + Width.value / 2,
-        y: Height.value - 10,
-        font,
-        size: 12,
-        color: config.secondaryColor,
-      });
-
-      page.drawText(reverseText(n(toNumber(price) * toNumber(quantity), "currency")), {
-        x: config.marginX + 5 + (Width.value * 3) / 4,
-        y: Height.value - 10,
-        font,
-        size: 12,
-        color: config.secondaryColor,
-      });
-
-      drawHorizontalLine(Height.value - 20, config.marginX, 0.3);
-
-      Height.value -= 30;
-    }
-  }
-
-  function drawSummary(summaryItems: Record<string, string | number>[]) {
-    for (const item of summaryItems) {
-      if (Height.value < config.marginBottom) {
-        addNewPage();
-      }
-
-      if (!page || !font) return;
-
-      const summaryX = getSummaryX(Width.value);
-
-      page.drawText(t(`fields.${item.label}`).toUpperCase(), {
-        x: summaryX,
-        y: Height.value - 10,
-        font,
-        size: 12,
-        color: config.mainColor,
-      });
-
-      page.drawText(String(item.value ?? ""), {
-        x: config.marginX + 5 + (Width.value * 3) / 4,
-        y: Height.value - 10,
-        font,
-        size: 12,
-        color: config.secondaryColor,
-      });
-
-      drawHorizontalLine(Height.value - 20, summaryX, 0.3);
-
-      Height.value -= 30;
-    }
-  }
-
-  function drawTotalAsText(total: number) {
-    if (!page || !font) return;
-
-    const totalAsText = numberToText(toNumber(total), locale.value as "en" | "fr" | "ar" | "de");
-
-    page.drawText(totalAsText, {
-      x: getMiddleX(totalAsText, Width.value, 13),
-      y: Height.value - 30,
-      font,
-      size: 13,
-      color: config.mainColor,
-    });
-  }
-
-  function copyPage(originalPage: PDFPage) {
-    if (!pdfDoc) return originalPage;
-
-    const cloneNode = originalPage.node.clone();
-    const { Contents } = originalPage.node.normalizedEntries();
-    if (Contents) cloneNode.set(PDFName.of("Contents"), Contents.clone());
-    const cloneRef = pdfDoc.context.register(cloneNode);
-    return PDFPage.of(cloneNode, cloneRef, pdfDoc);
-  }
-
-  function getTextWidth(text: string, fontSize: number) {
-    return font?.widthOfTextAtSize(text, fontSize) || 0;
-  }
-
-  function getMiddleX(text: string, width: number, fontSize: number) {
-    return (width - getTextWidth(text, fontSize)) / 2;
-  }
-
-  function capitalizeFirstLetter(text: string) {
-    return text.charAt(0).toUpperCase() + text.slice(1);
-  }
-
-  function reverseText(text: string) {
-    if (locale.value !== "ar") return text;
-    const currency = text.split("").splice(-5).join("");
-    const amount = text
-      .split("")
-      .splice(0, text.split("").length - 6)
-      .reverse()
-      .join("");
-    return `${amount} ${currency}`;
-  }
-
-  function getSummaryX(width: number) {
-    const offsets = { en: 60, fr: 60, de: -20, ar: 30 };
-    return width - width / 2 + (offsets[locale.value as keyof typeof offsets] || 60);
-  }
-
-  function getSummaryItems(total: number, vatTotal: number) {
-    if (!config.fields.vat) {
-      return [
+      const doc = h(
+        Document,
         {
-          label: "total",
-          value: reverseText(n(toNumber(total), "currency")),
+          title: data.identifier ?? type,
+          author: "Mahalli",
+          subject: type,
+          creator: "Mahalli",
+          producer: "Mahalli",
         },
-      ];
+        () => [
+          h(Page, { size: "A4", style: styles.page(config) }, () => [
+            templateImage ? h(Image, { src: templateImage, style: styles.bgTemplate }) : null,
+            h(View, { style: styles.section }, () => [
+              h(Text, { style: styles.muted }, t(`routes.${type}s`)),
+              h(Text, { style: styles.title }, data.identifier ?? "-"),
+              h(Text, { style: styles.muted }, createdAtLabel),
+              h(View, { style: styles.divider }),
+            ]),
+            h(View, { style: styles.cols }, () => [
+              h(View, { style: styles.col }, () => [
+                h(View, { style: styles.block }, () => [
+                  h(Text, { style: styles.sectionTitle }, t("fields.bill-to")),
+                  h(View, { style: styles.row }, [
+                    h(Text, { style: styles.label }, t("fields.full-name")),
+                    h(Text, { style: styles.value }, data.client?.full_name ?? data.full_name ?? "-"),
+                  ]),
+                  config.fields.email
+                    ? h(View, { style: styles.row }, [
+                        h(Text, { style: styles.label }, t("fields.email")),
+                        h(Text, { style: styles.value }, data.client?.email ?? data.email ?? "-"),
+                      ])
+                    : null,
+                  config.fields.phone_number
+                    ? h(View, { style: styles.row }, [
+                        h(Text, { style: styles.label }, t("fields.phone")),
+                        h(Text, { style: styles.value }, data.client?.phone_number ?? data.phone_number ?? "-"),
+                      ])
+                    : null,
+                  config.fields.address
+                    ? h(View, { style: styles.row }, [
+                        h(Text, { style: styles.label }, t("fields.address")),
+                        h(Text, { style: styles.value }, data.client?.address ?? data.address ?? "-"),
+                      ])
+                    : null,
+                ]),
+              ]),
+              h(View, { style: styles.col }, () => [
+                h(View, { style: styles.block }, () => [
+                  h(Text, { style: styles.sectionTitle }, t("fields.configuration")),
+                  config.fields.status
+                    ? h(View, { style: styles.row }, [
+                        h(Text, { style: styles.label }, t("fields.status")),
+                        h(Text, { style: styles.value }, statusLabel),
+                      ])
+                    : null,
+                  h(View, { style: styles.row }, [
+                    h(Text, { style: styles.label }, t("fields.date")),
+                    h(Text, { style: styles.value }, createdAtLabel),
+                  ]),
+                  h(View, { style: styles.row }, [
+                    h(Text, { style: styles.label }, t("fields.currency")),
+                    h(Text, { style: styles.value }, "MAD"),
+                  ]),
+                ]),
+              ]),
+            ]),
+            h(View, {}, () => [
+              h(View, { style: styles.tableHeader }, () => [
+                h(Text, { style: styles.cellName }, t("fields.product")),
+                h(Text, { style: styles.cellQty }, t("fields.quantity")),
+                h(Text, { style: styles.cellPrice }, t("fields.price")),
+                h(Text, { style: styles.cellTotal }, t("fields.total")),
+              ]),
+              ...items.map((item: any) => {
+                const quantity = Number(item.quantity ?? 0);
+                const price = Number(item.price ?? 0);
+                const lineTotal = quantity * price;
+                return h(View, { style: styles.tableRow }, () => [
+                  h(Text, { style: styles.cellName }, item.name ?? "-"),
+                  h(Text, { style: styles.cellQty }, String(quantity)),
+                  h(Text, { style: styles.cellPrice }, n(price, "currency")),
+                  h(Text, { style: styles.cellTotal }, n(lineTotal, "currency")),
+                ]);
+              }),
+            ]),
+            h(View, { style: styles.totals }, () => [
+              h(View, { style: styles.row }, [
+                h(Text, {}, t("fields.subtotal")),
+                h(Text, {}, n(subtotal, "currency")),
+              ]),
+              config.fields.vat
+                ? h(View, { style: styles.row }, [
+                    h(Text, {}, `${t("fields.vat-rate")} (${config.vat}%)`),
+                    h(Text, {}, n(subtotal * (Number(config.vat) / 100), "currency")),
+                  ])
+                : null,
+              h(View, { style: styles.row }, [
+                h(Text, {}, t("fields.total")),
+                h(Text, {}, n(totalWithVat, "currency")),
+              ]),
+            ]),
+          ]),
+        ],
+      );
+
+      const pdf = await usePdf(computed(() => doc), { reactive: false });
+      await pdf.execute(true);
+      return pdf.url.value ?? "";
+    } catch (err: any) {
+      showErrorToast(err);
+      Logger.error(`PDF GENERATION ERROR: ${err?.message ?? JSON.stringify(err)}`);
+      return "";
     }
-    return [
-      { label: "sub-total", value: reverseText(n(toNumber(total), "currency")) },
-      { label: "vat-rate", value: `${config.vat}%` },
-      {
-        label: "vat-amount",
-        value: reverseText(n(toNumber(vatTotal), "currency")),
-      },
-      {
-        label: "grand-total",
-        value: reverseText(n(toNumber(total) + toNumber(vatTotal), "currency")),
-      },
-    ];
-  }
-
-  function addNewPage() {
-    if (!pdfDoc) return;
-
-    let newPage: PDFPage;
-    if (template) {
-      newPage = pdfDoc.addPage(copyPage(template));
-    } else {
-      newPage = pdfDoc.addPage();
-    }
-    newPage.setSize(...PageSizes.A4);
-    page = newPage;
-    const { width, height } = newPage.getSize();
-    Width.value = width;
-    Height.value = height - config.marginTop;
-  }
-
-  function drawHorizontalLine(y: number, startX = config.marginX, o = 0.75) {
-    page?.drawLine({
-      start: { x: startX, y },
-      end: { x: Width.value - config.marginX, y },
-      thickness: 1,
-      color: config.mainColor,
-      opacity: o,
-    });
-  }
-
-  function handleError(err: any) {
-    showErrorToast(err);
-    Logger.error(`ERROR PDF-LIB: ${err}`);
   }
 
   return {

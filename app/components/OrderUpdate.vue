@@ -465,5 +465,3 @@ function deleteOrderItem(index: number) {
     </div>
   </form>
 </template>
-
-

@@ -183,5 +183,3 @@ function clearFile() {
     </div>
   </div>
 </template>
-
-

@@ -1,19 +1,17 @@
 use super::dto::*;
-use crate::OrderStatus;
+use crate::{OrderStatus, QuoteStatus};
 use sea_orm::{
     sea_query::{Alias, Cond, Expr, Func, Query, SqliteQueryBuilder},
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
-    clients::{self, Entity as Clients},
-    inventory_transactions::{
-        self, ActiveModel as InventoryActiveModel, Entity as InventoryTransactions,
-    },
-    order_items::{self, ActiveModel as OrderItemActiveModel, Entity as OrderItems},
-    orders::{self, ActiveModel as OrderActiveModel, Entity as Orders},
-    products::{self, Entity as Products},
-    quote_items::{self, Entity as QuoteItems},
-    quotes::Entity as Quotes,
+    clients,
+    inventory_transactions::{self, ActiveModel as InventoryActiveModel},
+    order_items::{self, ActiveModel as OrderItemActiveModel},
+    orders::{self, ActiveModel as OrderActiveModel},
+    prelude::*,
+    products, quote_items,
+    quotes::ActiveModel as QuoteActiveModel,
 };
 
 fn requested_order(direction: Option<&str>) -> Order {
@@ -39,7 +37,6 @@ impl OrdersService {
             .join(JoinType::Join, orders::Relation::Clients.def())
             .filter(
                 Cond::all()
-                    .add(Expr::col((Orders, orders::Column::IsArchived)).eq(false))
                     .add(Expr::col((Orders, orders::Column::IsDeleted)).eq(false))
                     .add(order_search_condition(&args.search)),
             )
@@ -71,6 +68,13 @@ impl OrdersService {
                 Expr::col((Orders, orders::Column::CreatedAt)),
                 Expr::col((Orders, orders::Column::ClientId)),
                 Expr::col((Clients, clients::Column::FullName)),
+                Expr::col((Clients, clients::Column::Email)),
+                Expr::col((Clients, clients::Column::PhoneNumber)),
+                Expr::col((Clients, clients::Column::Address)),
+                Expr::col((Clients, clients::Column::Ice)),
+                Expr::col((Clients, clients::Column::IfNumber)),
+                Expr::col((Clients, clients::Column::Rc)),
+                Expr::col((Clients, clients::Column::Patente)),
             ])
             .expr_as(
                 Func::coalesce([
@@ -112,7 +116,6 @@ impl OrdersService {
             )
             .cond_where(
                 Cond::all()
-                    .add(Expr::col((Orders, orders::Column::IsArchived)).eq(false))
                     .add(Expr::col((Orders, orders::Column::IsDeleted)).eq(false))
                     .add(order_search_condition(&args.search)),
             )
@@ -428,6 +431,9 @@ impl OrdersService {
                         product_id: ActiveValue::Set(item.product_id),
                         quantity: ActiveValue::Set(item.quantity),
                         transaction_type: ActiveValue::Set("OUT".to_string()),
+                        source_type: ActiveValue::Set("ORDER".to_string()),
+                        source_id: ActiveValue::Set(Some(created_order.id.clone())),
+                        unit_price: ActiveValue::Set(Some(item.price as f32)),
                         ..Default::default()
                     }
                     .insert(txn)
@@ -487,6 +493,9 @@ impl OrdersService {
                                 product_id: ActiveValue::Set(item.product_id),
                                 quantity: ActiveValue::Set(item.quantity),
                                 transaction_type: ActiveValue::Set("OUT".to_string()),
+                                source_type: ActiveValue::Set("ORDER".to_string()),
+                                source_id: ActiveValue::Set(Some(order.id.clone())),
+                                unit_price: ActiveValue::Set(Some(item.price as f32)),
                                 ..Default::default()
                             }
                             .insert(txn)
@@ -525,9 +534,9 @@ impl OrdersService {
                     None => match Quotes::find_by_id(&id).one(txn).await? {
                         Some(quote) => {
                             let order = OrderActiveModel {
-                                client_id: ActiveValue::Set(quote.client_id),
+                                client_id: ActiveValue::Set(quote.client_id.clone()),
                                 status: ActiveValue::Set("PENDING".to_string()),
-                                quote_id: ActiveValue::Set(Some(quote.id)),
+                                quote_id: ActiveValue::Set(Some(quote.id.clone())),
                                 ..Default::default()
                             }
                             .insert(txn)
@@ -545,6 +554,9 @@ impl OrdersService {
                                     product_id: ActiveValue::Set(item.product_id),
                                     quantity: ActiveValue::Set(item.quantity),
                                     transaction_type: ActiveValue::Set("OUT".to_string()),
+                                    source_type: ActiveValue::Set("ORDER".to_string()),
+                                    source_id: ActiveValue::Set(Some(order.id.clone())),
+                                    unit_price: ActiveValue::Set(Some(item.price as f32)),
                                     ..Default::default()
                                 }
                                 .insert(txn)
@@ -560,6 +572,12 @@ impl OrdersService {
                             if !items.is_empty() {
                                 OrderItems::insert_many(items).exec(txn).await?;
                             }
+
+                            let mut quote_active: QuoteActiveModel = quote.into();
+                            quote_active.status =
+                                ActiveValue::Set(QuoteStatus::Accepted.as_str().to_string());
+                            quote_active.update(txn).await?;
+
                             Ok(order.id)
                         }
                         None => Err(DbErr::RecordNotFound("no quote".to_string())),
