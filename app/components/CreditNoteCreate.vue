@@ -9,6 +9,8 @@ import { toast } from "vue-sonner";
 import { FormField, FormItem, FormControl, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 const props = defineProps<{
   invoice: SelectInvoices;
@@ -95,55 +97,51 @@ function addItem() {
 </script>
 
 <template>
-  <div class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-      <div class="sticky top-0 bg-white border-b flex items-center justify-between p-4">
-        <h2 class="text-xl font-semibold">{{ t("buttons.create-credit-note") }}</h2>
-        <button @click="close" class="p-1 hover:bg-gray-100 rounded">
-          <X :size="20" />
-        </button>
+  <form class="w-full flex justify-center" @submit="onSubmit">
+    <Card class="card-modal-shell w-4/6 lg:w-1/2">
+      <div class="card-modal-header">
+        <div class="card-modal-header-inner">
+          <div class="space-y-1">
+            <p class="card-modal-eyebrow">{{ t("routes.invoices") }}</p>
+            <h2 class="card-modal-title">{{ t("buttons.create-credit-note") }}</h2>
+            <p class="card-modal-description">{{ t("fields.invoice") }}: {{ invoice.identifier }}</p>
+          </div>
+          <Button type="button" variant="ghost" size="icon" class="rounded-full" @click="close">
+            <X class="size-5" />
+          </Button>
+        </div>
       </div>
 
-      <form @submit="onSubmit" class="p-6 space-y-6">
-        <div class="bg-gray-50 p-4 rounded-lg space-y-2">
-          <p class="text-sm text-gray-600">
-            {{ t("fields.invoice") }}: <span class="font-semibold">{{ invoice.identifier }}</span>
-          </p>
-          <p class="text-sm text-gray-600">
-            {{ t("fields.total") }}: <span class="font-semibold">{{ formatMoney(invoice.total) }}</span>
-          </p>
-        </div>
+      <CardContent class="card-modal-body space-y-4">
+        <FormField v-slot="{ componentField }" name="reason">
+          <FormItem>
+            <FormLabel>{{ t("fields.reason") }}</FormLabel>
+            <FormControl>
+              <Textarea
+                v-bind="componentField"
+                :placeholder="t('placeholders.reason')"
+              />
+            </FormControl>
+          </FormItem>
+        </FormField>
 
-        <div>
-          <FormField v-slot="{ componentField }" name="reason">
-            <FormItem>
-              <FormLabel>{{ t("fields.reason") }}</FormLabel>
-              <FormControl>
-                <Textarea
-                  v-bind="componentField"
-                  :placeholder="t('placeholders.reason')"
-                />
-              </FormControl>
-            </FormItem>
-          </FormField>
-        </div>
-
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-semibold">{{ t("fields.items") }}</h3>
-            <button
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold text-sm">{{ t("fields.items") }}</h3>
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               @click="addItem"
-              class="flex items-center gap-2 px-3 py-1 text-sm bg-blue-50 text-blue-700 rounded hover:bg-blue-100"
             >
-              <Plus :size="16" />
+              <Plus :size="16" class="mr-2" />
               {{ t("buttons.add-product") }}
-            </button>
+            </Button>
           </div>
 
-          <div class="space-y-3">
-            <div v-for="(field, idx) in fields" :key="field.key" class="grid grid-cols-12 gap-3 p-3 bg-gray-50 rounded-lg">
-              <div class="col-span-5">
+          <div class="space-y-3 border-t pt-4">
+            <div v-for="(field, idx) in fields" :key="field.key" class="grid grid-cols-12 gap-3">
+              <div class="col-span-6">
                 <FormField v-slot="{ componentField }" :name="`items[${idx}].product_id`">
                   <FormItem>
                     <FormLabel class="text-xs">{{ t("fields.product") }}</FormLabel>
@@ -152,7 +150,7 @@ function addItem() {
                         v-bind="componentField"
                         disabled
                         :value="invoiceItems[idx]?.product_name || ''"
-                        class="bg-gray-100"
+                        class="bg-slate-50"
                       />
                     </FormControl>
                   </FormItem>
@@ -181,43 +179,39 @@ function addItem() {
                 </FormField>
               </div>
 
-              <div class="col-span-2 flex items-end">
-                <button
+              <div class="col-span-1 flex items-end justify-center">
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
                   @click="remove(idx)"
-                  class="w-full px-2 py-1 text-red-600 hover:bg-red-50 rounded transition"
+                  class="text-red-600 hover:text-red-700"
                 >
-                  <Trash2 :size="16" class="mx-auto" />
-                </button>
+                  <Trash2 :size="16" />
+                </Button>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="border-t pt-4 space-y-3">
-          <div class="flex justify-between text-lg font-semibold">
+        <div class="border-t pt-4 space-y-2">
+          <div class="flex justify-between font-semibold">
             <span>{{ t("fields.subtotal") }}</span>
             <span>{{ formatMoney(subtotal) }}</span>
           </div>
         </div>
+      </CardContent>
 
-        <div class="flex gap-3 justify-end">
-          <button
-            type="button"
-            @click="close"
-            class="px-4 py-2 border rounded-lg hover:bg-gray-50"
-          >
+      <div class="card-modal-footer">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+          <Button type="button" variant="outline" @click="close">
             {{ t("buttons.cancel") }}
-          </button>
-          <button
-            type="submit"
-            :disabled="isPosting"
-            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-          >
+          </Button>
+          <Button type="submit" :disabled="isPosting">
             {{ isPosting ? t("buttons.creating") : t("buttons.create") }}
-          </button>
+          </Button>
         </div>
-      </form>
-    </div>
-  </div>
+      </div>
+    </Card>
+  </form>
 </template>
