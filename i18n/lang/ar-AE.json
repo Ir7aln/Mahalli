@@ -13,6 +13,7 @@
     "orders": "الطلبات",
     "delivery-notes": "سندات التسليم",
     "invoices": "الفواتير",
+    "credit-notes": "إشعارات الخصم",
     "inventory": "المخزون",
     "dashboard": "لوحة التحكم",
     "settings": "الإعدادات",
@@ -39,6 +40,8 @@
     "to-order": "إنشاء طلب",
     "to-delivery-note": "إنشاء سند تسليم",
     "to-invoice": "إنشاء فاتورة",
+    "create-invoice": "إنشاء فاتورة",
+    "create-credit-note": "إنشاء إشعار خصم",
     "inventory-update": "تحديث المخزون",
     "generate-invoice": "إنشاء الفاتورة",
     "generate-order": "إنشاء الطلب",
@@ -119,7 +122,10 @@
     "ice": "ICE",
     "if-number": "IF",
     "rc": "RC",
-    "patente": "Patente / TP"
+    "patente": "Patente / TP",
+    "reason": "السبب",
+    "contact": "جهات الاتصال",
+    "legal-identifiers": "المعرفات القانونية"
   },
   "placeholders": {
     "select-client": "اختر عميلاً",
@@ -265,6 +271,9 @@
     "delivery-note": {
       "created": "تم إنشاء سند التسليم"
     },
+    "credit-note": {
+      "created": "تم إنشاء إشعار الخصم"
+    },
     "invoice": {
       "created": "تم إنشاء فاتورة",
       "updated": "تم تحديث الفاتورة",
@@ -305,6 +314,8 @@
       "delivery-note-not-found": "تعذر العثور على سند التسليم.",
       "delivery-note-order-not-found": "تعذر العثور على الطلب المرتبط بسند التسليم هذا.",
       "delivery-note-inventory-missing": "تعذر العثور على حركة المخزون المرتبطة بسند التسليم هذا.",
+      "credit-note-not-found": "تعذر العثور على إشعار الخصم.",
+      "credit-note-invoice-not-found": "تعذر العثور على الفاتورة المرتبطة بإشعار الخصم هذا.",
       "invoice-not-found": "تعذر العثور على الفاتورة.",
       "invoice-payment-date-invalid": "تاريخ الدفعة غير صالح.",
       "invoice-payment-amount-invalid": "يجب أن يكون مبلغ الدفعة أكبر من صفر.",

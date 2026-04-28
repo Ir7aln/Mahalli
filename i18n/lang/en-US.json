@@ -13,6 +13,7 @@
     "orders": "Orders",
     "delivery-notes": "Delivery notes",
     "invoices": "Invoices",
+    "credit-notes": "Credit notes",
     "inventory": "Inventory",
     "dashboard": "Dashboard",
     "settings": "Settings",
@@ -39,6 +40,8 @@
     "to-order": "Create order",
     "to-delivery-note": "Create delivery note",
     "to-invoice": "Create invoice",
+    "create-invoice": "Create invoice",
+    "create-credit-note": "Create credit note",
     "inventory-update": "Update inventory",
     "generate-invoice": "Generate invoice",
     "generate-order": "Generate order",
@@ -119,7 +122,10 @@
     "ice": "ICE",
     "if-number": "IF",
     "rc": "RC",
-    "patente": "Patente / TP"
+    "patente": "Patente / TP",
+    "reason": "Reason",
+    "contact": "Contact",
+    "legal-identifiers": "Legal Identifiers"
   },
   "placeholders": {
     "select-client": "Select a client",
@@ -266,6 +272,9 @@
     "delivery-note": {
       "created": "A delivery note has been created"
     },
+    "credit-note": {
+      "created": "A credit note has been created"
+    },
     "invoice": {
       "created": "An Invoice has been created",
       "updated": "The Invoice has been updated",
@@ -306,6 +315,8 @@
       "delivery-note-not-found": "The delivery note could not be found.",
       "delivery-note-order-not-found": "The source order for this delivery note could not be found.",
       "delivery-note-inventory-missing": "A linked stock movement for this delivery note could not be found.",
+      "credit-note-not-found": "The credit note could not be found.",
+      "credit-note-invoice-not-found": "The invoice for this credit note could not be found.",
       "invoice-not-found": "The invoice could not be found.",
       "invoice-payment-date-invalid": "The payment date is invalid.",
       "invoice-payment-amount-invalid": "The payment amount must be greater than zero.",

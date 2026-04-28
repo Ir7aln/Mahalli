@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { commands, type InvoiceProductItem, type SelectInvoices } from "@/bindings";
-import { CircleDollarSign, FilePenLine, GripHorizontal, Printer, Trash2 } from "lucide-vue-next";
+import { CircleDollarSign, FilePenLine, GripHorizontal, Printer, Trash2, ReceiptText } from "lucide-vue-next";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
 import { InvoiceAddPayment, InvoiceDelete, InvoiceUpdate } from "#components";
@@ -342,6 +342,10 @@ async function updateInvoiceStatus(id: string, status: string) {
                     </NuxtLink>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem :disabled="invoice.status !== 'FINALIZED'">
+                    <ReceiptText :size="20" class="text-slate-800 inline mr-2" />
+                    {{ t("buttons.create-credit-note") }}
+                  </DropdownMenuItem>
                   <DropdownMenuItem @click="toggleThisInvoice(invoice, 'delete')">
                     <Trash2 :size="20" class="text-red-500 inline mr-2" />
                     <span class="text-red-500">

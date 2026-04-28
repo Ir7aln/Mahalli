@@ -5,6 +5,7 @@ use tenant_service::sea_orm::{DbErr, TransactionError};
 
 pub mod clients;
 pub mod column_preferences;
+pub mod credit_notes;
 pub mod dashboard;
 pub mod databases;
 pub mod delivery_notes;
@@ -172,6 +173,14 @@ fn map_error_details(raw: &str) -> (&'static str, &'static str, String) {
         );
     }
 
+    if normalized.contains("credit note") && normalized.contains("not found") {
+        return (
+            "CREDIT_NOTE_NOT_FOUND",
+            "notifications.errors.credit-note-not-found",
+            String::from("The credit note could not be found."),
+        );
+    }
+
     if normalized.contains("delivery note inventory transaction missing") {
         return (
             "DELIVERY_NOTE_INVENTORY_MISSING",
@@ -181,6 +190,13 @@ fn map_error_details(raw: &str) -> (&'static str, &'static str, String) {
     }
 
     if normalized.contains("no invoice") || normalized.contains("invoice not found") {
+        if normalized.contains("credit note") {
+            return (
+                "CREDIT_NOTE_INVOICE_NOT_FOUND",
+                "notifications.errors.credit-note-invoice-not-found",
+                String::from("The invoice for this credit note could not be found."),
+            );
+        }
         return (
             "INVOICE_NOT_FOUND",
             "notifications.errors.invoice-not-found",

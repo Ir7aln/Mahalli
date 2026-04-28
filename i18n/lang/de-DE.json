@@ -13,6 +13,7 @@
     "orders": "Bestellungen",
     "delivery-notes": "Lieferscheine",
     "invoices": "Rechnungen",
+    "credit-notes": "Gutschriften",
     "inventory": "Lagerbestand",
     "dashboard": "Dashboard",
     "settings": "Einstellungen",
@@ -39,6 +40,8 @@
     "to-order": "Bestellung erstellen",
     "to-delivery-note": "Lieferschein erstellen",
     "to-invoice": "Rechnung erstellen",
+    "create-invoice": "Rechnung erstellen",
+    "create-credit-note": "Gutschrift erstellen",
     "inventory-update": "Lagerbestand aktualisieren",
     "generate-invoice": "Rechnung erstellen",
     "generate-order": "Bestellung erstellen",
@@ -119,7 +122,10 @@
     "ice": "ICE",
     "if-number": "IF",
     "rc": "RC",
-    "patente": "Patente / TP"
+    "patente": "Patente / TP",
+    "reason": "Grund",
+    "contact": "Kontakt",
+    "legal-identifiers": "Rechtliche Identifikatoren"
   },
   "placeholders": {
     "select-client": "Wählen Sie einen Kunden",
@@ -266,6 +272,9 @@
     "delivery-note": {
       "created": "Ein Lieferschein wurde erstellt"
     },
+    "credit-note": {
+      "created": "Eine Gutschrift wurde erstellt"
+    },
     "invoice": {
       "created": "Eine Rechnung wurde erstellt",
       "updated": "Die Rechnung wurde aktualisiert",
@@ -306,6 +315,8 @@
       "delivery-note-not-found": "Der Lieferschein wurde nicht gefunden.",
       "delivery-note-order-not-found": "Die Ausgangsbestellung für diesen Lieferschein wurde nicht gefunden.",
       "delivery-note-inventory-missing": "Eine verknüpfte Lagerbewegung für diesen Lieferschein wurde nicht gefunden.",
+      "credit-note-not-found": "Die Gutschrift wurde nicht gefunden.",
+      "credit-note-invoice-not-found": "Die Rechnung für diese Gutschrift wurde nicht gefunden.",
       "invoice-not-found": "Die Rechnung wurde nicht gefunden.",
       "invoice-payment-date-invalid": "Das Zahlungsdatum ist ungültig.",
       "invoice-payment-amount-invalid": "Der Zahlungsbetrag muss größer als null sein.",

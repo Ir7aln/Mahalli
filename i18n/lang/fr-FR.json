@@ -13,6 +13,7 @@
     "orders": "Commandes",
     "delivery-notes": "Bons de livraison",
     "invoices": "Factures",
+    "credit-notes": "Avoirs",
     "inventory": "Inventaire",
     "dashboard": "Tableau de bord",
     "settings": "Paramètres",
@@ -39,6 +40,8 @@
     "to-order": "Créer une commande",
     "to-delivery-note": "Créer un bon de livraison",
     "to-invoice": "Créer une facture",
+    "create-invoice": "Créer une facture",
+    "create-credit-note": "Créer un avoir",
     "inventory-update": "Mettre à jour l'inventaire",
     "generate-invoice": "Générer la facture",
     "generate-order": "Générer la commande",
@@ -119,7 +122,10 @@
     "ice": "ICE",
     "if-number": "IF",
     "rc": "RC",
-    "patente": "Patente / TP"
+    "patente": "Patente / TP",
+    "reason": "Motif",
+    "contact": "Contact",
+    "legal-identifiers": "Identifiants légaux"
   },
   "placeholders": {
     "select-client": "Sélectionnez un client",
@@ -265,6 +271,9 @@
     "delivery-note": {
       "created": "Un bon de livraison a été créé"
     },
+    "credit-note": {
+      "created": "Un avoir a été créé"
+    },
     "invoice": {
       "created": "Une facture a été créée",
       "updated": "La facture a été mise à jour",
@@ -305,6 +314,8 @@
       "delivery-note-not-found": "Le bon de livraison est introuvable.",
       "delivery-note-order-not-found": "La commande source de ce bon de livraison est introuvable.",
       "delivery-note-inventory-missing": "Un mouvement de stock lié à ce bon de livraison est introuvable.",
+      "credit-note-not-found": "L'avoir est introuvable.",
+      "credit-note-invoice-not-found": "La facture de cet avoir est introuvable.",
       "invoice-not-found": "La facture est introuvable.",
       "invoice-payment-date-invalid": "La date du paiement est invalide.",
       "invoice-payment-amount-invalid": "Le montant du paiement doit être supérieur à zéro.",

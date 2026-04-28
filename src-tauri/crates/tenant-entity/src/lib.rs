@@ -3,6 +3,8 @@
 pub mod prelude;
 
 pub mod clients;
+pub mod credit_note_items;
+pub mod credit_notes;
 pub mod delivery_note_items;
 pub mod delivery_notes;
 pub mod inventory_transactions;
