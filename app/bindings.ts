@@ -29,6 +29,7 @@ export const commands = {
 	listDeliveryNotes: (args: ListDeliveryNotesArgs) => typedError<Success<DeliveryNotesResponse>, Fail>(__TAURI_INVOKE("list_delivery_notes", { args })),
 	listDeliveryNoteProducts: (id: string) => typedError<Success<DeliveryNoteProductItem[]>, Fail>(__TAURI_INVOKE("list_delivery_note_products", { id })),
 	createDeliveryNoteFromOrder: (id: string) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_delivery_note_from_order", { id })),
+	createCreditNote: (creditNote: CreateCreditNote) => typedError<Success<CreditNoteResponse>, Fail>(__TAURI_INVOKE("create_credit_note", { creditNote })),
 	listOrders: (args: ListOrdersArgs) => typedError<Success<OrdersResponse>, Fail>(__TAURI_INVOKE("list_orders", { args })),
 	getOrder: (id: string) => typedError<Success<OrderWithClient>, Fail>(__TAURI_INVOKE("get_order", { id })),
 	getOrderDetails: (id: string) => typedError<Success<OrderDetailsResponse>, Fail>(__TAURI_INVOKE("get_order_details", { id })),
@@ -56,8 +57,9 @@ export const commands = {
 	addInvoicePayment: (payment: AddInvoicePayment) => typedError<Success<string>, Fail>(__TAURI_INVOKE("add_invoice_payment", { payment })),
 	deleteInvoice: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_invoice", { id })),
 	listInvoiceProducts: (id: string) => typedError<Success<InvoiceProductItem[]>, Fail>(__TAURI_INVOKE("list_invoice_products", { id })),
-	createInvoiceFromOrder: (id: string) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_invoice_from_order", { id })),
+	createInvoiceFromDeliveryNote: (id: string) => typedError<Success<string>, Fail>(__TAURI_INVOKE("create_invoice_from_delivery_note", { id })),
 	updateInvoiceStatus: (invoice: UpdateInvoiceStatus) => typedError<Success<null>, Fail>(__TAURI_INVOKE("update_invoice_status", { invoice })),
+	finalizeInvoice: (id: string) => typedError<Success<null>, Fail>(__TAURI_INVOKE("finalize_invoice", { id })),
 	deleteInvoiceItem: (id: string) => typedError<Success<number>, Fail>(__TAURI_INVOKE("delete_invoice_item", { id })),
 	listInventoryStats: () => typedError<Success<SelectTransaction[]>, Fail>(__TAURI_INVOKE("list_inventory_stats")),
 	listTopClients: () => typedError<Success<SelectTops[]>, Fail>(__TAURI_INVOKE("list_top_clients")),
@@ -66,6 +68,8 @@ export const commands = {
 	listFinancialMetrics: () => typedError<Success<FinancialMetricsResponse>, Fail>(__TAURI_INVOKE("list_financial_metrics")),
 	getColumnPreferences: (page: string) => typedError<Success<ColumnPreference | null>, Fail>(__TAURI_INVOKE("get_column_preferences", { page })),
 	saveColumnPreferences: (args: SaveColumnPreferenceArgs) => typedError<Success<null>, Fail>(__TAURI_INVOKE("save_column_preferences", { args })),
+	getSellerProfile: () => typedError<Success<SellerProfileDTO>, Fail>(__TAURI_INVOKE("get_seller_profile")),
+	updateSellerProfile: (profile: UpdateSellerProfileDTO) => typedError<Success<SellerProfileDTO>, Fail>(__TAURI_INVOKE("update_seller_profile", { profile })),
 	seedDatabase: () => typedError<Success<null>, Fail>(__TAURI_INVOKE("seed_database")),
 };
 
@@ -125,10 +129,32 @@ export type ColumnPreference = {
 	visible_columns: string[],
 };
 
+export type CreateCreditNote = {
+	invoice_id: string,
+	reason: string | null,
+	items: CreditNoteItemInput[],
+};
+
 export type CreateTenantDatabaseRequest = {
 	name: string,
 	clone_from_database_id: string | null,
 	make_active: boolean,
+};
+
+export type CreditNoteItemInput = {
+	product_id: string,
+	quantity: number,
+	price: number,
+};
+
+export type CreditNoteResponse = {
+	id: string,
+	invoice_id: string,
+	client_id: string,
+	identifier: string | null,
+	reason: string | null,
+	created_at: string,
+	total: number,
 };
 
 export type DatabaseBootstrapStatus = {
@@ -496,6 +522,13 @@ export type SelectDeliveryNotes = {
 	created_at: string,
 	client_id: string,
 	full_name: string,
+	email: string | null,
+	phone_number: string | null,
+	address: string | null,
+	ice: string | null,
+	if_number: string | null,
+	rc: string | null,
+	patente: string | null,
 	identifier: string,
 	order_id: string,
 	order_identifier: string,
@@ -531,6 +564,13 @@ export type SelectInvoices = {
 	paid_amount: number,
 	client_id: string,
 	full_name: string,
+	email: string | null,
+	phone_number: string | null,
+	address: string | null,
+	ice: string | null,
+	if_number: string | null,
+	rc: string | null,
+	patente: string | null,
 	status: string,
 	identifier: string,
 	products: number,
@@ -557,6 +597,13 @@ export type SelectOrders = {
 	created_at: string,
 	client_id: string,
 	full_name: string,
+	email: string | null,
+	phone_number: string | null,
+	address: string | null,
+	ice: string | null,
+	if_number: string | null,
+	rc: string | null,
+	patente: string | null,
 	status: string,
 	identifier: string,
 	products: number,
@@ -595,6 +642,13 @@ export type SelectQuotes = {
 	created_at: string,
 	client_id: string,
 	full_name: string,
+	email: string | null,
+	phone_number: string | null,
+	address: string | null,
+	ice: string | null,
+	if_number: string | null,
+	rc: string | null,
+	patente: string | null,
 	products: number,
 	identifier: string,
 	total: number,
@@ -635,6 +689,24 @@ export type SelectTransaction = {
 	price: number,
 	quantity: number,
 	transaction_type: string,
+};
+
+export type SellerProfileDTO = {
+	id: string,
+	legal_name: string,
+	commercial_name: string | null,
+	address: string | null,
+	city: string | null,
+	phone_number: string | null,
+	email: string | null,
+	ice: string | null,
+	if_number: string | null,
+	rc: string | null,
+	patente: string | null,
+	logo: string | null,
+	default_currency: string,
+	default_payment_terms_days: number,
+	invoice_footer: string | null,
 };
 
 export type StatusCountResponse = {
@@ -701,6 +773,23 @@ export type UpdateQuoteItem = {
 	price: number,
 	quantity: number,
 	product_id: string,
+};
+
+export type UpdateSellerProfileDTO = {
+	legal_name: string | null,
+	commercial_name: string | null,
+	address: string | null,
+	city: string | null,
+	phone_number: string | null,
+	email: string | null,
+	ice: string | null,
+	if_number: string | null,
+	rc: string | null,
+	patente: string | null,
+	logo: string | null,
+	default_currency: string | null,
+	default_payment_terms_days: number | null,
+	invoice_footer: string | null,
 };
 
 /* Tauri Specta runtime */

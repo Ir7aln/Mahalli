@@ -9,7 +9,7 @@ use tenant_entity::{
     inventory_transactions::{self, ActiveModel as InventoryActiveModel},
     order_items::{self, ActiveModel as OrderItemActiveModel},
     orders::{self, ActiveModel as OrderActiveModel},
-    products, quote_items, quotes,
+    products, quote_items,
     prelude::*,
 };
 

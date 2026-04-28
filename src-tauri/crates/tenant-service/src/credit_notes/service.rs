@@ -5,9 +5,8 @@ use sea_orm::{
     TransactionTrait, ActiveModelTrait,
 };
 use tenant_entity::{
-    credit_note_items::{self, ActiveModel as CreditNoteItemActiveModel},
-    credit_notes::{self, ActiveModel as CreditNoteActiveModel},
-    invoices,
+    credit_note_items::ActiveModel as CreditNoteItemActiveModel,
+    credit_notes::ActiveModel as CreditNoteActiveModel,
     prelude::*,
 };
 

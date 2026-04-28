@@ -7,7 +7,6 @@ use tenant_entity::{
     clients,
     delivery_note_items::{self, ActiveModel as DeliveryNoteItemActiveModel},
     delivery_notes::{self, ActiveModel as DeliveryNoteActiveModel},
-    inventory_transactions,
     order_items, orders,
     products,
     prelude::*,

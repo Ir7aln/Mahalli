@@ -1,9 +1,6 @@
 use super::dto::*;
 use sea_orm::*;
-use tenant_entity::{
-    templates::{self, ActiveModel as TemplateActiveModel},
-    prelude::*,
-};
+use tenant_entity::templates::ActiveModel as TemplateActiveModel;
 
 pub struct TemplatesService;
 

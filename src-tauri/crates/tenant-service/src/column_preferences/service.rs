@@ -4,7 +4,7 @@ use sea_orm::{
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use tenant_entity::{
-    user_column_preferences::{self, ActiveModel as UserColumnPreferenceActiveModel},
+    user_column_preferences::{self},
     prelude::*,
 };
 

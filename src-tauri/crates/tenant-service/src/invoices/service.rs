@@ -9,12 +9,11 @@ use sea_orm::{
 };
 use tenant_entity::{
     clients,
-    delivery_note_items, delivery_notes,
-    inventory_transactions::{self, ActiveModel as InventoryActiveModel},
+    delivery_note_items,
+    inventory_transactions::ActiveModel as InventoryActiveModel,
     invoice_items::{self, ActiveModel as InvoiceItemActiveModel},
     invoice_payments::{self, ActiveModel as InvoicePaymentActiveModel},
-    invoices::{self, ActiveModel as InvoiceActiveModel},
-    order_items, orders::{self, ActiveModel as OrderActiveModel},
+    invoices::{self, ActiveModel as InvoiceActiveModel}, orders::ActiveModel as OrderActiveModel,
     products,
     prelude::*,
 };
