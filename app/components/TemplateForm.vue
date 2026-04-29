@@ -130,7 +130,7 @@ const onSubmit = handleSubmit(async (values) => {
 
         <div v-if="documentType !== 'quote' && documentType !== 'credit-note'" class="space-y-2">
           <FormField v-slot="{ value, handleChange }" name="fields.status">
-            <FormItem class="flex justify-between items-end space-y-0">
+            <FormItem class="flex justify-between items-center space-y-0 rtl:flex-row-reverse">
               <FormLabel>{{ t("fields.status") }}</FormLabel>
               <FormControl>
                 <Switch :checked="value" @update:checked="handleChange" />
@@ -158,7 +158,7 @@ const onSubmit = handleSubmit(async (values) => {
 
         <div class="space-y-2">
           <FormField v-slot="{ value, handleChange }" name="fields.vat">
-            <FormItem class="flex justify-between items-end space-y-0">
+            <FormItem class="flex justify-between items-center space-y-0 rtl:flex-row-reverse">
               <FormLabel>{{ t("fields.vat-rate") }}</FormLabel>
               <FormControl>
                 <Switch :checked="value" @update:checked="handleChange" />
@@ -181,7 +181,7 @@ const onSubmit = handleSubmit(async (values) => {
 
         <div v-for="item in CLIENT_FIELDS" :key="item.field" class="space-y-2">
           <FormField v-slot="{ value, handleChange }" :name="`fields.${item.field}`">
-            <FormItem class="flex justify-between items-end space-y-0">
+            <FormItem class="flex justify-between items-center space-y-0 rtl:flex-row-reverse">
               <FormLabel>{{ t(`fields.${item.label}`) }}</FormLabel>
               <FormControl>
                 <Switch :checked="value" @update:checked="handleChange" />
