@@ -85,152 +85,134 @@ export function usePdfGenerator() {
 
   const styles = {
     page: (rtl: boolean) => ({
-      paddingTop: config.marginTop,
-      paddingBottom: config.marginBottom,
-      paddingHorizontal: config.marginX,
+      paddingTop: 30,
+      paddingBottom: 30,
+      paddingHorizontal: 28,
       fontSize: 10,
-      color: "#0f172a",
+      color: "#111827",
       fontFamily: "Cairo",
       direction: rtl ? "rtl" : "ltr",
+      backgroundColor: "#ffffff",
     }),
 
-    section: {
-      marginBottom: 14,
-    },
+    header: (rtl: boolean) => ({
+      flexDirection: rtl ? "row-reverse" : "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 18,
+    }),
 
     title: (rtl: boolean) => ({
-      ...baseText,
-      fontSize: 20,
-      fontWeight: 700,
-      marginBottom: 2,
+      fontSize: 28,
+      fontWeight: 600,
+      color: "#111827",
+      textAlign: rtl ? "right" : "left",
+      letterSpacing: 1,
+    }),
+
+    logo: {
+      width: 90,
+      height: "auto",
+    },
+
+    section: {
+      marginBottom: 18,
+    },
+
+    sectionTitle: (rtl: boolean) => ({
+      fontSize: 12,
+      fontWeight: 600,
+      color: "#1f2937",
+      borderBottomWidth: 1,
+      borderBottomColor: "#e5e7eb",
+      paddingBottom: 4,
+      marginBottom: 8,
+      textAlign: rtl ? "right" : "left",
+    }),
+
+    text: (rtl: boolean) => ({
+      fontSize: 10,
+      color: "#374151",
+      marginBottom: 3,
       textAlign: rtl ? "right" : "left",
     }),
 
     muted: (rtl: boolean) => ({
-      ...baseText,
-      fontSize: 8.5,
-      color: "#475569",
+      fontSize: 9,
+      color: "#6b7280",
       textAlign: rtl ? "right" : "left",
     }),
 
-    label: (rtl: boolean) => ({
-      ...baseText,
-      fontSize: 8,
-      color: "#64748b",
-      textTransform: "uppercase",
-      letterSpacing: 0.6,
-      textAlign: rtl ? "right" : "left",
-    }),
-
-    value: (rtl: boolean) => ({
-      ...baseText,
-      fontSize: 9.5,
-      color: "#0f172a",
-      fontWeight: 500,
-      textAlign: rtl ? "left" : "right",
-    }),
-
-    divider: {
-      borderBottomWidth: 1,
-      borderBottomColor: "#cbd5e1",
-      marginTop: 8,
-      marginBottom: 10,
-    },
-
-    cols: (rtl: boolean) => ({
+    grid: (rtl: boolean) => ({
       flexDirection: rtl ? "row-reverse" : "row",
-      gap: 12,
-      marginBottom: 10,
+      gap: 20,
+      marginBottom: 12,
     }),
 
     col: {
       width: "50%",
     },
 
-    block: {
-      borderWidth: 1,
-      borderColor: "#e2e8f0",
-      paddingTop: 8,
-      paddingBottom: 6,
-      paddingHorizontal: 8,
-      borderRadius: 0,
-      marginBottom: 10,
-      backgroundColor: "#f8fafc",
-      minHeight: 96,
-    },
-
-    sectionTitle: (rtl: boolean) => ({
-      ...baseText,
-      fontSize: 8,
-      color: "#64748b",
-      textTransform: "uppercase",
-      letterSpacing: 0.6,
-      marginBottom: 6,
-      textAlign: rtl ? "right" : "left",
-    }),
-
-    row: (rtl: boolean) => ({
-      flexDirection: rtl ? "row-reverse" : "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 4,
-    }),
-
     tableHeader: (rtl: boolean) => ({
       flexDirection: rtl ? "row-reverse" : "row",
+      paddingBottom: 6,
+      marginBottom: 4,
       borderBottomWidth: 1,
-      borderBottomColor: "#94a3b8",
-      borderTopWidth: 1,
-      borderTopColor: "#94a3b8",
-      paddingTop: 5,
-      paddingBottom: 5,
-      marginBottom: 2,
-      fontSize: 8.5,
+      borderBottomColor: "#d1d5db",
+      fontSize: 10,
       fontWeight: 600,
-      color: "#1e293b",
-      fontFamily: "Cairo",
+      color: "#111827",
     }),
 
     tableRow: (rtl: boolean) => ({
       flexDirection: rtl ? "row-reverse" : "row",
-      borderBottomWidth: 1,
-      borderBottomColor: "#e2e8f0",
-      paddingVertical: 5,
-      fontSize: 9,
-      fontFamily: "Cairo",
+      paddingVertical: 6,
+      fontSize: 10,
+      color: "#374151",
     }),
 
     cellName: (rtl: boolean) => ({
-      ...baseText,
-      width: "42%",
+      width: "45%",
       textAlign: rtl ? "right" : "left",
     }),
 
     cellQty: {
-      ...baseText,
-      width: "18%",
+      width: "15%",
       textAlign: "right",
     },
 
     cellPrice: {
-      ...baseText,
       width: "20%",
       textAlign: "right",
     },
 
     cellTotal: {
-      ...baseText,
       width: "20%",
       textAlign: "right",
     },
 
     totals: (rtl: boolean) => ({
-      marginTop: 10,
+      marginTop: 20,
       alignSelf: rtl ? "flex-start" : "flex-end",
-      width: "50%",
+      width: "45%",
+    }),
+
+    totalRow: (rtl: boolean) => ({
+      flexDirection: rtl ? "row-reverse" : "row",
+      justifyContent: "space-between",
+      marginBottom: 6,
+      fontSize: 11,
+    }),
+
+    totalFinal: (rtl: boolean) => ({
+      flexDirection: rtl ? "row-reverse" : "row",
+      justifyContent: "space-between",
+      marginTop: 8,
+      paddingTop: 6,
       borderTopWidth: 1,
-      borderTopColor: "#94a3b8",
-      paddingTop: 7,
+      borderTopColor: "#9ca3af",
+      fontSize: 12,
+      fontWeight: 600,
     }),
 
     bgTemplate: {
@@ -273,9 +255,6 @@ export function usePdfGenerator() {
         {
           title: data.identifier ?? type,
           author: "Mahalli",
-          subject: type,
-          creator: "Mahalli",
-          producer: "Mahalli",
         },
         () => [
           h(Page, { size: "A4", style: styles.page(rtl) }, () => [
@@ -283,78 +262,72 @@ export function usePdfGenerator() {
               ? h(Image, { src: templateImage, style: styles.bgTemplate })
               : null,
 
+            // 🔥 HEADER
+            h(View, { style: styles.header(rtl) }, () => [
+              h(View, {}, () => [
+                h(Text, { style: styles.title(rtl) }, type.toUpperCase()),
+                h(Text, { style: styles.muted(rtl) }, safeText(data.identifier)),
+                h(Text, { style: styles.muted(rtl) }, safeText(createdAtLabel)),
+              ]),
+
+              templateImage
+                ? h(Image, { src: templateImage, style: styles.logo })
+                : null,
+            ]),
+
+            // 🔥 CUSTOMER + META GRID
+            h(View, { style: styles.grid(rtl) }, () => [
+              // LEFT - CUSTOMER
+              h(View, { style: styles.col }, () => [
+                h(Text, { style: styles.sectionTitle(rtl) }, t("fields.bill-to")),
+
+                h(Text, { style: styles.text(rtl) },
+                  safeText(data.client?.full_name ?? data.full_name)
+                ),
+
+                config.fields.email
+                  ? h(Text, { style: styles.text(rtl) },
+                      safeText(data.client?.email ?? data.email))
+                  : null,
+
+                config.fields.phone_number
+                  ? h(Text, { style: styles.text(rtl) },
+                      safeText(data.client?.phone_number ?? data.phone_number))
+                  : null,
+
+                config.fields.address
+                  ? h(Text, { style: styles.text(rtl) },
+                      safeText(data.client?.address ?? data.address))
+                  : null,
+              ]),
+
+              // RIGHT - META
+              h(View, { style: styles.col }, () => [
+                h(Text, { style: styles.sectionTitle(rtl) }, t("fields.configuration")),
+
+                config.fields.status
+                  ? h(Text, { style: styles.text(rtl) },
+                      `${t("fields.status")}: ${safeText(statusLabel)}`)
+                  : null,
+
+                h(Text, { style: styles.text(rtl) },
+                  `${t("fields.date")}: ${safeText(createdAtLabel)}`),
+
+                h(Text, { style: styles.text(rtl) }, "MAD"),
+              ]),
+            ]),
+
+            // 🔥 TABLE
             h(View, { style: styles.section }, () => [
-              h(Text, { style: styles.muted(rtl) }, safeText(t(`routes.${type}s`))),
-              h(Text, { style: styles.title(rtl) }, safeText(data.identifier)),
-              h(Text, { style: styles.muted(rtl) }, safeText(createdAtLabel)),
-              h(View, { style: styles.divider }),
-            ]),
-
-            h(View, { style: styles.cols(rtl) }, () => [
-              h(View, { style: styles.col }, () => [
-                h(View, { style: styles.block }, () => [
-                  h(Text, { style: styles.sectionTitle(rtl) }, safeText(t("fields.bill-to"))),
-
-                  h(View, { style: styles.row(rtl) }, [
-                    h(Text, { style: styles.label(rtl) }, safeText(t("fields.full-name"))),
-                    h(Text, { style: styles.value(rtl) }, safeText(data.client?.full_name ?? data.full_name)),
-                  ]),
-
-                  config.fields.email
-                    ? h(View, { style: styles.row(rtl) }, [
-                        h(Text, { style: styles.label(rtl) }, safeText(t("fields.email"))),
-                        h(Text, { style: styles.value(rtl) }, safeText(data.client?.email ?? data.email)),
-                      ])
-                    : null,
-
-                  config.fields.phone_number
-                    ? h(View, { style: styles.row(rtl) }, [
-                        h(Text, { style: styles.label(rtl) }, safeText(t("fields.phone"))),
-                        h(Text, { style: styles.value(rtl) }, safeText(data.client?.phone_number ?? data.phone_number)),
-                      ])
-                    : null,
-
-                  config.fields.address
-                    ? h(View, { style: styles.row(rtl) }, [
-                        h(Text, { style: styles.label(rtl) }, safeText(t("fields.address"))),
-                        h(Text, { style: styles.value(rtl) }, safeText(data.client?.address ?? data.address)),
-                      ])
-                    : null,
-                ]),
-              ]),
-
-              h(View, { style: styles.col }, () => [
-                h(View, { style: styles.block }, () => [
-                  h(Text, { style: styles.sectionTitle(rtl) }, safeText(t("fields.configuration"))),
-
-                  config.fields.status
-                    ? h(View, { style: styles.row(rtl) }, [
-                        h(Text, { style: styles.label(rtl) }, safeText(t("fields.status"))),
-                        h(Text, { style: styles.value(rtl) }, safeText(statusLabel)),
-                      ])
-                    : null,
-
-                  h(View, { style: styles.row(rtl) }, [
-                    h(Text, { style: styles.label(rtl) }, safeText(t("fields.date"))),
-                    h(Text, { style: styles.value(rtl) }, safeText(createdAtLabel)),
-                  ]),
-
-                  h(View, { style: styles.row(rtl) }, [
-                    h(Text, { style: styles.label(rtl) }, safeText(t("fields.currency"))),
-                    h(Text, { style: styles.value(rtl) }, "MAD"),
-                  ]),
-                ]),
-              ]),
-            ]),
-
-            h(View, {}, () => [
+              // HEADER
               h(View, { style: styles.tableHeader(rtl) }, () => [
-                h(Text, { style: styles.cellName(rtl) }, safeText(t("fields.product"))),
-                h(Text, { style: styles.cellQty }, safeText(t("fields.quantity"))),
-                h(Text, { style: styles.cellPrice }, safeText(t("fields.price"))),
-                h(Text, { style: styles.cellTotal }, safeText(t("fields.total"))),
+                h(Text, { style: styles.cellName(rtl) }, t("fields.product")),
+                h(Text, { style: styles.cellQty }, t("fields.quantity")),
+                h(Text, { style: styles.cellPrice }, t("fields.price")),
+                h(Text, { style: styles.cellTotal }, t("fields.total")),
               ]),
 
+              // ROWS
               ...items.map((item: any) => {
                 const quantity = Number(item.quantity ?? 0);
                 const price = Number(item.price ?? 0);
@@ -369,22 +342,27 @@ export function usePdfGenerator() {
               }),
             ]),
 
+            // 🔥 TOTALS
             h(View, { style: styles.totals(rtl) }, () => [
-              h(View, { style: styles.row(rtl) }, [
-                h(Text, { style: baseText }, safeText(t("fields.subtotal"))),
-                h(Text, { style: baseText }, n(subtotal, "currency")),
+              h(View, { style: styles.totalRow(rtl) }, [
+                h(Text, {}, t("fields.subtotal")),
+                h(Text, {}, n(subtotal, "currency")),
               ]),
 
               config.fields.vat
-                ? h(View, { style: styles.row(rtl) }, [
-                    h(Text, { style: baseText }, `${safeText(t("fields.vat-rate"))} (${config.vat}%)`),
-                    h(Text, { style: baseText }, n(subtotal * (Number(config.vat) / 100), "currency")),
+                ? h(View, { style: styles.totalRow(rtl) }, [
+                    h(Text, {}, `${t("fields.vat-rate")} (${config.vat}%)`),
+                    h(Text, {}, n(subtotal * (config.vat / 100), "currency")),
                   ])
                 : null,
 
-              h(View, { style: styles.row(rtl) }, [
-                h(Text, { style: baseText }, safeText(t("fields.total"))),
-                h(Text, { style: baseText }, n(totalWithVat, "currency")),
+              h(View, { style: styles.totalFinal(rtl) }, [
+                h(Text, {}, t("fields.total")),
+                h(Text, {}, n(totalWithVat, "currency")),
+              ]),
+
+              h(View, { style: styles.totalFinal(rtl) }, [
+                h(Text, {}, useTotalAsText().numberToText(totalWithVat, locale.value)),
               ]),
             ]),
           ]),

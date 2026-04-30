@@ -85,7 +85,12 @@ function toggleSort(key: string) {
             <div class="flex items-center justify-between gap-3">
               <span class="min-w-0 truncate">{{ tx?.name }}</span>
               <div
-                v-if="tx.order_identifier || tx.invoice_identifier || tx.quote_identifier || tx.credit_note_identifier"
+                v-if="
+                  tx.order_identifier ||
+                  tx.invoice_identifier ||
+                  tx.quote_identifier ||
+                  tx.credit_note_identifier
+                "
                 class="flex shrink-0 flex-wrap justify-end gap-2 text-xs font-normal"
               >
                 <NuxtLink

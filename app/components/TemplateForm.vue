@@ -40,12 +40,7 @@ const ConfigSchema = z.object({
   }),
   documentValues: z.object({
     status: z
-      .enum([
-        ...INVOICE_STATUSES,
-        ...ORDER_STATUSES,
-        ...QUOTE_STATUSES,
-        ...DELIVERY_NOTE_STATUSES,
-      ])
+      .enum([...INVOICE_STATUSES, ...ORDER_STATUSES, ...QUOTE_STATUSES, ...DELIVERY_NOTE_STATUSES])
       .optional(),
     client: z.object({
       full_name: z.string().optional(),

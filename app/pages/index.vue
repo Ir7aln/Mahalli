@@ -144,9 +144,13 @@ const { data: inventoryData } = await useAsyncData("home-inventory", async () =>
 const recentInvoices = computed<SelectInvoices[]>(() => invoicesData.value?.invoices ?? []);
 const recentOrders = computed<SelectOrders[]>(() => ordersData.value?.orders ?? []);
 const recentQuotes = computed<SelectQuotes[]>(() => quotesData.value?.quotes ?? []);
-const recentDeliveryNotes = computed<SelectDeliveryNotes[]>(() => deliveryNotesData.value?.delivery_notes ?? []);
+const recentDeliveryNotes = computed<SelectDeliveryNotes[]>(
+  () => deliveryNotesData.value?.delivery_notes ?? [],
+);
 const recentCreditNotes = computed<CreditNoteResponse[]>(() => creditNotesData.value?.notes ?? []);
-const recentInventoryMovements = computed<SelectInventory[]>(() => inventoryData.value?.inventory ?? []);
+const recentInventoryMovements = computed<SelectInventory[]>(
+  () => inventoryData.value?.inventory ?? [],
+);
 
 const summaryCards = computed(() => [
   {
@@ -219,7 +223,9 @@ const quickActions = [
       <div class="p-4">
         <div class="grid gap-3 sm:grid-cols-2">
           <div class="border border-slate-200 rounded-sm p-4 bg-white">
-            <p class="text-xs uppercase tracking-wide text-slate-500">{{ t("dashboard.revenue") }}</p>
+            <p class="text-xs uppercase tracking-wide text-slate-500">
+              {{ t("dashboard.revenue") }}
+            </p>
             <p class="text-2xl mt-2 font-semibold text-emerald-700">
               {{ n(toNumber(financials?.current_revenue), "currency") }}
             </p>
@@ -232,7 +238,9 @@ const quickActions = [
             </p>
           </div>
           <div class="border border-slate-200 rounded-sm p-4 bg-white">
-            <p class="text-xs uppercase tracking-wide text-slate-500">{{ t("dashboard.expenses") }}</p>
+            <p class="text-xs uppercase tracking-wide text-slate-500">
+              {{ t("dashboard.expenses") }}
+            </p>
             <p class="text-2xl mt-2 font-semibold text-rose-700">
               {{ n(toNumber(financials?.current_expenses), "currency") }}
             </p>

@@ -22,7 +22,7 @@ const { close } = useModal();
       </div>
     </div>
     <CardContent class="card-modal-body">
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-3 gap-2">
         <NuxtLink :class="buttonVariants({ variant: 'ghost' })" :to="switchLocalePath('en')">
           <span class="w-3/5 items-center h-full text-start flex justify-center gap-2">
             <span class="py-2 w-8">

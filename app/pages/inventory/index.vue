@@ -99,7 +99,7 @@ const activeFilters = computed(
         ? {
             key: "source_type",
             label: t("fields.order"),
-            value: t(`routes.${sourceType.value.toLowerCase().replace('_', '-')}`),
+            value: t(`routes.${sourceType.value.toLowerCase().replace("_", "-")}`),
           }
         : null,
       createdFrom.value
@@ -150,7 +150,16 @@ const debouncedFilters = useDebounceFn(() => {
 
 watch(searchQuery, debouncedSearch);
 watch(
-  [transactionType, sourceType, createdFrom, createdTo, quantityMin, quantityMax, priceMin, priceMax],
+  [
+    transactionType,
+    sourceType,
+    createdFrom,
+    createdTo,
+    quantityMin,
+    quantityMax,
+    priceMin,
+    priceMax,
+  ],
   debouncedFilters,
 );
 

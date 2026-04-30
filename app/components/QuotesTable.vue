@@ -28,7 +28,14 @@ const sortDirection = computed(() =>
 
 const visibleCols = computed(
   () =>
-    props.visibleColumns ?? ["identifier", "full_name", "status", "products", "created_at", "total"],
+    props.visibleColumns ?? [
+      "identifier",
+      "full_name",
+      "status",
+      "products",
+      "created_at",
+      "total",
+    ],
 );
 
 function toggleSort(key: string) {
