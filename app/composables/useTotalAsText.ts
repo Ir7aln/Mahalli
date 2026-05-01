@@ -51,14 +51,14 @@ export function useTotalAsText() {
     const tens = Math.floor(remainder / 10);
     const ones = remainder % 10;
 
-    if (hundreds > 0) parts.push(arabicHundreds[hundreds]);
+    if (hundreds > 0) parts.push(arabicHundreds[hundreds]!);
 
     if (remainder > 0) {
       if (remainder < 20) {
-        parts.push(arabicOnes[remainder]);
+        parts.push(arabicOnes[remainder]!);
       } else {
-        if (ones > 0) parts.push(arabicOnes[ones]);
-        if (tens > 1) parts.push(arabicTens[tens]);
+        if (ones > 0) parts.push(arabicOnes[ones]!);
+        if (tens > 1) parts.push(arabicTens[tens]!);
       }
     }
 

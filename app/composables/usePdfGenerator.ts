@@ -91,14 +91,14 @@ export function usePdfGenerator() {
       fontSize: 10,
       color: "#111827",
       fontFamily: "Cairo",
-      direction: rtl ? "rtl" : "ltr",
+      direction: (rtl ? "rtl" : "ltr") as "rtl" | "ltr",
       backgroundColor: "#ffffff",
     }),
 
     header: (rtl: boolean) => ({
-      flexDirection: rtl ? "row-reverse" : "row",
-      justifyContent: "space-between",
-      alignItems: "center",
+      flexDirection: (rtl ? "row-reverse" : "row") as "row-reverse" | "row",
+      justifyContent: "space-between" as const,
+      alignItems: "center" as const,
       marginBottom: 18,
     }),
 
@@ -106,7 +106,7 @@ export function usePdfGenerator() {
       fontSize: 28,
       fontWeight: 600,
       color: "#111827",
-      textAlign: rtl ? "right" : "left",
+      textAlign: (rtl ? "right" : "left") as "right" | "left",
       letterSpacing: 1,
     }),
 
@@ -127,24 +127,24 @@ export function usePdfGenerator() {
       borderBottomColor: "#e5e7eb",
       paddingBottom: 4,
       marginBottom: 8,
-      textAlign: rtl ? "right" : "left",
+      textAlign: (rtl ? "right" : "left") as "right" | "left",
     }),
 
     text: (rtl: boolean) => ({
       fontSize: 10,
       color: "#374151",
       marginBottom: 3,
-      textAlign: rtl ? "right" : "left",
+      textAlign: (rtl ? "right" : "left") as "right" | "left",
     }),
 
     muted: (rtl: boolean) => ({
       fontSize: 9,
       color: "#6b7280",
-      textAlign: rtl ? "right" : "left",
+      textAlign: (rtl ? "right" : "left") as "right" | "left",
     }),
 
     grid: (rtl: boolean) => ({
-      flexDirection: rtl ? "row-reverse" : "row",
+      flexDirection: (rtl ? "row-reverse" : "row") as "row-reverse" | "row",
       gap: 20,
       marginBottom: 12,
     }),
@@ -154,7 +154,7 @@ export function usePdfGenerator() {
     },
 
     tableHeader: (rtl: boolean) => ({
-      flexDirection: rtl ? "row-reverse" : "row",
+      flexDirection: (rtl ? "row-reverse" : "row") as "row-reverse" | "row",
       paddingBottom: 6,
       marginBottom: 4,
       borderBottomWidth: 1,
@@ -165,7 +165,7 @@ export function usePdfGenerator() {
     }),
 
     tableRow: (rtl: boolean) => ({
-      flexDirection: rtl ? "row-reverse" : "row",
+      flexDirection: (rtl ? "row-reverse" : "row") as "row-reverse" | "row",
       paddingVertical: 6,
       fontSize: 10,
       color: "#374151",
@@ -173,7 +173,7 @@ export function usePdfGenerator() {
 
     cellName: (rtl: boolean) => ({
       width: "45%",
-      textAlign: rtl ? "right" : "left",
+      textAlign: (rtl ? "right" : "left") as "right" | "left",
     }),
 
     cellQty: {
@@ -193,20 +193,20 @@ export function usePdfGenerator() {
 
     totals: (rtl: boolean) => ({
       marginTop: 20,
-      alignSelf: rtl ? "flex-start" : "flex-end",
+      alignSelf: (rtl ? "flex-start" : "flex-end") as "flex-start" | "flex-end",
       width: "45%",
     }),
 
     totalRow: (rtl: boolean) => ({
-      flexDirection: rtl ? "row-reverse" : "row",
-      justifyContent: "space-between",
+      flexDirection: (rtl ? "row-reverse" : "row") as "row-reverse" | "row",
+      justifyContent: "space-between" as const,
       marginBottom: 6,
       fontSize: 11,
     }),
 
     totalFinal: (rtl: boolean) => ({
-      flexDirection: rtl ? "row-reverse" : "row",
-      justifyContent: "space-between",
+      flexDirection: (rtl ? "row-reverse" : "row") as "row-reverse" | "row",
+      justifyContent: "space-between" as const,
       marginTop: 8,
       paddingTop: 6,
       borderTopWidth: 1,
