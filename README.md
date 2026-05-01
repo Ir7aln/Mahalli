@@ -18,11 +18,16 @@ Check out a quick video demonstration of Mahalli's features:
 
 ## Built for Moroccan B2B Workflow
 
-Mahalli is specifically designed to streamline the business-to-business (B2B) workflow prevalent in Morocco. The typical process involves:
+Mahalli is specifically designed around the B2B document chain used by Moroccan businesses. The full flow is:
 
-1. **Quote Generation**: Businesses often start by generating a detailed quote for their clients.
-2. **Order Creation**: Once the quote is approved, it transitions into an official order.
-3. **Invoice Generation**: Upon payment or delivery, an invoice is created to finalize the transaction.
+1. **Quote / Devis** — The seller generates a quote and sends it to the client for approval.
+2. **Customer Order / Bon de commande** — Once the quote is approved, it converts into a formal purchase order.
+3. **Delivery Note / Bon de livraison** — When goods are dispatched, a delivery note is issued against the order to confirm what was shipped and when.
+4. **Invoice / Facture** — The final billing document, generated after delivery. Invoices are immutable once finalized.
+5. **Payment Tracking** — Partial and full payments are recorded against invoices. Outstanding balances are computed per client.
+6. **Credit Note / Avoir** — When a finalized invoice needs a correction (returned goods, pricing errors), a credit note is issued against it rather than modifying or deleting the original.
+
+Each document type carries the Moroccan legal identity fields required on printed paperwork: **ICE**, **IF** (identifiant fiscal), **RC** (registre de commerce), and **Patente / TP**, for both clients and the seller's own profile.
 
 Mahalli provides comprehensive tools to manage each step of this process efficiently.
 
