@@ -9,6 +9,7 @@ import {
   fontStore,
 } from "@ceereals/vue-pdf";
 import * as Logger from "@tauri-apps/plugin-log";
+import { commands } from "@/bindings";
 
 type DocType =
   | "order"
@@ -79,14 +80,10 @@ export function usePdfGenerator() {
     return `data:${mime};base64,${base64}`;
   }
 
-  const baseText = {
-    fontFamily: "Cairo",
-  };
-
   const styles = {
     page: (rtl: boolean) => ({
-      paddingTop: 30,
-      paddingBottom: 30,
+      paddingTop: 28,
+      paddingBottom: 28,
       paddingHorizontal: 28,
       fontSize: 10,
       color: "#111827",
@@ -95,19 +92,22 @@ export function usePdfGenerator() {
       backgroundColor: "#ffffff",
     }),
 
+    // Large title — matches text-5xl font-medium
     header: (rtl: boolean) => ({
       flexDirection: (rtl ? "row-reverse" : "row") as "row-reverse" | "row",
       justifyContent: "space-between" as const,
       alignItems: "center" as const,
-      marginBottom: 18,
+      marginBottom: 20,
+      paddingBottom: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: "#e5e7eb",
     }),
 
     title: (rtl: boolean) => ({
-      fontSize: 28,
-      fontWeight: 600,
+      fontSize: 40,
+      fontWeight: 500,
       color: "#111827",
       textAlign: (rtl ? "right" : "left") as "right" | "left",
-      letterSpacing: 1,
     }),
 
     logo: {
@@ -115,24 +115,31 @@ export function usePdfGenerator() {
       height: "auto",
     },
 
-    section: {
-      marginBottom: 18,
-    },
-
+    // Section headings — matches text-xl font-bold border-b-2 border-gray-200 pb-2 mb-4
     sectionTitle: (rtl: boolean) => ({
-      fontSize: 12,
-      fontWeight: 600,
+      fontSize: 13,
+      fontWeight: 700,
       color: "#1f2937",
-      borderBottomWidth: 1,
+      borderBottomWidth: 2,
       borderBottomColor: "#e5e7eb",
-      paddingBottom: 4,
-      marginBottom: 8,
+      paddingBottom: 6,
+      marginBottom: 10,
       textAlign: (rtl ? "right" : "left") as "right" | "left",
     }),
 
+    // Standard body text — matches text-gray-700
     text: (rtl: boolean) => ({
       fontSize: 10,
       color: "#374151",
+      marginBottom: 3,
+      textAlign: (rtl ? "right" : "left") as "right" | "left",
+    }),
+
+    // Bold name line — matches font-bold text-gray-900
+    bold: (rtl: boolean) => ({
+      fontSize: 10,
+      fontWeight: 700,
+      color: "#111827",
       marginBottom: 3,
       textAlign: (rtl ? "right" : "left") as "right" | "left",
     }),
@@ -143,32 +150,39 @@ export function usePdfGenerator() {
       textAlign: (rtl ? "right" : "left") as "right" | "left",
     }),
 
+    // Two-column layout — matches grid grid-cols-2 gap-8
     grid: (rtl: boolean) => ({
       flexDirection: (rtl ? "row-reverse" : "row") as "row-reverse" | "row",
-      gap: 20,
-      marginBottom: 12,
+      gap: 32,
+      marginBottom: 20,
     }),
 
     col: {
       width: "50%",
     },
 
+    // Table header row — matches bg-gray-200 border border-gray-500 p-3 font-semibold
     tableHeader: (rtl: boolean) => ({
       flexDirection: (rtl ? "row-reverse" : "row") as "row-reverse" | "row",
-      paddingBottom: 6,
-      marginBottom: 4,
+      backgroundColor: "#e5e7eb",
       borderBottomWidth: 1,
-      borderBottomColor: "#d1d5db",
+      borderBottomColor: "#6b7280",
+      paddingVertical: 8,
+      paddingHorizontal: 6,
       fontSize: 10,
-      fontWeight: 600,
-      color: "#111827",
+      fontWeight: 700,
+      color: "#1f2937",
     }),
 
+    // Table data rows — matches border border-gray-500 p-3
     tableRow: (rtl: boolean) => ({
       flexDirection: (rtl ? "row-reverse" : "row") as "row-reverse" | "row",
-      paddingVertical: 6,
+      borderBottomWidth: 1,
+      borderBottomColor: "#d1d5db",
+      paddingVertical: 8,
+      paddingHorizontal: 6,
       fontSize: 10,
-      color: "#374151",
+      color: "#1f2937",
     }),
 
     cellName: (rtl: boolean) => ({
@@ -178,52 +192,99 @@ export function usePdfGenerator() {
 
     cellQty: {
       width: "15%",
-      textAlign: "right",
+      textAlign: "right" as const,
     },
 
     cellPrice: {
       width: "20%",
-      textAlign: "right",
+      textAlign: "right" as const,
     },
 
     cellTotal: {
       width: "20%",
-      textAlign: "right",
+      textAlign: "right" as const,
     },
 
+    // Totals box — right-aligned, ~1/3 width
     totals: (rtl: boolean) => ({
       marginTop: 20,
       alignSelf: (rtl ? "flex-start" : "flex-end") as "flex-start" | "flex-end",
-      width: "45%",
+      width: "38%",
+      marginBottom: 6,
     }),
 
+    // Normal totals row — matches flex justify-between py-1 text-gray-700
     totalRow: (rtl: boolean) => ({
       flexDirection: (rtl ? "row-reverse" : "row") as "row-reverse" | "row",
       justifyContent: "space-between" as const,
-      marginBottom: 6,
-      fontSize: 11,
+      paddingVertical: 4,
+      fontSize: 10,
+      color: "#374151",
     }),
 
+    // Grand total row — matches text-xl font-bold border-t-2 border-gray-500 py-2 mt-2
     totalFinal: (rtl: boolean) => ({
       flexDirection: (rtl ? "row-reverse" : "row") as "row-reverse" | "row",
       justifyContent: "space-between" as const,
+      paddingVertical: 8,
       marginTop: 8,
-      paddingTop: 6,
-      borderTopWidth: 1,
-      borderTopColor: "#9ca3af",
-      fontSize: 12,
-      fontWeight: 600,
+      borderTopWidth: 2,
+      borderTopColor: "#6b7280",
+      fontSize: 13,
+      fontWeight: 700,
+      color: "#111827",
     }),
 
+    // Total in words — full-width muted line below the totals box
+    totalWords: (rtl: boolean) => ({
+      marginTop: 6,
+      fontSize: 9,
+      color: "#6b7280",
+      textAlign: (rtl ? "right" : "left") as "right" | "left",
+    }),
+
+    // Seller details section at bottom
+    sellerDetails: {
+      marginTop: 24,
+      marginBottom: 8,
+    },
+
+    // Inline "Label: value" row in seller details
+    detailItem: (rtl: boolean) => ({
+      fontSize: 10,
+      color: "#1f2937",
+      marginBottom: 4,
+      textAlign: (rtl ? "right" : "left") as "right" | "left",
+    }),
+
+    // Footer bar — matches bg-gray-50 p-4 text-center text-sm text-gray-600 border-t
+    footer: {
+      marginTop: 12,
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+      backgroundColor: "#f9fafb",
+      borderTopWidth: 1,
+      borderTopColor: "#e5e7eb",
+      textAlign: "center" as const,
+    },
+
     bgTemplate: {
-      position: "absolute",
+      position: "absolute" as const,
       left: 0,
       top: 0,
       width: "100%",
       height: "100%",
       zIndex: -1,
     },
-  } as const;
+  };
+
+  // Inline bold label helper for seller detail rows
+  function detailRow(rtl: boolean, label: string, value: string) {
+    return h(Text, { style: styles.detailItem(rtl) }, () => [
+      h(Text, { style: { fontWeight: 600, color: "#374151" } }, `${label}: `),
+      value,
+    ]);
+  }
 
   async function generatePdf(data: any, type: DocType) {
     if (!data) return "";
@@ -234,6 +295,9 @@ export function usePdfGenerator() {
       const templateImage = config.template.bytes
         ? toDataUri(config.template.bytes, config.template.name)
         : null;
+
+      const sellerResult = await commands.getSellerProfile();
+      const seller = sellerResult.status === "ok" ? sellerResult.data.data : null;
 
       const items = Array.isArray(data.items) ? data.items : [];
       const vatMultiplier = 1 + (Number(config.vat) || 0) / 100;
@@ -250,6 +314,14 @@ export function usePdfGenerator() {
         ? d(new Date(data.created_at), "long")
         : "-";
 
+      const hasSellerInfo = !!(
+        seller?.legal_name ||
+        seller?.ice ||
+        seller?.if_number ||
+        seller?.rc ||
+        seller?.patente
+      );
+
       const doc = h(
         Document,
         {
@@ -262,12 +334,15 @@ export function usePdfGenerator() {
               ? h(Image, { src: templateImage, style: styles.bgTemplate })
               : null,
 
-            // 🔥 HEADER
+            // HEADER
             h(View, { style: styles.header(rtl) }, () => [
               h(View, {}, () => [
                 h(Text, { style: styles.title(rtl) }, type.toUpperCase()),
                 h(Text, { style: styles.muted(rtl) }, safeText(data.identifier)),
                 h(Text, { style: styles.muted(rtl) }, safeText(createdAtLabel)),
+                config.fields.status
+                  ? h(Text, { style: styles.muted(rtl) }, safeText(statusLabel))
+                  : null,
               ]),
 
               templateImage
@@ -275,51 +350,31 @@ export function usePdfGenerator() {
                 : null,
             ]),
 
-            // 🔥 CUSTOMER + META GRID
-            h(View, { style: styles.grid(rtl) }, () => [
-              // LEFT - CUSTOMER
-              h(View, { style: styles.col }, () => [
-                h(Text, { style: styles.sectionTitle(rtl) }, t("fields.bill-to")),
+            // CUSTOMER
+            h(View, { style: { marginBottom: 20 } }, () => [
+              h(Text, { style: styles.sectionTitle(rtl) }, t("fields.bill-to")),
 
-                h(Text, { style: styles.text(rtl) },
-                  safeText(data.client?.full_name ?? data.full_name)
-                ),
+              h(Text, { style: styles.bold(rtl) },
+                safeText(data.client?.full_name ?? data.full_name)),
 
-                config.fields.email
-                  ? h(Text, { style: styles.text(rtl) },
-                      safeText(data.client?.email ?? data.email))
-                  : null,
+              config.fields.email
+                ? h(Text, { style: styles.text(rtl) },
+                    safeText(data.client?.email ?? data.email))
+                : null,
 
-                config.fields.phone_number
-                  ? h(Text, { style: styles.text(rtl) },
-                      safeText(data.client?.phone_number ?? data.phone_number))
-                  : null,
+              config.fields.phone_number
+                ? h(Text, { style: styles.text(rtl) },
+                    safeText(data.client?.phone_number ?? data.phone_number))
+                : null,
 
-                config.fields.address
-                  ? h(Text, { style: styles.text(rtl) },
-                      safeText(data.client?.address ?? data.address))
-                  : null,
-              ]),
-
-              // RIGHT - META
-              h(View, { style: styles.col }, () => [
-                h(Text, { style: styles.sectionTitle(rtl) }, t("fields.configuration")),
-
-                config.fields.status
-                  ? h(Text, { style: styles.text(rtl) },
-                      `${t("fields.status")}: ${safeText(statusLabel)}`)
-                  : null,
-
-                h(Text, { style: styles.text(rtl) },
-                  `${t("fields.date")}: ${safeText(createdAtLabel)}`),
-
-                h(Text, { style: styles.text(rtl) }, "MAD"),
-              ]),
+              config.fields.address
+                ? h(Text, { style: styles.text(rtl) },
+                    safeText(data.client?.address ?? data.address))
+                : null,
             ]),
 
-            // 🔥 TABLE
-            h(View, { style: styles.section }, () => [
-              // HEADER
+            // TABLE
+            h(View, { style: { marginBottom: 20 } }, () => [
               h(View, { style: styles.tableHeader(rtl) }, () => [
                 h(Text, { style: styles.cellName(rtl) }, t("fields.product")),
                 h(Text, { style: styles.cellQty }, t("fields.quantity")),
@@ -327,7 +382,6 @@ export function usePdfGenerator() {
                 h(Text, { style: styles.cellTotal }, t("fields.total")),
               ]),
 
-              // ROWS
               ...items.map((item: any) => {
                 const quantity = Number(item.quantity ?? 0);
                 const price = Number(item.price ?? 0);
@@ -342,7 +396,7 @@ export function usePdfGenerator() {
               }),
             ]),
 
-            // 🔥 TOTALS
+            // TOTALS BOX — right-aligned, ~38% wide
             h(View, { style: styles.totals(rtl) }, () => [
               h(View, { style: styles.totalRow(rtl) }, [
                 h(Text, {}, t("fields.subtotal")),
@@ -360,11 +414,71 @@ export function usePdfGenerator() {
                 h(Text, {}, t("fields.total")),
                 h(Text, {}, n(totalWithVat, "currency")),
               ]),
-
-              h(View, { style: styles.totalFinal(rtl) }, [
-                h(Text, {}, useTotalAsText().numberToText(totalWithVat, locale.value)),
-              ]),
             ]),
+
+            // TOTAL IN WORDS — full-width muted line
+            h(Text, { style: styles.totalWords(rtl) },
+              useTotalAsText().numberToText(totalWithVat, locale.value)),
+
+            // SELLER DETAILS (bottom)
+            hasSellerInfo
+              ? h(View, { style: styles.sellerDetails }, () => [
+                  h(Text, { style: styles.sectionTitle(rtl) }, t("seller-profile.title")),
+
+                  h(View, { style: styles.grid(rtl) }, () => [
+                    // LEFT — name / contact
+                    h(View, { style: styles.col }, () => [
+                      seller?.legal_name
+                        ? detailRow(rtl, t("seller-profile.fields.legal-name"), safeText(seller.legal_name))
+                        : null,
+
+                      seller?.commercial_name
+                        ? detailRow(rtl, t("seller-profile.fields.commercial-name"), safeText(seller.commercial_name))
+                        : null,
+
+                      seller?.email
+                        ? detailRow(rtl, t("fields.email"), safeText(seller.email))
+                        : null,
+
+                      seller?.phone_number
+                        ? detailRow(rtl, t("fields.phone"), safeText(seller.phone_number))
+                        : null,
+
+                      (seller?.address || seller?.city)
+                        ? detailRow(rtl, t("fields.address"),
+                            [seller?.address, seller?.city].filter(Boolean).join(", "))
+                        : null,
+                    ]),
+
+                    // RIGHT — legal identifiers
+                    h(View, { style: styles.col }, () => [
+                      seller?.ice
+                        ? detailRow(rtl, t("fields.ice"), safeText(seller.ice))
+                        : null,
+
+                      seller?.if_number
+                        ? detailRow(rtl, t("fields.if-number"), safeText(seller.if_number))
+                        : null,
+
+                      seller?.rc
+                        ? detailRow(rtl, t("fields.rc"), safeText(seller.rc))
+                        : null,
+
+                      seller?.patente
+                        ? detailRow(rtl, t("fields.patente"), safeText(seller.patente))
+                        : null,
+                    ]),
+                  ]),
+                ])
+              : null,
+
+            // FOOTER — gray bar, centered, matches bg-gray-50 text-center border-t
+            seller?.invoice_footer
+              ? h(View, { style: styles.footer }, () => [
+                  h(Text, { style: { fontSize: 9, color: "#4b5563" } },
+                    safeText(seller.invoice_footer)),
+                ])
+              : null,
           ]),
         ],
       );
