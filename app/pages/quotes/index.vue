@@ -183,7 +183,7 @@ const openCreateQuoteModal = () => modal.open(QuoteCreate, { sheet: true });
 <template>
   <main class="h-full w-full">
     <div class="flex h-full w-full flex-col items-start justify-start gap-2">
-      <div class="flex w-full items-start justify-between">
+      <div class="flex w-full items-start justify-between mb-4">
         <div class="w-full ltr:text-left rtl:text-right">
           <h1 class="text-3xl font-bold text-slate-900">
             {{ t("quotes.title") }}

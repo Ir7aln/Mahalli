@@ -211,7 +211,7 @@ const quickActions = [
         v-for="action in quickActions"
         :key="action.path"
         :to="localePath({ path: action.path, query: action.query })"
-        class="rounded-sm border border-slate-200 bg-white px-3 py-2 text-xs font-medium uppercase tracking-wide text-slate-700 hover:bg-slate-100 transition-colors text-center whitespace-normal break-words min-h-10 flex items-center justify-center"
+        class="rounded-sm border border-slate-200 bg-white px-3 py-2 text-xs font-medium uppercase tracking-wide text-slate-700 hover:bg-slate-100 transition-colors text-center whitespace-normal break-words min-h-9 flex items-center justify-center"
       >
         {{ t(action.label) }}
       </NuxtLink>
