@@ -16,7 +16,7 @@ const iframeSrc = computed(() => {
       <div
         class="w-full max-w-[860px] rounded-md border border-slate-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.12)] overflow-hidden"
       >
-        <div class="h-10 border-b border-slate-200 bg-slate-50 flex items-center px-4">
+        <div class="h-9 border-b border-slate-200 bg-slate-50 flex items-center px-4">
           <div class="flex items-center gap-2">
             <span class="size-2.5 rounded-full bg-rose-400" />
             <span class="size-2.5 rounded-full bg-amber-400" />

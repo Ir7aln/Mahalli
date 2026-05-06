@@ -157,7 +157,7 @@ table:not(.not-default) {
 }
 
 table:not(.not-default) > thead {
-  @apply text-xs h-10 bg-gray-100 max-w-lg w-fit font-semibold text-[rgba(25,23,17,0.6)];
+  @apply text-xs h-9 bg-gray-100 max-w-lg w-fit font-semibold text-[rgba(25,23,17,0.6)];
 }
 
 table:not(.not-default) > thead > tr {

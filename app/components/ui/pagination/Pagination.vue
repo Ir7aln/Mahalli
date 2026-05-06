@@ -67,7 +67,7 @@ function goToLast() {
               as-child
             >
               <Button
-                class="w-10 h-10 p-0"
+                class="w-10 h-9 p-0"
                 :variant="item.value === page ? 'default' : 'outline'"
                 @click="goToPage(item.value)"
               >

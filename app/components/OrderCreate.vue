@@ -335,7 +335,7 @@ const onSubmit = handleSubmit(async (formValues) => {
                       <p class="text-xs font-semibold text-slate-500 md:hidden">
                         {{ t("fields.total") }}
                       </p>
-                      <div class="flex h-10 items-center text-sm font-medium text-slate-900">
+                      <div class="flex h-9 items-center text-sm font-medium text-slate-900">
                         {{
                           formatMoney(
                             Number(values.items?.[index]?.quantity ?? 0) *

@@ -91,7 +91,7 @@ async function createDatabase() {
           <select
             id="database-source"
             v-model="form.cloneFromDatabaseId"
-            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+            class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
           >
             <option value="">{{ t("database.common.start-empty") }}</option>
             <option v-for="database in props.databases" :key="database.id" :value="database.id">
