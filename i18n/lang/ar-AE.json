@@ -159,6 +159,14 @@
       "invoice-footer": "تذييل الفاتورة"
     }
   },
+  "settings": {
+    "title": "الإعدادات",
+    "description": "إدارة إعدادات وتكوينات التطبيق الخاص بك.",
+    "tabs": {
+      "databases": "قواعد البيانات",
+      "seller-profile": "ملف البائع"
+    }
+  },
   "status": {
     "pending": "قيد الانتظار",
     "accepted": "مقبول",

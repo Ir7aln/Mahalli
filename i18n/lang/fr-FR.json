@@ -159,6 +159,14 @@
       "invoice-footer": "Pied de facture"
     }
   },
+  "settings": {
+    "title": "Paramètres",
+    "description": "Gérez les paramètres et les configurations de votre application.",
+    "tabs": {
+      "databases": "Bases de données",
+      "seller-profile": "Profil vendeur"
+    }
+  },
   "status": {
     "pending": "En attente",
     "accepted": "Accepté",

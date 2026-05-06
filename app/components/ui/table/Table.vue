@@ -37,3 +37,11 @@ onUnmounted(() => ro?.disconnect());
     </table>
   </div>
 </template>
+
+<style scoped>
+    @media (min-width: 1024px) {
+    :deep(table) {
+        table-layout: fixed;
+    }
+    }
+</style>

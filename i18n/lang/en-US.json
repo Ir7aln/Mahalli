@@ -159,6 +159,14 @@
       "invoice-footer": "Invoice footer"
     }
   },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your application settings and configurations.",
+    "tabs": {
+      "databases": "Databases",
+      "seller-profile": "Seller Profile"
+    }
+  },
   "status": {
     "pending": "Pending",
     "accepted": "Accepted",
