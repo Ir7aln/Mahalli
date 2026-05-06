@@ -167,8 +167,9 @@ impl DeliveryNotesService {
         if args.total_min.is_some() {
             query.and_having(
                 Func::sum(
-                    Expr::col((DeliveryNoteItems, delivery_note_items::Column::Price))
-                        .mul(Expr::col((DeliveryNoteItems, delivery_note_items::Column::Quantity))),
+                    Expr::col((DeliveryNoteItems, delivery_note_items::Column::Price)).mul(
+                        Expr::col((DeliveryNoteItems, delivery_note_items::Column::Quantity)),
+                    ),
                 )
                 .gte(args.total_min.unwrap_or(0.0)),
             );
@@ -176,8 +177,9 @@ impl DeliveryNotesService {
         if args.total_max.is_some() {
             query.and_having(
                 Func::sum(
-                    Expr::col((DeliveryNoteItems, delivery_note_items::Column::Price))
-                        .mul(Expr::col((DeliveryNoteItems, delivery_note_items::Column::Quantity))),
+                    Expr::col((DeliveryNoteItems, delivery_note_items::Column::Price)).mul(
+                        Expr::col((DeliveryNoteItems, delivery_note_items::Column::Quantity)),
+                    ),
                 )
                 .lte(args.total_max.unwrap_or(f64::MAX)),
             );
