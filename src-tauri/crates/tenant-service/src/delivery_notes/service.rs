@@ -1,5 +1,5 @@
 use super::dto::*;
-use crate::{DeliveryNoteStatus, OrderStatus};
+use crate::OrderStatus;
 use sea_orm::{
     sea_query::{Alias, Cond, Expr, Func, Query, SqliteQueryBuilder},
     DatabaseConnection as DbConn, *,
