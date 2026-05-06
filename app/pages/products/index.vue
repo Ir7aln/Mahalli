@@ -147,7 +147,18 @@ const openCreateProductModal = () => modal.open(ProductCreate, {});
 
 <template>
   <main class="h-full w-full">
-    <div class="flex h-full w-full flex-col items-start justify-start">
+    <div class="flex h-full w-full flex-col items-start justify-start gap-2">
+      <div class="flex w-full items-start justify-between">
+        <div class="w-full ltr:text-left rtl:text-right">
+          <h1 class="text-3xl font-bold text-slate-900">
+            {{ t("products.title") }}
+          </h1>
+          <p class="mt-1 text-slate-500">
+            {{ t("products.description") }}
+          </p>
+        </div>
+      </div>
+
       <ListFilterBar
         :search="searchQuery"
         :active-filters="activeFilters"

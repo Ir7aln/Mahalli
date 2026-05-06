@@ -167,6 +167,38 @@
       "seller-profile": "Profil vendeur"
     }
   },
+  "clients": {
+    "title": "Clients",
+    "description": "Gérez vos clients et leurs informations de contact."
+  },
+  "products": {
+    "title": "Produits",
+    "description": "Gérez votre catalogue de produits et vos stocks."
+  },
+  "invoices": {
+    "title": "Factures",
+    "description": "Consultez et gérez vos factures et paiements."
+  },
+  "orders": {
+    "title": "Commandes",
+    "description": "Créez et gérez vos commandes de vente."
+  },
+  "inventory": {
+    "title": "Inventaire",
+    "description": "Suivez vos mouvements de stock et transactions d'inventaire."
+  },
+  "quotes": {
+    "title": "Devis",
+    "description": "Créez et gérez vos devis de vente."
+  },
+  "delivery-notes": {
+    "title": "Bons de livraison",
+    "description": "Gérez votre documentation de livraison et vos expéditions."
+  },
+  "credit-notes": {
+    "title": "Avoirs",
+    "description": "Créez et gérez les avoirs pour vos factures."
+  },
   "status": {
     "pending": "En attente",
     "accepted": "Accepté",

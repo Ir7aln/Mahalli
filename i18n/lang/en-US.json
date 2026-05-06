@@ -167,6 +167,38 @@
       "seller-profile": "Seller Profile"
     }
   },
+  "clients": {
+    "title": "Clients",
+    "description": "Manage your clients and their contact information."
+  },
+  "products": {
+    "title": "Products",
+    "description": "Manage your product catalog and inventory."
+  },
+  "invoices": {
+    "title": "Invoices",
+    "description": "View and manage your invoices and payments."
+  },
+  "orders": {
+    "title": "Orders",
+    "description": "Create and manage your sales orders."
+  },
+  "inventory": {
+    "title": "Inventory",
+    "description": "Track your stock movements and inventory transactions."
+  },
+  "quotes": {
+    "title": "Quotes",
+    "description": "Create and manage your sales quotes."
+  },
+  "delivery-notes": {
+    "title": "Delivery Notes",
+    "description": "Manage your delivery documentation and shipments."
+  },
+  "credit-notes": {
+    "title": "Credit Notes",
+    "description": "Create and manage credit notes for your invoices."
+  },
   "status": {
     "pending": "Pending",
     "accepted": "Accepted",

@@ -39,7 +39,7 @@ const dir = computed(() => (locale.value === "ar" ? "rtl" : "ltr"));
 <template>
   <div class="mb-3 flex w-full flex-col gap-2" :dir="dir">
     <div class="flex w-full flex-col gap-2">
-      <div class="flex w-full items-center justify-between">
+      <div class="flex w-full items-center justify-between rtl:flex-row-reverse">
         <div />
         <slot name="actions" />
       </div>
