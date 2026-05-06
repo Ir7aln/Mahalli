@@ -49,7 +49,7 @@ function toggleSort(key: string) {
     <Table :dir="locale === 'ar' ? 'rtl' : 'ltr'">
       <TableHeader>
         <TableRow>
-          <TableHead v-if="visibleCols.includes('identifier')" class="w-24" />
+          <TableHead v-if="visibleCols.includes('identifier')" class="w-28" />
           <TableHead v-if="visibleCols.includes('full_name')">
             <TableSortHeader
               :label="t('fields.full-name')"

@@ -78,7 +78,7 @@ function updateProductInventory(id: string, name: string) {
       <TableHeader>
         <TableRow>
           <TableHead v-if="visibleCols.includes('image')" class="w-14" />
-          <TableHead v-if="visibleCols.includes('name')" class="w-20">
+          <TableHead v-if="visibleCols.includes('name')" class="flex-1">
             <TableSortHeader
               :label="t('fields.name')"
               :active="sortKey === 'name'"
