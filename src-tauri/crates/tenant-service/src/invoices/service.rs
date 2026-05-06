@@ -302,18 +302,14 @@ impl InvoicesService {
             .conditions(
                 args.total_min.is_some(),
                 |x| {
-                    x.and_where(
-                        invoice_total_expr().gte(args.total_min.unwrap_or(0.0))
-                    );
+                    x.and_where(invoice_total_expr().gte(args.total_min.unwrap_or(0.0)));
                 },
                 |_| {},
             )
             .conditions(
                 args.total_max.is_some(),
                 |x| {
-                    x.and_where(
-                        invoice_total_expr().lte(args.total_max.unwrap_or(f64::MAX))
-                    );
+                    x.and_where(invoice_total_expr().lte(args.total_max.unwrap_or(f64::MAX)));
                 },
                 |_| {},
             )

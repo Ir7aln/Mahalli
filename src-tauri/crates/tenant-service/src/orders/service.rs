@@ -194,8 +194,10 @@ impl OrdersService {
         if args.total_min.is_some() {
             query.and_having(
                 Func::sum(
-                    Expr::col((OrderItems, order_items::Column::Price))
-                        .mul(Expr::col((InventoryTransactions, inventory_transactions::Column::Quantity))),
+                    Expr::col((OrderItems, order_items::Column::Price)).mul(Expr::col((
+                        InventoryTransactions,
+                        inventory_transactions::Column::Quantity,
+                    ))),
                 )
                 .gte(args.total_min.unwrap_or(0.0)),
             );
@@ -203,8 +205,10 @@ impl OrdersService {
         if args.total_max.is_some() {
             query.and_having(
                 Func::sum(
-                    Expr::col((OrderItems, order_items::Column::Price))
-                        .mul(Expr::col((InventoryTransactions, inventory_transactions::Column::Quantity))),
+                    Expr::col((OrderItems, order_items::Column::Price)).mul(Expr::col((
+                        InventoryTransactions,
+                        inventory_transactions::Column::Quantity,
+                    ))),
                 )
                 .lte(args.total_max.unwrap_or(f64::MAX)),
             );
