@@ -204,7 +204,7 @@ const openCreateInvoiceModal = () => modal.open(InvoiceCreate, { sheet: true });
         @clear-all="clearAllFilters"
       >
         <template #actions>
-          <Button class="gap-2 text-nowrap" @click="openCreateInvoiceModal()">
+          <Button size="sm" class="gap-2 text-nowrap" @click="openCreateInvoiceModal()">
             <Plus :size="20" />
             {{ t("buttons.toggle-create-invoice") }}
           </Button>

@@ -166,7 +166,7 @@ const openCreateClientModal = () => modal.open(ClientCreate, {});
         @clear-all="clearAllFilters"
       >
         <template #actions>
-          <Button class="gap-2 text-nowrap" @click="openCreateClientModal()">
+          <Button size="sm" class="gap-2 text-nowrap" @click="openCreateClientModal()">
             <Plus :size="20" />
             {{ t("buttons.toggle-create-client") }}
           </Button>

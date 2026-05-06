@@ -202,7 +202,7 @@ const openCreateQuoteModal = () => modal.open(QuoteCreate, { sheet: true });
         @clear-all="clearAllFilters"
       >
         <template #actions>
-          <Button class="gap-2 text-nowrap" @click="openCreateQuoteModal">
+          <Button size="sm" class="gap-2 text-nowrap" @click="openCreateQuoteModal">
             <Plus :size="20" />
             {{ t("buttons.toggle-create-quote") }}
           </Button>

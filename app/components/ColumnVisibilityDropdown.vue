@@ -53,7 +53,7 @@ function toggleAll() {
 <template>
   <DropdownMenu :dir="dir">
     <DropdownMenuTrigger as-child>
-      <Button variant="outline" class="gap-2">
+      <Button variant="outline" size="sm" class="gap-2">
         <Settings2 class="size-4" />
         <span class="hidden sm:inline">{{ t("fields.columns") }}</span>
       </Button>

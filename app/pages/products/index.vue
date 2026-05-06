@@ -167,7 +167,7 @@ const openCreateProductModal = () => modal.open(ProductCreate, {});
         @clear-all="clearAllFilters"
       >
         <template #actions>
-          <Button class="gap-2 text-nowrap" @click="openCreateProductModal">
+          <Button size="sm" class="gap-2 text-nowrap" @click="openCreateProductModal">
             <Plus :size="20" />
             {{ t("buttons.toggle-create-product") }}
           </Button>

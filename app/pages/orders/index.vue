@@ -203,7 +203,7 @@ const openCreateOrderModal = () => modal.open(OrderCreate, { sheet: true });
         @clear-all="clearAllFilters"
       >
         <template #actions>
-          <Button class="gap-2 text-nowrap" @click="openCreateOrderModal">
+          <Button size="sm" class="gap-2 text-nowrap" @click="openCreateOrderModal">
             <Plus :size="20" />
             {{ t("buttons.toggle-create-order") }}
           </Button>
