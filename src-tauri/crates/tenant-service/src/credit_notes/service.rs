@@ -212,6 +212,22 @@ impl CreditNotesService {
             });
         }
 
+        if let Some(created_from) = &args.created_from {
+            response_notes.retain(|note| note.created_at.as_str() >= created_from.as_str());
+        }
+
+        if let Some(created_to) = &args.created_to {
+            response_notes.retain(|note| note.created_at.as_str() <= created_to.as_str());
+        }
+
+        if let Some(total_min) = args.total_min {
+            response_notes.retain(|note| note.total >= total_min);
+        }
+
+        if let Some(total_max) = args.total_max {
+            response_notes.retain(|note| note.total <= total_max);
+        }
+
         match args.sort.as_deref() {
             Some("identifier") => response_notes.sort_by(|a, b| a.identifier.cmp(&b.identifier)),
             Some("full_name") => response_notes.sort_by(|a, b| a.full_name.cmp(&b.full_name)),

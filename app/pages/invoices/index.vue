@@ -20,6 +20,8 @@ const searchQuery = ref(queryString(route.query.search));
 const status = ref(queryString(route.query.status));
 const createdFrom = ref(queryString(route.query.created_from));
 const createdTo = ref(queryString(route.query.created_to));
+const totalMin = ref(queryString(route.query.total_min));
+const totalMax = ref(queryString(route.query.total_max));
 
 const invoiceTableColumns = [
   { key: "identifier", label: t("fields.identifier") },
@@ -42,6 +44,8 @@ const queryParams = computed(() => ({
   status: queryString(route.query.status) || null,
   created_from: queryString(route.query.created_from) || null,
   created_to: queryString(route.query.created_to) || null,
+  total_min: queryString(route.query.total_min) ? queryNumber(route.query.total_min, 0) : null,
+  total_max: queryString(route.query.total_max) ? queryNumber(route.query.total_max, 0) : null,
   refresh: queryString(route.query.refresh),
   sort: queryString(route.query.sort) || null,
   direction: queryString(route.query.direction) || null,
@@ -55,6 +59,8 @@ async function fetchInvoices() {
     status: queryParams.value.status,
     created_from: queryParams.value.created_from,
     created_to: queryParams.value.created_to,
+    total_min: queryParams.value.total_min,
+    total_max: queryParams.value.total_max,
     sort: queryParams.value.sort,
     direction: queryParams.value.direction,
   });
@@ -96,6 +102,12 @@ const activeFilters = computed(
             value: d(new Date(createdTo.value), "short"),
           }
         : null,
+      totalMin.value
+        ? { key: "total_min", label: `${t("fields.total")} ${t("filters.min")}`, value: totalMin.value }
+        : null,
+      totalMax.value
+        ? { key: "total_max", label: `${t("fields.total")} ${t("filters.max")}`, value: totalMax.value }
+        : null,
     ].filter(Boolean) as Array<{ key: string; label: string; value: string }>,
 );
 
@@ -108,11 +120,13 @@ const debouncedSearch = useDebounceFn(() => {
 
 watch(searchQuery, debouncedSearch);
 
-watch([status, createdFrom, createdTo], () => {
+watch([status, createdFrom, createdTo, totalMin, totalMax], () => {
   updateQueryParams({
     status: status.value || null,
     created_from: createdFrom.value || null,
     created_to: createdTo.value || null,
+    total_min: totalMin.value || null,
+    total_max: totalMax.value || null,
     page: 1,
   });
 });
@@ -153,12 +167,16 @@ function clearFilter(key: string) {
   if (key === "status") status.value = "";
   if (key === "created_from") createdFrom.value = "";
   if (key === "created_to") createdTo.value = "";
+  if (key === "total_min") totalMin.value = "";
+  if (key === "total_max") totalMax.value = "";
 }
 
 function clearAllFilters() {
   status.value = "";
   createdFrom.value = "";
   createdTo.value = "";
+  totalMin.value = "";
+  totalMax.value = "";
 }
 
 const openCreateInvoiceModal = () => modal.open(InvoiceCreate, { sheet: true });
@@ -217,6 +235,24 @@ const openCreateInvoiceModal = () => modal.open(InvoiceCreate, { sheet: true });
                   <div class="space-y-2">
                     <p class="text-xs text-muted-foreground">{{ t("filters.to") }}</p>
                     <Input v-model="createdTo" type="date" />
+                  </div>
+                </div>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>{{ t("fields.total") }}</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent class="w-52 p-3">
+                <div class="space-y-5">
+                  <div class="space-y-2">
+                    <p class="text-xs text-muted-foreground">{{ t("filters.min") }}</p>
+                    <Input v-model="totalMin" type="number" :placeholder="t('filters.min')" />
+                  </div>
+                  <div class="space-y-2">
+                    <p class="text-xs text-muted-foreground">{{ t("filters.max") }}</p>
+                    <Input v-model="totalMax" type="number" :placeholder="t('filters.max')" />
                   </div>
                 </div>
               </DropdownMenuSubContent>

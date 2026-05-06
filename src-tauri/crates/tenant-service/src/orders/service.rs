@@ -190,6 +190,26 @@ impl OrdersService {
             }
         }
         query.group_by_col((Orders, orders::Column::Id));
+
+        if args.total_min.is_some() {
+            query.and_having(
+                Func::sum(
+                    Expr::col((OrderItems, order_items::Column::Price))
+                        .mul(Expr::col((InventoryTransactions, inventory_transactions::Column::Quantity))),
+                )
+                .gte(args.total_min.unwrap_or(0.0)),
+            );
+        }
+        if args.total_max.is_some() {
+            query.and_having(
+                Func::sum(
+                    Expr::col((OrderItems, order_items::Column::Price))
+                        .mul(Expr::col((InventoryTransactions, inventory_transactions::Column::Quantity))),
+                )
+                .lte(args.total_max.unwrap_or(f64::MAX)),
+            );
+        }
+
         let (sql, values) = query.to_owned().build(SqliteQueryBuilder);
 
         let result = SelectOrders::find_by_statement(Statement::from_sql_and_values(

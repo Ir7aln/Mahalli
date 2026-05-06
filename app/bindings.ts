@@ -341,6 +341,10 @@ export type ListCreditNotesArgs = {
 	search: string,
 	sort: string | null,
 	direction: string | null,
+	created_from: string | null,
+	created_to: string | null,
+	total_min: number | null,
+	total_max: number | null,
 };
 
 export type ListDeliveryNotesArgs = {
@@ -350,6 +354,8 @@ export type ListDeliveryNotesArgs = {
 	status: string | null,
 	created_from: string | null,
 	created_to: string | null,
+	total_min: number | null,
+	total_max: number | null,
 	sort: string | null,
 	direction: string | null,
 };
@@ -378,6 +384,8 @@ export type ListInvoicesArgs = {
 	status: string | null,
 	created_from: string | null,
 	created_to: string | null,
+	total_min: number | null,
+	total_max: number | null,
 	sort: string | null,
 	direction: string | null,
 };
@@ -389,6 +397,8 @@ export type ListOrdersArgs = {
 	status: string | null,
 	created_from: string | null,
 	created_to: string | null,
+	total_min: number | null,
+	total_max: number | null,
 	sort: string | null,
 	direction: string | null,
 };
@@ -411,6 +421,8 @@ export type ListQuotesArgs = {
 	status: string | null,
 	created_from: string | null,
 	created_to: string | null,
+	total_min: number | null,
+	total_max: number | null,
 	sort: string | null,
 	direction: string | null,
 };

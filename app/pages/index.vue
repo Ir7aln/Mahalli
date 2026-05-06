@@ -170,12 +170,27 @@ const summaryCards = computed(() => [
   {
     label: t("routes.invoices"),
     value: String(invoicesData.value?.count ?? 0),
-    sub: t("tables.empty.description"),
+    sub: "",
   },
   {
     label: t("routes.orders"),
     value: String(ordersData.value?.count ?? 0),
-    sub: t("tables.empty.description"),
+    sub: "",
+  },
+  {
+    label: t("routes.quotes"),
+    value: String(quotesData.value?.count ?? 0),
+    sub: "",
+  },
+  {
+    label: t("routes.delivery-notes"),
+    value: String(deliveryNotesData.value?.count ?? 0),
+    sub: "",
+  },
+  {
+    label: t("routes.credit-notes"),
+    value: String(creditNotesData.value?.count ?? 0),
+    sub: "",
   },
 ]);
 
@@ -190,7 +205,7 @@ const quickActions = [
 </script>
 
 <template>
-  <main class="w-full p-4 md:p-6 space-y-4 bg-slate-50/40 min-h-[calc(100vh-70px)]">
+  <main class="w-full space-y-4 bg-slate-50/40 min-h-[calc(100vh-70px)]">
     <section class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6">
       <NuxtLink
         v-for="action in quickActions"
@@ -202,9 +217,64 @@ const quickActions = [
       </NuxtLink>
     </section>
 
-    <section class="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+    <section class="rounded-sm border border-slate-200 bg-white">
+     <div class="border-b border-slate-200 px-4 py-3">
+       <h2 class="text-base font-semibold text-slate-900">{{ t("dashboard.title") }}</h2>
+     </div>
+     <div class="p-4">
+       <div class="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+         <div class="border border-slate-200 rounded-sm p-4 bg-white">
+           <p class="text-xs uppercase tracking-wide text-slate-500">
+             {{ t("dashboard.revenue") }}
+           </p>
+           <p class="text-2xl mt-2 font-semibold text-emerald-700">
+             {{ n(toNumber(financials?.current_revenue), "currency") }}
+           </p>
+           <p class="text-xs text-slate-500 mt-2">
+             {{
+               t("dashboard.growth", {
+                 n: n(financials?.revenue_growth_percentage || 0, { style: "percent" }),
+               })
+             }}
+           </p>
+         </div>
+         <div class="border border-slate-200 rounded-sm p-4 bg-white">
+           <p class="text-xs uppercase tracking-wide text-slate-500">
+             {{ t("dashboard.expenses") }}
+           </p>
+           <p class="text-2xl mt-2 font-semibold text-rose-700">
+             {{ n(toNumber(financials?.current_expenses), "currency") }}
+           </p>
+           <p class="text-xs text-slate-500 mt-2">
+             {{
+               t("dashboard.growth", {
+                 n: n(financials?.expenses_growth_percentage || 0, { style: "percent" }),
+               })
+             }}
+           </p>
+         </div>
+         <div class="border border-slate-200 rounded-sm p-4 bg-white">
+           <p class="text-xs uppercase tracking-wide text-slate-500">
+             {{ t("dashboard.profit") }}
+           </p>
+           <p class="text-2xl mt-2 font-semibold text-blue-700">
+             {{ n(toNumber(financials?.current_net_profit), "currency") }}
+           </p>
+           <p class="text-xs text-slate-500 mt-2">
+             {{
+               t("dashboard.growth", {
+                 n: n(financials?.net_profit_growth_percentage || 0, { style: "percent" }),
+               })
+             }}
+           </p>
+         </div>
+       </div>
+     </div>
+   </section>
+
+    <section class="grid gap-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
       <div
-        v-for="card in summaryCards"
+        v-for="card in summaryCards.slice(2)"
         :key="card.label"
         class="rounded-sm border border-slate-200 bg-white px-4 py-3"
       >
@@ -216,52 +286,14 @@ const quickActions = [
       </div>
     </section>
 
-    <section class="rounded-sm border border-slate-200 bg-white">
-      <div class="border-b border-slate-200 px-4 py-3">
-        <h2 class="text-base font-semibold text-slate-900">{{ t("dashboard.title") }}</h2>
-      </div>
-      <div class="p-4">
-        <div class="grid gap-3 sm:grid-cols-2">
-          <div class="border border-slate-200 rounded-sm p-4 bg-white">
-            <p class="text-xs uppercase tracking-wide text-slate-500">
-              {{ t("dashboard.revenue") }}
-            </p>
-            <p class="text-2xl mt-2 font-semibold text-emerald-700">
-              {{ n(toNumber(financials?.current_revenue), "currency") }}
-            </p>
-            <p class="text-xs text-slate-500 mt-2">
-              {{
-                t("dashboard.growth", {
-                  n: n(financials?.revenue_growth_percentage || 0, { style: "percent" }),
-                })
-              }}
-            </p>
-          </div>
-          <div class="border border-slate-200 rounded-sm p-4 bg-white">
-            <p class="text-xs uppercase tracking-wide text-slate-500">
-              {{ t("dashboard.expenses") }}
-            </p>
-            <p class="text-2xl mt-2 font-semibold text-rose-700">
-              {{ n(toNumber(financials?.current_expenses), "currency") }}
-            </p>
-            <p class="text-xs text-slate-500 mt-2">
-              {{
-                t("dashboard.growth", {
-                  n: n(financials?.expenses_growth_percentage || 0, { style: "percent" }),
-                })
-              }}
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
+
 
     <div class="grid gap-4 xl:grid-cols-3">
       <section class="overflow-hidden rounded-sm border border-slate-200 bg-white">
         <div class="border-b border-slate-200 px-4 py-3">
           <h3 class="text-sm font-semibold text-slate-900">{{ t("routes.invoices") }}</h3>
         </div>
-        <div class="px-4 py-2 overflow-x-auto">
+        <div class="px-4 py-2 overflow-x-auto border-none">
           <table class="w-full text-sm">
             <tbody>
               <tr
@@ -291,7 +323,7 @@ const quickActions = [
         <div class="border-b border-slate-200 px-4 py-3">
           <h3 class="text-sm font-semibold text-slate-900">{{ t("routes.orders") }}</h3>
         </div>
-        <div class="px-4 py-2 overflow-x-auto">
+        <div class="px-4 py-2 overflow-x-auto border-none">
           <table class="w-full text-sm">
             <tbody>
               <tr
@@ -321,7 +353,7 @@ const quickActions = [
         <div class="border-b border-slate-200 px-4 py-3">
           <h3 class="text-sm font-semibold text-slate-900">{{ t("routes.quotes") }}</h3>
         </div>
-        <div class="px-4 py-2 overflow-x-auto">
+        <div class="px-4 py-2 overflow-x-auto border-none">
           <table class="w-full text-sm">
             <tbody>
               <tr
@@ -351,7 +383,7 @@ const quickActions = [
         <div class="border-b border-slate-200 px-4 py-3">
           <h3 class="text-sm font-semibold text-slate-900">{{ t("routes.delivery-notes") }}</h3>
         </div>
-        <div class="px-4 py-2 overflow-x-auto">
+        <div class="px-4 py-2 overflow-x-auto border-none">
           <table class="w-full text-sm">
             <tbody>
               <tr
@@ -381,7 +413,7 @@ const quickActions = [
         <div class="border-b border-slate-200 px-4 py-3">
           <h3 class="text-sm font-semibold text-slate-900">{{ t("routes.credit-notes") }}</h3>
         </div>
-        <div class="px-4 py-2 overflow-x-auto">
+        <div class="px-4 py-2 overflow-x-auto border-none">
           <table class="w-full text-sm">
             <tbody>
               <tr
@@ -411,7 +443,7 @@ const quickActions = [
         <div class="border-b border-slate-200 px-4 py-3">
           <h3 class="text-sm font-semibold text-slate-900">{{ t("routes.inventory") }}</h3>
         </div>
-        <div class="px-4 py-2 overflow-x-auto">
+        <div class="px-4 py-2 overflow-x-auto border-none">
           <table class="w-full text-sm">
             <tbody>
               <tr

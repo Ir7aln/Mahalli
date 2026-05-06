@@ -186,10 +186,11 @@
     "out": "Vendu"
   },
   "dashboard": {
-    "title": "Articles vendus et achetés au cours des trois derniers mois",
+    "title": "Aperçu financier",
     "labels": ["ACHETÉ", "VENDU"],
     "revenue": "Revenu total",
     "expenses": "Dépenses totales",
+    "profit": "Bénéfice total",
     "growth": " {n} par rapport au mois dernier",
     "b3c": "Meilleurs clients en fonction des dépenses",
     "bp": "Meilleurs produits vendus (quantité)"

@@ -187,10 +187,11 @@
   },
 
   "dashboard": {
-    "title": "Sold and bought items during the last three months",
+    "title": "Financial Overview",
     "labels": ["BOUGHT", "SOLD"],
     "revenue": "Total revenue",
     "expenses": "Total expenses",
+    "profit": "Total profit",
     "growth": " {n} from last month",
     "b3c": "Best clients based on expenses",
     "bp": "Best Selling Products (quantity)"

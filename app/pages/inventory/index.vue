@@ -98,8 +98,8 @@ const activeFilters = computed(
       sourceType.value
         ? {
             key: "source_type",
-            label: t("fields.order"),
-            value: t(`routes.${sourceType.value.toLowerCase().replace("_", "-")}`),
+            label: t("filters.from"),
+            value: sourceType.value === "CREDIT_NOTE" ? t("routes.credit-notes") : t(`routes.${sourceType.value.toLowerCase().replace("_", "-")}`),
           }
         : null,
       createdFrom.value
@@ -117,13 +117,13 @@ const activeFilters = computed(
           }
         : null,
       quantityMin.value
-        ? { key: "quantity_min", label: t("filters.min"), value: quantityMin.value }
+        ? { key: "quantity_min", label: `${t("fields.quantity")} ${t("filters.min")}`, value: quantityMin.value }
         : null,
       quantityMax.value
-        ? { key: "quantity_max", label: t("filters.max"), value: quantityMax.value }
+        ? { key: "quantity_max", label: `${t("fields.quantity")} ${t("filters.max")}`, value: quantityMax.value }
         : null,
-      priceMin.value ? { key: "price_min", label: t("filters.min"), value: priceMin.value } : null,
-      priceMax.value ? { key: "price_max", label: t("filters.max"), value: priceMax.value } : null,
+      priceMin.value ? { key: "price_min", label: `${t("fields.price")} ${t("filters.min")}`, value: priceMin.value } : null,
+      priceMax.value ? { key: "price_max", label: `${t("fields.price")} ${t("filters.max")}`, value: priceMax.value } : null,
     ].filter(Boolean) as Array<{ key: string; label: string; value: string }>,
 );
 

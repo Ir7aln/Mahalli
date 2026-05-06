@@ -10,6 +10,8 @@ pub struct ListQuotesArgs {
     pub status: Option<String>,
     pub created_from: Option<String>,
     pub created_to: Option<String>,
+    pub total_min: Option<f64>,
+    pub total_max: Option<f64>,
     pub sort: Option<String>,
     pub direction: Option<String>,
 }

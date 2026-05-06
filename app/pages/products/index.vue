@@ -85,10 +85,10 @@ const activeFilters = computed(
         ? { key: "stock_status", label: t("filters.stock-status"), value: stockStatusLabel.value }
         : null,
       sellingPriceMin.value
-        ? { key: "selling_price_min", label: t("filters.min"), value: sellingPriceMin.value }
+        ? { key: "selling_price_min", label: `${t("fields.selling-price")} ${t("filters.min")}`, value: sellingPriceMin.value }
         : null,
       sellingPriceMax.value
-        ? { key: "selling_price_max", label: t("filters.max"), value: sellingPriceMax.value }
+        ? { key: "selling_price_max", label: `${t("fields.selling-price")} ${t("filters.max")}`, value: sellingPriceMax.value }
         : null,
     ].filter(Boolean) as Array<{ key: string; label: string; value: string }>,
 );
