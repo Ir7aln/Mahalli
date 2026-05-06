@@ -100,7 +100,7 @@ const menuItems = [
               :size="20"
             />
             <div
-              class="absolute invisible opacity-0 group-hover:visible group-hover:opacity-100 ltr:left-full rtl:right-full w-fit ltr:ml-2 rtl:mr-2 bg-white border border-gray-200 rounded-md shadow-md px-3 py-2 whitespace-nowrap transition-all duration-300 pointer-events-none ltr:-translate-x-2 rtl:translate-x-2 group-hover:translate-x-0 ltr:origin-left rtl:origin-right"
+              class="absolute invisible opacity-0 group-hover:visible group-hover:opacity-100 ltr:left-full rtl:right-full h-9 w-fit flex items-center ltr:ml-2 rtl:mr-2 bg-white border border-gray-200 rounded-md shadow-md px-3 whitespace-nowrap transition-all duration-300 pointer-events-none ltr:-translate-x-2 rtl:translate-x-2 group-hover:translate-x-0 ltr:origin-left rtl:origin-right"
             >
               <span class="text-sm font-medium text-gray-700">{{ t(item.label) }}</span>
             </div>
@@ -115,7 +115,7 @@ const menuItems = [
             :size="20"
           />
           <div
-            class="absolute invisible opacity-0 group-hover:visible group-hover:opacity-100 ltr:left-full rtl:right-full w-fit ltr:ml-2 rtl:mr-2 bg-white border border-gray-200 rounded-md shadow-md px-3 py-2 whitespace-nowrap transition-all duration-300 pointer-events-none ltr:-translate-x-2 rtl:translate-x-2 group-hover:translate-x-0 ltr:origin-left rtl:origin-right"
+            class="absolute invisible opacity-0 group-hover:visible group-hover:opacity-100 ltr:left-full rtl:right-full h-9 w-fit flex items-center ltr:ml-2 rtl:mr-2 bg-white border border-gray-200 rounded-md shadow-md px-3 whitespace-nowrap transition-all duration-300 pointer-events-none ltr:-translate-x-2 rtl:translate-x-2 group-hover:translate-x-0 ltr:origin-left rtl:origin-right"
           >
             <span class="text-sm font-medium text-gray-700">{{ LOCALE_TEXT[locale] }}</span>
           </div>
