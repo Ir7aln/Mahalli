@@ -136,7 +136,11 @@
     "patente": "Patente / TP",
     "reason": "السبب",
     "contact": "جهات الاتصال",
-    "legal-identifiers": "المعرفات القانونية"
+    "legal-identifiers": "المعرفات القانونية",
+    "credit-note": "إشعار خصم",
+    "delivery-note": "ملاحظة التسليم",
+    "client": "العميل",
+    "paid-amount": "المبلغ المدفوع"
   },
   "placeholders": {
     "select-client": "اختر عميلاً",
@@ -441,6 +445,12 @@
       "update": "تحديث الفاتورة",
       "delete": "حذف الفاتورة",
       "add-payment": "إضافة دفعة"
+    },
+    "credit-notes": {
+      "view": "عرض إشعار الخصم"
+    },
+    "delivery-notes": {
+      "view": "عرض ملاحظة التسليم"
     },
     "organizations": {
       "create": "إضافة منظمة جديدة",

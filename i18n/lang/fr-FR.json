@@ -136,7 +136,11 @@
     "patente": "Patente / TP",
     "reason": "Motif",
     "contact": "Contact",
-    "legal-identifiers": "Identifiants légaux"
+    "legal-identifiers": "Identifiants légaux",
+    "credit-note": "Note de crédit",
+    "delivery-note": "Bordereau de livraison",
+    "client": "Client",
+    "paid-amount": "Montant payé"
   },
   "placeholders": {
     "select-client": "Sélectionnez un client",
@@ -441,6 +445,12 @@
       "update": "Mettre à jour la facture",
       "delete": "Supprimer la facture",
       "add-payment": "Ajouter un paiement"
+    },
+    "credit-notes": {
+      "view": "Afficher la note de crédit"
+    },
+    "delivery-notes": {
+      "view": "Afficher le bordereau de livraison"
     },
     "organizations": {
       "create": "Ajouter une nouvelle organisation",

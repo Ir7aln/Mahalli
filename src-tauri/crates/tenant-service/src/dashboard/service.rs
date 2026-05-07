@@ -4,7 +4,8 @@ use sea_orm::{
     DatabaseConnection as DbConn, *,
 };
 use tenant_entity::{
-    inventory_transactions, invoice_payments, invoices, order_items, orders, prelude::*, products,
+    credit_note_items, credit_notes, inventory_transactions, invoice_payments, invoices,
+    order_items, orders, prelude::*, products,
 };
 
 pub struct DashboardService;
@@ -24,6 +25,43 @@ fn invoice_paid_amount_expr() -> SimpleExpr {
                 .from(InvoicePayments)
                 .cond_where(
                     Expr::col((InvoicePayments, invoice_payments::Column::InvoiceId))
+                        .equals((Invoices, invoices::Column::Id)),
+                )
+                .to_owned(),
+        )),
+    )
+}
+
+fn invoice_credit_notes_amount_expr() -> SimpleExpr {
+    SimpleExpr::SubQuery(
+        None,
+        Box::new(SubQueryStatement::SelectStatement(
+            Query::select()
+                .expr(Expr::expr(Func::coalesce([
+                    Expr::expr(Func::sum(
+                        Expr::col((
+                            credit_note_items::Entity,
+                            credit_note_items::Column::Quantity,
+                        ))
+                        .mul(Expr::col((
+                            credit_note_items::Entity,
+                            credit_note_items::Column::Price,
+                        ))),
+                    )),
+                    Expr::val(0.0f64),
+                ])))
+                .from(credit_note_items::Entity)
+                .join(
+                    JoinType::InnerJoin,
+                    credit_notes::Entity,
+                    Expr::col((credit_notes::Entity, credit_notes::Column::Id))
+                        .equals((
+                            credit_note_items::Entity,
+                            credit_note_items::Column::CreditNoteId,
+                        )),
+                )
+                .cond_where(
+                    Expr::col((credit_notes::Entity, credit_notes::Column::InvoiceId))
                         .equals((Invoices, invoices::Column::Id)),
                 )
                 .to_owned(),
@@ -57,7 +95,8 @@ fn revenue_expr(start: &'static str, end: Option<&'static str>) -> SimpleExpr {
                                 InventoryTransactions,
                                 inventory_transactions::Column::Quantity,
                             ))
-                            .mul(Expr::col((OrderItems, order_items::Column::Price))),
+                            .mul(Expr::col((OrderItems, order_items::Column::Price)))
+                            .sub(invoice_credit_notes_amount_expr()),
                         )
                         .case(
                             Expr::col((Invoices, invoices::Column::Status)).eq("FINALIZED"),
@@ -65,11 +104,12 @@ fn revenue_expr(start: &'static str, end: Option<&'static str>) -> SimpleExpr {
                                 InventoryTransactions,
                                 inventory_transactions::Column::Quantity,
                             ))
-                            .mul(Expr::col((OrderItems, order_items::Column::Price))),
+                            .mul(Expr::col((OrderItems, order_items::Column::Price)))
+                            .sub(invoice_credit_notes_amount_expr()),
                         )
                         .case(
                             Expr::col((Invoices, invoices::Column::Status)).eq("PARTIALLY_PAID"),
-                            invoice_paid_amount_expr(),
+                            invoice_paid_amount_expr().sub(invoice_credit_notes_amount_expr()),
                         )
                         .finally(Expr::val(0)),
                     )),

@@ -136,7 +136,11 @@
     "patente": "Patente / TP",
     "reason": "Reason",
     "contact": "Contact",
-    "legal-identifiers": "Legal Identifiers"
+    "legal-identifiers": "Legal Identifiers",
+    "credit-note": "Credit note",
+    "delivery-note": "Delivery note",
+    "client": "Client",
+    "paid-amount": "Paid amount"
   },
   "placeholders": {
     "select-client": "Select a client",
@@ -442,6 +446,12 @@
       "update": "Update invoice",
       "delete": "Delete invoice",
       "add-payment": "Add payment"
+    },
+    "credit-notes": {
+      "view": "View credit note"
+    },
+    "delivery-notes": {
+      "view": "View delivery note"
     },
     "organizations": {
       "create": "Add new organization",

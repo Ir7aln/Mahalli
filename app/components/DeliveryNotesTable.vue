@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { commands } from "@/bindings";
 import type { DeliveryNoteProductItem, SelectDeliveryNotes } from "@/bindings";
-import { FileText, GripHorizontal, Printer, ReceiptText } from "lucide-vue-next";
+import { FileText, GripHorizontal, Printer, ReceiptText, Eye } from "lucide-vue-next";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
-import { NuxtLink } from "#components";
+import { DeliveryNoteView, NuxtLink } from "#components";
 import { queryString } from "@/utils/query";
 
 const props = defineProps<{
@@ -18,6 +18,7 @@ const emits = defineEmits<{
 const route = useRoute();
 const router = useRouter();
 const { updateQueryParams } = useUpdateRouteQueryParams();
+const modal = useModal();
 const { t, d, locale, n } = useI18n();
 const { showErrorToast } = useCommandError();
 const localePath = useLocalePath();
@@ -61,6 +62,14 @@ function previewProducts(id: string) {
 }
 
 const cancelPreviewProducts = () => clearTimeout(previewProductsTimer);
+
+function toggleDeliveryNoteView(deliveryNote: SelectDeliveryNotes) {
+  modal.open(DeliveryNoteView, {
+    sheet: true,
+    id: deliveryNote.id,
+    identifier: deliveryNote.identifier,
+  });
+}
 
 async function createInvoiceFromDeliveryNote(id: string) {
   const result = await commands.createInvoiceFromDeliveryNote(id);
@@ -308,6 +317,10 @@ async function createInvoiceFromDeliveryNote(id: string) {
                   <GripHorizontal class="text-slate-800 inline" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent class="rtl:ml-6 ltr:mr-6">
+                  <DropdownMenuItem class="cursor-pointer" @click="toggleDeliveryNoteView(deliveryNote)">
+                    <Eye :size="20" class="text-slate-800 inline mr-2" />
+                    {{ t("buttons.view") }}
+                  </DropdownMenuItem>
                   <DropdownMenuItem @click="createInvoiceFromDeliveryNote(deliveryNote.id)">
                     <ReceiptText :size="20" class="text-slate-800 inline mr-2" />
                     {{ t("buttons.create-invoice") }}

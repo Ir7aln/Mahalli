@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { commands } from "@/bindings";
-import { GripHorizontal, Printer } from "lucide-vue-next";
+import { GripHorizontal, Printer, Eye } from "lucide-vue-next";
 import * as Logger from "@tauri-apps/plugin-log";
-import { NuxtLink } from "#components";
+import { CreditNoteView, NuxtLink } from "#components";
 import { queryString } from "@/utils/query";
 
 const props = defineProps<{
@@ -12,6 +12,7 @@ const props = defineProps<{
 
 const route = useRoute();
 const { updateQueryParams } = useUpdateRouteQueryParams();
+const modal = useModal();
 const { t, d, locale, n } = useI18n();
 const localePath = useLocalePath();
 const sortKey = computed(() => queryString(route.query.sort));
@@ -41,6 +42,14 @@ function toggleSort(key: string) {
     return;
   }
   updateQueryParams({ sort: "", direction: "", page: 1 });
+}
+
+function toggleCreditNoteView(creditNote: any) {
+  modal.open(CreditNoteView, {
+    sheet: true,
+    id: creditNote.id,
+    identifier: creditNote.identifier,
+  });
 }
 </script>
 
@@ -140,6 +149,10 @@ function toggleSort(key: string) {
                   <GripHorizontal class="text-slate-800 inline" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent class="rtl:ml-6 ltr:mr-6">
+                  <DropdownMenuItem class="cursor-pointer" @click="toggleCreditNoteView(creditNote)">
+                    <Eye :size="20" class="text-slate-800 inline mr-2" />
+                    {{ t("buttons.view") }}
+                  </DropdownMenuItem>
                   <DropdownMenuItem>
                     <NuxtLink :to="localePath(`/credit-notes/${creditNote.id}`)">
                       <Printer :size="20" class="text-slate-800 inline mr-2" />

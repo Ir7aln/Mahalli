@@ -90,8 +90,8 @@ function addItem() {
   });
 }
 
-function invoiceItemAt(index: number) {
-  return invoiceDetails.value?.items?.[index] ?? null;
+function getInvoiceItem(index: number) {
+  return invoiceDetails.value?.items?.[index];
 }
 
 const onSubmit = handleSubmit(async (formData) => {
@@ -168,12 +168,10 @@ const onSubmit = handleSubmit(async (formData) => {
                   <FormItem>
                     <FormLabel class="text-xs">{{ t("fields.product") }}</FormLabel>
                     <FormControl>
-                      <Input
-                        v-bind="componentField"
-                        disabled
-                        :value="invoiceItemAt(idx)?.name || ''"
-                        class="bg-slate-50"
-                      />
+                      <div class="flex items-center h-10 px-3 rounded-md border border-input bg-slate-50 text-sm">
+                        {{ getInvoiceItem(idx)?.name || getInvoiceItem(idx)?.product_id || "" }}
+                      </div>
+                      <input v-bind="componentField" type="hidden" />
                     </FormControl>
                   </FormItem>
                 </FormField>
@@ -188,7 +186,7 @@ const onSubmit = handleSubmit(async (formData) => {
                         v-bind="componentField"
                         type="number"
                         min="1"
-                        :max="invoiceItemAt(idx)?.quantity"
+                        :max="getInvoiceItem(idx)?.quantity"
                       />
                     </FormControl>
                   </FormItem>
@@ -204,7 +202,7 @@ const onSubmit = handleSubmit(async (formData) => {
                         v-bind="componentField"
                         type="number"
                         min="0"
-                        :max="invoiceItemAt(idx)?.price"
+                        :max="getInvoiceItem(idx)?.price"
                         step="0.01"
                       />
                     </FormControl>
