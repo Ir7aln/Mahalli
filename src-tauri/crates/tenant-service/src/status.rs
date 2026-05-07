@@ -145,6 +145,7 @@ impl InvoiceStatus {
             (InvoiceStatus::Cancelled, InvoiceStatus::Cancelled) => true,
             (InvoiceStatus::Cancelled, _) => false,
             (InvoiceStatus::Paid, InvoiceStatus::Paid) => true,
+            (InvoiceStatus::Paid, InvoiceStatus::Finalized) => true,
             (InvoiceStatus::Paid, _) => false,
             (InvoiceStatus::Draft, InvoiceStatus::Finalized) => true,
             (InvoiceStatus::Draft, InvoiceStatus::Paid) => true,

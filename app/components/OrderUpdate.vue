@@ -8,7 +8,7 @@ import {
   type UpdateOrder,
 } from "@/bindings";
 import * as Logger from "@tauri-apps/plugin-log";
-import { CalendarDays, Plus, Trash2, X } from "lucide-vue-next";
+import { Plus, Trash2, X } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import { useFieldArray, useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
@@ -272,14 +272,11 @@ function deleteOrderItem(index: number) {
                     </FormItem>
                   </FormField>
                 </div>
-                <div class="flex items-center justify-between gap-4">
-                  <span class="inline-flex items-center gap-2 text-slate-500">
-                    <CalendarDays class="size-4" />
-                    {{ t("fields.date") }}
-                  </span>
-                  <span class="font-medium text-slate-900">
+                <div class="space-y-2 border-b border-slate-100 pb-3 sm:border-b-0 sm:pb-0">
+                  <span class="text-slate-500">{{ t("fields.date") }}</span>
+                  <div class="flex items-center h-9 font-medium text-slate-900">
                     {{ values.created_at ? d(new Date(values.created_at), "long") : "--" }}
-                  </span>
+                  </div>
                 </div>
               </div>
 

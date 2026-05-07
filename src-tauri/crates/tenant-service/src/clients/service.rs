@@ -43,6 +43,7 @@ fn client_credit_expr() -> SimpleExpr {
                             "CANCELLED",
                             "DRAFT",
                             "PAID",
+                            "FINALIZED",
                         ]))
                         .add(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
                         .add(
@@ -77,6 +78,7 @@ fn client_credit_expr() -> SimpleExpr {
                             "CANCELLED",
                             "DRAFT",
                             "PAID",
+                            "FINALIZED",
                         ]))
                         .add(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
                         .add(
@@ -298,6 +300,7 @@ impl ClientsService {
                         "CANCELLED",
                         "DRAFT",
                         "PAID",
+                        "FINALIZED",
                     ])),
             )
             .group_by_col((Invoices, invoices::Column::Id))

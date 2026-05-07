@@ -103,10 +103,18 @@ const activeFilters = computed(
           }
         : null,
       totalMin.value
-        ? { key: "total_min", label: `${t("fields.total")} ${t("filters.min")}`, value: totalMin.value }
+        ? {
+            key: "total_min",
+            label: `${t("fields.total")} ${t("filters.min")}`,
+            value: totalMin.value,
+          }
         : null,
       totalMax.value
-        ? { key: "total_max", label: `${t("fields.total")} ${t("filters.max")}`, value: totalMax.value }
+        ? {
+            key: "total_max",
+            label: `${t("fields.total")} ${t("filters.max")}`,
+            value: totalMax.value,
+          }
         : null,
     ].filter(Boolean) as Array<{ key: string; label: string; value: string }>,
 );

@@ -201,6 +201,33 @@ fn normalize_invoice_status(current_status: &str, total: f64, paid_amount: f64) 
     None
 }
 
+async fn create_payment_for_status_change<C>(
+    txn: &C,
+    invoice_id: &str,
+    description: &str,
+) -> Result<(), DbErr>
+where
+    C: ConnectionTrait,
+{
+    let total = invoice_total_by_id(txn, invoice_id).await?;
+    let paid_amount = invoice_paid_by_id(txn, invoice_id).await?;
+    let remaining = (total - paid_amount).max(0.0);
+
+    if remaining > 0.0 {
+        InvoicePaymentActiveModel {
+            invoice_id: ActiveValue::Set(invoice_id.to_string()),
+            payment_date: ActiveValue::Set(Utc::now().naive_utc()),
+            description: ActiveValue::Set(Some(description.to_string())),
+            amount: ActiveValue::Set(remaining),
+            ..Default::default()
+        }
+        .insert(txn)
+        .await?;
+    }
+
+    Ok(())
+}
+
 fn invoice_search_condition(search: &str) -> Cond {
     let pattern = format!("%{}%", search);
     Cond::any()
@@ -822,56 +849,75 @@ impl InvoicesService {
     pub async fn update_invoice_status(
         db: &DbConn,
         data: UpdateInvoiceStatus,
-    ) -> Result<(), DbErr> {
-        let next_status = InvoiceStatus::from_str(&data.status)
-            .ok_or_else(|| DbErr::Custom(format!("invalid invoice status: {}", data.status)))?;
+    ) -> Result<(), TransactionError<DbErr>> {
+        db.transaction::<_, (), DbErr>(|txn| {
+            Box::pin(async move {
+                let next_status = InvoiceStatus::from_str(&data.status).ok_or_else(|| {
+                    DbErr::Custom(format!("invalid invoice status: {}", data.status))
+                })?;
 
-        let invoice_model = Invoices::find_by_id(data.id).one(db).await?;
-        let invoice =
-            invoice_model.ok_or_else(|| DbErr::RecordNotFound("invoice not found".to_string()))?;
+                let invoice_model = Invoices::find_by_id(data.id.clone()).one(txn).await?;
+                let invoice = invoice_model
+                    .ok_or_else(|| DbErr::RecordNotFound("invoice not found".to_string()))?;
 
-        let current_status = InvoiceStatus::from_str(&invoice.status).ok_or_else(|| {
-            DbErr::Custom(format!("corrupted invoice status: {}", invoice.status))
-        })?;
+                let current_status = InvoiceStatus::from_str(&invoice.status).ok_or_else(|| {
+                    DbErr::Custom(format!("corrupted invoice status: {}", invoice.status))
+                })?;
 
-        if !current_status.is_valid_transition(&next_status) {
-            return Err(DbErr::Custom(format!(
-                "invalid status transition from {} to {}",
-                current_status.as_str(),
-                next_status.as_str()
-            )));
-        }
+                if !current_status.is_valid_transition(&next_status) {
+                    return Err(DbErr::Custom(format!(
+                        "invalid status transition from {} to {}",
+                        current_status.as_str(),
+                        next_status.as_str()
+                    )));
+                }
 
-        let mut invoice_active: InvoiceActiveModel = invoice.into();
-        invoice_active.status = ActiveValue::Set(next_status.as_str().to_string());
-        match invoice_active.update(db).await {
-            Ok(_) => Ok(()),
-            Err(err) => Err(err),
-        }
+                if next_status == InvoiceStatus::Finalized {
+                    create_payment_for_status_change(txn, &data.id, "Finalized").await?;
+                }
+
+                let mut invoice_active: InvoiceActiveModel = invoice.into();
+                invoice_active.status = ActiveValue::Set(next_status.as_str().to_string());
+                if next_status == InvoiceStatus::Finalized {
+                    invoice_active.finalized_at = ActiveValue::Set(Some(Utc::now().naive_utc()));
+                }
+                invoice_active.save(txn).await?;
+
+                Ok(())
+            })
+        })
+        .await
     }
 
-    pub async fn finalize_invoice(db: &DbConn, id: String) -> Result<(), DbErr> {
-        let invoice_model = Invoices::find_by_id(&id).one(db).await?;
-        let invoice =
-            invoice_model.ok_or_else(|| DbErr::RecordNotFound("invoice not found".to_string()))?;
+    pub async fn finalize_invoice(db: &DbConn, id: String) -> Result<(), TransactionError<DbErr>> {
+        db.transaction::<_, (), DbErr>(|txn| {
+            Box::pin(async move {
+                let invoice_model = Invoices::find_by_id(&id).one(txn).await?;
+                let invoice = invoice_model
+                    .ok_or_else(|| DbErr::RecordNotFound("invoice not found".to_string()))?;
 
-        let current_status = InvoiceStatus::from_str(&invoice.status).ok_or_else(|| {
-            DbErr::Custom(format!("corrupted invoice status: {}", invoice.status))
-        })?;
+                let current_status = InvoiceStatus::from_str(&invoice.status).ok_or_else(|| {
+                    DbErr::Custom(format!("corrupted invoice status: {}", invoice.status))
+                })?;
 
-        if current_status != InvoiceStatus::Paid {
-            return Err(DbErr::Custom(
-                "only paid invoices can be finalized".to_string(),
-            ));
-        }
+                if current_status != InvoiceStatus::Paid {
+                    return Err(DbErr::Custom(
+                        "only paid invoices can be finalized".to_string(),
+                    ));
+                }
 
-        let mut invoice_active: InvoiceActiveModel = invoice.into();
-        invoice_active.status = ActiveValue::Set(InvoiceStatus::Finalized.as_str().to_string());
-        invoice_active.finalized_at = ActiveValue::Set(Some(Utc::now().naive_utc()));
-        match invoice_active.update(db).await {
-            Ok(_) => Ok(()),
-            Err(err) => Err(err),
-        }
+                create_payment_for_status_change(txn, &id, "Finalized").await?;
+
+                let mut invoice_active: InvoiceActiveModel = invoice.into();
+                invoice_active.status =
+                    ActiveValue::Set(InvoiceStatus::Finalized.as_str().to_string());
+                invoice_active.finalized_at = ActiveValue::Set(Some(Utc::now().naive_utc()));
+                invoice_active.save(txn).await?;
+
+                Ok(())
+            })
+        })
+        .await
     }
 
     pub async fn delete_invoice(db: &DbConn, id: String) -> Result<u64, DbErr> {

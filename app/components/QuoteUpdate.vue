@@ -7,7 +7,7 @@ import {
   type QuoteWithClient,
   type UpdateQuote,
 } from "@/bindings";
-import { CalendarDays, Plus, Trash2, X } from "lucide-vue-next";
+import { Plus, Trash2, X } from "lucide-vue-next";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
 import { useFieldArray, useForm } from "vee-validate";
@@ -241,14 +241,11 @@ function deleteQuoteItem(index: number) {
             </div>
 
             <div class="space-y-6 border-b border-slate-200 py-6">
-              <div class="flex items-center justify-between gap-4 text-sm">
-                <span class="inline-flex items-center gap-2 text-slate-500">
-                  <CalendarDays class="size-4" />
-                  {{ t("fields.date") }}
-                </span>
-                <span class="font-medium text-slate-900">
+              <div class="space-y-2 text-sm">
+                <span class="text-slate-500">{{ t("fields.date") }}</span>
+                <div class="flex items-center h-9 font-medium text-slate-900">
                   {{ values.created_at ? d(new Date(values.created_at), "long") : "--" }}
-                </span>
+                </div>
               </div>
 
               <div class="space-y-4">

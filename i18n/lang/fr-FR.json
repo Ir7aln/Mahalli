@@ -54,7 +54,8 @@
     "generate-credit-note": "Générer l'avoir",
     "create": "Créer",
     "creating": "Création...",
-    "view": "Afficher"
+    "view": "Afficher",
+    "close": "Fermer"
   },
   "translationTitle": "Changer de langue",
   "translationDescription": "Choisissez la langue à utiliser dans Mahalli.",
@@ -424,16 +425,19 @@
     },
     "orders": {
       "create": "Ajouter une nouvelle commande",
+      "view": "Afficher la commande",
       "update": "Mettre à jour la commande",
       "delete": "Supprimer la commande"
     },
     "quotes": {
       "create": "Ajouter un nouveau devis",
+      "view": "Afficher le devis",
       "update": "Mettre à jour le devis",
       "delete": "Supprimer le devis"
     },
     "invoices": {
       "create": "Ajouter une nouvelle facture",
+      "view": "Afficher la facture",
       "update": "Mettre à jour la facture",
       "delete": "Supprimer la facture",
       "add-payment": "Ajouter un paiement"

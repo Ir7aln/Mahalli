@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { commands } from "@/bindings";
-import { FilePenLine, GripHorizontal, Printer, Trash2, Truck } from "lucide-vue-next";
+import { FilePenLine, GripHorizontal, Printer, Trash2, Truck, Eye } from "lucide-vue-next";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
-import { NuxtLink, QuoteDelete, QuoteUpdate } from "#components";
+import { NuxtLink, QuoteDelete, QuoteUpdate, QuoteView } from "#components";
 import type { QuoteProductItem, SelectQuotes } from "@/bindings";
 import { queryString } from "@/utils/query";
 
@@ -59,9 +59,15 @@ function previewProducts(id: string) {
 }
 const cancelPreviewProducts = () => clearTimeout(previewProductsTimer);
 
-function toggleThisQuote(quote: SelectQuotes, name: "delete" | "update") {
+function toggleThisQuote(quote: SelectQuotes, name: "delete" | "update" | "view") {
   if (name === "delete") {
     modal.open(QuoteDelete, {
+      id: quote.id,
+      identifier: quote.identifier,
+    });
+  } else if (name === "view") {
+    modal.open(QuoteView, {
+      sheet: true,
       id: quote.id,
       identifier: quote.identifier,
     });
@@ -296,11 +302,18 @@ async function createOrderFromQuote(id: string) {
                   <GripHorizontal class="text-slate-800 inline" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent class="rtl:ml-6 ltr:mr-6">
-                  <DropdownMenuItem @click="toggleThisQuote(quote, 'update')">
+                  <DropdownMenuItem class="cursor-pointer" @click="toggleThisQuote(quote, 'view')">
+                    <Eye :size="20" class="text-slate-800 inline mr-2" />
+                    {{ t("buttons.view") }}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    :disabled="quote.status === 'ACCEPTED'"
+                    @click="toggleThisQuote(quote, 'update')"
+                  >
                     <FilePenLine :size="20" class="text-slate-800 inline mr-2" />
                     {{ t("buttons.edit") }}
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem class="cursor-pointer">
                     <NuxtLink
                       :to="
                         localePath({
@@ -314,12 +327,15 @@ async function createOrderFromQuote(id: string) {
                     </NuxtLink>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem @click="createOrderFromQuote(quote.id!)">
+                  <DropdownMenuItem class="cursor-pointer" @click="createOrderFromQuote(quote.id!)">
                     <Truck :size="20" class="text-slate-800 inline mr-2" />
                     {{ t("buttons.to-order") }}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem @click="toggleThisQuote(quote, 'delete')">
+                  <DropdownMenuItem
+                    :disabled="quote.status === 'ACCEPTED'"
+                    @click="toggleThisQuote(quote, 'delete')"
+                  >
                     <Trash2 :size="20" class="text-red-500 inline mr-2" />
                     <span class="text-red-500">
                       {{ t("buttons.delete") }}

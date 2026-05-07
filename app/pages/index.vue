@@ -218,59 +218,59 @@ const quickActions = [
     </section>
 
     <section class="rounded-sm border border-slate-200 bg-white">
-     <div class="border-b border-slate-200 px-4 py-3">
-       <h2 class="text-base font-semibold text-slate-900">{{ t("dashboard.title") }}</h2>
-     </div>
-     <div class="p-4">
-       <div class="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-         <div class="border border-slate-200 rounded-sm p-4 bg-white">
-           <p class="text-xs uppercase tracking-wide text-slate-500">
-             {{ t("dashboard.revenue") }}
-           </p>
-           <p class="text-2xl mt-2 font-semibold text-emerald-700">
-             {{ n(toNumber(financials?.current_revenue), "currency") }}
-           </p>
-           <p class="text-xs text-slate-500 mt-2">
-             {{
-               t("dashboard.growth", {
-                 n: n(financials?.revenue_growth_percentage || 0, { style: "percent" }),
-               })
-             }}
-           </p>
-         </div>
-         <div class="border border-slate-200 rounded-sm p-4 bg-white">
-           <p class="text-xs uppercase tracking-wide text-slate-500">
-             {{ t("dashboard.expenses") }}
-           </p>
-           <p class="text-2xl mt-2 font-semibold text-rose-700">
-             {{ n(toNumber(financials?.current_expenses), "currency") }}
-           </p>
-           <p class="text-xs text-slate-500 mt-2">
-             {{
-               t("dashboard.growth", {
-                 n: n(financials?.expenses_growth_percentage || 0, { style: "percent" }),
-               })
-             }}
-           </p>
-         </div>
-         <div class="border border-slate-200 rounded-sm p-4 bg-white">
-           <p class="text-xs uppercase tracking-wide text-slate-500">
-             {{ t("dashboard.profit") }}
-           </p>
-           <p class="text-2xl mt-2 font-semibold text-blue-700">
-             {{ n(toNumber(financials?.current_net_profit), "currency") }}
-           </p>
-           <p class="text-xs text-slate-500 mt-2">
-             {{
-               t("dashboard.growth", {
-                 n: n(financials?.net_profit_growth_percentage || 0, { style: "percent" }),
-               })
-             }}
-           </p>
-         </div>
-       </div>
-     </div>
-   </section>
+      <div class="border-b border-slate-200 px-4 py-3">
+        <h2 class="text-base font-semibold text-slate-900">{{ t("dashboard.title") }}</h2>
+      </div>
+      <div class="p-4">
+        <div class="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          <div class="border border-slate-200 rounded-sm p-4 bg-white">
+            <p class="text-xs uppercase tracking-wide text-slate-500">
+              {{ t("dashboard.revenue") }}
+            </p>
+            <p class="text-2xl mt-2 font-semibold text-emerald-700">
+              {{ n(toNumber(financials?.current_revenue), "currency") }}
+            </p>
+            <p class="text-xs text-slate-500 mt-2">
+              {{
+                t("dashboard.growth", {
+                  n: n(financials?.revenue_growth_percentage || 0, { style: "percent" }),
+                })
+              }}
+            </p>
+          </div>
+          <div class="border border-slate-200 rounded-sm p-4 bg-white">
+            <p class="text-xs uppercase tracking-wide text-slate-500">
+              {{ t("dashboard.expenses") }}
+            </p>
+            <p class="text-2xl mt-2 font-semibold text-rose-700">
+              {{ n(toNumber(financials?.current_expenses), "currency") }}
+            </p>
+            <p class="text-xs text-slate-500 mt-2">
+              {{
+                t("dashboard.growth", {
+                  n: n(financials?.expenses_growth_percentage || 0, { style: "percent" }),
+                })
+              }}
+            </p>
+          </div>
+          <div class="border border-slate-200 rounded-sm p-4 bg-white">
+            <p class="text-xs uppercase tracking-wide text-slate-500">
+              {{ t("dashboard.profit") }}
+            </p>
+            <p class="text-2xl mt-2 font-semibold text-blue-700">
+              {{ n(toNumber(financials?.current_net_profit), "currency") }}
+            </p>
+            <p class="text-xs text-slate-500 mt-2">
+              {{
+                t("dashboard.growth", {
+                  n: n(financials?.net_profit_growth_percentage || 0, { style: "percent" }),
+                })
+              }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section class="grid gap-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
       <div
@@ -285,8 +285,6 @@ const quickActions = [
         </div>
       </div>
     </section>
-
-
 
     <div class="grid gap-4 xl:grid-cols-3">
       <section class="overflow-hidden rounded-sm border border-slate-200 bg-white">

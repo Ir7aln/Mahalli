@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { commands } from "@/bindings";
 import * as Logger from "@tauri-apps/plugin-log";
-import { FilePenLine, GripHorizontal, Printer, ReceiptText, Trash2 } from "lucide-vue-next";
+import { FilePenLine, GripHorizontal, Printer, ReceiptText, Trash2, Eye } from "lucide-vue-next";
 import { toast } from "vue-sonner";
-import { NuxtLink, OrderDelete, OrderUpdate } from "#components";
+import { NuxtLink, OrderDelete, OrderUpdate, OrderView } from "#components";
 import { ORDER_STATUSES, STATUS_COLORS } from "@/consts";
 import type { OrderProductItem, SelectOrders } from "@/bindings";
 import { queryString } from "@/utils/query";
@@ -60,9 +60,15 @@ function previewProducts(id: string) {
 }
 const cancelPreviewProducts = () => clearTimeout(previewProductsTimer);
 
-function toggleThisOrder(order: SelectOrders, name: "delete" | "update") {
+function toggleThisOrder(order: SelectOrders, name: "delete" | "update" | "view") {
   if (name === "delete") {
     modal.open(OrderDelete, {
+      id: order.id,
+      identifier: order.identifier,
+    });
+  } else if (name === "view") {
+    modal.open(OrderView, {
+      sheet: true,
       id: order.id,
       identifier: order.identifier,
     });
@@ -326,11 +332,18 @@ async function createDeliveryNoteFromOrder(id: string) {
                   <GripHorizontal class="text-slate-800 inline" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent class="rtl:ml-6 ltr:mr-6">
-                  <DropdownMenuItem @click="toggleThisOrder(order, 'update')">
+                  <DropdownMenuItem class="cursor-pointer" @click="toggleThisOrder(order, 'view')">
+                    <Eye :size="20" class="text-slate-800 inline mr-2" />
+                    {{ t("buttons.view") }}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    :disabled="order.status === 'COMPLETED'"
+                    @click="toggleThisOrder(order, 'update')"
+                  >
                     <FilePenLine :size="20" class="text-slate-800 inline mr-2" />
                     {{ t("buttons.edit") }}
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem class="cursor-pointer">
                     <NuxtLink
                       :to="
                         localePath({
@@ -344,13 +357,19 @@ async function createDeliveryNoteFromOrder(id: string) {
                     </NuxtLink>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem @click="createDeliveryNoteFromOrder(order.id!)">
+                  <DropdownMenuItem
+                    class="cursor-pointer"
+                    @click="createDeliveryNoteFromOrder(order.id!)"
+                  >
                     <ReceiptText :size="20" class="text-slate-800 inline mr-2" />{{
                       t("buttons.to-delivery-note")
                     }}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem @click="toggleThisOrder(order, 'delete')">
+                  <DropdownMenuItem
+                    :disabled="order.status === 'COMPLETED'"
+                    @click="toggleThisOrder(order, 'delete')"
+                  >
                     <Trash2 :size="20" class="text-red-500 inline mr-2" />
                     <span class="text-red-500">
                       {{ t("buttons.delete") }}

@@ -1,22 +1,9 @@
 import { computed, h, reactive } from "vue";
-import {
-  Document,
-  Image,
-  Page,
-  Text,
-  View,
-  usePdf,
-  fontStore,
-} from "@ceereals/vue-pdf";
+import { Document, Image, Page, Text, View, usePdf, fontStore } from "@ceereals/vue-pdf";
 import * as Logger from "@tauri-apps/plugin-log";
 import { commands } from "@/bindings";
 
-type DocType =
-  | "order"
-  | "invoice"
-  | "quote"
-  | "delivery-note"
-  | "credit-note";
+type DocType = "order" | "invoice" | "quote" | "delivery-note" | "credit-note";
 
 let fontsRegistered = false;
 
@@ -32,9 +19,7 @@ function registerPdfFonts() {
 }
 
 function isArabicLocale(locale: string) {
-  return ["ar", "ar-MA", "ar-SA", "ar-AE", "ar-EG"].some((code) =>
-    locale.startsWith(code),
-  );
+  return ["ar", "ar-MA", "ar-SA", "ar-AE", "ar-EG"].some((code) => locale.startsWith(code));
 }
 
 function safeText(value: unknown) {
@@ -302,17 +287,11 @@ export function usePdfGenerator() {
       const items = Array.isArray(data.items) ? data.items : [];
       const vatMultiplier = 1 + (Number(config.vat) || 0) / 100;
       const subtotal = Number(data.total ?? 0);
-      const totalWithVat = config.fields.vat
-        ? subtotal * vatMultiplier
-        : subtotal;
+      const totalWithVat = config.fields.vat ? subtotal * vatMultiplier : subtotal;
 
-      const statusLabel = data.status
-        ? t(`status.${String(data.status).toLowerCase()}`)
-        : "-";
+      const statusLabel = data.status ? t(`status.${String(data.status).toLowerCase()}`) : "-";
 
-      const createdAtLabel = data.created_at
-        ? d(new Date(data.created_at), "long")
-        : "-";
+      const createdAtLabel = data.created_at ? d(new Date(data.created_at), "long") : "-";
 
       const hasSellerInfo = !!(
         seller?.legal_name ||
@@ -330,9 +309,7 @@ export function usePdfGenerator() {
         },
         () => [
           h(Page, { size: "A4", style: styles.page(rtl) }, () => [
-            templateImage
-              ? h(Image, { src: templateImage, style: styles.bgTemplate })
-              : null,
+            templateImage ? h(Image, { src: templateImage, style: styles.bgTemplate }) : null,
 
             // HEADER
             h(View, { style: styles.header(rtl) }, () => [
@@ -345,31 +322,37 @@ export function usePdfGenerator() {
                   : null,
               ]),
 
-              templateImage
-                ? h(Image, { src: templateImage, style: styles.logo })
-                : null,
+              templateImage ? h(Image, { src: templateImage, style: styles.logo }) : null,
             ]),
 
             // CUSTOMER
             h(View, { style: { marginBottom: 20 } }, () => [
               h(Text, { style: styles.sectionTitle(rtl) }, t("fields.bill-to")),
 
-              h(Text, { style: styles.bold(rtl) },
-                safeText(data.client?.full_name ?? data.full_name)),
+              h(
+                Text,
+                { style: styles.bold(rtl) },
+                safeText(data.client?.full_name ?? data.full_name),
+              ),
 
               config.fields.email
-                ? h(Text, { style: styles.text(rtl) },
-                    safeText(data.client?.email ?? data.email))
+                ? h(Text, { style: styles.text(rtl) }, safeText(data.client?.email ?? data.email))
                 : null,
 
               config.fields.phone_number
-                ? h(Text, { style: styles.text(rtl) },
-                    safeText(data.client?.phone_number ?? data.phone_number))
+                ? h(
+                    Text,
+                    { style: styles.text(rtl) },
+                    safeText(data.client?.phone_number ?? data.phone_number),
+                  )
                 : null,
 
               config.fields.address
-                ? h(Text, { style: styles.text(rtl) },
-                    safeText(data.client?.address ?? data.address))
+                ? h(
+                    Text,
+                    { style: styles.text(rtl) },
+                    safeText(data.client?.address ?? data.address),
+                  )
                 : null,
             ]),
 
@@ -417,8 +400,11 @@ export function usePdfGenerator() {
             ]),
 
             // TOTAL IN WORDS — full-width muted line
-            h(Text, { style: styles.totalWords(rtl) },
-              useTotalAsText().numberToText(totalWithVat, locale.value)),
+            h(
+              Text,
+              { style: styles.totalWords(rtl) },
+              useTotalAsText().numberToText(totalWithVat, locale.value),
+            ),
 
             // SELLER DETAILS (bottom)
             hasSellerInfo
@@ -429,11 +415,19 @@ export function usePdfGenerator() {
                     // LEFT — name / contact
                     h(View, { style: styles.col }, () => [
                       seller?.legal_name
-                        ? detailRow(rtl, t("seller-profile.fields.legal-name"), safeText(seller.legal_name))
+                        ? detailRow(
+                            rtl,
+                            t("seller-profile.fields.legal-name"),
+                            safeText(seller.legal_name),
+                          )
                         : null,
 
                       seller?.commercial_name
-                        ? detailRow(rtl, t("seller-profile.fields.commercial-name"), safeText(seller.commercial_name))
+                        ? detailRow(
+                            rtl,
+                            t("seller-profile.fields.commercial-name"),
+                            safeText(seller.commercial_name),
+                          )
                         : null,
 
                       seller?.email
@@ -444,25 +438,24 @@ export function usePdfGenerator() {
                         ? detailRow(rtl, t("fields.phone"), safeText(seller.phone_number))
                         : null,
 
-                      (seller?.address || seller?.city)
-                        ? detailRow(rtl, t("fields.address"),
-                            [seller?.address, seller?.city].filter(Boolean).join(", "))
+                      seller?.address || seller?.city
+                        ? detailRow(
+                            rtl,
+                            t("fields.address"),
+                            [seller?.address, seller?.city].filter(Boolean).join(", "),
+                          )
                         : null,
                     ]),
 
                     // RIGHT — legal identifiers
                     h(View, { style: styles.col }, () => [
-                      seller?.ice
-                        ? detailRow(rtl, t("fields.ice"), safeText(seller.ice))
-                        : null,
+                      seller?.ice ? detailRow(rtl, t("fields.ice"), safeText(seller.ice)) : null,
 
                       seller?.if_number
                         ? detailRow(rtl, t("fields.if-number"), safeText(seller.if_number))
                         : null,
 
-                      seller?.rc
-                        ? detailRow(rtl, t("fields.rc"), safeText(seller.rc))
-                        : null,
+                      seller?.rc ? detailRow(rtl, t("fields.rc"), safeText(seller.rc)) : null,
 
                       seller?.patente
                         ? detailRow(rtl, t("fields.patente"), safeText(seller.patente))
@@ -475,15 +468,21 @@ export function usePdfGenerator() {
             // FOOTER — gray bar, centered, matches bg-gray-50 text-center border-t
             seller?.invoice_footer
               ? h(View, { style: styles.footer }, () => [
-                  h(Text, { style: { fontSize: 9, color: "#4b5563" } },
-                    safeText(seller.invoice_footer)),
+                  h(
+                    Text,
+                    { style: { fontSize: 9, color: "#4b5563" } },
+                    safeText(seller.invoice_footer),
+                  ),
                 ])
               : null,
           ]),
         ],
       );
 
-      const pdf = await usePdf(computed(() => doc), { reactive: false });
+      const pdf = await usePdf(
+        computed(() => doc),
+        { reactive: false },
+      );
       await pdf.execute(true);
 
       return pdf.url.value ?? "";

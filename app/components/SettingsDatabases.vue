@@ -33,7 +33,9 @@ const {
 );
 
 const databases = computed<DatabaseRecord[]>(() => databasesData.value?.databases ?? []);
-const activeDatabase = computed<DatabaseRecord | null>(() => databasesData.value?.activeDatabase ?? null);
+const activeDatabase = computed<DatabaseRecord | null>(
+  () => databasesData.value?.activeDatabase ?? null,
+);
 
 async function refresh() {
   refreshKey.value += 1;
@@ -132,7 +134,9 @@ async function seedDatabase() {
 
   <section class="grid gap-6 xl:grid-cols-[380px_minmax(0,1fr)]">
     <div class="flex flex-col gap-6">
-      <div class="rounded-md border border-slate-200 bg-white p-6 shadow-sm text-left rtl:text-right">
+      <div
+        class="rounded-md border border-slate-200 bg-white p-6 shadow-sm text-left rtl:text-right"
+      >
         <h2 class="text-lg font-semibold text-slate-900">{{ t("database.create.title") }}</h2>
         <p class="mt-1 text-sm text-slate-500">
           {{ t("database.settings.create-card-description") }}
@@ -152,7 +156,9 @@ async function seedDatabase() {
         </div>
       </div>
 
-      <div class="rounded-md border border-slate-200 bg-white p-6 shadow-sm text-left rtl:text-right">
+      <div
+        class="rounded-md border border-slate-200 bg-white p-6 shadow-sm text-left rtl:text-right"
+      >
         <h2 class="text-lg font-semibold text-slate-900">
           {{ t("database.settings.seed-title") }}
         </h2>
@@ -206,11 +212,7 @@ async function seedDatabase() {
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="database in databases"
-              :key="database.id"
-              class="border-t border-slate-200"
-            >
+            <tr v-for="database in databases" :key="database.id" class="border-t border-slate-200">
               <td class="px-4 py-4 text-left rtl:text-right">
                 <p class="font-medium text-slate-900">{{ database.name }}</p>
                 <p
@@ -228,9 +230,7 @@ async function seedDatabase() {
               </td>
               <td class="px-4 py-4">
                 <Badge :variant="database.is_active ? 'default' : 'secondary'">
-                  {{
-                    database.is_active ? t("database.status.active") : t("database.status.idle")
-                  }}
+                  {{ database.is_active ? t("database.status.active") : t("database.status.idle") }}
                 </Badge>
               </td>
               <td class="px-4 py-4 ltr:text-right rtl:text-left">

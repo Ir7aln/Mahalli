@@ -54,7 +54,8 @@
     "generate-credit-note": "إنشاء إشعار الخصم",
     "create": "إنشاء",
     "creating": "جاري الإنشاء...",
-    "view": "عرض"
+    "view": "عرض",
+    "close": "إغلاق"
   },
   "translationTitle": "تغيير اللغة",
   "translationDescription": "اختر اللغة التي تريد استخدامها في Mahalli.",
@@ -424,16 +425,19 @@
     },
     "orders": {
       "create": "إضافة طلب جديد",
+      "view": "عرض الطلب",
       "update": "تحديث الطلب",
       "delete": "حذف الطلب"
     },
     "quotes": {
       "create": "إضافة عرض جديد",
+      "view": "عرض العرض",
       "update": "تحديث العرض",
       "delete": "حذف العرض"
     },
     "invoices": {
       "create": "إضافة فاتورة جديدة",
+      "view": "عرض الفاتورة",
       "update": "تحديث الفاتورة",
       "delete": "حذف الفاتورة",
       "add-payment": "إضافة دفعة"

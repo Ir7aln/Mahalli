@@ -39,9 +39,9 @@ onUnmounted(() => ro?.disconnect());
 </template>
 
 <style scoped>
-    @media (min-width: 1024px) {
-    :deep(table) {
-        table-layout: fixed;
-    }
-    }
+@media (min-width: 1024px) {
+  :deep(table) {
+    table-layout: fixed;
+  }
+}
 </style>

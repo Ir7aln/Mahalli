@@ -54,7 +54,8 @@
     "generate-credit-note": "Generate credit note",
     "create": "Create",
     "creating": "Creating...",
-    "view": "View"
+    "view": "View",
+    "close": "Close"
   },
   "translationTitle": "Change Language",
   "translationDescription": "Choose the language you want to use across Mahalli.",
@@ -425,16 +426,19 @@
     },
     "orders": {
       "create": "Add new order",
+      "view": "View order",
       "update": "Update order",
       "delete": "Delete order"
     },
     "quotes": {
       "create": "Add new quote",
+      "view": "View quote",
       "update": "Update quote",
       "delete": "Delete quote"
     },
     "invoices": {
       "create": "Add new invoice",
+      "view": "View invoice",
       "update": "Update invoice",
       "delete": "Delete invoice",
       "add-payment": "Add payment"

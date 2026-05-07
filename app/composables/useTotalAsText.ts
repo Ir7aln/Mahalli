@@ -1,27 +1,107 @@
 type SupportedLanguage = "ar" | "fr" | "en";
 
 export function useTotalAsText() {
-
   const arabicOnes = [
-    "", "واحد", "اثنان", "ثلاثة", "أربعة", "خمسة", "ستة", "سبعة", "ثمانية", "تسعة",
-    "عشرة", "أحد عشر", "اثنا عشر", "ثلاثة عشر", "أربعة عشر", "خمسة عشر", "ستة عشر", "سبعة عشر", "ثمانية عشر", "تسعة عشر",
+    "",
+    "واحد",
+    "اثنان",
+    "ثلاثة",
+    "أربعة",
+    "خمسة",
+    "ستة",
+    "سبعة",
+    "ثمانية",
+    "تسعة",
+    "عشرة",
+    "أحد عشر",
+    "اثنا عشر",
+    "ثلاثة عشر",
+    "أربعة عشر",
+    "خمسة عشر",
+    "ستة عشر",
+    "سبعة عشر",
+    "ثمانية عشر",
+    "تسعة عشر",
   ];
-  const arabicTens = ["", "عشرة", "عشرون", "ثلاثون", "أربعون", "خمسون", "ستون", "سبعون", "ثمانون", "تسعون"];
-  const arabicHundreds = ["", "مائة", "مئتان", "ثلاثمائة", "أربعمائة", "خمسمائة", "ستمائة", "سبعمائة", "ثمانمائة", "تسعمائة"];
+  const arabicTens = [
+    "",
+    "عشرة",
+    "عشرون",
+    "ثلاثون",
+    "أربعون",
+    "خمسون",
+    "ستون",
+    "سبعون",
+    "ثمانون",
+    "تسعون",
+  ];
+  const arabicHundreds = [
+    "",
+    "مائة",
+    "مئتان",
+    "ثلاثمائة",
+    "أربعمائة",
+    "خمسمائة",
+    "ستمائة",
+    "سبعمائة",
+    "ثمانمائة",
+    "تسعمائة",
+  ];
   const arabicScales = ["", "ألف", "مليون", "مليار", "تريليون"];
 
-
   const frenchOnes = ["", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"];
-  const frenchTeens = ["dix", "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit", "dix-neuf"];
-  const frenchTens = ["", "dix", "vingt", "trente", "quarante", "cinquante", "soixante", "soixante-dix", "quatre-vingt", "quatre-vingt-dix"];
+  const frenchTeens = [
+    "dix",
+    "onze",
+    "douze",
+    "treize",
+    "quatorze",
+    "quinze",
+    "seize",
+    "dix-sept",
+    "dix-huit",
+    "dix-neuf",
+  ];
+  const frenchTens = [
+    "",
+    "dix",
+    "vingt",
+    "trente",
+    "quarante",
+    "cinquante",
+    "soixante",
+    "soixante-dix",
+    "quatre-vingt",
+    "quatre-vingt-dix",
+  ];
   const frenchScales = ["", "mille", "million", "milliard", "billion"];
 
-
   const englishOnes = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
-  const englishTeens = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
-  const englishTens = ["", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+  const englishTeens = [
+    "ten",
+    "eleven",
+    "twelve",
+    "thirteen",
+    "fourteen",
+    "fifteen",
+    "sixteen",
+    "seventeen",
+    "eighteen",
+    "nineteen",
+  ];
+  const englishTens = [
+    "",
+    "ten",
+    "twenty",
+    "thirty",
+    "forty",
+    "fifty",
+    "sixty",
+    "seventy",
+    "eighty",
+    "ninety",
+  ];
   const englishScales = ["", "thousand", "million", "billion", "trillion"];
-
 
   function convertToArabic(number: number): string {
     if (number === 0) return "صفر";
@@ -65,7 +145,6 @@ export function useTotalAsText() {
     return parts.join(" و ");
   }
 
-
   function convertToFrench(number: number): string {
     if (number === 0) return "zéro";
     if (number < 0) return `moins ${convertToFrench(Math.abs(number))}`;
@@ -79,8 +158,7 @@ export function useTotalAsText() {
         const partText = convertFrenchPart(part);
         const scale = scaleIndex > 0 ? frenchScales[scaleIndex] : "";
 
-        const pluralScale = (part > 1 && scaleIndex > 1) ? `${scale}s` : scale;
-
+        const pluralScale = part > 1 && scaleIndex > 1 ? `${scale}s` : scale;
 
         const isOneThousand = part === 1 && scaleIndex === 1;
         const prefix = isOneThousand ? "" : partText;
@@ -91,7 +169,7 @@ export function useTotalAsText() {
       scaleIndex++;
     }
 
-    return result.replace(/\s+/g, ' ').trim();
+    return result.replace(/\s+/g, " ").trim();
   }
 
   function convertFrenchPart(number: number): string {
@@ -100,7 +178,8 @@ export function useTotalAsText() {
     const remainder = number % 100;
 
     if (hundreds > 0) {
-      result += hundreds === 1 ? "cent " : `${frenchOnes[hundreds]} cent${remainder === 0 ? "s " : " "}`;
+      result +=
+        hundreds === 1 ? "cent " : `${frenchOnes[hundreds]} cent${remainder === 0 ? "s " : " "}`;
     }
 
     if (remainder > 0) {
@@ -113,12 +192,10 @@ export function useTotalAsText() {
         const ones = remainder % 10;
 
         if (tens === 7 || tens === 9) {
-
           const baseTen = tens === 7 ? "soixante" : "quatre-vingt";
-          const connector = (tens === 7 && ones === 1) ? " et " : "-";
+          const connector = tens === 7 && ones === 1 ? " et " : "-";
           result += `${baseTen}${connector}${frenchTeens[ones]}`;
         } else {
-
           const is80Exact = tens === 8 && ones === 0;
           result += is80Exact ? "quatre-vingts" : frenchTens[tens];
 
@@ -133,7 +210,6 @@ export function useTotalAsText() {
 
     return result.trim();
   }
-
 
   function convertToEnglish(number: number): string {
     if (number === 0) return "zero";
@@ -152,7 +228,7 @@ export function useTotalAsText() {
       scaleIndex++;
     }
 
-    return result.replace(/\s+/g, ' ').trim();
+    return result.replace(/\s+/g, " ").trim();
   }
 
   function convertEnglishPart(number: number): string {
@@ -181,7 +257,6 @@ export function useTotalAsText() {
 
     return result.trim();
   }
-
 
   const numberToText = (number: number, language: SupportedLanguage | string) => {
     const integerPart = Math.floor(number);

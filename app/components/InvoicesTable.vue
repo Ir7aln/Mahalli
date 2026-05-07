@@ -8,10 +8,17 @@ import {
   Trash2,
   ReceiptText,
   CheckCircle2,
+  Eye,
 } from "lucide-vue-next";
 import * as Logger from "@tauri-apps/plugin-log";
 import { toast } from "vue-sonner";
-import { InvoiceAddPayment, InvoiceDelete, InvoiceUpdate, CreditNoteCreate } from "#components";
+import {
+  InvoiceAddPayment,
+  InvoiceDelete,
+  InvoiceUpdate,
+  InvoiceView,
+  CreditNoteCreate,
+} from "#components";
 import { INVOICE_STATUSES, STATUS_COLORS } from "@/consts";
 import { queryString } from "@/utils/query";
 
@@ -69,9 +76,15 @@ function previewProducts(id: string) {
 }
 const cancelPreviewProducts = () => clearTimeout(previewProductsTimer);
 
-function toggleThisInvoice(invoice: SelectInvoices, name: "delete" | "update") {
+function toggleThisInvoice(invoice: SelectInvoices, name: "delete" | "update" | "view") {
   if (name === "delete") {
     modal.open(InvoiceDelete, {
+      id: invoice.id,
+      identifier: invoice.identifier,
+    });
+  } else if (name === "view") {
+    modal.open(InvoiceView, {
+      sheet: true,
       id: invoice.id,
       identifier: invoice.identifier,
     });
@@ -353,11 +366,23 @@ function createCreditNote(invoice: SelectInvoices) {
                   <GripHorizontal class="text-slate-800 inline" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent class="rtl:ml-6 ltr:mr-6">
-                  <DropdownMenuItem @click="toggleThisInvoice(invoice, 'update')">
+                  <DropdownMenuItem
+                    class="cursor-pointer"
+                    @click="toggleThisInvoice(invoice, 'view')"
+                  >
+                    <Eye :size="20" class="text-slate-800 inline mr-2" />
+                    {{ t("buttons.view") }}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    class="cursor-pointer"
+                    :disabled="invoice.status === 'FINALIZED'"
+                    @click="toggleThisInvoice(invoice, 'update')"
+                  >
                     <FilePenLine :size="20" class="text-slate-800 inline mr-2" />
                     {{ t("buttons.edit") }}
                   </DropdownMenuItem>
                   <DropdownMenuItem
+                    class="cursor-pointer"
                     :disabled="invoice.status !== 'PAID'"
                     @click="finalizeInvoice(invoice.id as string)"
                   >
@@ -365,13 +390,18 @@ function createCreditNote(invoice: SelectInvoices) {
                     {{ t("buttons.finalize") }}
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    :disabled="toNumber(invoice.total) - toNumber(invoice.paid_amount) <= 0"
+                    class="cursor-pointer"
+                    :disabled="
+                      toNumber(invoice.total) - toNumber(invoice.paid_amount) <= 0 ||
+                      invoice.status === 'PAID' ||
+                      invoice.status === 'FINALIZED'
+                    "
                     @click="openAddPayment(invoice)"
                   >
                     <CircleDollarSign :size="20" class="text-slate-800 inline mr-2" />
                     {{ t("buttons.add-payment") }}
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem class="cursor-pointer">
                     <NuxtLink
                       :to="
                         localePath({
@@ -386,13 +416,18 @@ function createCreditNote(invoice: SelectInvoices) {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
+                    class="cursor-pointer"
                     :disabled="invoice.status !== 'FINALIZED'"
                     @click="createCreditNote(invoice)"
                   >
                     <ReceiptText :size="20" class="text-slate-800 inline mr-2" />
                     {{ t("buttons.create-credit-note") }}
                   </DropdownMenuItem>
-                  <DropdownMenuItem @click="toggleThisInvoice(invoice, 'delete')">
+                  <DropdownMenuItem
+                    class="cursor-pointer"
+                    :disabled="invoice.status === 'FINALIZED'"
+                    @click="toggleThisInvoice(invoice, 'delete')"
+                  >
                     <Trash2 :size="20" class="text-red-500 inline mr-2" />
                     <span class="text-red-500">
                       {{ t("buttons.delete") }}
