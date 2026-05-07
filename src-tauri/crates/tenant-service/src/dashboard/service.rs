@@ -33,7 +33,7 @@ fn invoice_paid_amount_expr() -> SimpleExpr {
 
 fn revenue_expr(start: &'static str, end: Option<&'static str>) -> SimpleExpr {
     let mut condition = Expr::cust(start)
-        .and(Expr::col((Invoices, invoices::Column::Status)).is_in(vec!["PAID", "PARTIALLY_PAID"]))
+        .and(Expr::col((Invoices, invoices::Column::Status)).is_in(vec!["PAID", "PARTIALLY_PAID", "FINALIZED"]))
         .and(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
         .and(
             Expr::col((Orders, orders::Column::Status))
@@ -53,6 +53,14 @@ fn revenue_expr(start: &'static str, end: Option<&'static str>) -> SimpleExpr {
                     Expr::expr(Func::sum(
                         Expr::case(
                             Expr::col((Invoices, invoices::Column::Status)).eq("PAID"),
+                            Expr::col((
+                                InventoryTransactions,
+                                inventory_transactions::Column::Quantity,
+                            ))
+                            .mul(Expr::col((OrderItems, order_items::Column::Price))),
+                        )
+                        .case(
+                            Expr::col((Invoices, invoices::Column::Status)).eq("FINALIZED"),
                             Expr::col((
                                 InventoryTransactions,
                                 inventory_transactions::Column::Quantity,
