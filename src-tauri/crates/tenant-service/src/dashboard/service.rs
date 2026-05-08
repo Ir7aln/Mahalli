@@ -54,11 +54,10 @@ fn invoice_credit_notes_amount_expr() -> SimpleExpr {
                 .join(
                     JoinType::InnerJoin,
                     credit_notes::Entity,
-                    Expr::col((credit_notes::Entity, credit_notes::Column::Id))
-                        .equals((
-                            credit_note_items::Entity,
-                            credit_note_items::Column::CreditNoteId,
-                        )),
+                    Expr::col((credit_notes::Entity, credit_notes::Column::Id)).equals((
+                        credit_note_items::Entity,
+                        credit_note_items::Column::CreditNoteId,
+                    )),
                 )
                 .cond_where(
                     Expr::col((credit_notes::Entity, credit_notes::Column::InvoiceId))
@@ -71,7 +70,11 @@ fn invoice_credit_notes_amount_expr() -> SimpleExpr {
 
 fn revenue_expr(start: &'static str, end: Option<&'static str>) -> SimpleExpr {
     let mut condition = Expr::cust(start)
-        .and(Expr::col((Invoices, invoices::Column::Status)).is_in(vec!["PAID", "PARTIALLY_PAID", "FINALIZED"]))
+        .and(Expr::col((Invoices, invoices::Column::Status)).is_in(vec![
+            "PAID",
+            "PARTIALLY_PAID",
+            "FINALIZED",
+        ]))
         .and(Expr::col((Invoices, invoices::Column::IsDeleted)).eq(false))
         .and(
             Expr::col((Orders, orders::Column::Status))
