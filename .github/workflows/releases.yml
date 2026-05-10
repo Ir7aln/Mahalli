@@ -42,23 +42,44 @@ jobs:
       matrix:
         platform: [macos-latest, ubuntu-22.04, windows-latest]
     runs-on: ${{ matrix.platform }}
+    env:
+      CARGO_INCREMENTAL: "0"
     steps:
       - uses: actions/checkout@v4
         with:
           lfs: true
+
+      - name: Add LLVM to PATH
+        if: matrix.platform == 'windows-latest'
+        run: echo "C:\Program Files\LLVM\bin" >> $env:GITHUB_PATH
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
-      - name: install Rust stable
+
+      - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
-      - name: install dependencies (ubuntu only)
+
+      - name: Install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev
-      - name: install frontend dependencies
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ matrix.platform }}-cargo-deps-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ matrix.platform }}-cargo-deps-
+
+      - name: Install frontend dependencies
         run: bun install
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

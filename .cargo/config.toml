@@ -1,0 +1,6 @@
+[profile.release]
+codegen-units = 16
+
+[target.x86_64-pc-windows-msvc]
+linker = "lld-link"
+rustflags = ["-C", "link-arg=/DEBUG:NONE"]
