@@ -64,6 +64,7 @@ fn resolve_default_tenant_path(tenants_dir: &Path) -> PathBuf {
     tenants_dir.join("main.sqlite")
 }
 
+#[cfg(debug_assertions)]
 fn sqlite_url_to_path(url: &str) -> Option<PathBuf> {
     let path = url.strip_prefix("sqlite://")?;
     let path = path.split('?').next()?;

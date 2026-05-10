@@ -73,6 +73,7 @@ pub fn builder<R: Runtime>() -> Builder<R> {
     ])
 }
 
+#[cfg(test)]
 pub fn export_bindings() {
     builder::<tauri::Wry>()
         .export(
