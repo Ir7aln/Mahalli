@@ -49,7 +49,7 @@
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDg2NkRCNTQ0M0UzNkYyNDgKUldSSThqWStSTFZ0aGtIempCL0RUYVhiS2ZHZnZDZUJKVklDc1lUV0FSWkF4b25ZSS84clE3SEIK",
       "endpoints": [
-        "https://mahalli-dektop-updater.abdelilah4dev.workers.dev/check/AbdelilahOu/Mahalli-nuxt/{{target}}/{{arch}}/{{current_version}}"
+        "https://tauri-updater.ar7al.workers.dev/check/Ir7aln/Mahalli/{{target}}/{{arch}}/{{current_version}}"
       ],
       "windows": {
         "installMode": "basicUi"
