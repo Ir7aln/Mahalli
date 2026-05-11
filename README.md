@@ -6,16 +6,6 @@
 
 Mahalli is a desktop application for inventory and invoicing. It helps you manage clients, products, quotes, orders, and invoices — across multiple workspaces.
 
-## Video Showcase
-
-Check out a quick video demonstration of Mahalli's features:
-
-[Watch the Showcase Video](assets/showcase.mp4)
-
-<div>
-    <video src="assets/showcase.mp4" controls></video>
-</div>
-
 ## Built for Moroccan B2B Workflow
 
 Mahalli is specifically designed around the B2B document chain used by Moroccan businesses. The full flow is:
@@ -123,9 +113,3 @@ Shorthands `make migrationsup`, `make migrationslast`, `make migrationsdown`, an
 | `make system-migrationsdown`        | Drop and reset the system database            |
 | `make system-entity`                | Regenerate SeaORM entities from the system DB |
 | `make system-migration name=<name>` | Generate a new system migration file          |
-
-### Version
-
-```bash
-make update-v v=1.2.3
-```
