@@ -286,6 +286,9 @@ impl OrdersService {
                     status: order.0.status,
                     identifier: order.0.identifier,
                     full_name: client.full_name,
+                    email: client.email,
+                    address: client.address,
+                    phone_number: client.phone_number,
                     items,
                 })
             }

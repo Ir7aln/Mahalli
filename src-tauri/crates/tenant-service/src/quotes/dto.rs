@@ -103,6 +103,9 @@ pub struct QuoteWithClient {
     pub created_at: String,
     pub identifier: Option<String>,
     pub full_name: String,
+    pub email: Option<String>,
+    pub address: Option<String>,
+    pub phone_number: Option<String>,
     pub items: Vec<SelectQuotesItemsForUpdate>,
 }
 

@@ -90,7 +90,7 @@ handleGeneratePdf();
 
 <template>
   <main class="w-full h-full flex gap-2 min-h-[calc(100vh-68px)]">
-    <PdfViewer :pdf-content="pdfContent" />
+    <PdfViewer :pdf-content="pdfContent" :filename="quote?.identifier ?? undefined" />
     <TemplateForm
       :config="config"
       :document="quote"

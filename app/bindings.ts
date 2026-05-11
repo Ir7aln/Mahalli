@@ -528,6 +528,9 @@ export type OrderWithClient = {
 	status: string,
 	identifier: string | null,
 	full_name: string,
+	email: string | null,
+	address: string | null,
+	phone_number: string | null,
 	items: SelectOrdersItemsForUpdate[],
 };
 
@@ -585,6 +588,9 @@ export type QuoteWithClient = {
 	created_at: string,
 	identifier: string | null,
 	full_name: string,
+	email: string | null,
+	address: string | null,
+	phone_number: string | null,
 	items: SelectQuotesItemsForUpdate[],
 };
 

@@ -260,6 +260,9 @@ impl QuotesService {
                     created_at: quote.0.created_at.to_string(),
                     identifier: quote.0.identifier,
                     full_name: client.full_name,
+                    email: client.email,
+                    address: client.address,
+                    phone_number: client.phone_number,
                     items,
                 })
             }

@@ -91,7 +91,7 @@ handleGeneratePdf();
 
 <template>
   <main class="w-full h-full flex gap-2 min-h-[calc(100vh-68px)]">
-    <PdfViewer :pdf-content="pdfContent" />
+    <PdfViewer :pdf-content="pdfContent" :filename="deliveryNote?.identifier ?? undefined" />
     <TemplateForm
       :config="config"
       :document="deliveryNote"

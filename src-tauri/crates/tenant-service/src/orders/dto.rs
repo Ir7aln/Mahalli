@@ -115,6 +115,9 @@ pub struct OrderWithClient {
     pub status: String,
     pub identifier: Option<String>,
     pub full_name: String,
+    pub email: Option<String>,
+    pub address: Option<String>,
+    pub phone_number: Option<String>,
     pub items: Vec<SelectOrdersItemsForUpdate>,
 }
 

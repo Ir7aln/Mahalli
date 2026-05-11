@@ -89,7 +89,7 @@ handleGeneratePdf();
 
 <template>
   <main class="flex space-x-2 h-full flex-1">
-    <PdfViewer :pdf-content="pdfContent" />
+    <PdfViewer :pdf-content="pdfContent" :filename="invoice?.identifier ?? undefined" />
     <TemplateForm
       :config="config"
       :document="invoice"

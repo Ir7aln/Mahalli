@@ -43,7 +43,7 @@
   },
   "productName": "mahalli",
   "mainBinaryName": "mahalli",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "identifier": ".mahalli",
   "plugins": {
     "updater": {
