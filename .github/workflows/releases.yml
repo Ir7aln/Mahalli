@@ -67,14 +67,22 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev
 
+      - name: Compute Cargo cache key
+        id: cargo-cache-key
+        shell: bash
+        run: |
+          hash=$(grep '^checksum' src-tauri/Cargo.lock | python3 -c "import sys,hashlib;
+          print(hashlib.sha256(sys.stdin.buffer.read()).hexdigest())")
+          echo "hash=$hash" >> $GITHUB_OUTPUT
+
       - name: Cache Cargo registry
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: ${{ matrix.platform }}-cargo-deps-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ matrix.platform }}-cargo-deps-${{ steps.cargo-cache-key.outputs.hash }}
           restore-keys: ${{ matrix.platform }}-cargo-deps-
 
       - name: Install frontend dependencies
