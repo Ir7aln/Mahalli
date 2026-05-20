@@ -39,7 +39,6 @@ const queryParams = computed(() => ({
   page: queryNumber(route.query.page, 1),
   limit: route.query.limit ? queryNumber(route.query.limit, LIMIT) : LIMIT,
   search: queryString(route.query.search),
-  refresh: queryString(route.query.refresh),
   sort: queryString(route.query.sort) || null,
   direction: queryString(route.query.direction) || null,
   created_from: createdFrom.value || null,
@@ -104,7 +103,7 @@ async function fetchCreditNotes() {
   return result.data.data;
 }
 
-const { data: creditNotesData } = await useAsyncData(fetchCreditNotes, {
+const { data: creditNotesData } = await useAsyncData("credit-notes-list", fetchCreditNotes, {
   watch: [queryParams],
 });
 

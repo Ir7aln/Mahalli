@@ -88,9 +88,7 @@ async function createOrderFromQuote(id: string) {
     return;
   }
   Logger.info(`CREATE ORDER FROM QUOTE: ${id}`);
-  updateQueryParams({
-    refresh: `refresh-update-${Math.random() * 9999}`,
-  });
+  await refreshNuxtData(["quotes-list", "home-quotes", "orders-list", "home-orders"]);
   toast.success(t("notifications.order.created"), {
     closeButton: true,
     description: h(NuxtLink, {

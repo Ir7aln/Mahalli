@@ -8,7 +8,6 @@ const props = defineProps<{
   id: string;
   identifier: string;
 }>();
-const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const { t } = useI18n();
 const { showErrorToast } = useCommandError();
@@ -23,10 +22,7 @@ async function deleteTheInvoice() {
     toast.success(t("notifications.invoice.deleted"), {
       closeButton: true,
     });
-    // toggle refresh
-    updateQueryParams({
-      refresh: `refresh-delete-${Math.random() * 9999}`,
-    });
+    await refreshNuxtData(["invoices-list", "home-invoices", "home-financials"]);
   } catch (err: any) {
     showErrorToast(err);
     Logger.error(`ERROR DELETE INVOICE: ${err.error ? err.error : err.message}`);

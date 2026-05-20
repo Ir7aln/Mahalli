@@ -53,6 +53,8 @@ async function createDatabase() {
     closeButton: true,
   });
 
+  await refreshNuxtData("nav-databases");
+
   if (props.onCreated) {
     await props.onCreated();
   }

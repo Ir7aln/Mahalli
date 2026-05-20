@@ -32,7 +32,6 @@ const props = defineProps<{
   identifier: string;
 }>();
 
-const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const { t, d, n } = useI18n();
 const { showErrorToast } = useCommandError();
@@ -188,9 +187,7 @@ const onSubmit = handleSubmit(async (formValues) => {
       closeButton: true,
     });
 
-    updateQueryParams({
-      refresh: `refresh-update-${Math.random() * 9999}`,
-    });
+    await refreshNuxtData(["invoices-list", "home-invoices", "home-financials"]);
   } catch (err: any) {
     Logger.error(`ERROR UPDATE INVOICE: ${err.error ? err.error : err.message}`);
   } finally {

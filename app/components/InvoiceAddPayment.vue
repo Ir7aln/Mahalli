@@ -14,7 +14,6 @@ const props = defineProps<{
 
 const { t, d, n } = useI18n();
 const { showErrorToast, getErrorMessage } = useCommandError();
-const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const isPosting = ref(false);
 const isLoading = ref(true);
@@ -101,9 +100,7 @@ const onSubmit = handleSubmit(async (formValues) => {
       },
     });
 
-    updateQueryParams({
-      refresh: `refresh-payment-${Math.random() * 9999}`,
-    });
+    await refreshNuxtData(["invoices-list", "home-invoices", "home-financials"]);
   } catch (err: any) {
     toast.error(t("notifications.error.title"), {
       description: getErrorMessage(err),

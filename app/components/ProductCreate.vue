@@ -10,7 +10,6 @@ import { z } from "zod";
 
 const { t } = useI18n();
 const { showErrorToast } = useCommandError();
-const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const quantity = ref<number>(0);
 
@@ -67,10 +66,7 @@ async function createNewProduct(product: NewProduct) {
     toast.success(t("notifications.product.created", { name: product.name }), {
       closeButton: true,
     });
-    // toggle refresh
-    updateQueryParams({
-      refresh: `refresh-create-${Math.random() * 9999}`,
-    });
+    await refreshNuxtData(["products-list", "home-inventory"]);
   } catch (err: any) {
     showErrorToast(err);
     Logger.error(`ERROR CREATE PRODUCT: ${err.error ? err.error : err.message}`);

@@ -12,7 +12,6 @@ const props = defineProps<{
   id: string;
   name: string;
 }>();
-const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const { t } = useI18n();
 const { showErrorToast } = useCommandError();
@@ -51,10 +50,7 @@ async function updateTheProduct({ quantity }: z.infer<typeof inventory>) {
     toast.success(t("notifications.product.updated", { name: props.name }), {
       closeButton: true,
     });
-    // toggle refresh
-    updateQueryParams({
-      refresh: `refresh-update-${Math.random() * 9999}`,
-    });
+    await refreshNuxtData(["inventory-list", "home-inventory"]);
   } catch (err: any) {
     showErrorToast(err);
     Logger.error(`ERROR UPDATE PRODUCT INVENTORY: ${err.error ? err.error : err.message}`);

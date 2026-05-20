@@ -21,7 +21,6 @@ const props = defineProps<{
 }>();
 const { t } = useI18n();
 const { showErrorToast } = useCommandError();
-const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const clientSchema = toTypedSchema(
   z.object({
@@ -87,10 +86,7 @@ async function updateTheClient(client: {
     toast.success(t("notifications.client.updated", { name: client.full_name }), {
       closeButton: true,
     });
-    // toggle refresh
-    updateQueryParams({
-      refresh: `refresh-update-${Math.random() * 9999}`,
-    });
+    await refreshNuxtData("clients-list");
   } catch (err: any) {
     showErrorToast(err);
     Logger.error(`ERROR UPDATE CLIENT: ${err.error ? err.error : err.message}`);

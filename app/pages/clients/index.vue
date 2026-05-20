@@ -58,7 +58,6 @@ const queryParams = computed(() => ({
   page: queryNumber(route.query.page, 1),
   limit: route.query.limit ? queryNumber(route.query.limit, LIMIT) : LIMIT,
   credit_only: queryBoolean(route.query.credit_only, false) ?? false,
-  refresh: queryString(route.query.refresh),
   sort: queryString(route.query.sort) || null,
   direction: queryString(route.query.direction) || null,
 }));
@@ -81,7 +80,7 @@ async function fetchClients() {
   return result.data.data;
 }
 
-const { data: clientsData } = await useAsyncData(fetchClients, {
+const { data: clientsData } = await useAsyncData("clients-list", fetchClients, {
   watch: [queryParams],
 });
 

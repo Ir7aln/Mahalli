@@ -113,9 +113,7 @@ async function updateInvoiceStatus(id: string, status: string) {
     return;
   }
   Logger.info(`UPDATE INVOICE STATUS: ${JSON.stringify({ id, status })}`);
-  updateQueryParams({
-    refresh: `refresh-update-${Math.random() * 9999}`,
-  });
+  await refreshNuxtData(["invoices-list", "home-invoices", "home-financials"]);
 }
 
 async function finalizeInvoice(id: string) {
@@ -126,9 +124,7 @@ async function finalizeInvoice(id: string) {
     return;
   }
   Logger.info(`FINALIZE INVOICE: ${id}`);
-  updateQueryParams({
-    refresh: `refresh-update-${Math.random() * 9999}`,
-  });
+  await refreshNuxtData(["invoices-list", "home-invoices", "home-financials"]);
 }
 
 function createCreditNote(invoice: SelectInvoices) {

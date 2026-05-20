@@ -50,7 +50,6 @@ const queryParams = computed(() => ({
     : null,
   price_min: queryString(route.query.price_min) ? queryNumber(route.query.price_min, 0) : null,
   price_max: queryString(route.query.price_max) ? queryNumber(route.query.price_max, 0) : null,
-  refresh: queryString(route.query.refresh),
   sort: queryString(route.query.sort) || null,
   direction: queryString(route.query.direction) || null,
 }));
@@ -79,7 +78,7 @@ async function fetchInventory() {
   return result.data.data;
 }
 
-const { data: inventoryData } = await useAsyncData(fetchInventory, {
+const { data: inventoryData } = await useAsyncData("inventory-list", fetchInventory, {
   watch: [queryParams],
 });
 

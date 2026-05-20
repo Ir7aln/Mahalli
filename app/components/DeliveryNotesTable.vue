@@ -79,9 +79,7 @@ async function createInvoiceFromDeliveryNote(id: string) {
     return;
   }
   Logger.info(`CREATE INVOICE FROM DELIVERY NOTE: ${id}`);
-  updateQueryParams({
-    refresh: `refresh-update-${Math.random() * 9999}`,
-  });
+  await refreshNuxtData(["delivery-notes-list", "home-delivery-notes", "invoices-list", "home-invoices", "home-financials"]);
   toast.success(t("notifications.invoice.created"), {
     closeButton: true,
     description: h(NuxtLink, {

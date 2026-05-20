@@ -26,7 +26,6 @@ interface ProductOption {
 
 const { t, d, n } = useI18n();
 const { showErrorToast } = useCommandError();
-const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const clients = ref<ClientOption[]>([]);
 const products = ref<ProductOption[]>([]);
@@ -136,9 +135,7 @@ const onSubmit = handleSubmit(async (formValues) => {
       closeButton: true,
     });
 
-    updateQueryParams({
-      refresh: `refresh-create-${Math.random() * 9999}`,
-    });
+    await refreshNuxtData(["quotes-list", "home-quotes"]);
   } catch (err: any) {
     showErrorToast(err);
     Logger.error(`ERROR CREATE QUOTE: ${err.error ? err.error : err.message}`);

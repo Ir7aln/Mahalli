@@ -29,7 +29,6 @@ const props = defineProps<{
   id: string;
   identifier: string;
 }>();
-const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const { t, d, n } = useI18n();
 const { showErrorToast } = useCommandError();
@@ -168,9 +167,7 @@ const onSubmit = handleSubmit(async (formValues) => {
       closeButton: true,
     });
 
-    updateQueryParams({
-      refresh: `refresh-update-${Math.random() * 9999}`,
-    });
+    await refreshNuxtData(["quotes-list", "home-quotes"]);
   } catch (err: any) {
     showErrorToast(err);
     Logger.error(`ERROR UPDATE QUOTE: ${err.error ? err.error : err.message}`);

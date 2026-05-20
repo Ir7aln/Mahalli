@@ -263,7 +263,8 @@
     "status": {
       "active": "نشطة",
       "idle": "غير نشطة",
-      "current": "الحالية"
+      "current": "الحالية",
+      "switch-title": "تبديل قاعدة البيانات"
     },
     "placeholders": {
       "name": "متجر الدار البيضاء",

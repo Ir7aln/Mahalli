@@ -89,9 +89,7 @@ async function updateOrderStatus(id: string, status: string) {
     return;
   }
   Logger.info(`UPDATE ORDER STATUS: ${JSON.stringify({ id, status })}`);
-  updateQueryParams({
-    refresh: `refresh-update-${Math.random() * 9999}`,
-  });
+  await refreshNuxtData(["orders-list", "home-orders"]);
 }
 
 async function createDeliveryNoteFromOrder(id: string) {
@@ -102,9 +100,7 @@ async function createDeliveryNoteFromOrder(id: string) {
     return;
   }
   Logger.info(`CREATE DELIVERY NOTE FROM ORDER: ${id}`);
-  updateQueryParams({
-    refresh: `refresh-update-${Math.random() * 9999}`,
-  });
+  await refreshNuxtData(["orders-list", "home-orders", "delivery-notes-list", "home-delivery-notes"]);
   toast.success(t("notifications.delivery-note.created"), {
     closeButton: true,
     description: h(NuxtLink, {

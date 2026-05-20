@@ -10,7 +10,6 @@ const props = defineProps<{
 }>();
 const { t } = useI18n();
 const { showErrorToast } = useCommandError();
-const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 
 async function deleteTheQuotes() {
@@ -23,10 +22,7 @@ async function deleteTheQuotes() {
     toast.success(t("notifications.quote.deleted"), {
       closeButton: true,
     });
-    // toggle refresh
-    updateQueryParams({
-      refresh: `refresh-delete-${Math.random() * 9999}`,
-    });
+    await refreshNuxtData(["quotes-list", "home-quotes"]);
   } catch (err: any) {
     showErrorToast(err);
     Logger.error(`ERROR DELETE QUOTE: ${err.error ? err.error : err.message}`);

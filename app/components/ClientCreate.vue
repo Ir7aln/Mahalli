@@ -9,7 +9,6 @@ import { z } from "zod";
 
 const { t } = useI18n();
 const { showErrorToast } = useCommandError();
-const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const CreateClientSchema = z.object({
   id: z.string().optional(),
@@ -58,10 +57,7 @@ async function createNewClient(client: NewClient) {
     toast.success(t("notifications.client.created", { name: client.full_name }), {
       closeButton: true,
     });
-    // toggle refresh
-    updateQueryParams({
-      refresh: `refresh-create-${Math.random() * 9999}`,
-    });
+    await refreshNuxtData("clients-list");
   } catch (err: any) {
     showErrorToast(err);
     Logger.error(`ERROR CREATE CLIENT: ${err.error ? err.error : err.message}`);

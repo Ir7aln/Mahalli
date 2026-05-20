@@ -41,7 +41,6 @@ const queryParams = computed(() => ({
   created_to: queryString(route.query.created_to) || null,
   total_min: queryString(route.query.total_min) ? queryNumber(route.query.total_min, 0) : null,
   total_max: queryString(route.query.total_max) ? queryNumber(route.query.total_max, 0) : null,
-  refresh: queryString(route.query.refresh),
   sort: queryString(route.query.sort) || null,
   direction: queryString(route.query.direction) || null,
 }));
@@ -67,7 +66,7 @@ async function fetchDeliveryNotes() {
   return result.data.data;
 }
 
-const { data: deliveryNotesData } = await useAsyncData(fetchDeliveryNotes, {
+const { data: deliveryNotesData } = await useAsyncData("delivery-notes-list", fetchDeliveryNotes, {
   watch: [queryParams],
 });
 

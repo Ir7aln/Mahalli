@@ -16,7 +16,6 @@ const props = defineProps<{
   description?: string;
   minQuantity: number;
 }>();
-const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const { t } = useI18n();
 const { showErrorToast } = useCommandError();
@@ -82,10 +81,7 @@ async function updateTheProduct(product: {
     toast.success(t("notifications.product.updated", { name: product.name }), {
       closeButton: true,
     });
-    // toggle refresh
-    updateQueryParams({
-      refresh: `refresh-update-${Math.random() * 9999}`,
-    });
+    await refreshNuxtData(["products-list", "home-inventory"]);
   } catch (err: any) {
     showErrorToast(err);
     Logger.error(`ERROR UPDATE PRODUCT: ${err.error ? err.error : err.message}`);

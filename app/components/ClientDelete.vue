@@ -10,7 +10,6 @@ const props = defineProps<{
 }>();
 const { t } = useI18n();
 const { showErrorToast } = useCommandError();
-const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 
 async function deleteTheClient() {
@@ -23,10 +22,7 @@ async function deleteTheClient() {
     toast.success(t("notifications.client.deleted", { name: props.fullName }), {
       closeButton: true,
     });
-    // toggle refresh
-    updateQueryParams({
-      refresh: `refresh-delete-${Math.random() * 9999}`,
-    });
+    await refreshNuxtData("clients-list");
   } catch (err: any) {
     showErrorToast(err);
     Logger.error(`ERROR DELETE CLIENT: ${err.error ? err.error : err.message}`);

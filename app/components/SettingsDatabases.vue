@@ -9,12 +9,10 @@ const { t, locale } = useI18n();
 const { refreshStatus } = useDatabaseBootstrap();
 const modal = useModal();
 
-const refreshKey = ref(0);
 const seeding = ref(false);
 
 const {
   data: databasesData,
-  refresh: refreshDatabases,
   pending,
 } = useAsyncData(
   "settings-databases",
@@ -29,7 +27,6 @@ const {
       activeDatabase: result.data.data?.active_database ?? null,
     };
   },
-  { watch: [refreshKey] },
 );
 
 const databases = computed<DatabaseRecord[]>(() => databasesData.value?.databases ?? []);
@@ -38,9 +35,8 @@ const activeDatabase = computed<DatabaseRecord | null>(
 );
 
 async function refresh() {
-  refreshKey.value += 1;
   await refreshStatus();
-  await refreshDatabases();
+  await refreshNuxtData("settings-databases");
 }
 
 function openCreateDatabaseModal() {
@@ -67,7 +63,8 @@ async function switchDatabase(id: string) {
     closeButton: true,
   });
 
-  await refresh();
+  await refreshStatus();
+  await refreshNuxtData();
 }
 
 async function seedDatabase() {

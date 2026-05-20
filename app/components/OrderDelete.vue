@@ -10,7 +10,6 @@ const props = defineProps<{
 }>();
 const { t } = useI18n();
 const { showErrorToast } = useCommandError();
-const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 
 async function deleteTheOrders() {
@@ -23,10 +22,7 @@ async function deleteTheOrders() {
     toast.success(t("notifications.order.deleted"), {
       closeButton: true,
     });
-    // toggle refresh
-    updateQueryParams({
-      refresh: `refresh-delete-${Math.random() * 9999}`,
-    });
+    await refreshNuxtData(["orders-list", "home-orders"]);
   } catch (err: any) {
     showErrorToast(err);
     Logger.error(`ERROR DELETE ORDER: ${err.error ? err.error : err.message}`);

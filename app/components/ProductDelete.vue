@@ -8,7 +8,6 @@ const props = defineProps<{
   id: string;
   name: string;
 }>();
-const { updateQueryParams } = useUpdateRouteQueryParams();
 const { close } = useModal();
 const { t } = useI18n();
 const { showErrorToast } = useCommandError();
@@ -23,10 +22,7 @@ async function deleteTheProduct() {
     toast.success(t("notifications.product.deleted", { name: props.name }), {
       closeButton: true,
     });
-    // toggle refresh
-    updateQueryParams({
-      refresh: `refresh-delete-${Math.random() * 9999}`,
-    });
+    await refreshNuxtData(["products-list", "home-inventory"]);
   } catch (err: any) {
     showErrorToast(err);
     Logger.error(`ERROR DELETE PRODUCT: ${err.error ? err.error : err.message}`);

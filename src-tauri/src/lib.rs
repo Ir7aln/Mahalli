@@ -39,10 +39,6 @@ impl AppState {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 #[tokio::main]
 pub async fn run() {
-    // Export bindings only in debug mode
-    #[cfg(debug_assertions)]
-    specta::export_bindings();
-
     let app_paths = AppPaths::resolve();
     let db_manager = DatabaseManager::new(app_paths.clone());
     let system_db_conn = setup_system_database(&app_paths).await;

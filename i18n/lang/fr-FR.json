@@ -263,7 +263,8 @@
     "status": {
       "active": "Active",
       "idle": "Inactive",
-      "current": "Actuelle"
+      "current": "Actuelle",
+      "switch-title": "Changer de base"
     },
     "placeholders": {
       "name": "Magasin Casablanca",

@@ -264,7 +264,8 @@
     "status": {
       "active": "Active",
       "idle": "Idle",
-      "current": "Current"
+      "current": "Current",
+      "switch-title": "Switch Database"
     },
     "placeholders": {
       "name": "Casablanca Store",

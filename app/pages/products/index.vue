@@ -42,7 +42,6 @@ const queryParams = computed(() => ({
   selling_price_max: queryString(route.query.selling_price_max)
     ? queryNumber(route.query.selling_price_max, 0)
     : null,
-  refresh: queryString(route.query.refresh),
   sort: queryString(route.query.sort) || null,
   direction: queryString(route.query.direction) || null,
 }));
@@ -66,7 +65,7 @@ async function fetchProducts() {
   return result.data.data;
 }
 
-const { data: productsData } = await useAsyncData(fetchProducts, {
+const { data: productsData } = await useAsyncData("products-list", fetchProducts, {
   watch: [queryParams],
 });
 
